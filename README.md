@@ -1,4 +1,4 @@
-# Teensy Nano Board
+# OpenExo
 
 ![Diagram](/Documentation/Figures/CodeDiagram.svg)
 
