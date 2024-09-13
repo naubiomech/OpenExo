@@ -1,0 +1,5 @@
+EMG previously processed as described in Colley et al. (2024). Please reference that for details. 
+File contains EMG from other tasks.
+MVIC values hard coded in 
+
+Data can be found here: https://drive.google.com/drive/folders/1fx4A6N2uzEDUWUE-o8SEh4-bvtEjuoau?usp=drive_link

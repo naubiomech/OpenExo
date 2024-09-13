@@ -1,4 +1,4 @@
-# OpenExo
+# Teensy Nano Board
 
 ![Diagram](/Documentation/Figures/CodeDiagram.svg)
 
@@ -7,3 +7,5 @@ build the and flash the codebase check [here](Documentation/BUILD_AND_FLASH.md) 
 contribute check [here](CONTRIBUTING.md) for more details. 
  
 Check out the [Documentation Folder](/Documentation) for more details and C++ info.
+
+Introductory videos on the system, its operation, and getting started can be found [here](https://drive.google.com/drive/folders/1eBydW7si7EmyGxdDkagQktmnZ7M4nHI4?usp=drive_link) 

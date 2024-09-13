@@ -1065,7 +1065,7 @@ This guide is designed to provide background information on OpenExo's software.
 This system is designed to be flexible, where the system can be easily adapted to the user's needs, changing the motors used, number of joints, etc. 
 
 ### Code Location  
-If you are reading this you have found the location, but for completeness it can be found at: https://github.com/naubiomech/OpenExo.git. 
+If you are reading this you have found the location, but for completeness it can be found at: https://github.com/naubiomech/ExoCode/tree/nano_teensy_board. 
 
 ### Style Guide  
 The detailed style guide can be found [here](StyleGuide.md).

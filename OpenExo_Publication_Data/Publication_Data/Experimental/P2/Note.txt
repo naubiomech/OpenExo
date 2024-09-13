@@ -1,0 +1,14 @@
+"baseline start" = start of quiet standing baseline metabolic measurement
+"baseline end" = end of quiet standing baseline metabolic measurement
+
+"exo1_start" = start of timed walking, once treadmill was up to speed
+"exo1_end" = end of timed walking, once eight minutes had elapsed.
+
+"#Min" = is the number of minutes since the start data marker, rounded to the nearest available data point
+[Do to inconsitent sampling of the device there was not always a data point availabe at the #Min exactly]
+
+In Shod_Metabolic, you will notice that it says "exo1_start" and "exo1_end". 
+While labeled this way, the participant did NOT walk with the exo in this condition.
+These labels were maintained despite being misrepresntative to make using the processing code as easy as possible to run without having to change it.
+[With hindsight it would have been better to use generic terminology like "start" and "end" in the processing code]
+

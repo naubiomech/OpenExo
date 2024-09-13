@@ -1,0 +1,11 @@
+For the AK80 and Ak70 motors, if you are pursuing applications that require 
+torque mangiutdes over 30 Nm, we recommend using a larger steel cable than the ones provided.
+
+This necessitates a few modifications to the bill of materials and parts for the system, namely different:
+
+Cable-Chain Interfaces
+Bowden Tubes
+Steel Cable
+Crimps
+
+We have included an updated BOM with this information to help you orient to that, the assembly process reamins the same 
