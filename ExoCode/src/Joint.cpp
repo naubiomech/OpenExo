@@ -923,7 +923,7 @@ void AnkleJoint::run_joint()
  */
 void AnkleJoint::set_controller(uint8_t controller_id)  //Changes the high level controller in Controller, and the low level controller in Motor
 {
-        #ifdef JOINT_DEBUG
+    #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
         logger::println("Ankle : set_controller : Entered");
         logger::print("Ankle : set_controller : Controller ID : ");
@@ -966,7 +966,7 @@ void AnkleJoint::set_controller(uint8_t controller_id)  //Changes the high level
             logger::print("Unkown Controller!\n", LogLevel::Error);
             _controller = &_zero_torque;
             break;
-    } 
+    }
 };
 
 //=================================================================

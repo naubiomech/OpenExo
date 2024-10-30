@@ -1259,33 +1259,38 @@ float CalibrManager::calc_motor_cmd()
     bool active_trial = (exo_status == status_defs::messages::trial_on) || 
         (exo_status == status_defs::messages::fsr_calibration) ||
         (exo_status == status_defs::messages::fsr_refinement);
+	
+    if (active_trial)
+    {
+        if (_joint_data->is_left)
+        {
+            Serial.print("\nLeft angle: ");
+            Serial.print(_side_data->ankle.joint_position);
+            Serial.print("  |  Left torque: ");
+            Serial.print(_joint_data->torque_reading);
+            cmd = _controller_data->parameters[controller_defs::calibr_manager::calibr_cmd];
+            cmd = 3.5;
+            Serial.print("  |  Left cmd: ");
+            Serial.print(cmd);
+        }
+        else
+        {
+            Serial.print("  |  Right angle: ");
+            Serial.print(_side_data->ankle.joint_position);
+            Serial.print("  |  Right torque: ");
+            Serial.print(_joint_data->torque_reading);
+            cmd = 3.5;
+            Serial.print("  |  Right cmd: ");
+            Serial.print(cmd);
+            Serial.print("  |  doToeRefinement: ");
+            Serial.print(String(_side_data->do_calibration_refinement_toe_fsr));
+            Serial.print("  |  Exo status: ");
+            uint16_t exo_status = _data->get_status();
+            Serial.print(String(exo_status));
+        }
+    }
 		
-		if (_joint_data->is_left) {
-		Serial.print("\nLeft angle: ");
-		Serial.print(_side_data->ankle.joint_position);
-		Serial.print("  |  Left torque: ");
-		Serial.print(_joint_data->torque_reading);
-		cmd = _controller_data->parameters[controller_defs::calibr_manager::calibr_cmd];
-		cmd = 3.5;
-		Serial.print("  |  Left cmd: ");
-		Serial.print(cmd);
-	}
-	else {
-		Serial.print("  |  Right angle: ");
-		Serial.print(_side_data->ankle.joint_position);
-		Serial.print("  |  Right torque: ");
-		Serial.print(_joint_data->torque_reading);
-		cmd = 3.5;
-		Serial.print("  |  Right cmd: ");
-		Serial.print(cmd);
-		Serial.print("  |  doToeRefinement: ");
-		Serial.print(String(_side_data->do_calibration_refinement_toe_fsr));
-		Serial.print("  |  Exo status: ");
-		uint16_t exo_status = _data->get_status();
-		Serial.print(String(exo_status));
-	}
-		
-return cmd;
+    return cmd;
 	
 }
 

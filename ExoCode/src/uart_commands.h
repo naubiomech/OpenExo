@@ -124,8 +124,8 @@ namespace UART_command_handlers
 {
     inline static void get_controller_params(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
     {
-        // logger::println("UART_command_handlers::update_controller_params->Fetching params with msg: ");
-        // UART_msg_t_utils::print_msg(msg);
+         //logger::println("UART_command_handlers::update_controller_params->Fetching params with msg: ");
+         //UART_msg_t_utils::print_msg(msg);
 
         JointData *j_data = exo_data->get_joint_with(msg.joint_id);
         if (j_data == NULL)
@@ -366,13 +366,13 @@ namespace UART_command_handlers
         case (uint8_t)config_defs::exo_name::bilateral_hip:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_RT_LEN;
             rx_msg.data[0] = exo_data->right_side.percent_gait / 100; 
-            rx_msg.data[1] = exo_data->right_side.toe_stance;
+            rx_msg.data[1] = exo_data->right_side.heel_fsr;   //toe_stance
             rx_msg.data[2] = exo_data->right_side.hip.controller.ff_setpoint; 
             rx_msg.data[3] = exo_data->left_side.percent_gait / 100; 
-            rx_msg.data[4] = exo_data->left_side.toe_stance;
+            rx_msg.data[4] = exo_data->left_side.heel_fsr;      //toe_stance
             rx_msg.data[5] = exo_data->left_side.hip.controller.ff_setpoint; 
-            rx_msg.data[6] = exo_data->right_side.heel_fsr;
-            rx_msg.data[7] = exo_data->left_side.heel_fsr;
+            rx_msg.data[6] = exo_data->right_side.toe_fsr;      //heel_fsr
+            rx_msg.data[7] = exo_data->left_side.toe_fsr;       //heel_fsr
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_elbow:
@@ -543,7 +543,8 @@ namespace UART_command_handlers
     }
     inline static void update_FSR_thesholds(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
     {
-        // logger::println("UART_command_handlers::update_FSR_thesholds->got message: ");
+        logger::println("UART_command_handlers::update_FSR_thesholds->got message: ");
+        logger::println(msg.data[(uint8_t)UART_command_enums::FSR_thresholds::RIGHT_THRESHOLD]);
         // UART_msg_t_utils::print_msg(msg);
         exo_data->right_side.toe_fsr_upper_threshold = msg.data[(uint8_t)UART_command_enums::FSR_thresholds::RIGHT_THRESHOLD] + fsr_config::SCHMITT_DELTA;
         exo_data->right_side.toe_fsr_lower_threshold = msg.data[(uint8_t)UART_command_enums::FSR_thresholds::RIGHT_THRESHOLD] - fsr_config::SCHMITT_DELTA;

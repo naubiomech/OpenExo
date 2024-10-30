@@ -127,7 +127,7 @@ bool FSR::refine_calibration(bool do_refinement)
             /* If You Want Raw FSR Signal, Uncomment this and Comment out Regression Section Below */
             uint16_t current_reading = analogRead(_pin);
 
-            ///* Regression Equation FSR to Make Proportional to Ankle Moment*/
+            /////* Regression Equation FSR to Make Proportional to Ankle Moment*/
             //double p[4] = { 0.0787, -0.8471, 20.599, -22.670 };
             //float Vo = 10 * 3.3 * analogRead(_pin) / 4095;                      //ZL Added in the 10* to scale the output
             //Vo = (Vo) / (87.43 * pow((Vo), (-0.6721)) - 7.883);                 //Apply interlink conversion

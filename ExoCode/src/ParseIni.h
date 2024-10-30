@@ -322,7 +322,11 @@ namespace config_defs
         //Define our own type so we don't have to type so much
         typedef std::map<std::string, uint8_t> IniKeyCode;
         
-        const IniKeyCode board_name = {{"AK_Board", (uint8_t)config_defs::board_name::AK_board},};
+        const IniKeyCode board_name = 
+        {
+            {"AK_Board", (uint8_t)config_defs::board_name::AK_board},
+        };
+        
         const IniKeyCode board_version = 
         { 
             {"0.1", (uint8_t)config_defs::board_version::zero_one},

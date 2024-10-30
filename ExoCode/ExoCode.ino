@@ -678,20 +678,34 @@ namespace config_info
             1,  //Board name
             3,  //Board version
             2,  //Battery
-            1,  //Exo name
-            1,  //Exo side
-            2,  //Hip
-            1,  //Knee
-            3,  //Ankle
-            1,  //Hip gear
-            1,  //Knee gear
-            1,  //Ankle gear
-            1,  //Hip default controller
-            1,  //Knee default controller
-            1,  //Ankle default controller
-            3,  //Hip flip dir
-            3,  //Knee flip dir
-            3,  //Ankle flip dir
+            22,  //Exo name
+            3,  //Exo side
+            5,  //Hip
+            5,  //Knee
+            5,  //Ankle
+            4,  //Hip gear
+            4,  //Knee gear
+            4,  //Ankle gear
+            6,  //Hip default controller
+            6,  //Knee default controller
+            10, //Ankle default controller
+            6,  //Elbow default controller
+            2,  //Hip use torque sensor
+            2,  //Knee use torque sensor
+            2,  //Ankle use torque sensor
+            2,  //Elbow use torque sensor
+            4,  //Hip flip motor dir
+            4,  //Knee flip motor dir
+            4,  //Ankle flip motor dir
+            4,  //Elbow flip motor dir
+            4,  //Hip flip torque dir
+            4,  //Knee flip torque dir
+            4,  //Ankle flip torque dir
+            4,  //Elbow flip torque dir
+            4,  //Hip flip angle dir
+            4,  //Knee flip angle dir
+            4,  //Ankle flip angle dir
+            4,  //Elbow flip angle dir
           };
 }
 
