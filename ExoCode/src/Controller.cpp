@@ -231,6 +231,31 @@ float _Controller::_pid(float cmd, float measurement, float p_gain, float i_gain
 
 //****************************************************
 
+int _Controller::_servo_runner(uint8_t servo_pin, uint8_t speed_level, long angle_initial, long angle_final)
+{
+	unsigned long progress;
+	if (!((pos1 == angle_initial)&&(pos2 == angle_final))) {//if servo command changes
+		myservo.attach(servo_pin,500,2500);//attach the servo (may modify for better efficiency)
+		pos1 = angle_initial;
+		pos2 = angle_final;
+		servoWatch = millis();//start the timer
+		servo_active = true;//flip the servo flag
+	}
+	if (servo_active) {
+		progress = millis() - servoWatch;//calculate time passed
+		pos = map(progress, 0, 100, pos1, pos2);//this approach elimiates the need for a delay()
+		pos = constrain(pos, pos1, pos2);//prevent overshooting
+		myservo.write(pos);
+		if (progress >= 100) {//only actuate the servo for 100 milliseconds
+			servo_active = false;//flip the servo flag
+			progress = 0;
+		}
+	}
+	return pos;//report the current "pos" if needed
+}
+
+//****************************************************
+
 ZeroTorque::ZeroTorque(config_defs::joint_id id, ExoData* exo_data)
 : _Controller(id, exo_data)
 {

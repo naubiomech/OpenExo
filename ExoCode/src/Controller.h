@@ -89,6 +89,16 @@ class _Controller
          * @param derivative gain
          */
         float _pid(float cmd, float measurement, float p_gain, float i_gain, float d_gain);
+		
+		/**
+         * @brief actuate the servo motor (might need to move this out of the controller class) 
+         * 
+         * @param signal pin 
+         * @param not used
+         * @param start angle
+         * @param end angle
+         */
+		int _servo_runner(uint8_t servo_pin, uint8_t speed_level, long angle_initial, long angle_final);
         
         //Values for the Compact Form Model Free Adaptive Controller
         std::pair<float, float> measurements;
