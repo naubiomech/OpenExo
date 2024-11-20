@@ -132,6 +132,35 @@ class NullMotor : public _Motor
     void set_error() {};
 };
 
+/**
+ * @brief Class for Maxon EC motor
+ */
+class MaxonMotor : public _Motor
+{
+    public:
+    MaxonMotor(config_defs::joint_id id, ExoData* exo_data, int enable_pin);//:_Motor(id, exo_data, enable_pin) {};
+    void transaction(float torque);
+	void read_data() {};
+    void send_data(float torque);
+    void on_off() {};
+    bool enable();
+    bool enable(bool overide);
+    void zero() {};
+    float get_Kt() {return 0.0;};
+    void set_error() {};//for now it's not doing anything for this motor type
+	void master_switch();
+	void maxon_manager(bool manager_active);//quickly and automatically reset the Maxon motor in case of the driver board reporting an error
+	
+	protected:
+	bool _enable_response; /**< True if the motor responded to an enable command */
+	bool pwm_motor_was_off = true;
+	bool pwm_just_powered_on = true;
+	uint16_t pwm_standby_count = 0;
+	bool do_scan4maxon_err = true;
+	bool maxon_counter_active = false;
+	unsigned long zen_millis;
+};
+
 
 /**
  * @brief This will define some of the common communication used by all the CAN motors and should be inherited by all of them.

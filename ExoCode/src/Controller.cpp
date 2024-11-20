@@ -11,6 +11,8 @@
 #include <math.h>
 #include <random>
 #include <cmath>
+#include <Servo.h>
+Servo myservo;//TO-DO: Move servo definition code out of controller.cpp
 
 _Controller::_Controller(config_defs::joint_id id, ExoData* exo_data)
 {
@@ -243,7 +245,7 @@ int _Controller::_servo_runner(uint8_t servo_pin, uint8_t speed_level, long angl
 	}
 	if (servo_active) {
 		progress = millis() - servoWatch;//calculate time passed
-		pos = map(progress, 0, 100, pos1, pos2);//this approach elimiates the need for a delay()
+		pos = map(progress, 0, 100, pos1, pos2);//this elimiates the need for a delay()
 		pos = constrain(pos, pos1, pos2);//prevent overshooting
 		myservo.write(pos);
 		if (progress >= 100) {//only actuate the servo for 100 milliseconds

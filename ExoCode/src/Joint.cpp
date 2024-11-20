@@ -451,6 +451,12 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
                 #endif
                 HipJoint::set_motor(new AK70(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
                 break;
+			case (uint8_t)config_defs::motor::MaxonMotor:
+                #ifdef JOINT_DEBUG
+                    logger::println("MaxonMotor");
+                #endif
+                HipJoint::set_motor(new MaxonMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
             default :
                 #ifdef JOINT_DEBUG
                     logger::println("NULL");
@@ -636,6 +642,12 @@ KneeJoint::KneeJoint(config_defs::joint_id id, ExoData* exo_data)
                     logger::println("AK70");
                 #endif
                 KneeJoint::set_motor(new AK70(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+			case (uint8_t)config_defs::motor::MaxonMotor:
+                #ifdef JOINT_DEBUG
+                    logger::println("MaxonMotor");
+                #endif
+                KneeJoint::set_motor(new MaxonMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
                 break;
             default :
                 #ifdef JOINT_DEBUG
@@ -823,6 +835,12 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
                     logger::println("AK70");
                 #endif
                 AnkleJoint::set_motor(new AK70(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+			case (uint8_t)config_defs::motor::MaxonMotor:
+                #ifdef JOINT_DEBUG
+                    logger::println("MaxonMotor");
+                #endif
+                AnkleJoint::set_motor(new MaxonMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
                 break;
             default :
                 #ifdef JOINT_DEBUG
@@ -1038,6 +1056,12 @@ ElbowJoint::ElbowJoint(config_defs::joint_id id, ExoData* exo_data)
                 #endif
                 ElbowJoint::set_motor(new AK70(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
             break;
+			case (uint8_t)config_defs::motor::MaxonMotor:
+                #ifdef JOINT_DEBUG
+                    logger::println("MaxonMotor");
+                #endif
+                ElbowJoint::set_motor(new MaxonMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
             default:
                 #ifdef JOINT_DEBUG
                             logger::println("NULL");

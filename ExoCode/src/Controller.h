@@ -79,6 +79,12 @@ class _Controller
         float _prev_de_dt;                  /**< Prev error derivative used if the timestep is not good*/
         float _prev_pid_time;               /**< Prev time the PID was called */
         
+		long pos;//servo parameters
+		unsigned long servoWatch;
+		int pos1;
+		int pos2;
+		bool servo_active = false;
+		
         /**
          * @brief calculates the current PID contribution to the motor command. 
          * 
