@@ -1,6 +1,7 @@
 import asyncio
 
 import Data.DataToCsv as DataToCsv
+import Data.SaveModelData as saveModelData
 
 # Options during trial. Change torque settings or end trial
 
@@ -92,7 +93,7 @@ class ExoTrial:
         await deviceManager.calibrateFSRs()  # Begins Exo calibration
         print("calibrate fsr\n")
         # Send FSR value to Exo FSR
-        await deviceManager.sendFsrValues([0.30, 0.30])
+        await deviceManager.sendPresetFsrValues()
 
     # -----------------------------------------------------------------------------
 
@@ -118,5 +119,5 @@ class ExoTrial:
     # -----------------------------------------------------------------------------
 
     # Loads exo data into csv
-    def loadDataToCSV(self, deviceManager):
-        self.csvWriter.writeToCsv(deviceManager._realTimeProcessor._exo_data)
+    def loadDataToCSV(self, deviceManager,disconnect = False):
+        self.csvWriter.writeToCsv(deviceManager._realTimeProcessor._exo_data,disconnect)

@@ -1,14 +1,16 @@
 import csv
 
-from _datetime import datetime
+from datetime import datetime
 
 
 class CsvWritter:
-    def writeToCsv(self, exoData):
+    def writeToCsv(self, exoData, disconnected=False):
         print("Creating filedata")
         # initialize array for output file
         fileData = []
+
         # establish field arrays for output file
+        timestamps = ["EpochTimestamp"]  # New field for epoch time
         tStep = ["TStep"]
         rTorque = ["RTorque"]
         rSetP = ["RSetP"]
@@ -19,7 +21,20 @@ class CsvWritter:
         lFsr = ["LFsr"]
         rFsr = ["RFsr"]
 
-        # append data to field array
+        #record our model features
+        minSV = ["minSV"]
+        maxSV = ["maxSV"]
+        minSA = ["minSA"]
+        maxSA = ["maxSA"]
+        maxFSR = ["maxFSR"]
+        stancetime = ["StanceTime"]
+        swingtime = ["SwingTime"]
+
+        #and predicted task/state
+        Task = ["Task"]
+        mark = ["Mark"]
+
+
         for xt in exoData.tStep:
             tStep.append(xt)
         for rT in exoData.rTorque:
@@ -38,10 +53,32 @@ class CsvWritter:
             rFsr.append(rF)
         for lF in exoData.lFsr:
             lFsr.append(lF)
+        for min in exoData.MinShankVel:
+            minSV.append(min)
+        for max in exoData.MaxShankVel:
+            maxSV.append(max)
+        for inSA in exoData.MinShankAng:
+            minSA.append(inSA)
+        for axSA in exoData.MaxShankAng:
+            maxSA.append(axSA)
+        for fsr in exoData.MaxFSR:
+            maxFSR.append(fsr)
+        for task in exoData.Task:
+            Task.append(task)
+        for trig in exoData.Mark:
+            mark.append(trig)
+        for moment in exoData.StanceTime:
+            stancetime.append(moment)
+        for moment in exoData.SwingTime:
+            swingtime.append(moment)
         for tS in exoData.tStep:
             tStep.append(tS)
+        # Add the epoch timestamps (current time in seconds) to the timestamps list
+        for _ in exoData.epochTime:
+            timestamps.append(_)
 
         # add field array with data to output file
+        fileData.append(timestamps)
         fileData.append(tStep)
         fileData.append(rTorque)
         fileData.append(rSetP)
@@ -51,17 +88,30 @@ class CsvWritter:
         fileData.append(LState)
         fileData.append(lFsr)
         fileData.append(rFsr)
+        fileData.append(minSV)
+        fileData.append(maxSV)
+        fileData.append(minSA)
+        fileData.append(maxSA)
+        fileData.append(maxFSR)
+        fileData.append(stancetime)
+        fileData.append(swingtime)
+        fileData.append(Task)
+        fileData.append(mark)
 
+        
         # rotate 2D array to place lables on top
         fileDataTransposed = self.rotateArray(fileData)
         print("flipping array")
 
-        today = datetime.now()  # Pull system time and date
-        fileName = today.strftime(
-            "%Y-%b-%d-%H-%M-%S"
-        )  # Format file name based on YYYY-MM-DD-HH:MM:SS
-        fileName += ".csv"  # Add .csv to file name
-        print("file is: ", fileName)
+        today = datetime.now()
+        base_file_name = today.strftime("%Y-%b-%d-%H-%M-%S")
+        
+        # Append disconnection notice to filename if applicable
+        if disconnected:
+            fileName = f"{base_file_name}_disconnected.csv"
+        else:
+            fileName = f"{base_file_name}.csv"
+
 
         with open(fileName, "w") as csvFile:  # Open file with file name
             csvwriter = csv.writer(csvFile)  # Prep file for csv data

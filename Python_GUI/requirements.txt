@@ -1,4 +1,9 @@
-async-tkinter-loop==0.9.3
-bleak==0.21.1
-matplotlib==3.9.0
-numpy==1.26.4
+async_tkinter_loop
+numpy
+bleak
+pandas
+scikit-learn
+micromlgen
+matplotlib
+pygame
+pillow
