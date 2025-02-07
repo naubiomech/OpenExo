@@ -33,7 +33,7 @@ class SideData {
         SideData(bool is_left, uint8_t* config_to_send);
         
         /**
-         * @brief reconfigures the side data if the configuration changes after constructor called.
+         * @brief Reconfigures the side data if the configuration changes after constructor called.
          * 
          * @param configuration array
          */

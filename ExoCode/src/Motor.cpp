@@ -31,7 +31,6 @@ _Motor::_Motor(config_defs::joint_id id, ExoData* exo_data, int enable_pin)
         logger::print(_enable_pin);
         logger::print("\n");
     #endif
-
     
     pinMode(_enable_pin, OUTPUT);
     
@@ -129,8 +128,6 @@ void _CANMotor::transaction(float torque)
     check_response();
 };
 
-
-
 void _CANMotor::read_data()
 {
     //Read data from motor
@@ -180,8 +177,6 @@ void _CANMotor::read_data()
     }
     return;
 };
-
-
 
 void _CANMotor::send_data(float torque)
 {
@@ -238,7 +233,7 @@ void _CANMotor::check_response()
 {
     //Only run if the motor is supposed to be enabled
     uint16_t exo_status = _data->get_status();
-    bool active_trial = (exo_status == status_defs::messages::trial_on) || 
+    bool active_trial = (exo_status == status_defs::messages::trial_on) ||
         (exo_status == status_defs::messages::fsr_calibration) ||
         (exo_status == status_defs::messages::fsr_refinement);
     if (_data->user_paused || !active_trial || _data->estop || _error)
@@ -261,7 +256,7 @@ void _CANMotor::check_response()
         }
 
     }
-}
+};
 
 void _CANMotor::on_off()
 {
@@ -376,18 +371,17 @@ void _CANMotor::zero()
 float _CANMotor::get_Kt()
 {
     return _Kt;
-}
+};
 
 void _CANMotor::set_error()
 {
     _error = true;
-}
+};
 
 void _CANMotor::set_Kt(float Kt)
 {
     _Kt = Kt;
-}
-
+};
 
 void _CANMotor::_handle_read_failure()
 {
@@ -408,6 +402,7 @@ float _CANMotor::_float_to_uint(float x, float x_min, float x_max, int bits)
     }
     return pgg;
 };
+
 float _CANMotor::_uint_to_float(unsigned int x_int, float x_min, float x_max, int bits)
 {
     float span = x_max - x_min;
@@ -454,13 +449,13 @@ _CANMotor(id, exo_data, enable_pin)
     _I_MAX = 13.5f;
     _V_MAX = 23.04f;
 
-    float kt = 0.1725 * 6; //We set KT to 0.1725 * 6 whcih differs from the manufacturer's stated KT, that's because they are wrong (This has been validated mulitple ways). We only have validated for this version as we use OpenLoop at the hip with these, other motors are used with closed loop and thus are corrected in real-time. We recommend validating these KTs if using for OpenLoop. 
+    float kt = 0.1725 * 6; //We set KT to 0.1725 * 6 whcih differs from the manufacturer's stated KT, that's because they are wrong (This has been validated mulitple ways). We only have validated for this version as we use open loop at the hip with these, other motors are used with closed loop and thus are corrected in real-time. We recommend validating these KTs if using for open loop. 
     set_Kt(kt);
     exo_data->get_joint_with(static_cast<uint8_t>(id))->motor.kt = kt;
 
-#ifdef MOTOR_DEBUG
-    logger::println("AK60_v1_1::AK60_v1_1 : Leaving Constructor");
-#endif
+    #ifdef MOTOR_DEBUG
+        logger::println("AK60_v1_1::AK60_v1_1 : Leaving Constructor");
+    #endif
 };
 
 /*
@@ -478,10 +473,9 @@ _CANMotor(id, exo_data, enable_pin)
     set_Kt(kt);
     exo_data->get_joint_with(static_cast<uint8_t>(id))->motor.kt = kt;
 
-
-#ifdef MOTOR_DEBUG
-    logger::println("AK80::AK80 : Leaving Constructor");
-#endif
+    #ifdef MOTOR_DEBUG
+        logger::println("AK80::AK80 : Leaving Constructor");
+    #endif
 };
 
 /*
@@ -498,6 +492,195 @@ _CANMotor(id, exo_data, enable_pin)
     float kt = 0.13 * 10;
     set_Kt(kt);
     exo_data->get_joint_with(static_cast<uint8_t>(id))->motor.kt = kt;
+
+    #ifdef MOTOR_DEBUG
+        logger::println("AK70::AK70 : Leaving Constructor");
+    #endif
+};
+
+
+/*
+ * Constructor for the PWM (Maxon) Motor.  
+ * We are using multilevel inheritance, so we have a general motor type, which is inherited by the PWM (e.g. Maxon) or other type (e.g. Maxon) since models within these types will share communication protocols, which is then inherited by the specific motor model, which may have specific torque constants etc.
+ */
+MaxonMotor::MaxonMotor(config_defs::joint_id id, ExoData* exo_data, int enable_pin) //Constructor: type is the motor type
+: _Motor(id, exo_data, enable_pin)
+{
+    JointData* j_data = exo_data->get_joint_with(static_cast<uint8_t>(id));
+	
+    #ifdef MOTOR_DEBUG
+        logger::println("MaxonMotor::MaxonMotor: Leaving Constructor");
+    #endif
+};
+
+void MaxonMotor::transaction(float torque)
+{
+    //Send data
+    send_data(torque);
+
+    //Only enable the motor when it is an active trial 
+    master_switch();
+
+    //Currently only implemented for right side 
+	if (!_motor_data->is_left) 
+    {
+		if (_motor_data->enabled)
+        {
+			maxon_manager(true); //Monitors for and corrects motor resetting error if the system is operational.
+		}
+		else
+        {
+			maxon_manager(false);   //Reset the motor error detection function, in case user pauses device in middle of error event
+		}
+
+		// Serial.print("\nRight leg MaxonMotor::transaction(float torque)  |  torque = ");
+		// Serial.print(torque);
+	}
+};
+
+bool MaxonMotor::enable()
+{
+    return true;    //This function is currently bypassed for this motor at the moment.
+};
+
+bool MaxonMotor::enable(bool overide)
+{	
+	//Only change the state and send messages if the enabled state (used as a master switch for this motor) has changed.
+    if ((_prev_motor_enabled != _motor_data->enabled) || overide)
+    {
+		if (_motor_data->enabled)   //_motor_data->enabled is controlled by active_trial and user_paused, refer to master_switch().
+		{
+            //Enable motor
+			digitalWrite(_enable_pin,HIGH);         //Relocate in the future
+		}
+
+		_enable_response = true;
+	}
+
+	if (!overide)                   //When enable(false), send the disable motor command, set the analogWrite resolution, and send 50% PWM command
+    {
+		_enable_response = false;
+		
+        //Disable motor, the message after this shouldn't matter as the power is cut, and the send() doesn't send a message if not enabled.
+		digitalWrite(_enable_pin,LOW);
+		analogWriteResolution(12);
+		analogWriteFrequency(A9, 5000);
+		analogWrite(A9,2048);
+		pinMode(A1,INPUT);
+    }
+
+	_prev_motor_enabled = _motor_data->enabled;
+
+    return _enable_response;
+	
+    #ifdef MOTOR_DEBUG
+        logger::print(_prev_motor_enabled);
+        logger::print("\t");
+        logger::print(_motor_data->enabled);
+        logger::print("\t");
+        logger::print(_motor_data->is_on);
+        logger::print("\n");
+    #endif
+};
+
+void MaxonMotor::send_data(float torque) //Always send motor command regardless of the motor "enable" status
+{
+    #ifdef MOTOR_DEBUG
+        logger::print("Sending data: ");
+        logger::print(uint32_t(_motor_data->id));
+        logger::print("\n");
+    #endif
+	
+	int direction_modifier = _motor_data->flip_direction ? -1 : 1; 
+
+	_motor_data->t_ff = torque;
+    _motor_data->last_command = torque;
+	
+	uint16_t exo_status = _data->get_status();
+    bool active_trial = (exo_status == status_defs::messages::trial_on) ||
+        (exo_status == status_defs::messages::fsr_calibration) ||
+        (exo_status == status_defs::messages::fsr_refinement);
+   
+	if (_data->user_paused || !active_trial)        //Ignores the exo error handler and the emergency stop for the moment
+    {
+        analogWrite(A9,2048);   //Send 50% PWM (0 current)
+    }
+    else
+    {
+	    if (!_motor_data->is_left)  //Only operational on the right side at the moment
+        {
+		    uint16_t post_fuse_torque = max(655,2048+(direction_modifier*1*torque));    //Set the lowest allowed PWM command (455)
+		    post_fuse_torque = min(3690,post_fuse_torque);                              //Set the highest allowed PWM command (3890)
+		    analogWrite(A9,post_fuse_torque);
+	    }
+    }
+};
+
+void MaxonMotor::master_switch()
+{
+   //Only run if the motor is supposed to be enabled
+    uint16_t exo_status = _data->get_status();
+    bool active_trial = (exo_status == status_defs::messages::trial_on) || 
+        (exo_status == status_defs::messages::fsr_calibration) ||
+        (exo_status == status_defs::messages::fsr_refinement);
+
+	if (_data->user_paused || !active_trial || _data->estop)
+    {
+		_motor_data->enabled = false;
+        enable(false);
+    }
+	else
+    {
+		_motor_data->enabled = true;
+        enable(true);
+	}
+};
+
+//Our implementation of the Maxon motor including the ec motor and the Escon 50_8 Motor Controller would occasionally cause 50_8 to enter error mode, with "Over current" being one of the errors.
+//To address this issue, we have developed a solution contained in maxon_manager() below. 
+void MaxonMotor::maxon_manager(bool manager_active)
+{
+    pinMode(37, INPUT_PULLUP);
+
+    //Initialize variables when switch is set to false, run the error detection and rest code when switch is set to true. 
+    if (!manager_active)
+    {
+        do_scan4maxon_err = true;       
+        maxon_counter_active = false;
+    }
+    else
+    {
+        //Scan for Motor Error
+        if ((do_scan4maxon_err) && (!digitalRead(37)))
+        {
+            do_scan4maxon_err = false;          
+            maxon_counter_active = true;
+            zen_millis = millis();
+        }
+
+        if (maxon_counter_active) 
+        {
+            //Two iterations after maxon_counter_actie = true, de-enable motor
+            if (millis() - zen_millis >= 2)
+            {
+                enable(false);
+            }
+
+            //Ten iterations after maxon_counter_actie = true, re-enable motor
+            if (millis() - zen_millis >= 10)
+            {
+                enable(true);
+            }
+            
+            //Thirty iterations after maxon_counter_actie = true, start scanning for error again
+            if (millis() - zen_millis >= 30)
+            {
+                do_scan4maxon_err = true;                                                       
+                maxon_counter_active = false;                                   
+                _motor_data->maxon_plotting_scalar = -1 * _motor_data->maxon_plotting_scalar;
+            }
+        }
+    }
 };
 
 #endif

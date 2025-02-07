@@ -2,16 +2,17 @@
 #include "Logger.h"
 
 /*
- * Constructor for the Joint data.
+ * Constructor for the joint data.
  * Takes the joint id and the array from the INI parser.
  * Stores the id, torque sensor reading, if it is on the left side (for convenience), and if the joint is used.
  * Uses an initializer list for the motor and controller data. 
  */
-JointData::JointData(config_defs::joint_id id, uint8_t* config_to_send, float joint_RoM, bool do_flip_angle)
+JointData::JointData(config_defs::joint_id id, uint8_t* config_to_send, float joint_RoM, bool do_flip_angle, float torque_offset)
 : motor(id, config_to_send)
 , controller(id, config_to_send)
 , joint_RoM(joint_RoM)
 , do_flip_angle(do_flip_angle)
+, torque_offset(torque_offset)
 {
     
     //Set all the data based on the id and configuration
@@ -39,7 +40,7 @@ JointData::JointData(config_defs::joint_id id, uint8_t* config_to_send, float jo
 
             // logger::print("Hip\n");
             
-            //Check if the direction should be flipped
+            //Check if the sensor directions should be flipped
             if ((config_to_send[config_defs::hip_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::both) || ((config_to_send[config_defs::hip_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::left) && this->is_left) || ((config_to_send[config_defs::hip_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::right) && (!this->is_left)))
             {
                 this->flip_direction = 1;
@@ -69,7 +70,7 @@ JointData::JointData(config_defs::joint_id id, uint8_t* config_to_send, float jo
 
             // logger::print("Knee\n");
              
-            //Check if the direction should be flipped
+            //Check if the sensor directions should be flipped
             if ((config_to_send[config_defs::knee_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::both) || ((config_to_send[config_defs::knee_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::left) && this->is_left) || ((config_to_send[config_defs::knee_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::right) && (!this->is_left)))
             {
                 this->flip_direction = 1;
@@ -99,7 +100,7 @@ JointData::JointData(config_defs::joint_id id, uint8_t* config_to_send, float jo
 
             // logger::print("Ankle\n");
             
-            //Check if the direction should be flipped
+            //Check if the sensor directions should be flipped
             if ((config_to_send[config_defs::ankle_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::both) || ((config_to_send[config_defs::ankle_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::left) && this->is_left) || ((config_to_send[config_defs::ankle_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::right) && (!this->is_left)))
             {
                 this->flip_direction = 1;
@@ -129,7 +130,7 @@ JointData::JointData(config_defs::joint_id id, uint8_t* config_to_send, float jo
 
             // logger::print("Elbow\n");
 
-            //Check if the direction should be flipped
+            //Check if the sensor directions should be flipped
             if ((config_to_send[config_defs::elbow_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::both) || ((config_to_send[config_defs::elbow_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::left) && this->is_left) || ((config_to_send[config_defs::elbow_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::right) && (!this->is_left)))
             {
                 this->flip_direction = 1;
@@ -167,7 +168,7 @@ void JointData::reconfigure(uint8_t* config_to_send)
 
             // logger::print("Hip\n");
             
-            //Check if the direction should be flipped
+            //Check if the sensor directions should be flipped
             if ((config_to_send[config_defs::hip_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::both) || ((config_to_send[config_defs::hip_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::left) && this->is_left) || ((config_to_send[config_defs::hip_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::right) && (!this->is_left)))
             {
                 this->flip_direction = 1;
@@ -184,9 +185,10 @@ void JointData::reconfigure(uint8_t* config_to_send)
             is_used = (config_to_send[config_defs::knee_idx] != (uint8_t)config_defs::motor::not_used) && ((static_cast<uint8_t>(config_defs::exo_side::bilateral) == config_to_send[config_defs::exo_side_idx]) 
                 || (((uint8_t)config_defs::exo_side::left == config_to_send[config_defs::exo_side_idx]) && this->is_left)
                 || (((uint8_t)config_defs::exo_side::right == config_to_send[config_defs::exo_side_idx]) && !this->is_left));
+            
             // logger::print("Knee\n");
             
-            //Check if the direction should be flipped
+            //Check if the sensor directions should be flipped
             if ((config_to_send[config_defs::knee_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::both) || ((config_to_send[config_defs::knee_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::left) && this->is_left) || ((config_to_send[config_defs::knee_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::right) && (!this->is_left)))
             {
                 this->flip_direction = 1;
@@ -203,10 +205,10 @@ void JointData::reconfigure(uint8_t* config_to_send)
             is_used = (config_to_send[config_defs::ankle_idx] != (uint8_t)config_defs::motor::not_used) && ((static_cast<uint8_t>(config_defs::exo_side::bilateral) == config_to_send[config_defs::exo_side_idx]) 
                 || (((uint8_t)config_defs::exo_side::left == config_to_send[config_defs::exo_side_idx]) && this->is_left)
                 || (((uint8_t)config_defs::exo_side::right == config_to_send[config_defs::exo_side_idx]) && !this->is_left));
+            
             // logger::print("Ankle\n");
             
-            
-            //Check if the direction should be flipped
+            //Check if the sensor directions should be flipped
             if ((config_to_send[config_defs::ankle_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::both) || ((config_to_send[config_defs::ankle_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::left) && this->is_left) || ((config_to_send[config_defs::ankle_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::right) && (!this->is_left)))
             {
                 this->flip_direction = 1;
@@ -226,7 +228,7 @@ void JointData::reconfigure(uint8_t* config_to_send)
             
             // logger::print("Elbow\n");
 
-            //Check if the direction should be flipped
+            //Check if the sensor directions should be flipped
             if ((config_to_send[config_defs::elbow_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::both) || ((config_to_send[config_defs::elbow_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::left) && this->is_left) || ((config_to_send[config_defs::elbow_flip_torque_dir_idx] == (uint8_t)config_defs::flip_torque_dir::right) && (!this->is_left)))
             {
                 this->flip_direction = 1;

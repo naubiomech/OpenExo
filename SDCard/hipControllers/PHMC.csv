@@ -1,0 +1,6 @@
+5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows"
+2,"parameter number, the number of parameters to read per line"
+,Parameter list for the ZeroTorque controller
+,Parameter order: 
+Extension Setpoint,Flexion Setpoint
+0,0
