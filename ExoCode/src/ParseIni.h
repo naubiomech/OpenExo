@@ -19,14 +19,13 @@
  */
 namespace ini_config
 {
-    const int buffer_length = 500;  /**< length of the buffer for reading the file. */
+    const int buffer_length = 500;  /**< Length of the buffer for reading the file. */
     const int key_length = 25;      /**< Max length of the key name */
     const int section_length = 10;  /**< Max length of the section name */
-    const int number_of_keys = 41;  /**< Number of keys to be parsed. */
+    const int number_of_keys = 48;  /**< Number of keys to be parsed. */
 }
 
-//Includes for reading the ini file from the SD card.
-//1 is the lowest value to confirm that data is present for sending over SPI
+//Reading the ini file from the SD card; 1 is the lowest value to confirm that data is present for sending over SPI
 
 /**
  * @brief Namespace that defines numeric coding for different keys values. These are used throughout the code.
@@ -38,12 +37,13 @@ namespace config_defs
         AK_board = 1,
     };
     
-    enum class board_version : uint8_t
+    enum class board_version : uint8_t          //Board version options (zero_five_one is default recommended for AK Motors)
     { 
         zero_one = 1,
         zero_three = 2,
         zero_four = 3,
         zero_five_one = 4,
+		zero_six_Maxon = 5,
     };
     
     enum class battery : uint8_t
@@ -52,7 +52,7 @@ namespace config_defs
         dumb = 2,
     };
 
-    enum class exo_name : uint8_t
+    enum class exo_name : uint8_t           //Exo configuration options
     { 
         bilateral_ankle = 1, 
         bilateral_hip = 2, 
@@ -78,14 +78,14 @@ namespace config_defs
         test = 22,
     };
     
-    enum class exo_side : uint8_t
+    enum class exo_side : uint8_t           //Side options
     { 
         bilateral = 1, 
         left = 2, 
         right = 3,
     };
     
-    enum class JointType
+    enum class JointType                    //Joints options
     {
         hip = 1,
         knee = 2,
@@ -93,16 +93,17 @@ namespace config_defs
         elbow = 4,
     };
     
-    enum class motor : uint8_t
+    enum class motor : uint8_t              //Motor options
     { 
         not_used = 1, 
         AK60 = 2, 
         AK80 = 3,
         AK60_v1_1 = 4,
         AK70 = 5,
+		MaxonMotor = 6,
     };
     
-    enum class gearing : uint8_t
+    enum class gearing : uint8_t            //Gearing ratio options
     { 
         gearing_1_1 = 1,
         gearing_2_1 = 2,
@@ -111,7 +112,7 @@ namespace config_defs
     };
     
     
-    enum class joint_id : uint8_t
+    enum class joint_id : uint8_t           //Joint IDs
     {
         //Byte format : [0, is_left, !is_left, unused_joint, is_elbow, is_ankle, is_knee, is_hip]
         left = 0b01000000,
@@ -135,7 +136,7 @@ namespace config_defs
                                             //Unused Joint ID: 48
     };
         
-    enum class  hip_controllers : uint8_t
+    enum class  hip_controllers : uint8_t   //Hip Controller IDs
     {
         disabled = 1,
         zero_torque = 2,
@@ -143,19 +144,19 @@ namespace config_defs
         constant_torque = 4,
         chirp = 5,
         step = 6,
+        phmc = 7,
     };
     
-    enum class knee_controllers : uint8_t
+    enum class knee_controllers : uint8_t   //Knee Controller IDs
     {
         disabled = 1,
         zero_torque = 2,
         constant_torque = 3,
-        elbow_min_max = 4,
-        chirp = 5,
-        step = 6,
+        chirp = 4,
+        step = 5,
     };
         
-    enum class ankle_controllers : uint8_t
+    enum class ankle_controllers : uint8_t  //Ankle Controller IDs
     {
         disabled = 1, 
         zero_torque = 2, 
@@ -163,13 +164,13 @@ namespace config_defs
         zhang_collins = 4,
         constant_torque = 5,
         trec = 6,
-		elbow_min_max = 7,
-		calibr_manager = 8,
-        chirp = 9,
-        step = 10,
+		calibr_manager = 7,
+        chirp = 8,
+        step = 9,
+		spv2 = 10,
     };
 
-    enum class elbow_controllers : uint8_t
+    enum class elbow_controllers : uint8_t  //Elbow Controller IDs
     {
         disabled = 1,
         zero_torque = 2,
@@ -179,13 +180,13 @@ namespace config_defs
         step = 6,
     };
     
-    enum class use_torque_sensor : uint8_t
+    enum class use_torque_sensor : uint8_t  //Option to use or not use torque sensor for low-level control
     {
         no = 1, 
         yes = 2, 
     };
 
-    enum class flip_motor_dir : uint8_t
+    enum class flip_motor_dir : uint8_t     //Flip direction of motor, can be used to help determine which is positive in controller
     {
         neither = 1,
         left = 2,
@@ -193,7 +194,7 @@ namespace config_defs
         both = 4,
     };
 
-    enum class flip_torque_dir : uint8_t
+    enum class flip_torque_dir : uint8_t    //Flip direction for torque, important to align with motor directions
     {
         neither = 1,
         left = 2,
@@ -201,7 +202,7 @@ namespace config_defs
         both = 4,
     };
 
-    enum class flip_angle_dir : uint8_t
+    enum class flip_angle_dir : uint8_t     //Flip direciton for angle sensors
     {
         neither = 1,
         left = 2,
@@ -260,6 +261,15 @@ namespace config_defs
 	static const int right_ankle_RoM_idx = 38;
     static const int left_elbow_RoM_idx = 39;
     static const int right_elbow_RoM_idx = 40;
+	
+	static const int left_hip_torque_offset_idx = 41;
+	static const int right_hip_torque_offset_idx = 42;
+	static const int left_knee_torque_offset_idx = 43;
+	static const int right_knee_torque_offset_idx = 44;
+	static const int left_ankle_torque_offset_idx = 45;
+	static const int right_ankle_torque_offset_idx = 46;
+	static const int left_elbow_torque_offset_idx = 47;
+	static const int right_elbow_torque_offset_idx = 48;
 }
 
 #if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41) 
@@ -277,14 +287,14 @@ namespace config_defs
     #endif
 
     /**
-     * @brief Parses the config.ini file in the root folder of the SD card and puts the parsed data to the provided array
+     * @brief Parses the config.ini file in the root folder of the SD card and puts the parsed data in the provided array
      * 
      * @param pointer to the uint8_t array to be updated with the encoded parameter info. Array should be ini_config::number_of_keys in length
      */
-    void ini_parser(uint8_t* config_to_send); // uses default filename
+    void ini_parser(uint8_t* config_to_send); //Uses default filename
     
     /**
-     * @brief Parses the specified filename from the SD card and puts the parsed data to the array provided
+     * @brief Parses the specified filename from the SD card and puts the parsed data into the array provided
      * 
      * @param pointer to the character array that contains a nonstandard filename to parse.
      * @param pointer to the uint8_t array to be updated with the encoded parameter info. Array should be ini_config::number_of_keys in length
@@ -292,7 +302,7 @@ namespace config_defs
     void ini_parser(char* filename, uint8_t* config_to_send); //uses sent filename
     
     /**
-     * @brief retrieve the key values and get the print the output
+     * @brief Retrieve the key values and print the output
      *
      * @param pointer to char array that contains the section containing the key
      * @param pointer to char array that contains the key name
@@ -332,6 +342,7 @@ namespace config_defs
             {"0.1", (uint8_t)config_defs::board_version::zero_one},
             {"0.3", (uint8_t)config_defs::board_version::zero_three},
             {"0.5.1", (uint8_t)config_defs::board_version::zero_five_one},
+			{"0.6", (uint8_t)config_defs::board_version::zero_six_Maxon},   //Note: This works for board version 0.7 as well, hence lack of specific version for it
         };
         
         const IniKeyCode battery = 
@@ -380,6 +391,7 @@ namespace config_defs
             {"AK80", (uint8_t)config_defs::motor::AK80},
             {"AK60v1.1", (uint8_t)config_defs::motor::AK60_v1_1},
             {"AK70", (uint8_t)config_defs::motor::AK70},
+			{"MaxonMotor", (uint8_t)config_defs::motor::MaxonMotor},
         };
         
         const IniKeyCode gearing 
@@ -399,6 +411,7 @@ namespace config_defs
             {"constantTorque", (uint8_t)config_defs::hip_controllers::constant_torque},
             {"chirp", (uint8_t)config_defs::hip_controllers::chirp},
             {"step", (uint8_t)config_defs::hip_controllers::step},
+            {"phmc", (uint8_t)config_defs::hip_controllers::phmc},
 
         };
         
@@ -407,7 +420,6 @@ namespace config_defs
             {"0", (uint8_t)config_defs::knee_controllers::disabled}, 
             {"zeroTorque", (uint8_t)config_defs::knee_controllers::zero_torque}, 
             {"constantTorque", (uint8_t)config_defs::knee_controllers::constant_torque},
-            {"elbowMinMax", (uint8_t)config_defs::knee_controllers::elbow_min_max},
             {"chirp", (uint8_t)config_defs::knee_controllers::chirp},
             {"step", (uint8_t)config_defs::knee_controllers::step},
         };
@@ -420,10 +432,10 @@ namespace config_defs
             {"zhangCollins", (uint8_t)config_defs::ankle_controllers::zhang_collins},
             {"constantTorque", (uint8_t)config_defs::ankle_controllers::constant_torque},
             {"TREC", (uint8_t)config_defs::ankle_controllers::trec},
-			{"elbowMinMax", (uint8_t)config_defs::ankle_controllers::elbow_min_max},
 			{"calibrManager", (uint8_t)config_defs::ankle_controllers::calibr_manager},
             {"chirp", (uint8_t)config_defs::ankle_controllers::chirp},
             {"step", (uint8_t)config_defs::ankle_controllers::step},
+			{"SPV2", (uint8_t)config_defs::ankle_controllers::spv2},
         };  
 
         const IniKeyCode elbow_controllers
@@ -523,6 +535,15 @@ namespace config_defs
 		float right_ankle_RoM;
         float left_elbow_RoM;
         float right_elbow_RoM;
+		
+		float left_hip_torque_offset;
+		float right_hip_torque_offset;
+		float left_knee_torque_offset;
+		float right_knee_torque_offset;
+		float left_ankle_torque_offset;
+		float right_ankle_torque_offset;
+		float left_elbow_torque_offset;
+		float right_elbow_torque_offset;
 		
     };
 #endif

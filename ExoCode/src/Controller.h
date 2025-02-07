@@ -28,8 +28,7 @@
 
 /**
  * @brief This class defines the interface for controllers.  
- * All controllers must have a:
- * float calc_motor_cmd() that returns a torque cmd in Nm.  
+ * All controllers must have a: float calc_motor_cmd() that returns a torque cmd in Nm.  
  * 
  */
 class _Controller
@@ -64,7 +63,7 @@ class _Controller
         
         ExoData* _data;                     /**< Pointer to the full data instance*/
         ControllerData* _controller_data;   /**< Pointer to the data associated with this controller */
-        SideData* _side_data;                 /**< Pointer for the side data the controller is associated with */
+        SideData* _side_data;               /**< Pointer for the side data the controller is associated with */
         JointData* _joint_data;             /**< Pointer to the joint data the controller is associated with */
          
         config_defs::joint_id _id;          /**< Id of the joint this controller is attached to. */
@@ -79,8 +78,15 @@ class _Controller
         float _prev_de_dt;                  /**< Prev error derivative used if the timestep is not good*/
         float _prev_pid_time;               /**< Prev time the PID was called */
         
+        //Parameters for Servo Control (SPV2)
+		long pos;
+		unsigned long servoWatch;
+		int pos1;
+		int pos2;
+		bool _do_stop_servo = false;
+		
         /**
-         * @brief calculates the current PID contribution to the motor command. 
+         * @brief Calculates the current PID contribution to the motor command. 
          * 
          * @param controller command 
          * @param measured controlled value
@@ -89,6 +95,26 @@ class _Controller
          * @param derivative gain
          */
         float _pid(float cmd, float measurement, float p_gain, float i_gain, float d_gain);
+		
+		/**
+         * @brief Actuate the servo motor (might need to move this out of the controller class) 
+         * 
+         * @param signal pin 
+         * @param not used
+         * @param start angle
+         * @param end angle
+         */
+		int _servo_runner(uint8_t servo_pin, uint8_t speed_level, long angle_initial, long angle_final);
+		
+		/**
+         * @brief A function that returns cmd_ff for stateless PJMC. 
+         * 
+         * @param current fsr percentage value (after calibration, this value should typical range from 0 to 1 
+         * @param fsr threshold; a current fsr value below this threshold will have the generic pjmc function return a cmd_ff with a sign of setpoint_negative
+         * @param positive setpoint (the sign definitions follow those as shown in OpenSim's default models: Positive for dorsiflexion, knee extension, and hip flexion.
+         * @param negative setpoint
+         */
+        float _pjmc_generic(float current_fsr, float fsr_threshold, float setpoint_positive, float setpoint_negative);
         
         //Values for the Compact Form Model Free Adaptive Controller
         std::pair<float, float> measurements;
@@ -105,7 +131,7 @@ class _Controller
 };
 
 /**
- * @brief Terrain Responsive Exoskeleton Controller (TREC) 
+ * @brief Terrain Responsive Exoskeleton Controller (TREC)
  * This controller is for the ankle joint
  *
  * For full details see: "Mixed Terrain Ankle Assistance and Modularity in Wearable Robotics" by Chancelor Frank Cuddeback (https://biomech.nau.edu/)
@@ -114,23 +140,27 @@ class _Controller
  */
 class TREC : public _Controller
 {
-    public:
-        TREC(config_defs::joint_id id, ExoData* exo_data);
-        ~TREC(){};
+public:
+    TREC(config_defs::joint_id id, ExoData* exo_data);
+    ~TREC() {};
 
-        float calc_motor_cmd();
-    
-    private:
-        void _update_reference_angles(SideData* side_data, ControllerData* controller_data, float percent_grf, float percent_grf_heel);
-        void _capture_neutral_angle(SideData* side_data, ControllerData* controller_data);
-		void _grf_threshold_dynamic_tuner(SideData* side_data, ControllerData* controller_data, float threshold, float percent_grf_heel);
-		void _plantar_setpoint_adjuster(SideData* side_data, ControllerData* controller_data, float pjmcSpringDamper);
+    float calc_motor_cmd();
+
+private:
+    void _update_reference_angles(SideData* side_data, ControllerData* controller_data, float percent_grf, float percent_grf_heel);
+    void _capture_neutral_angle(SideData* side_data, ControllerData* controller_data);
+    void _grf_threshold_dynamic_tuner(SideData* side_data, ControllerData* controller_data, float threshold, float percent_grf_heel);
+    void _plantar_setpoint_adjuster(SideData* side_data, ControllerData* controller_data, float pjmcSpringDamper);
 };
 
 /**
  * @brief Proportional Joint Moment Controller
  * This controller is for the ankle joint 
- * Applies a plantar torque based on the normalized magnitude of the toe FSR
+ * Applies a plantar torque based on the normalized magnitude of the toe FSR.
+ * 
+ * This controller is based on:
+ * Gasparri, G.M., Luque, J., Lerner, Z.F. (2019).
+ * Proportional Joint-Moment Control for Instantaneosuly Adaptive Ankle Exoskeleton Assistnace. IEEE TNSRE, 27(4), 751-759.
  *
  * See ControllerData.h for details on the parameters used.
  */
@@ -172,10 +202,9 @@ class ZeroTorque : public _Controller
  * From t2 to t3 falls to (t3, ts)
  * From t3 to 100% applies zero torque
  * 
- * 2022-02 : This controller was based on:
+ * This controller is based on:
  * Zhang, J., Fiers, P., Witte, K. A., Jackson, R. W., Poggensee, K. L., Atkeson, C. G., & Collins, S. H. 
  * (2017). Human-in-the-loop optimization of exoskeleton assistance during walking. Science, 356(6344), 1280-1284.
- * and written by P. Stegall
  * 
  * See ControllerData.h for details on the parameters used.
  */
@@ -204,10 +233,9 @@ class ZhangCollins: public _Controller
  * From t1_peak to t2_peak applies a spline going up to (t2_peak,mass*normalized_peak_torque).
  * From t2_peak to t3_peak falls to (t3_peak, 0)
  *
- * 2022-04 : This controller was based on:
+ * This controller was based on:
  * Franks, P. W., Bryan, G. M., Martin, R. M., Reyes, R., Lakmazaheri, A. C., & Collins, S. H.
  * (2021). Comparing optimized exoskeleton assistance of the hip, knee, and ankle in single and multi-joint configurations. Wearable Technologies, 2.
- * and written by P. Stegall
  *
  * See ControllerData.h for details on the parameters used.
  */
@@ -226,6 +254,13 @@ class FranksCollinsHip: public _Controller
        
 };
 
+/**
+ * @brief Constant Torque Controller
+ * This controller is for any joint
+ * Applies a constant torque, filter applied when changing magnitude of torque
+ *
+ * See ControllerData.h for details on the parameters used.
+ */
 class ConstantTorque : public _Controller
 {
 public:
@@ -241,6 +276,17 @@ public:
 
 };
 
+/**
+ * @brief Elbow Controller 
+ * This controller is for the elbow joint
+ * Applies flexion or extension torque based on hand FSRs that assists with lifting motion 
+ * 
+ * This controller is detailed in:
+ * Colley, D., Bowersock, C.D., Lerner, Z.F. (2024)
+ * A Lightweight Powered Elbow Exoskeleton for Manual Handling Tasks. IEEE T-MRB, 6(4), 1627-1636.
+ *
+ * See ControllerData.h for details on the parameters used.
+ */
 class ElbowMinMax : public _Controller
 {
 public:
@@ -284,6 +330,15 @@ public:
     
 };
 
+/**
+ * @brief Calibration Controller
+ * This controller is for any joint.
+ * Applies a constant torque to help calibrate direction sign (+/-) and ensure torque sensor sign (+/-) matches desired direction.
+ * This controller should be utilized when first testing a new device, especially when incorporating a torque sensor.
+ * Failure to do so can lead to amplification of error between desired and measured torque which can be unsafe. 
+ *
+ * See ControllerData.h for details on the parameters used. See documentation on procedures for calibration
+ */
 class CalibrManager : public _Controller
 {
 public:
@@ -293,6 +348,14 @@ public:
     float calc_motor_cmd();
 };
 
+/**
+ * @brief Chirp Controller
+ * This controller is for any joint
+ * Applies a sinewave with user defined parameters. 
+ * Used for hardware performance validation. 
+ *
+ * See ControllerData.h for details on the parameters used.
+ */
 class Chirp : public _Controller
 {
 public:
@@ -308,6 +371,14 @@ public:
 
 };
 
+/**
+ * @brief Step Controller
+ * This controller is for any joint
+ * Applies step response to hardware of user specified magnitude, duration, and frequency.
+ * Used for hardware performance validation.
+ *
+ * See ControllerData.h for details on the parameters used.
+ */
 class Step : public _Controller
 {
 public:
@@ -330,6 +401,78 @@ public:
     float change_time;
 
     float calc_motor_cmd();         /* Function that calculates the motor command. */
+
+};
+
+/**
+ * @brief Proportional Hip Moment Controller
+ * This controller is for the hip joint
+ * Applies a torque based on an estimate of the hip moment.
+ *
+ * NOTE: THIS CONTROLLER IS STILL UNDERDEVELOPMENT
+ * 
+ * See ControllerData.h for details on the parameters used.
+ */
+class ProportionalHipMoment : public _Controller
+{
+public:
+    ProportionalHipMoment(config_defs::joint_id id, ExoData* exo_data);
+    ~ProportionalHipMoment() {};
+    
+    /* Note: Duration in this controller is in terms of number of iterations in that window, rather than as a time. */
+
+    int state;                      /* Keeps track of what state we are in: State 1 - Mid-to-Late Swing (15% onward), State 2: Stance, State 3: Early-Swing (First 15%). */
+
+    bool first_state2;              /* Flag to set variable values upon the first instance of the current State 2. */
+    bool first_state3;              /* Flag to set variable values upon the first instance of the current State 3. */
+
+    int swing_counter;              /* Keeps track of the number of iterations that have occured in current swing phase. */
+    int state1_counter;             /* Keeps track of the number of iterations that have occured in current State 1. */
+    int prev_state1_counter;        /* Stores the previous duration of State 1, used to estimate position in current State 1 relative to expected duration. */
+    int stance_counter;             /* Keeps track of the number of iterations that have occured in current Stance Phase. */
+    int swing_duration;             /* Stores the duration of the previous swing phase. */
+ 
+    float setpoint;                 /* Stores the calculated feed-foward setpoint for the hip command. */
+    float old_setpoint;             /* Stores the setpoint at the end of State 3 to be used for setpoint calculation in State 1. */
+
+    int state_count_12;             /* Keeps track of the number of iterations that have occured in the State 1 - to - State 2 Transition. */
+    int state_count_23;             /* Keeps track of the number of iterations that have occured in the State 2 - to - State 3 Transition. */
+    int state_count_31;             /* Keeps track of the number of iterations that have occured in the State 3 - to - State 1 Transition. */
+    
+    int Prev_latestance_duration;   /* Stores the previous duration of the late-stance phase (part of the late-stance to early-swing transition period. */
+    int latestance_duration;        /* Records the duration of the recently ended late-stance phase. */
+    int latestance_counter;         /* Keeps track of the number of iterations that have occured in the current Late-Stance Period. */
+    float Alpha_counter;            /* Keeps track of the number of iterations that have occured in the current Late-Stance - and - Early Swing Transition Period. */
+    float Alpha;                    /* Stores the expected duration of the Late-Stance - and - Early Swing Transition Period, based on the duration of the last transition period. */
+    float t;                        /* Calculated percentage of stance-to-swing transition based on the duration of the previous stance-to-swing transition (expressed as 0.1, 0.2,... rather than 10%, 20%,...). */
+    
+    float fs;                       /* Ratio of heel and toe fsrs accounting for GRF Ratio (0.25). */
+    float fs_min;                   /* Stores the minimum calculated fs for the current cycle, used as a starting estimate for the Late-Stance - to - Early Swing transition period. */
+    float prev_fs;                  /* Stores the previous cycle's fs to help determine the slope of the fs curve. */
+    float hip_ratio;                /* Part of calculation to determine the feed-foward setpoint calculation during stance-phase (State 2). */
+
+    float calc_motor_cmd();         /* Function to calcualte the desired motor command. */
+
+private:
+
+};
+
+/**
+ * @brief SPV2 Controller
+ * 
+ * NOTE: THIS CONTROLLER IS STILL UNDER DEVELOPMENT 
+ * 
+ * See ControllerData.h for details on the parameters used.
+ */
+class SPV2 : public _Controller
+{
+public:
+    SPV2(config_defs::joint_id id, ExoData* exo_data);
+    ~SPV2() {};
+
+    float calc_motor_cmd();
+
+private:
 
 };
 

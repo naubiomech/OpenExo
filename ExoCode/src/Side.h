@@ -30,7 +30,7 @@
 #include <algorithm>
 
 /**
- * @brief class to operate a side.
+ * @brief Class to operate a side.
  * 
  */
 class Side
@@ -39,7 +39,7 @@ class Side
         Side(bool is_left, ExoData* exo_data); //Constructor: 
         
         /**
-         * @brief read FSR,  calc percent gait, read joint data, send joint commands
+         * @brief Read FSR, calc percent gait, read joint data, send joint commands
          */
         void run_side(); 
 		
@@ -56,7 +56,7 @@ class Side
         void read_data(); 
 		
         /**
-         * @brief sends new control command to the motors used on that side, based on the defined controllers
+         * @brief Sends new control command to the motors used on that side, based on the defined controllers
          */
         void update_motor_cmds();   
 		
@@ -66,7 +66,7 @@ class Side
         void set_controller(int joint, int controller);  
 		
         /**
-         * @brief Simply clears the step time estimate for when it gets off by more than can be adjusted for.
+         * @brief Clears the step time estimate for when it gets off by more than can be adjusted for.
          */
         void clear_step_time_estimate();
 
@@ -84,7 +84,7 @@ class Side
         void _check_thresholds();
 		
         /**
-         * @brief Calculates the percent of gait based on the ground contact reading
+         * @brief Calculates the percentage of gait cycle based on the ground contact reading
          * and an estimate of the step time based on the average time of the last few steps.
          * Returns the percent gait which saturates at 100%
          * 
@@ -93,7 +93,7 @@ class Side
         float _calc_percent_gait();
 
         /**
-         * @brief Calculates the percent of stance based on the toe contact reading
+         * @brief Calculates the percentage of stance phase based on the toe contact reading
          * and an estimate of the stance time based on the average time of the last few stance phases.
          * Returns the percent stance which saturates at 100%
          *
@@ -102,7 +102,7 @@ class Side
         float _calc_percent_stance();
 
         /**
-         * @brief Calculates the percent of swing based on the FSR reading
+         * @brief Calculates the percentage of swing phase based on the FSR reading
          * and an estimate of the swing time based on the average time of the last few swing phases.
          * Returns the percent swing which saturates at 100%
          *
@@ -162,8 +162,8 @@ class Side
         ElbowJoint _elbow;  /**< Instance of an elbow joint */
         
         //FSR objects for the side. 
-        FSR _heel_fsr;      /**< Heel force sensitive resistor */
-		FSR _toe_fsr;       /**< Toe force sensitive resistor */
+        FSR _heel_fsr;                        /**< Heel force sensitive resistor, typically is a raw value */
+		FSR_Regressed _toe_fsr;               /**< Toe force sensitive resistor, typically is a regressed value */
 
         //Inclination object for the side
         InclinationDetector* inclination_detector;

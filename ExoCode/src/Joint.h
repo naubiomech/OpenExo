@@ -61,23 +61,22 @@ class _Joint
 		virtual ~_Joint(){};
         
         /**
-         * @brief updates the controller and sends the motor command
+         * @brief Updates the controller and sends the motor command
          */
         virtual void run_joint() = 0;   
 		
         /**
-         * @brief reads data from motor and sensors
+         * @brief Reads data from motor and sensors
          */
         virtual void read_data(); 
 
         /**
-         * @brief Checks if we need to do the calibration for the motor and sensors
-         * and runs the calibration.
+         * @brief Checks if we need to do the calibration for the motor and sensors and runs the calibration.
          */
         virtual void check_calibration();         
 		
         /**
-         * @brief changes the high level controller in Controller, and the low level controller in Motor
+         * @brief Changes the high level controller in Controller, and the low level controller in Motor
          * 
          * @param controller id for that joint
          */
@@ -105,7 +104,7 @@ class _Joint
         /**
          * @brief Takes in the joint id and exo data, and checks if the current joint is used.
          * If it is used it pulls the next open motor enable pin for the side, and increments the counter.
-         * If the joint is not used, or we have used up all the available torque sensor pins for the side, it sets the pin to a pin that is not connected.
+         * If the joint is not used, or we have used up all the available pins for the side, it sets the pin to a pin that is not connected.
          *
          * @param joint id
          * @param ExoData pointer
@@ -133,7 +132,7 @@ class _Joint
 };
 
 /**
- * @brief class for the hip joint which contains joint specific controllers.
+ * @brief Class for the hip joint which contains joint specific controllers.
  */
 class HipJoint : public _Joint
 {
@@ -142,12 +141,12 @@ class HipJoint : public _Joint
         ~HipJoint(){};
         
         /**
-         * @brief reads the sensors for the joint and sends a torque command, See _Joint
+         * @brief Reads the sensors for the joint and sends a torque command, See _Joint
          */
         void run_joint();  
         
         /**
-         * @brief sets the controller that is to be used, See _Joint
+         * @brief Sets the controller that is to be used, See _Joint
          *
          * @param controller id.
          */
@@ -156,16 +155,17 @@ class HipJoint : public _Joint
     protected:
         
         //Objects for joint specific controllers
-        ZeroTorque _zero_torque;                /**< Zero torque controller */
-        FranksCollinsHip _franks_collins_hip;   /**< Franks Collins Hip controller */
-        ConstantTorque _constant_torque;        /**< Constant torque controller */
-        Chirp _chirp;                           /**< Chirp Controller for Device Characterization */                    
-        Step _step;                             /**< Step Controller for Device Characterization */
+        ZeroTorque _zero_torque;                        /**< Zero torque controller */
+        FranksCollinsHip _franks_collins_hip;           /**< Franks Collins Hip controller */
+        ConstantTorque _constant_torque;                /**< Constant torque controller */
+        Chirp _chirp;                                   /**< Chirp Controller for Device Characterization */                    
+        Step _step;                                     /**< Step Controller for Device Characterization */
+        ProportionalHipMoment _proportional_hip_moment; /**< Proportional Hip Moment Conroller */
         
 };
 
 /**
- * @brief class for the knee joint which contains joint specific controllers.
+ * @brief Class for the knee joint which contains joint specific controllers.
  */
 class KneeJoint : public _Joint
 {
@@ -174,12 +174,12 @@ class KneeJoint : public _Joint
         ~KneeJoint(){};
         
         /**
-         * @brief reads the sensors for the joint and sends a torque command, See _Joint
+         * @brief Reads the sensors for the joint and sends a torque command, See _Joint
          */
         void run_joint();
         
         /**
-         * @brief sets the controller that is to be used, See _Joint
+         * @brief Sets the controller that is to be used, See _Joint
          *
          * @param controller id.
          */
@@ -190,13 +190,12 @@ class KneeJoint : public _Joint
         //Objects for joint specific controllers	
         ZeroTorque _zero_torque;                /**< Zero torque controller */
         ConstantTorque _constant_torque;        /**< Constant torque controller */
-        ElbowMinMax _elbow_min_max;             /**< Elbow Flexion/Extension Controller for Lifting */
         Chirp _chirp;                           /**< Chirp Controller for Device Characterization */ 
         Step _step;                             /**< Step Controller for Device Characterization */
 };
 
 /**
- * @brief class for the ankle joint which contains joint specific controllers.
+ * @brief Class for the ankle joint which contains joint specific controllers.
  */ 
 class AnkleJoint : public _Joint
 {
@@ -205,12 +204,12 @@ class AnkleJoint : public _Joint
         ~AnkleJoint(){};
         
         /**
-         * @brief reads the sensors for the joint and sends a torque command, See _Joint
+         * @brief Reads the sensors for the joint and sends a torque command, See _Joint
          */
         void run_joint();
         
         /**
-         * @brief sets the controller that is to be used, See _Joint
+         * @brief Sets the controller that is to be used, See _Joint
          *
          * @param controller id.
          */
@@ -232,15 +231,14 @@ class AnkleJoint : public _Joint
         ZhangCollins _zhang_collins;                            /**< Zhang Collins controller */
         ConstantTorque _constant_torque;                        /**< Constant torque controller*/
         TREC _trec;                                             /**< TREC */
-		ElbowMinMax _elbow_min_max;                             /**< Elbow Flexion/Extension Controller for Lifting */
 		CalibrManager _calibr_manager;                          /**< Calibration Manager "Controller" */
         Chirp _chirp;                                           /**< Chirp Controller for Device Characterization */
         Step _step;                                             /**< Step Controller for Device Characterization */
-        
+        SPV2 _spv2;												/**< SPV2 */
 };
 
 /**
- * @brief class for the ankle joint which contains joint specific controllers.
+ * @brief Class for the elbow joint which contains joint specific controllers.
  */
 class ElbowJoint : public _Joint
 {
@@ -249,12 +247,12 @@ public:
     ~ElbowJoint() {};
 
     /**
-     * @brief reads the sensors for the joint and sends a torque command, See _Joint
+     * @brief Reads the sensors for the joint and sends a torque command, See _Joint
      */
     void run_joint();
 
     /**
-     * @brief sets the controller that is to be used, See _Joint
+     * @brief Sets the controller that is to be used, See _Joint
      *
      * @param controller id.
      */

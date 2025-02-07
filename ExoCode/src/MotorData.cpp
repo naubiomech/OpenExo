@@ -189,7 +189,7 @@ MotorData::MotorData(config_defs::joint_id id, uint8_t* config_to_send)
     }
     
     
-    //This is only setup for AK motors at the moment, I think we will need to add other motor parameters for different types and just change the ones that are used rather than trying to just have motor specific parameters.
+    //For AK-Series Motors Only
     p = 0;      //Read position
     v = 0;      //Read velocity
     i = 0;      //Read current
@@ -379,7 +379,7 @@ void MotorData::reconfigure(uint8_t* config_to_send)
         }
     }
     
-    //This is only setup for AK motors at the moment, I think we will need to add other motor parameters for different types and just change the ones that are used rather than trying to just have motor specific parameters.
+    //For AK-Series Motors Only
     p = 0;      //Read position
     v = 0;      //Read velocity
     i = 0;      //Read current

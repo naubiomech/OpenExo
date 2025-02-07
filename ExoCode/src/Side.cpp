@@ -226,7 +226,6 @@ bool Side::_check_ground_strike()
 
     bool ground_strike = false;
     
-    
     // logger::print("Side::_check_ground_strike : _prev_heel_contact_state - ");
     // logger::print(_prev_heel_contact_state);
     // logger::print("\n");
@@ -294,7 +293,7 @@ float Side::_calc_percent_gait()
     int percent_gait = -1;
     
     //Only calulate if the expected step duration has been established.
-    if (_side_data->expected_step_duration>0)
+    if (_side_data->expected_step_duration > 0)
     {
         percent_gait = 100 * ((float)timestamp - _ground_strike_timestamp) / _side_data->expected_step_duration;
         percent_gait = min(percent_gait, 100); //Set saturation.
@@ -356,7 +355,7 @@ float Side::_update_expected_duration()
     uint8_t num_uninitialized = 0;
     
     //Check that everything is set.
-    for (int i = 0; i<_num_steps_avg; i++)
+    for (int i = 0; i < _num_steps_avg; i++)
     {
         num_uninitialized += (_step_times[i] == 0);
     }
@@ -368,14 +367,14 @@ float Side::_update_expected_duration()
     if  (num_uninitialized > 0)  //If all the values haven't been replaced
     {
         //Shift all the values and insert the new one
-        for (int i = 1; i<_num_steps_avg; i++)
+        for (int i = (_num_steps_avg - 1); i>0; i--)
         {
             _step_times[i] = _step_times[i-1];
         }
         _step_times[0] = step_time;
         
         // logger::print("Side::_update_expected_duration : _step_times not fully initialized- [\t");
-        // for (int i = 0; i<_num_steps_avg; i++)
+        // for (int i = 0; i < _num_steps_avg; i++)
         // {
             // logger::print(_step_times[i]);
             // logger::print("\t");
@@ -387,14 +386,14 @@ float Side::_update_expected_duration()
     else if ((step_time <= (_side_data->expected_duration_window_upper_coeff * *max_val)) & (step_time >= (_side_data->expected_duration_window_lower_coeff * *min_val))) // and (armed_time > ARMED_DURATION_PERCENT * self.expected_duration)): # a better check can be used.  If the person hasn't stopped or the step is good update the vector.  
     {
         int sum_step_times = step_time;
-        for (int i = 1; i<_num_steps_avg; i++)
+        for (int i = (_num_steps_avg - 1); i>0; i--)
         {
             sum_step_times += _step_times[i-1];
             _step_times[i] = _step_times[i-1];
         }
         _step_times[0] = step_time;
         
-        expected_step_duration = sum_step_times/_num_steps_avg;  //Average to the nearest ms
+        expected_step_duration = sum_step_times / _num_steps_avg;  //Average to the nearest ms
         
         // logger::print("Side::_update_expected_duration : _expected_step_duration - ");
         // logger::print(_expected_step_duration);
@@ -428,14 +427,14 @@ float Side::_update_expected_stance_duration()
     if (num_uninitialized > 0)  //If all the values haven't been replaced
     {
         //Shift all the values and insert the new one
-        for (int i = 1; i < _num_steps_avg; i++)
+        for (int i = (_num_steps_avg - 1); i>0; i--)
         {
             _stance_times[i] = _stance_times[i - 1];
         }
         _stance_times[0] = stance_time;
 
         // logger::print("Side::_update_expected_duration : _step_times not fully initialized- [\t");
-        // for (int i = 0; i<_num_steps_avg; i++)
+        // for (int i = 0; i < _num_steps_avg; i++)
         // {
             // logger::print(_step_times[i]);
             // logger::print("\t");
@@ -447,7 +446,7 @@ float Side::_update_expected_stance_duration()
     else if ((stance_time <= (_side_data->expected_duration_window_upper_coeff * *max_val)) & (stance_time >= (_side_data->expected_duration_window_lower_coeff * *min_val))) // and (armed_time > ARMED_DURATION_PERCENT * self.expected_duration)): # a better check can be used.  If the person hasn't stopped or the step is good update the vector.  
     {
         int sum_stance_times = stance_time;
-        for (int i = 1; i < _num_steps_avg; i++)
+        for (int i = (_num_steps_avg - 1); i>0; i--)
         {
             sum_stance_times += _stance_times[i - 1];
             _stance_times[i] = _stance_times[i - 1];
@@ -489,14 +488,14 @@ float Side::_update_expected_swing_duration()
     if (num_uninitialized > 0)  //If all the values haven't been replaced
     {
         //Shift all the values and insert the new one
-        for (int i = 1; i < _num_steps_avg; i++)
+        for (int i = (_num_steps_avg-1); i>0; i--)
         {
             _swing_times[i] = _swing_times[i - 1];
         }
         _swing_times[0] = swing_time;
 
         // logger::print("Side::_update_expected_duration : _step_times not fully initialized- [\t");
-        // for (int i = 0; i<_num_steps_avg; i++)
+        // for (int i = 0; i < _num_steps_avg; i++)
         // {
             // logger::print(_step_times[i]);
             // logger::print("\t");
@@ -508,7 +507,7 @@ float Side::_update_expected_swing_duration()
     else if ((swing_time <= (_side_data->expected_duration_window_upper_coeff * *max_val)) & (swing_time >= (_side_data->expected_duration_window_lower_coeff * *min_val))) // and (armed_time > ARMED_DURATION_PERCENT * self.expected_duration)): # a better check can be used.  If the person hasn't stopped or the step is good update the vector.  
     {
         int sum_swing_times = swing_time;
-        for (int i = 1; i < _num_steps_avg; i++)
+        for (int i = (_num_steps_avg - 1); i>0; i--)
         {
             sum_swing_times += _swing_times[i - 1];
             _swing_times[i] = _swing_times[i - 1];

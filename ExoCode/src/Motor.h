@@ -7,7 +7,6 @@
  * @date Jan. 2022
 */
 
-
 #ifndef Motor_h
 #define Motor_h
 
@@ -45,7 +44,7 @@ class _Motor
         //Pure virtual functions, these will have to be defined for each one.
         
         /**
-         * @brief reads motor data from each motor used on that side and stores the values
+         * @brief Reads motor data from each motor used on that side and stores the values
          */
         virtual void read_data() = 0; 
 
@@ -75,24 +74,24 @@ class _Motor
         virtual bool enable() = 0;  
         
         /**
-         * @brief same as enable but will resend commands if override is true, regardless of what the state of the system is.
+         * @brief Same as enable but will resend commands if override is true, regardless of what the state of the system is.
          */
         virtual bool enable(bool overide) = 0;  
         
         /**
-         * @brief set position to zero
+         * @brief Set position to zero
          */
         virtual void zero() = 0;  
         
         /**
-         * @brief lets you know if it is a left or right side.
+         * @brief Lets you know if it is a left or right side.
          * 
          * @return 1 if the motor is on the left side, 0 otherwise
          */
         virtual bool get_is_left();  // 
         
         /**
-         * @brief returns the motor id, same as the joint id
+         * @brief Returns the motor id, same as the joint id
          *
          * @return the motor id
          */
@@ -115,7 +114,7 @@ class _Motor
 };
 
 /**
- * @brief a motor that does nothing
+ * @brief A motor that does nothing
  */
 class NullMotor : public _Motor
 {
@@ -130,6 +129,32 @@ class NullMotor : public _Motor
     void zero() {};
     float get_Kt() {return 0.0;};
     void set_error() {};
+};
+
+/**
+ * @brief Class for Maxon EC motor
+ */
+class MaxonMotor : public _Motor
+{
+    public:
+    MaxonMotor(config_defs::joint_id id, ExoData* exo_data, int enable_pin);
+    void transaction(float torque);
+	void read_data() {};
+    void send_data(float torque);
+    void on_off() {};
+    bool enable();
+    bool enable(bool overide);
+    void zero() {};
+    float get_Kt() {return 0.0;};
+    void set_error() {};                        //Not yet implemented for this motor type
+	void master_switch();
+	void maxon_manager(bool manager_active);    /**< Quickly and automatically reset the Maxon motor in case of the driver board reporting an error. */
+	
+	protected:
+	bool _enable_response;                      /**< True if the motor responded to an enable command */
+	bool do_scan4maxon_err = true;              /**< Part of the Maxon motor driver error reporting utilities: A switch to enable or disable error detection */
+	bool maxon_counter_active = false;          /**< Part of the Maxon motor driver error reporting utilities: A switch for the error detection counter */
+	unsigned long zen_millis;                   /**< Part of the Maxon motor driver error reporting utilities: A timer for the motor reset function */
 };
 
 
