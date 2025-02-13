@@ -1957,26 +1957,91 @@ SPV2::SPV2(config_defs::joint_id id, ExoData* exo_data)
     #endif
 }
 
+void SPV2::_plantar_setpoint_adjuster(SideData* side_data, ControllerData* controller_data, float currentPrescription)
+{
+	if(_side_data->toe_stance) 
+    {	
+		//Update peak values
+		_controller_data->currentMaxPrescription = max(_controller_data->currentMaxPrescription, currentPrescription);
+		_controller_data->wasStance_spv2 = true;
+		
+		// if (!_joint_data->is_left)
+		// {
+			// Serial.print("  |  toe_stance TRUE. max: ");
+			// Serial.print(_controller_data->currentMaxPrescription);
+			// Serial.print(", current prescription: ");
+			// Serial.print(currentPrescription);
+		// }
+	}
+	else 
+    {
+		if (_controller_data->wasStance_spv2) 
+        {
+			_controller_data->oldMaxPrescription = _controller_data->currentMaxPrescription;
+			_controller_data->currentMaxPrescription = 0;
+			
+			if (_controller_data->oldMaxPrescription < _controller_data->parameters[controller_defs::spv2::plantar_scaling]) 
+            {
+			_controller_data->setpoint2use_spv2 ++;
+			}
+			else 
+            {
+				_controller_data->setpoint2use_spv2 --;
+			}
+
+			_controller_data->setpoint2use_spv2 = min(_controller_data->setpoint2use_spv2, 55);
+			_controller_data->setpoint2use_spv2 = max(_controller_data->setpoint2use_spv2, 0);
+			_controller_data->wasStance_spv2 = false;
+		}
+	}
+	if (_controller_data->oldMaxPrescription == 0) 
+    {
+		_controller_data->setpoint2use_spv2 = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
+	}
+}
+
 float SPV2::calc_motor_cmd()
 {
 	//Calculate Generic Contribution
 	float plantar_setpoint = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
 	float dorsi_setpoint = _controller_data->parameters[controller_defs::spv2::dorsi_scaling];
 	float threshold = constrain(_controller_data->parameters[controller_defs::spv2::timing_threshold]/100, 0, 99);
-	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.2);
-	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.2);
-	float cmd_ff = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
+	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.6);
+	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.6);
+	
+	
+	if (_controller_data->parameters[controller_defs::spv2::turn_on_peak_limiter]) 
+    {
+		plantar_setpoint = _controller_data->setpoint2use_spv2;
+	}
+	else 
+    {
+		plantar_setpoint = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
+		_controller_data->setpoint2use_spv2 = plantar_setpoint;
+	}
 
-	//if (!_joint_data->is_left)
-    //{
-	//	Serial.print("\nRunning SPV2...");
-	//	Serial.print(cmd_ff);
-	//}
+	
+	float cmd_ff = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
+	
+	// if (!_joint_data->is_left)
+    // {
+		// Serial.print("\nRunning SPV2...");
+		// Serial.print(cmd_ff);
+		// Serial.print("  |  post-adjustment: ");
+		// Serial.print(_controller_data->setpoint2use_spv2);
+	// }
 
     //Low pass filter torque_reading
     const float torque = _joint_data->torque_reading;
     const float alpha = 0.5;
     _controller_data->filtered_torque_reading = utils::ewma(torque, _controller_data->filtered_torque_reading, alpha);
+	
+	if (_controller_data->parameters[controller_defs::spv2::turn_on_peak_limiter]) 
+    {
+		//_plantar_setpoint_adjuster(_side_data, _controller_data, -cmd_ff);
+		_plantar_setpoint_adjuster(_side_data, _controller_data, -_controller_data->filtered_torque_reading);
+		
+	}
 	
 	float cmd;
 

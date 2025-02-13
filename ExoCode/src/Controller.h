@@ -473,7 +473,7 @@ public:
     float calc_motor_cmd();
 
 private:
-
+	void SPV2::_plantar_setpoint_adjuster(SideData* side_data, ControllerData* controller_data, float currentPrescription);
 };
 
 #endif

@@ -288,6 +288,11 @@ class ControllerData {
 		unsigned long servo_departure_time;
 		bool servo_did_go_down = true;
 		bool servo_get_ready = false;
+		float setpoint2use_spv2 = 0;			//Peak prescribed torque regulator
+		bool wasStance_spv2 = false;
+		float oldMaxPrescription = 0;
+		float currentMaxPrescription = 0;
+		
 
         //Variables for the PHMC Controller
         float fs;
