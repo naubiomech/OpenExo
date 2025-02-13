@@ -352,6 +352,7 @@ namespace UART_command_handlers
         switch (config[config_defs::exo_name_idx])
         {
         case (uint8_t)config_defs::exo_name::bilateral_ankle:
+            {
             rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN;
             rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading; 
             rx_msg.data[1] = exo_data->right_side.toe_stance;
@@ -361,7 +362,94 @@ namespace UART_command_handlers
             rx_msg.data[5] = exo_data->left_side.ankle.controller.ff_setpoint; 
             rx_msg.data[6] = exo_data->right_side.toe_fsr; 
             rx_msg.data[7] = exo_data->left_side.toe_fsr;
-            break;
+            // rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading; 
+            // rx_msg.data[1] = exo_data->right_side.toe_stance;
+            // rx_msg.data[2] = exo_data->right_side.ankle.controller.ff_setpoint;
+            // rx_msg.data[3] = exo_data->left_side.ankle.controller.filtered_torque_reading; 
+            // rx_msg.data[4] = exo_data->left_side.toe_stance;
+            // rx_msg.data[5] = exo_data->left_side.ankle.controller.ff_setpoint; 
+            // rx_msg.data[6] = exo_data->right_side.toe_fsr; 
+            // rx_msg.data[7] = exo_data->left_side.toe_fsr;
+                // break;
+			//TREC Plot
+		// int local_scalar = exo_data->right_side.ankle.controller.plotting_scalar;
+		//int local_scalar = exo_data->right_side.ankle.motor.maxon_plotting_scalar;
+		int local_scalar = 1;
+		//Right Torque
+				//rx_msg.data[0] = exo_data->right_leg.ankle.controller.filtered_torque_reading;
+				//rx_msg.data[0] = exo_data->left_leg.ankle.torque_reading;
+				//rx_msg.data[0] = exo_data->left_leg.ankle.controller.setpoint;
+				//rx_msg.data[0] = 10 * abs(exo_data->left_leg.ankle.controller.ff_setpoint - exo_data->left_leg.ankle.controller.filtered_torque_reading);
+				rx_msg.data[0] = local_scalar * exo_data->right_side.ankle.controller.ff_setpoint;
+				/* rx_msg.data[0] = exo_data->left_leg.ankle.controller.maxMaxonCMD; */
+				//rx_msg.data[0] = exo_data->right_leg.ankle.controller.setpoint;
+		//Right State. Only integer values will be plotted for rx_msg.data[1]
+               //rx_msg.data[1] = exo_data->right_leg.toe_stance;
+			   //rx_msg.data[1] = 100 * exo_data->right_leg.toe_fsr;
+			   
+			   
+			   //motor current plot
+			   rx_msg.data[1] = local_scalar * map(analogRead(A1),0,4095,-300,300);
+			   //motor reset plot hijack
+			   //rx_msg.data[1] = exo_data->left_leg.ankle.controller.gasp_motor_reset_plot;
+		//Right Set
+               //rx_msg.data[2] = exo_data->right_leg.ankle.controller.filtered_squelched_supportive_term;
+				//rx_msg.data[2] = exo_data->right_leg.ankle.torque_reading;
+				//rx_msg.data[2] = exo_data->right_leg.ankle.controller.setpoint;
+				//rx_msg.data[2] = 5;
+				//rx_msg.data[2] = 10 * abs(exo_data->right_leg.ankle.controller.ff_setpoint - exo_data->right_leg.ankle.controller.filtered_torque_reading);
+				rx_msg.data[2] = local_scalar * exo_data->right_side.ankle.controller.filtered_torque_reading;
+				/* rx_msg.data[2] = exo_data->right_leg.ankle.controller.maxMaxonCMD; */
+				//rx_msg.data[2] = exo_data->right_leg.ankle.controller.ff_setpoint;
+				//rx_msg.data[2] = exo_data->right_leg.ankle.controller.setpoint;
+				//rx_msg.data[2] = exo_data->right_leg.ankle.controller.previousMaxCmdCache;
+				//rx_msg.data[2] = exo_data->right_leg.ankle.controller.filtered_torque_reading;
+				//rx_msg.data[2] = exo_data->right_leg.ankle.controller.numBelow500;
+		//Left Torque
+               //rx_msg.data[3] = exo_data->left_leg.ankle.controller.filtered_torque_reading;
+				//rx_msg.data[3] = exo_data->left_leg.ankle.joint_position;
+				// rx_msg.data[3] = exo_data->left_leg.ankle.controller.filtered_torque_reading;
+				rx_msg.data[3] = local_scalar * exo_data->right_side.ankle.controller.ff_setpoint;
+				//rx_msg.data[3] = abs(exo_data->left_leg.ankle.torque_error_max)/10;
+				//rx_msg.data[3] = exo_data->left_leg.ankle.motor.p;
+		//Left State. Only integer values will be plotted for rx_msg.data[1]
+               //rx_msg.data[4] = exo_data->left_leg.toe_stance;
+			   rx_msg.data[4] = local_scalar * 100 * exo_data->right_side.heel_fsr;
+			   //rx_msg.data[4] = 100 * exo_data->left_leg.ankle.controller.filtered_toe_fsr;
+		//Left Set
+               //rx_msg.data[5] = exo_data->left_leg.ankle.controller.filtered_squelched_supportive_term;
+				rx_msg.data[5] = local_scalar * exo_data->right_side.ankle.controller.filtered_torque_reading;
+				//rx_msg.data[5] = exo_data->left_leg.ankle.controller.ff_setpoint;
+				//rx_msg.data[5] = exo_data->left_leg.ankle.controller.setpoint;
+				//rx_msg.data[5] = exo_data->left_leg.ankle.controller.previousMaxCmdCache;
+				//rx_msg.data[5] = exo_data->left_leg.ankle.controller.numBelow500;
+				//rx_msg.data[5] = exo_data->right_leg.ankle.joint_position;
+				//rx_msg.data[5] = abs(exo_data->right_leg.ankle.torque_error_max/10);
+				//rx_msg.data[5] = exo_data->right_leg.ankle.motor.p;
+		//Right FSR
+               //rx_msg.data[6] = exo_data->right_leg.toe_fsr;
+				//rx_msg.data[6] =exo_data->right_leg.ankle.joint_position;
+				//rx_msg.data[6] =exo_data->right_leg.ankle.controller.stateless_pjmc_term;
+				//rx_msg.data[6] = 100 * exo_data->right_leg.heel_fsr;
+				
+				//motor current plot
+				rx_msg.data[6] = local_scalar * map(analogRead(A1),0,4095,-300,300);
+				//motor reset plot hijack
+				//rx_msg.data[6] = exo_data->right_leg.ankle.controller.gasp_motor_reset_plot;
+		//Left FSR
+               //rx_msg.data[7] = exo_data->left_leg.toe_fsr;
+				//rx_msg.data[7] = exo_data->left_leg.ankle.joint_position;
+				//rx_msg.data[7] =exo_data->left_leg.ankle.controller.stateless_pjmc_term;
+				//rx_msg.data[7] = 100 * exo_data->left_leg.heel_fsr;
+				rx_msg.data[7] = local_scalar * 100 * exo_data->right_side.toe_fsr;
+				//rx_msg.data[7] = 100 * exo_data->right_leg.ankle.controller.filtered_toe_fsr;
+				
+				
+				
+				//rx_msg.data[8] = exo_data->left_leg.ankle.controller.gasp_motor_reset_plot;
+				//rx_msg.data[9] = exo_data->right_leg.ankle.controller.gasp_motor_reset_plot;
+                break;
+			}
 
         case (uint8_t)config_defs::exo_name::bilateral_hip:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_RT_LEN;
