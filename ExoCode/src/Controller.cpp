@@ -14,6 +14,7 @@
 #include <Servo.h>
 
 Servo myservo;          //TO DO: Move servo definition code out of Controller.cpp
+Servo myservo1;			// TO DO: Move servo definition code out of Controller.cpp
 
 _Controller::_Controller(config_defs::joint_id id, ExoData* exo_data)
 {
@@ -261,6 +262,18 @@ int _Controller::_servo_runner(uint8_t servo_pin, uint8_t speed_level, long angl
 	myservo.write(angle_final);
 
 	return 0;
+}
+
+//Specific function for Servo Control, will be moved to appropriate location in future 
+void _Controller::_servo1_runner(uint8_t servo_pin, uint8_t target_angle)
+{
+	if (!myservo1.attached())
+    {
+		myservo1.attach(servo_pin,500,2500);     //Attach the servo object
+	}
+
+	myservo1.write(target_angle);
+
 }
 
 //****************************************************
@@ -2000,8 +2013,37 @@ void SPV2::_plantar_setpoint_adjuster(SideData* side_data, ControllerData* contr
 	}
 }
 
+void SPV2::_calc_motor_current(SideData* side_data, ControllerData* controller_data)
+{
+	
+	
+	if((millis() - _controller_data->stiff_adj_time) > 10000) {
+		_controller_data->SPV2_oldCurrent = _controller_data->SPV2_newCurrent;
+		_controller_data->SPV2_newCurrent = _controller_data->SPV2_motor_current / _controller_data->SPV2_motor_current_count
+	}
+	else {
+		_controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + analogRead(A1);
+		_controller_data->SPV2_motor_current_count++;
+	}
+
+	//map(analogRead(A1),0,4095,-300,300)
+	//
+	
+}
+
+void SPV2::_stiffness_adjustment(newCurrent, oldCurrent, oldAngle, oldAdjDir, SideData* side_data, ControllerData* controller_data)
+{
+	float newCurrent = _controller_data->SPV2_newCurrent;
+	float oldCurrent = _controller_data->SPV2_oldCurrent;
+	float oldAdjDir = _controller_data->SPV2_AdjDir;
+	uint8_t newAngle = oldAngle + (((newCurrent - oldCurrent) > 0) - ((newCurrent - oldCurrent) < 0)) * (-oldAdjDir) * 1;//"((x>0)-(x<0))" extracts the sign of "x", source: https://forum.arduino.cc/t/sgn-sign-signum-function-suggestions/602445/5 
+}
+
 float SPV2::calc_motor_cmd()
 {
+	//Upper servo debugging
+	_servo1_runner(26, 90);
+	
 	//Calculate Generic Contribution
 	float plantar_setpoint = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
 	float dorsi_setpoint = _controller_data->parameters[controller_defs::spv2::dorsi_scaling];

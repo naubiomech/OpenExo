@@ -105,6 +105,7 @@ class _Controller
          * @param end angle
          */
 		int _servo_runner(uint8_t servo_pin, uint8_t speed_level, long angle_initial, long angle_final);
+		void _servo1_runner(uint8_t servo_pin, uint8_t target_angle);
 		
 		/**
          * @brief A function that returns cmd_ff for stateless PJMC. 
@@ -474,6 +475,7 @@ public:
 
 private:
 	void SPV2::_plantar_setpoint_adjuster(SideData* side_data, ControllerData* controller_data, float currentPrescription);
+	void SPV2::_stiffness_adjustment(float newCurrent, float oldCurrent, uint8_t oldAngle);
 };
 
 #endif

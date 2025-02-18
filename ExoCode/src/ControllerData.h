@@ -292,6 +292,9 @@ class ControllerData {
 		bool wasStance_spv2 = false;
 		float oldMaxPrescription = 0;
 		float currentMaxPrescription = 0;
+		unsigned long stiff_adj_time;
+		unsigned long SPV2_motor_current;
+		unsigned long SPV2_motor_current_count = 0;
 		
 
         //Variables for the PHMC Controller
