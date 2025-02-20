@@ -302,7 +302,8 @@ class ControllerData {
 		uint16_t SPV2_step_count = 0;
 		bool SPV2_servo1_counter_1stStage = false;
 		unsigned long SPV2_servo1_stopWatch;
-		bool SPV2_stiffness_adjustment_ready = false;
+		//bool SPV2_stiffness_adjustment_ready = false;
+		bool SPV2_do_calc_new_stiffness = false;
 		
 
         //Variables for the PHMC Controller
