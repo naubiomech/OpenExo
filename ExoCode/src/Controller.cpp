@@ -2013,36 +2013,62 @@ void SPV2::_plantar_setpoint_adjuster(SideData* side_data, ControllerData* contr
 	}
 }
 
-void SPV2::_calc_motor_current(SideData* side_data, ControllerData* controller_data)
+void SPV2::_calc_motor_current(ControllerData* controller_data)
 {
 	
-	
-	if((millis() - _controller_data->stiff_adj_time) > 10000) {
+	if(_controller_data->SPV2_motor_current_ready) {
 		_controller_data->SPV2_oldCurrent = _controller_data->SPV2_newCurrent;
-		_controller_data->SPV2_newCurrent = _controller_data->SPV2_motor_current / _controller_data->SPV2_motor_current_count
+		_controller_data->SPV2_newCurrent = abs((_controller_data->SPV2_motor_current / _controller_data->SPV2_motor_current_count) - 2048);
+		_controller_data->SPV2_motor_current = 0;
+		_controller_data->SPV2_motor_current_count = 0;
+		_controller_data->SPV2_stiffness_adjustment_ready = true;
+		_controller_data->SPV2_do_count_steps = true;
 	}
 	else {
 		_controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + analogRead(A1);
-		_controller_data->SPV2_motor_current_count++;
+		_controller_data->SPV2_motor_current_count++;//number of frames (not number of steps)
 	}
 
 	//map(analogRead(A1),0,4095,-300,300)
-	//
 	
 }
 
-void SPV2::_stiffness_adjustment(newCurrent, oldCurrent, oldAngle, oldAdjDir, SideData* side_data, ControllerData* controller_data)
+void SPV2::_stiffness_adjustment(ControllerData* controller_data)
 {
-	float newCurrent = _controller_data->SPV2_newCurrent;
-	float oldCurrent = _controller_data->SPV2_oldCurrent;
-	float oldAdjDir = _controller_data->SPV2_AdjDir;
-	uint8_t newAngle = oldAngle + (((newCurrent - oldCurrent) > 0) - ((newCurrent - oldCurrent) < 0)) * (-oldAdjDir) * 1;//"((x>0)-(x<0))" extracts the sign of "x", source: https://forum.arduino.cc/t/sgn-sign-signum-function-suggestions/602445/5 
+	//Update stiffness adjustment target angle
+	//Use change of motor current to update the stiffness target angle
+	if (_controller_data->SPV2_motor_current_ready) {
+		uint16_t newCurrent = _controller_data->SPV2_newCurrent;
+		uint16_t oldCurrent = _controller_data->SPV2_oldCurrent;
+		_controller_data->SPV2_currentAngle = _controller_data->SPV2_currentAngle + (((newCurrent - oldCurrent) > 0) - ((newCurrent - oldCurrent) < 0)) * (-1);//"((x>0)-(x<0))" extracts the sign of "x", source: https://forum.arduino.cc/t/sgn-sign-signum-function-suggestions/602445/5 
+		Serial.print("  |  newCurrent: ");
+		Serial.print(_controller_data->SPV2_newCurrent);
+	}
+}
+
+void SPV2::_step_counter(uint16_t num_steps_threshold, SideData* side_data, ControllerData* controller_data)
+{
+	Serial.print("  |  toe_stance: ");
+	Serial.print(_side_data->toe_stance);
+	if (_controller_data->SPV2_do_count_steps) {
+		if ((!_side_data->prev_toe_stance) && (_side_data->toe_stance)) {
+			_controller_data->SPV2_step_count++;
+		}
+		if (_controller_data->SPV2_step_count > num_steps_threshold) {
+			_controller_data->SPV2_step_count = 0;
+			_controller_data->SPV2_do_count_steps = false;
+			_controller_data->SPV2_motor_current_ready = true;
+		}
+		
+	}
 }
 
 float SPV2::calc_motor_cmd()
 {
 	//Upper servo debugging
 	_servo1_runner(26, 90);
+	Serial.print("\n_servo1_runner(26, 90);");
+	return 0;
 	
 	//Calculate Generic Contribution
 	float plantar_setpoint = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
@@ -2142,6 +2168,7 @@ float SPV2::calc_motor_cmd()
 			if (SD_content_imported)
             {
 				servoOutput = _servo_runner(27, 1, servo_target, servo_home);
+				_servo1_runner(26, 90);
 			}
 
 			// Serial.print("\nCASE 1. servo_target: ");
@@ -2165,6 +2192,9 @@ float SPV2::calc_motor_cmd()
 		if (!servo_switch)
         {
 			servoOutput = _servo_runner(27, 1, servo_target, servo_home);
+			_servo1_runner(26, _controller_data->SPV2_currentAngle);
+			Serial.print("\nServo1 running...  |  currentAngle: ");
+			Serial.print(_controller_data->SPV2_currentAngle);
 		}
 
 		if (exo_status == status_defs::messages::fsr_refinement)
@@ -2197,16 +2227,43 @@ float SPV2::calc_motor_cmd()
                     {
 						servoOutput = _servo_runner(27, 1, servo_home, servo_target);   //Servo goes to the target position (DOWN)
 						_controller_data->servo_did_go_down = true;
+						_controller_data->SPV2_servo1_counter_1stStage = false;
 					}
 					else
                     {	
 						_controller_data->servo_get_ready = false;
+						_controller_data->SPV2_servo1_counter_1stStage = true;
+						_controller_data->SPV2_servo1_stopWatch = millis();
+						//_controller_data->SPV2_
 					}
 				}
 				else
                 {
 					servoOutput = _servo_runner(27, 1, servo_target, servo_home);       //Servo goes back to the home position (UP)
+					//_servo1_runner(26, _controller_data->SPV2_currentAngle);
 				}
+				
+				//
+				if (_controller_data->SPV2_servo1_counter_1stStage) {
+					if ((millis() - _controller_data->SPV2_servo1_stopWatch) > 200) {
+						if (!_side_data->toe_stance) {
+							_servo1_runner(26, _controller_data->SPV2_currentAngle);
+							Serial.print("\nServo1 running...");
+							Serial.print(_controller_data->SPV2_currentAngle);
+						}
+						else {
+							_controller_data->SPV2_servo1_counter_1stStage = false;
+						}
+					}
+				}
+				
+				//Run Servo1
+				_step_counter(3, _side_data, _controller_data);
+				_calc_motor_current(_controller_data);
+				_stiffness_adjustment(_controller_data);
+				
+				Serial.print("  |  Step count: ");
+				Serial.print(_controller_data->SPV2_step_count);
 			}
 		}	
 	}
@@ -2263,7 +2320,8 @@ float SPV2::calc_motor_cmd()
 		// Serial.print("  |  ==?: ");
 		// Serial.print(_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor);
 
-		return cmd;
+		//return cmd;
+		return 0;
 	}
 	else
 	{
