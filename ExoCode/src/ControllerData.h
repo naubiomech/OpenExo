@@ -170,20 +170,20 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t plantar_scaling = 0;
         const uint8_t dorsi_scaling = 1;
         const uint8_t timing_threshold = 2;                     //Toe FSR threshold (unit: %)
-        const uint8_t spring_stiffness = 3;                     //Not currently used
-        const uint8_t damping = 5;                              //Not currently used
-        const uint8_t neutral_angle = 4;                        //Not currently used
-        const uint8_t propulsive_gain = 6;                      //Not currently used
+        const uint8_t spring_stiffness_adj_factor = 3;
+        const uint8_t neutral_angle = 4;
+		const uint8_t min_angle = 5;
+        const uint8_t max_angle = 6;
         const uint8_t kp = 7;
-		const uint8_t turn_on_peak_limiter = 9;                 //Not currently used
+		const uint8_t turn_on_peak_limiter = 9;                 
         const uint8_t kd = 8;
-		const uint8_t step_response_mode = 10;                  //Not currently used
+		const uint8_t do_update_stiffness = 10;
 		const uint8_t ki = 11;
 		const uint8_t do_use_servo = 12;
 		const uint8_t fsr_servo_threshold = 13;
 		const uint8_t servo_origin = 14;
 		const uint8_t servo_terminal = 15;
-		const uint8_t maxon_outOfOffice_itr = 16;               //Not currently used
+		const uint8_t motor_current_calc_win = 16;
         const uint8_t num_parameter = 17;
     }
 
@@ -300,10 +300,11 @@ class ControllerData {
 		uint8_t SPV2_currentAngle = 90;
 		bool SPV2_do_count_steps = true;
 		uint16_t SPV2_step_count = 0;
-		bool SPV2_servo1_counter_1stStage = false;
-		unsigned long SPV2_servo1_stopWatch;
+		//bool SPV2_servo1_counter_1stStage = false;
+		//unsigned long SPV2_servo1_stopWatch;
 		//bool SPV2_stiffness_adjustment_ready = false;
 		bool SPV2_do_calc_new_stiffness = false;
+		bool SPV2_iniAngle_imported = false;
 		
 
         //Variables for the PHMC Controller

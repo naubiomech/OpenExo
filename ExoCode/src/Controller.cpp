@@ -2045,7 +2045,8 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 	if (_controller_data->SPV2_do_calc_new_stiffness) {
 		uint16_t newCurrent = _controller_data->SPV2_newCurrent;
 		uint16_t oldCurrent = _controller_data->SPV2_oldCurrent;
-		_controller_data->SPV2_currentAngle = _controller_data->SPV2_currentAngle + (((newCurrent - oldCurrent) > 0) - ((newCurrent - oldCurrent) < 0)) * (-5);//"((x>0)-(x<0))" extracts the sign of "x", source: https://forum.arduino.cc/t/sgn-sign-signum-function-suggestions/602445/5 
+		uint8_t adjIncrement = _controller_data->parameters[controller_defs::spv2::spring_stiffness_adj_factor];
+		_controller_data->SPV2_currentAngle = _controller_data->SPV2_currentAngle + (((newCurrent - oldCurrent) > 0) - ((newCurrent - oldCurrent) < 0)) * (-adjIncrement);//"((x>0)-(x<0))" extracts the sign of "x", source: https://forum.arduino.cc/t/sgn-sign-signum-function-suggestions/602445/5 
 		_controller_data->SPV2_do_calc_new_stiffness = false;
 		_controller_data->SPV2_currentAngle = min(maxAngle, _controller_data->SPV2_currentAngle);
 		_controller_data->SPV2_currentAngle = max(minAngle, _controller_data->SPV2_currentAngle);
@@ -2164,21 +2165,27 @@ float SPV2::calc_motor_cmd()
 	uint8_t servo_home = _controller_data->parameters[controller_defs::spv2::servo_origin];
 	uint8_t servo_target = _controller_data->parameters[controller_defs::spv2::servo_terminal];
 	bool SD_content_imported = (((servo_home == 0)&&(servo_target == 0)&&(servo_fsr_threshold == 0))?false: true);
+	
 
+	if (!SD_content_imported) {
+		return 0;
+	}
 	//if (!_joint_data->is_left)
     //{
 	//	Serial.print("\nheel fsr threshold: ");
 	//	Serial.print(_controller_data->parameters[controller_defs::spv2::fsr_servo_threshold]);
 	//}
-
+	if (!_joint_data->is_left)
+	{
 	if (_data->user_paused || !active_trial)
 	{
-		if (!_joint_data->is_left)
-        {
+		
+        //{
 			if (SD_content_imported)
             {
 				servoOutput = _servo_runner(27, 1, servo_target, servo_home);
-				_servo1_runner(26, 90);
+				//_controller_data->SPV2_currentAngle = _controller_data->parameters[controller_defs::spv2::neutral_angle];
+				//_servo1_runner(26, 90);
 			}
 
 			// Serial.print("\nCASE 1. servo_target: ");
@@ -2187,7 +2194,7 @@ float SPV2::calc_motor_cmd()
 			// Serial.print(servo_home);
 			// Serial.print("  |  PID kp: ");
 			// Serial.print(_controller_data->parameters[controller_defs::spv2::kp]);
-		}
+		//}
 	}
 	else
     {
@@ -2202,15 +2209,13 @@ float SPV2::calc_motor_cmd()
 		if (!servo_switch)
         {
 			servoOutput = _servo_runner(27, 1, servo_target, servo_home);
-			_servo1_runner(26, _controller_data->SPV2_currentAngle);
+			// _servo1_runner(26, _controller_data->SPV2_currentAngle);
 			// Serial.print("\nServo1 running...  |  currentAngle: ");
 			// Serial.print(_controller_data->SPV2_currentAngle);
 		}
 
 		if (exo_status == status_defs::messages::fsr_refinement)
         {
-			if (!_joint_data->is_left)
-            {
 				// Serial.print("\npercent_grf_heel: ");
 				// Serial.print(percent_grf_heel);
                 
@@ -2237,47 +2242,57 @@ float SPV2::calc_motor_cmd()
                     {
 						servoOutput = _servo_runner(27, 1, servo_home, servo_target);   //Servo goes to the target position (DOWN)
 						_controller_data->servo_did_go_down = true;
-						_controller_data->SPV2_servo1_counter_1stStage = false;
+						//_controller_data->SPV2_servo1_counter_1stStage = false;
 					}
 					else
                     {	
 						_controller_data->servo_get_ready = false;
-						_controller_data->SPV2_servo1_counter_1stStage = true;
-						_controller_data->SPV2_servo1_stopWatch = millis();
+						//_controller_data->SPV2_servo1_counter_1stStage = true;
+						//_controller_data->SPV2_servo1_stopWatch = millis();
 						//_controller_data->SPV2_
 					}
 				}
 				else
                 {
 					servoOutput = _servo_runner(27, 1, servo_target, servo_home);       //Servo goes back to the home position (UP)
-					//_servo1_runner(26, _controller_data->SPV2_currentAngle);
+					// _servo1_runner(26, _controller_data->SPV2_currentAngle);
 				}
 				
 				//
-				if (_controller_data->SPV2_servo1_counter_1stStage) {
-					if ((millis() - _controller_data->SPV2_servo1_stopWatch) > 200) {
-						if (!_side_data->toe_stance) {
-							_servo1_runner(26, _controller_data->SPV2_currentAngle);
-							// Serial.print("\nServo1 running...");
-							// Serial.print(_controller_data->SPV2_currentAngle);
-						}
-						else {
-							_controller_data->SPV2_servo1_counter_1stStage = false;
-						}
-					}
-				}
+				// if (_controller_data->SPV2_servo1_counter_1stStage) {
+					// if ((millis() - _controller_data->SPV2_servo1_stopWatch) > 200) {
+						// if (!_side_data->toe_stance) {
+							// _servo1_runner(26, _controller_data->SPV2_currentAngle);
+							// // Serial.print("\nServo1 running...");
+							// // Serial.print(_controller_data->SPV2_currentAngle);
+						// }
+						// else {
+							// _controller_data->SPV2_servo1_counter_1stStage = false;
+						// }
+					// }
+				// }
 				
 				//Run Servo1
-				_step_counter(3, _side_data, _controller_data);
+				_step_counter(_controller_data->parameters[controller_defs::spv2::motor_current_calc_win], _side_data, _controller_data);
 				_calc_motor_current(_controller_data);
-				_stiffness_adjustment(60, 120, _controller_data);
+				_stiffness_adjustment(_controller_data->parameters[controller_defs::spv2::min_angle], _controller_data->parameters[controller_defs::spv2::max_angle], _controller_data);
+				
+				if (!_side_data->toe_stance) {
+					
+					//Pull the initial stiffness angle from the SD card
+					if ((_controller_data->SPV2_oldCurrent == 0) && (_controller_data->SPV2_newCurrent == 0)) {
+						_controller_data->SPV2_currentAngle = _controller_data->parameters[controller_defs::spv2::neutral_angle];
+					}
+					
+					_servo1_runner(26, _controller_data->SPV2_currentAngle);
+				}
 				
 				Serial.print("\nStep count: ");
 				Serial.print(_controller_data->SPV2_step_count);
 				
 				//Debugging——hijack motor command
 				cmd = percent_grf * 100;
-			}
+			
 		}	
 	}
 
@@ -2297,7 +2312,7 @@ float SPV2::calc_motor_cmd()
 			cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
 		}
 	}
-		
+}
 	//if (maxon_standby)
  //   {
 	//	_controller_data->plotting_scalar = -1;
