@@ -476,5 +476,88 @@ private:
 
 };
 
+
+/**
+ * @brief Angle Based Controller
+ *
+ * NOTE: THIS CONTROLLER IS STILL UNDERDEVELOPMENT
+ * 
+ * See ControllerData.h for details on the parameters used.
+ */
+class AngleBased : public _Controller
+{
+public:
+    AngleBased(config_defs::joint_id id, ExoData* exo_data);
+    ~AngleBased() {};
+    
+    float last_encoder_angle;       //stores the last recorded encoder angle
+    float encoder_angle;            //stores current enocder angle
+    float imu_angle;                //stores current imu angle
+    float est_angle;                //stores the estimated angle based on the encoder and imu angle (uses kalman filter to estimate)
+    float combined_fsr;             //stores the normilzed combined (toe and heel) fsr values
+    
+    float max_toe_fsr;
+    float max_heel_fsr;
+    bool first_step;
+    float max_combined_fsr;
+
+    float max_angle;
+    float min_angle;
+
+    float encoder_offset;
+    float imu_offset;
+    bool first_loop;
+
+    float user_defined_torque = 5;
+
+    union {
+    float estim_angle;
+    byte angle_bytes[4];
+    }data;
+    
+    bool startFlag;
+    double swingStartTime;
+    double elapsedSwingTime;
+    double swingAssistDuration = 500;
+    int stance_setpoint = 5;
+    int swing_setpoint = 5;
+    int steps;
+    double prevtime;
+
+    /*
+    double prev_time;
+    int right_nano = 8;
+    int left_nano = 9;
+    float hip_angle;
+    float left_angle;
+    float right_angle;
+    float cmd;
+    float cmd_ff;
+    float toe_fsr;
+    float heel_fsr;
+    float summed_fsrs;
+    float summed_fsrs_max;
+    float mapped_fsrs;
+    float overall_fsr_max;
+    float prev_fsr_max;
+    float hip_angle_max;
+    float hip_angle_min;
+    float norm_hip_angle;
+    float summed_fsrs_min = 10000;
+    int stance;
+    double swing_assist_duration = 2000;
+    */
+
+    float calc_motor_cmd();         /* Function to calcualte the desired motor command. */
+    void calibrate_encoders();      /* Finds the offset angle when the user is standing straight up.*/
+    //void calibrate_imu();           /* FInds the offset angle when the user is standing straight up.*/
+    void normalize_fsr();
+    void normalize_angle();
+    //float read_imu();
+
+private:
+
+};
+
 #endif
 #endif

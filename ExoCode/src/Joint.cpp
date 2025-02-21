@@ -400,6 +400,7 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
 , _chirp(id, exo_data)
 , _step(id, exo_data)
 , _proportional_hip_moment(id, exo_data)
+, _angle_based(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
@@ -435,6 +436,8 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
             logger::print(_is_left ? "Left " : "Right ");
             logger::print("Hip : setting motor to ");
         #endif
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Setup IMU class here
 
         switch (exo_data->left_side.hip.motor.motor_type)
         {
@@ -572,6 +575,9 @@ void HipJoint::set_controller(uint8_t controller_id)
             break;
         case (uint8_t)config_defs::hip_controllers::phmc :
             _controller = &_proportional_hip_moment;
+            break;
+        case (uint8_t)config_defs::hip_controllers::angle_based :
+            _controller = &_angle_based;
             break;
         default :
             logger::print("Unkown Controller!\n", LogLevel::Error);
