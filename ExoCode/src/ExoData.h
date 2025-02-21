@@ -20,15 +20,16 @@
 #include "StatusLed.h"
 #include "StatusDefs.h"
 /* 
- * ExoData was broken out from the Exo class to have it mirrored on a second microcontroller that handles BLE.
+ * ExoData was broken out from the Exo class as we were originally going to have it mirrored on a second microcontroller that handled BLE.
  * It doesn't need to be done this way if we aren't, and is pretty cumbersome.
- * Just thought you might be wondering about the approach.
+ * Just thought you might be wondering about the weirdness.
  */
 
-//Note: Status values are in StatusDefs.h
+//Status values are in StatusDefs.h
 
 //Type used for the for each joint method, the function should take JointData as input and return void
 typedef void (*for_each_joint_function_t) (JointData*, float*); 
+
 
 /**
  * @brief Class to store all the data related to the exo
@@ -39,7 +40,7 @@ class ExoData
         ExoData(uint8_t* config_to_send); //Constructor
         
         /**
-         * @brief Reconfigures the the exo data if the configuration changes after constructor called.
+         * @brief reconfigures the the exo data if the configuration changes after constructor called.
          * 
          * @param configuration array
          */
@@ -97,7 +98,6 @@ class ExoData
          * @param status_to_set status_defs::messages::status_t
          */
         void set_status(uint16_t status_to_set);
-        
         /**
          * @brief Get the status object
          * 
@@ -106,13 +106,13 @@ class ExoData
         uint16_t get_status(void);
 
         /**
-         * @brief Set the default controller parameters for the current controller. These are the first row in the controller csv file on the SD Card
+         * @brief Set the default controller parameters for the current controller. These are the first row in the controller csv file
          *
          */
         void set_default_parameters();
         
         /**
-         * @brief Set the default controller parameters for the current controller. These are the first row in the controller csv file on the SD Card
+         * @brief Set the default controller parameters for the current controller. These are the first row in the controller csv file
          * 
          */
         void set_default_parameters(uint8_t id);
@@ -126,8 +126,8 @@ class ExoData
         bool sync_led_state;    /**< State of the sync led */
         bool estop;             /**< State of the estop */
         float battery_value;    /**< Could be Voltage or SOC, depending on the battery type*/
-        SideData left_side;     /**< Data for the left side */
-        SideData right_side;    /**< Data for the right side */
+        SideData left_side;       /**< Data for the left side */
+        SideData right_side;      /**< Data for the right side */
 
         uint32_t mark;          /**< Used for timing, currently only used by the nano */
 

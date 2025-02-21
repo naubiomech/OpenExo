@@ -9,6 +9,7 @@
 
 SyncLed::SyncLed(int pin, int sync_start_stop_half_period_us, int sync_half_period_us)
 {
+  Serial.println("making sync led");
     //See header file for information on what each variable is for.
 	_pin = pin;
 	_current_sync_period = sync_half_period_us;

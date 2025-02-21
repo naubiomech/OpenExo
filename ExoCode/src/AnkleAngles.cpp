@@ -22,6 +22,7 @@ bool AnkleAngles::init(bool is_left)
     pinMode(_left_pin, INPUT);
     pinMode(_right_pin, INPUT);
     _is_initialized = true;
+    Serial.println("ankle angle is initialized");
 }
 
 float AnkleAngles::get(bool return_normalized)

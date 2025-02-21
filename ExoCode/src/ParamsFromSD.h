@@ -28,7 +28,7 @@
     typedef std::map<uint8_t, std::string> ParamFilenameKey;
     
     /**
-     * @brief Types of errors when reading the SD card
+     * @brief types of errors when reading the SD card
      */
     namespace param_error
     {
@@ -59,6 +59,7 @@
             {(uint8_t)config_defs::knee_controllers::disabled,"kneeControllers/zeroTorque.csv"},
             {(uint8_t)config_defs::knee_controllers::zero_torque,"kneeControllers/zeroTorque.csv"},
             {(uint8_t)config_defs::knee_controllers::constant_torque, "kneeControllers/constantTorque.csv"},
+            {(uint8_t)config_defs::knee_controllers::elbow_min_max, "kneeControllers/elbowMinMax.csv"},
             {(uint8_t)config_defs::knee_controllers::chirp,"kneeControllers/chirp.csv"},
             {(uint8_t)config_defs::knee_controllers::step,"kneeControllers/step.csv"},
         };
@@ -71,9 +72,9 @@
             {(uint8_t)config_defs::ankle_controllers::zhang_collins,"ankleControllers/zhangCollins.csv"},
             {(uint8_t)config_defs::ankle_controllers::constant_torque, "ankleControllers/constantTorque.csv"},
             {(uint8_t)config_defs::ankle_controllers::trec,"ankleControllers/trec.csv"},
+			{(uint8_t)config_defs::ankle_controllers::elbow_min_max, "ankleControllers/elbowMinMax.csv"},
             {(uint8_t)config_defs::ankle_controllers::chirp,"ankleControllers/chirp.csv"},
             {(uint8_t)config_defs::ankle_controllers::step,"ankleControllers/step.csv"},
-			{(uint8_t)config_defs::ankle_controllers::spv2,"ankleControllers/spv2.csv"},
         };
 
         const ParamFilenameKey elbow
@@ -84,11 +85,10 @@
             {(uint8_t)config_defs::elbow_controllers::chirp,"elbowControllers/chirp.csv"},
             {(uint8_t)config_defs::elbow_controllers::step,"elbowControllers/step.csv"},
         };
-
     };
     
     /**
-     * @brief Prints name of error message
+     * @brief prints name of error message
      *
      * @param error identifier
      */

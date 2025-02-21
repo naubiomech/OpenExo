@@ -24,7 +24,7 @@ AnkleIMU::AnkleIMU(bool is_left) : _is_left{is_left}
     _addr = addr;
 
 	#if BOARD_VERSION == AK_Board_V0_3 
-        _imu = Adafruit_BNO055(-1, addr, &IMU_WIRE);
+        //_imu = Adafruit_BNO055(-1, addr, &IMU_WIRE);
 	#endif
 
     if(!_imu.begin())
@@ -51,7 +51,7 @@ float AnkleIMU::get_global_angle()
 	
 #if BOARD_VERSION == AK_Board_V0_3 
         IMU_WIRE.beginTransmission(_addr);
-        IMU_WIRE.write(BNO055_EULER_R_LSB_ADDR);
+        //IMU_WIRE.write(BNO055_EULER_R_LSB_ADDR);
         IMU_WIRE.endTransmission();
         IMU_WIRE.requestFrom(_addr, 2, false);
         raw_data[0] = IMU_WIRE.read();

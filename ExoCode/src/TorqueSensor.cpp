@@ -92,7 +92,7 @@ bool TorqueSensor::calibrate(bool do_calibrate)
         //The time window ran out so we are done, and should average the values and set the _calibration value.
         else if (do_calibrate)
         {
-            if (_num_calibration_samples > 0)
+            if (_num_calibration_samples>0)
             {
                 _calibration = _zero_sum/(float)_num_calibration_samples;
             }
@@ -116,6 +116,7 @@ bool TorqueSensor::calibrate(bool do_calibrate)
             #endif
         }
         
+        //Find the min and max over the time interval, offset by min and normalize by (max-min), (val-avg_min)/(avg_max-avg_min), check if we are done with the calibration 
         _last_do_calibrate = do_calibrate;
     }
     else
@@ -126,7 +127,6 @@ bool TorqueSensor::calibrate(bool do_calibrate)
 
         do_calibrate = false;
     }
-
     return do_calibrate;
 };
 
@@ -161,18 +161,5 @@ float TorqueSensor::read()
     return _calibrated_reading;
 };
 
-float TorqueSensor::readOffset()
-{
-    return _calibration;
-};
-	
-float TorqueSensor::read_microSD(float _calibration_microSD)
-{
-    _raw_reading = analogRead(_pin);
-
-    //Torque value calculated based on the offset pulled from the SD card
-    _calibrated_reading_microSD = (((float)_raw_reading * torque_calibration::AI_CNT_TO_V) - _calibration_microSD) * torque_calibration::TRQ_V_TO_NM;
-    return _calibrated_reading_microSD;
-};
 
 #endif

@@ -17,9 +17,8 @@
     #define AK_Board_V0_3 2
     #define AK_Board_V0_4 3
     #define AK_Board_V0_5_1 4
-	#define AK_Board_V0_6_Maxon 5
 
-    #define BOARD_VERSION AK_Board_V0_5_1             
+    #define BOARD_VERSION AK_Board_V0_5_1                  
     #define REAL_TIME_I2C 1
     #define LOOP_FREQ_HZ 500
     #define LOOP_TIME_TOLERANCE 0.1 
@@ -74,7 +73,7 @@
     namespace BLE_times
     {
         const float _status_msg_delay = 2000000;    //Microseconds
-        const float _real_time_msg_delay = 20000;   //Microseconds
+        const float _real_time_msg_delay = 16667;   //Microseconds
         const float _update_delay = 1000;           //Microseconds
         const float _poll_timeout = 4;              //Milliseconds
     }

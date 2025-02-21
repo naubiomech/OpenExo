@@ -7,6 +7,7 @@
  * @date Jan. 2022
 */
 
+
 #ifndef MotorData_h
 #define MotorData_h
 
@@ -55,9 +56,6 @@ class MotorData
         //Timeout state
         int timeout_count;          /**< Number of timeouts in a row */
         int timeout_count_max = 40; /**< Number of timeouts in a row before the motor is disabled */
-		
-		//Real-time Maxon Motor Reset Feedback
-		int maxon_plotting_scalar = 1;
 
 };
 

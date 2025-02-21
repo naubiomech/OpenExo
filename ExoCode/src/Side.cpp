@@ -18,7 +18,7 @@ Side::Side(bool is_left, ExoData* exo_data)
 , _heel_fsr(is_left ? logic_micro_pins::fsr_sense_left_heel_pin : logic_micro_pins::fsr_sense_right_heel_pin) //Check if it is the left and use the appropriate pin for the side.
 , _toe_fsr(is_left ? logic_micro_pins::fsr_sense_left_toe_pin : logic_micro_pins::fsr_sense_right_toe_pin)
 {
-
+    
     _data = exo_data;
     
     _is_left = is_left;
@@ -139,6 +139,7 @@ void Side::read_data()
     //Check the inclination
     _side_data->inclination = inclination_detector->check(_side_data->toe_stance, _side_data->do_calibration_refinement_toe_fsr, _side_data->ankle.joint_position);
     
+    
     //Check the joint sensors if the joint is used.
     if (_side_data->hip.is_used)
     {
@@ -226,6 +227,7 @@ bool Side::_check_ground_strike()
 
     bool ground_strike = false;
     
+    
     // logger::print("Side::_check_ground_strike : _prev_heel_contact_state - ");
     // logger::print(_prev_heel_contact_state);
     // logger::print("\n");
@@ -293,7 +295,7 @@ float Side::_calc_percent_gait()
     int percent_gait = -1;
     
     //Only calulate if the expected step duration has been established.
-    if (_side_data->expected_step_duration > 0)
+    if (_side_data->expected_step_duration>0)
     {
         percent_gait = 100 * ((float)timestamp - _ground_strike_timestamp) / _side_data->expected_step_duration;
         percent_gait = min(percent_gait, 100); //Set saturation.
@@ -476,7 +478,7 @@ float Side::_update_expected_swing_duration()
     uint8_t num_uninitialized = 0;
     
     //Check that everything is set.
-    for (int i = 0; i < _num_steps_avg; i++)
+    for (int i = 0; i<_num_steps_avg; i++)
     {
         num_uninitialized += (_swing_times[i] == 0);
     }

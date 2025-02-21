@@ -10,7 +10,7 @@
 #include "uart_commands.h"
 #include "Logger.h"
 
-//#define EXO_DEBUG  //Uncomment if you want the debug statements to print to serial monitor
+//#define EXO_DEBUG  //Uncomment if you want debug statements to print to serial monitor
 
 //Arduino compiles everything in the src folder even if not included so it causes and error for the nano if this is not included.
 #if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41) 
@@ -23,7 +23,7 @@
 Exo::Exo(ExoData* exo_data)
 : left_side(true, exo_data)      //Constructor: uses initializer list for the sides
 , right_side(false, exo_data)    //Constructor: uses initializer list for the sides
-, sync_led(logic_micro_pins::sync_led_pin, sync_time::SYNC_START_STOP_HALF_PERIOD_US, sync_time::SYNC_HALF_PERIOD_US, logic_micro_pins::sync_led_on_state, logic_micro_pins::sync_default_pin)  //Create a sync LED object, the first and last arguments (pin) are found in Board.h, and the rest are in Config.h. If you do not have a digital input for the default state you can remove SYNC_DEFAULT_STATE_PIN.
+, sync_led(logic_micro_pins::sync_led_pin, sync_time::SYNC_START_STOP_HALF_PERIOD_US, sync_time::SYNC_HALF_PERIOD_US, logic_micro_pins::sync_led_on_state, logic_micro_pins::sync_default_pin)  //Create a sync LED object, the first and last arguments (pin) are found in Board.h, and the rest are in Config.h.  If you do not have a digital input for the default state you can remove SYNC_DEFAULT_STATE_PIN.
 , status_led(logic_micro_pins::status_led_r_pin, logic_micro_pins::status_led_g_pin, logic_micro_pins::status_led_b_pin)  //Create the status LED object.
 
 #ifdef USE_SPEED_CHECK
@@ -31,6 +31,7 @@ Exo::Exo(ExoData* exo_data)
 #endif
 
 {
+
     this->data = exo_data;
     
     #ifdef EXO_DEBUG
@@ -64,6 +65,7 @@ bool Exo::run()
 
     static const float lower_bound = (float) 1/LOOP_FREQ_HZ * 1000000 * (1 - LOOP_TIME_TOLERANCE);
     
+
     if (delta_t >= (lower_bound))
     {    
         #if USE_SPEED_CHECK
@@ -81,7 +83,12 @@ bool Exo::run()
         //If the estop is low, disable all of the motors
         if (data->estop)
         {
-            data->for_each_joint([](JointData* j_data, float* args){j_data->motor.enabled = false;});
+            data->for_each_joint(
+                    [](JointData* j_data, float* args)
+                    {
+                        j_data->motor.enabled = false;
+                    }
+                );
         }
 
         //Record the side data and send new commands to the motors.
@@ -116,6 +123,7 @@ bool Exo::run()
             UART_command_handlers::get_real_time_data(handler, data, msg, data->config);
             rt_delta_t = 0;
         }
+
 
         delta_t = 0;
         return true;

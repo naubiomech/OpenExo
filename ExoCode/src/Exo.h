@@ -1,7 +1,7 @@
 /**
  * @file Exo.h
  *
- * @brief Declares exo class that all the other components will live in. 
+ * @brief Declares for the different exo class that all the other components will live in. 
  * 
  * @author P. Stegall 
  * @date Jan. 2022
@@ -32,9 +32,9 @@ class Exo
 		Exo(ExoData* exo_data); //Constructor: uses initializer list for the Side objects.
 		
         /**
-         * @brief Reads motor data from each motor used on that side and stores the values
+         * @brief reads motor data from each motor used on that side and stores the values
          * 
-         * @return true if the code ran, ie tiiming was satisfied
+         * @return true If the code ran, ie tiiming was satisfied
          * @return false 
          */
         bool run();  

@@ -353,26 +353,26 @@ namespace UART_command_handlers
         {
         case (uint8_t)config_defs::exo_name::bilateral_ankle:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading; 
+            rx_msg.data[0] = exo_data->right_side.hip.controller.encoder_angle; 
             rx_msg.data[1] = exo_data->right_side.toe_stance;
             rx_msg.data[2] = exo_data->right_side.ankle.controller.ff_setpoint;
-            rx_msg.data[3] = exo_data->left_side.ankle.controller.filtered_torque_reading; 
+            rx_msg.data[3] = exo_data->left_side.hip.controller.encoder_angle; 
             rx_msg.data[4] = exo_data->left_side.toe_stance;
             rx_msg.data[5] = exo_data->left_side.ankle.controller.ff_setpoint; 
             rx_msg.data[6] = exo_data->right_side.toe_fsr; 
             rx_msg.data[7] = exo_data->left_side.toe_fsr;
-            break;
+                break;
 
         case (uint8_t)config_defs::exo_name::bilateral_hip:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_RT_LEN;
             rx_msg.data[0] = exo_data->right_side.hip.controller.encoder_angle;
-            rx_msg.data[1] = exo_data->right_side.toe_fsr; 
-            rx_msg.data[2] = exo_data->right_side.hip.controller.imu_angle;
+            rx_msg.data[1] = exo_data->right_side.hip.controller.stance; 
+            rx_msg.data[2] = exo_data->right_side.hip.controller.ff_setpoint;
             rx_msg.data[3] = exo_data->left_side.hip.controller.encoder_angle;
-            rx_msg.data[4] = exo_data->left_side.toe_fsr;      
-            rx_msg.data[5] = exo_data->left_side.hip.controller.imu_angle;
-            rx_msg.data[6] = exo_data->right_side.heel_fsr;
-            rx_msg.data[7] = exo_data->left_side.heel_fsr;
+            rx_msg.data[4] = exo_data->left_side.hip.controller.stance;      
+            rx_msg.data[5] = exo_data->left_side.hip.controller.ff_setpoint;
+            rx_msg.data[6] = exo_data->right_side.hip.controller.steps;
+            rx_msg.data[7] = exo_data->left_side.hip.controller.steps;
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_elbow:

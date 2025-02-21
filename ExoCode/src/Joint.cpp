@@ -9,7 +9,7 @@
 //Arduino compiles everything in the src folder even if not included so it causes and error for the nano if this is not included.
 #if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41) 
 
-//Initialize the used joint counters that will be used to select the TorqueSensor pin. If you don't do it it won't work.
+//Initialize the used joint counters that will be used to select the TorqueSensor pin.  If you don't do it it won't work.
 uint8_t _Joint::left_torque_sensor_used_count = 0;
 uint8_t _Joint::right_torque_sensor_used_count = 0;
 
@@ -27,7 +27,6 @@ _Joint::_Joint(config_defs::joint_id id, ExoData* exo_data)
 {
     // logger::print("_Joint::right_torque_sensor_used_count : ");
     // logger::println(_Joint::right_torque_sensor_used_count);
-
     #ifdef JOINT_DEBUG
         logger::println("_Joint :: Constructor : entered"); 
     #endif
@@ -65,7 +64,6 @@ _Joint::_Joint(config_defs::joint_id id, ExoData* exo_data)
     // logger::print("\t");
     // logger::print(uint8_t(_torque_sensor._pin));
     // logger::print("\t");
-    
 };  
 
 void _Joint::read_data()  
@@ -74,21 +72,11 @@ void _Joint::read_data()
     _joint_data->torque_reading = (_joint_data->flip_direction ? -1.0 : 1.0) * _torque_sensor.read();
     
     _joint_data->position = _joint_data->motor.p / _joint_data->motor.gearing;
+    last_position = _joint_data->position;
     _joint_data->velocity = _joint_data->motor.v / _joint_data->motor.gearing;
-	
-	//Read the true torque sensor offset
-	_joint_data->torque_offset_reading = _torque_sensor.readOffset();
-	
-	//Return calculated torque reading based on the offset pulled from the SD Card
-	_joint_data->torque_reading_microSD = (_joint_data->flip_direction ? -1.0 : 1.0) * _torque_sensor.read_microSD(_joint_data->torque_offset / 100);
-	
-	//To bypass the torque calibration process at the beginning of each trial, modify the torque offset placeholder "255" on the SD card
-	//Example: If the true offset is 1.19, use 119; if the true offset is 0.95, use 95.
-	if (_joint_data->torque_offset != 255)
-    {
-		_joint_data->torque_reading = _joint_data->torque_reading_microSD;
-	}
+
 };
+
 
 void _Joint::check_calibration()  
 {
@@ -126,7 +114,7 @@ unsigned int _Joint::get_torque_sensor_pin(config_defs::joint_id id, ExoData* ex
         {
             if (utils::get_is_left(id) && exo_data->left_side.hip.is_used && exo_data->hip_torque_flag == 1)  //Check if the left side is used and we want to use the torque sensor
             {
-                if (_Joint::left_torque_sensor_used_count < logic_micro_pins::num_available_joints) //If we still have available pins send the next one and increment the counter. If we don't send the not connected pin.
+                if (_Joint::left_torque_sensor_used_count < logic_micro_pins::num_available_joints) // If we still have available pins send the next one and increment the counter. If we don't send the not connected pin.
                 {
                     return logic_micro_pins::torque_sensor_left[_Joint::left_torque_sensor_used_count++];
                 }
@@ -385,6 +373,7 @@ unsigned int _Joint::get_motor_enable_pin(config_defs::joint_id id, ExoData* exo
     }
 };
 
+
 void _Joint::set_motor(_Motor* new_motor)
 {
     _motor = new_motor;
@@ -413,10 +402,12 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
     if (_is_left)
     {
         _joint_data = &(exo_data->left_side.hip);
+        hip_nano = 9;
     }
     else
     {
         _joint_data = &(exo_data->right_side.hip);
+        hip_nano = 8;
     }
 
     #ifdef JOINT_DEBUG
@@ -436,8 +427,6 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
             logger::print(_is_left ? "Left " : "Right ");
             logger::print("Hip : setting motor to ");
         #endif
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Setup IMU class here
 
         switch (exo_data->left_side.hip.motor.motor_type)
         {
@@ -466,12 +455,6 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
                 #endif
                 HipJoint::set_motor(new AK70(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
                 break;
-			case (uint8_t)config_defs::motor::MaxonMotor:
-                #ifdef JOINT_DEBUG
-                    logger::println("MaxonMotor");
-                #endif
-                HipJoint::set_motor(new MaxonMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
-                break;
             default :
                 #ifdef JOINT_DEBUG
                     logger::println("NULL");
@@ -494,6 +477,7 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
             logger::println("Hip : _controller set");
         #endif
     }
+
 };
 
 void HipJoint::run_joint()
@@ -505,6 +489,12 @@ void HipJoint::run_joint()
     //Make sure the correct controller is running.
     set_controller(_joint_data->controller.controller);
     
+    //update motor data before calc motor cmd
+    _motor->read_data();
+
+    //update imu angle data before calc motor cmd
+    read_imu();
+
     //Calculate the motor command
     _joint_data->controller.setpoint = _controller->calc_motor_cmd();
 
@@ -520,7 +510,10 @@ void HipJoint::run_joint()
         for (int i=0; i < _error_manager.errorQueueSize(); i++)
         {
             _motor->set_error();
-            ErrorReporter::get_instance()->report(_error_manager.popError(),_id);
+            ErrorReporter::get_instance()->report(
+                _error_manager.popError(),
+                _id
+            );
         }
     }
 
@@ -589,15 +582,35 @@ void HipJoint::set_controller(uint8_t controller_id)
     #endif
 };
 
+void HipJoint::read_imu()
+{
+    //if(millis() >= 5000)
+    //{
+        if(millis()-prevtime >= 100)
+        {
+            prevtime = millis();
+            Wire.requestFrom(hip_nano, 4);
+            for(int i = 0; i < 4; i++)
+            {
+                data.angle_bytes[i] = Wire.read();
+            }
+            _joint_data->imu_position = data.estim_angle;
+        }
+    //}
+    
+}
+
 //================================================================
 
 KneeJoint::KneeJoint(config_defs::joint_id id, ExoData* exo_data)
 : _Joint(id, exo_data) // <-- Initializer list
 , _zero_torque(id, exo_data)
 , _constant_torque(id, exo_data)
+, _elbow_min_max(id, exo_data)
 , _chirp(id, exo_data)
 , _step(id, exo_data)
 {
+    
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
         logger::println("Knee : Knee Constructor");
@@ -660,12 +673,6 @@ KneeJoint::KneeJoint(config_defs::joint_id id, ExoData* exo_data)
                 #endif
                 KneeJoint::set_motor(new AK70(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
                 break;
-			case (uint8_t)config_defs::motor::MaxonMotor:
-                #ifdef JOINT_DEBUG
-                    logger::println("MaxonMotor");
-                #endif
-                KneeJoint::set_motor(new MaxonMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
-                break;
             default :
                 #ifdef JOINT_DEBUG
                     logger::println("NULL");
@@ -717,7 +724,10 @@ void KneeJoint::run_joint()
         // end all errors to the other microcontroller
         for (int i=0; i < _error_manager.errorQueueSize(); i++)
         {
-            ErrorReporter::get_instance()->report(_error_manager.popError(),_id);
+            ErrorReporter::get_instance()->report(
+                _error_manager.popError(),
+                _id
+            );
         }
     }
 
@@ -759,6 +769,9 @@ void KneeJoint::set_controller(uint8_t controller_id)  //Changes the high level 
         case (uint8_t)config_defs::knee_controllers::constant_torque:
             _controller = &_constant_torque;
             break;
+        case (uint8_t)config_defs::knee_controllers::elbow_min_max:
+            _controller = &_elbow_min_max;
+            break;
         case (uint8_t)config_defs::knee_controllers::chirp:
             _controller = &_chirp;
             break;
@@ -781,17 +794,17 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
 , _zhang_collins(id, exo_data)
 , _constant_torque(id, exo_data)
 , _trec(id, exo_data)
+, _elbow_min_max(id, exo_data)
 , _calibr_manager(id, exo_data)
 , _chirp(id, exo_data)
 , _step(id, exo_data)
-, _spv2(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
         logger::println("Ankle : Ankle Constructor");
     #endif
 
-    _ankle_angle.init(_is_left);
+    //_ankle_angle.init(_is_left); // dont know why but my code wouldn't leave this function so i commented out unless I have and ankle angle to use
 
     //Set _joint_data to point to the data specific to this joint.
     if (_is_left)
@@ -847,12 +860,6 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
                 #endif
                 AnkleJoint::set_motor(new AK70(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
                 break;
-			case (uint8_t)config_defs::motor::MaxonMotor:
-                #ifdef JOINT_DEBUG
-                    logger::println("MaxonMotor");
-                #endif
-                AnkleJoint::set_motor(new MaxonMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
-                break;
             default :
                 #ifdef JOINT_DEBUG
                     logger::println("NULL");
@@ -876,7 +883,7 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
             logger::println("Ankle : _controller set");
         #endif
     }  
-
+    
 };
 
 /*
@@ -925,7 +932,10 @@ void AnkleJoint::run_joint()
         //Send all errors to the other microcontroller
         for (int i=0; i < _error_manager.errorQueueSize(); i++)
         {
-            ErrorReporter::get_instance()->report(_error_manager.popError(),_id);
+            ErrorReporter::get_instance()->report(
+                _error_manager.popError(),
+                _id
+            );
         }
     }
 
@@ -976,6 +986,9 @@ void AnkleJoint::set_controller(uint8_t controller_id)  //Changes the high level
         case (uint8_t)config_defs::ankle_controllers::trec:
             _controller = &_trec;
             break;
+		case (uint8_t)config_defs::ankle_controllers::elbow_min_max:
+            _controller = &_elbow_min_max;
+            break;
 		case (uint8_t)config_defs::ankle_controllers::calibr_manager:
             _controller = &_calibr_manager;
             break;
@@ -984,9 +997,6 @@ void AnkleJoint::set_controller(uint8_t controller_id)  //Changes the high level
             break;
         case (uint8_t)config_defs::ankle_controllers::step:
             _controller = &_step;
-            break;
-		case (uint8_t)config_defs::ankle_controllers::spv2:
-            _controller = &_spv2;
             break;
         default :
             logger::print("Unkown Controller!\n", LogLevel::Error);
@@ -1064,12 +1074,6 @@ ElbowJoint::ElbowJoint(config_defs::joint_id id, ExoData* exo_data)
                 #endif
                 ElbowJoint::set_motor(new AK70(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
             break;
-			case (uint8_t)config_defs::motor::MaxonMotor:
-                #ifdef JOINT_DEBUG
-                    logger::println("MaxonMotor");
-                #endif
-                ElbowJoint::set_motor(new MaxonMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
-                break;
             default:
                 #ifdef JOINT_DEBUG
                             logger::println("NULL");
@@ -1130,7 +1134,10 @@ void ElbowJoint ::run_joint()
         //Send all errors to the other microcontroller
         for (int i = 0; i < _error_manager.errorQueueSize(); i++)
         {
-            ErrorReporter::get_instance()->report(_error_manager.popError(),_id);
+            ErrorReporter::get_instance()->report(
+                _error_manager.popError(),
+                _id
+            );
         }
     }
 

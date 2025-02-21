@@ -7,6 +7,7 @@
  * @date Jan. 2022
 */
 
+
 #ifndef Controllerdata_h
 #define ControllerData_h
 #include <stdint.h>
@@ -130,8 +131,9 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 		const uint8_t num_parameter = 1;
 	}
 
-    namespace chirp                                                     //Parameters for Sine Wave Used in Chirp Testing
+    namespace chirp
     {
+        //Parameters for Sine Wave Used in Chirp Testing
         const uint8_t amplitude_idx = 0;                        //Amplitude, in Nm, of the torque sine wave
         const uint8_t start_frequency_idx = 1;                  //Starting frequency for the chirp  
         const uint8_t end_frequency_idx = 2;                    //Ending frequency for the chirp
@@ -144,8 +146,9 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t num_parameter = 9;
     }
 
-    namespace step                                              //Parameters for step torque used in max torque capacity testing
+    namespace step
     {
+        //Parameters for step torque used in max torque capacity testing
         const uint8_t amplitude_idx = 0;                        //Magnitude of the applied torque in Nm             
         const uint8_t duration_idx = 1;                         //Duration of the applied torque
         const uint8_t repetitions_idx = 2;                      //Number of times the torque is applied
@@ -160,31 +163,9 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 
     namespace proportional_hip_moment
     {
-        const uint8_t extension_setpoint_idx = 0;               //Parameter for extension setpoint 
-        const uint8_t flexion_setpoint_idx = 1;                 //Parameter for flexion setpoin
+        const uint8_t extension_setpoint_idx = 0;                   //Parameter for extension setpoint 
+        const uint8_t flexion_setpoint_idx = 1;                     //Parameter for flexion setpoin
         const uint8_t num_parameter = 2;
-    }
-
-	namespace spv2 
-    {
-        const uint8_t plantar_scaling = 0;
-        const uint8_t dorsi_scaling = 1;
-        const uint8_t timing_threshold = 2;                     //Toe FSR threshold (unit: %)
-        const uint8_t spring_stiffness = 3;                     //Not currently used
-        const uint8_t damping = 5;                              //Not currently used
-        const uint8_t neutral_angle = 4;                        //Not currently used
-        const uint8_t propulsive_gain = 6;                      //Not currently used
-        const uint8_t kp = 7;
-		const uint8_t turn_on_peak_limiter = 9;                 //Not currently used
-        const uint8_t kd = 8;
-		const uint8_t step_response_mode = 10;                  //Not currently used
-		const uint8_t ki = 11;
-		const uint8_t do_use_servo = 12;
-		const uint8_t fsr_servo_threshold = 13;
-		const uint8_t servo_origin = 14;
-		const uint8_t servo_terminal = 15;
-		const uint8_t maxon_outOfOffice_itr = 16;               //Not currently used
-        const uint8_t num_parameter = 17;
     }
 
     namespace angle_based
@@ -195,7 +176,7 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t combined_fsr_idx = 3;
     }
 
-    const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
+    const uint8_t max_parameters = franks_collins_hip::num_parameter;   //This should be the largest of all the num_parameters
 }
 
 /**
@@ -207,7 +188,7 @@ class ControllerData {
         ControllerData(config_defs::joint_id id, uint8_t* config_to_send);
         
         /**
-         * @brief Reconfigures the the controller data if the configuration changes after constructor called.
+         * @brief reconfigures the the controller data if the configuration changes after constructor called.
          * 
          * @param configuration array
          */
@@ -240,7 +221,7 @@ class ControllerData {
         float max_measured = 0;                             /**< Max measured value */
         float max_setpoint = 0;                             /**< Max setpoint value */
 
-        /* Controller Specific Variables That You Want To Plot. If you do not want to plot, than put variables in Controller.h under the controller of interest. */
+        /* Controller Specific Variables That You Want To Plot. */
 
         //Variables for TREC Controller (MOVE TO Controller.h)
         float reference_angle = 0;                              /**< Reference angle for the spring term */
@@ -290,12 +271,6 @@ class ControllerData {
 		
 		//Variables for the Zhang-Collins Controller
 		float previous_cmd = 0;
-		
-        //Variables for SPV2
-		int plotting_scalar = 1;                //Maxon servo interrupter
-		unsigned long servo_departure_time;
-		bool servo_did_go_down = true;
-		bool servo_get_ready = false;
 
         //Variables for the PHMC Controller
         float fs;
@@ -307,7 +282,7 @@ class ControllerData {
         float est_angle;
         float combined_fsr;
         int stance;
-
+        int steps;
 };      
 
 #endif

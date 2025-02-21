@@ -33,11 +33,12 @@ class SideData {
         SideData(bool is_left, uint8_t* config_to_send);
         
         /**
-         * @brief Reconfigures the side data if the configuration changes after constructor called.
+         * @brief reconfigures the side data if the configuration changes after constructor called.
          * 
          * @param configuration array
          */
         void reconfigure(uint8_t* config_to_send);
+
         
         JointData hip;      /**< Data for the hip joint */
         JointData knee;     /**< Data for the knee joint */
