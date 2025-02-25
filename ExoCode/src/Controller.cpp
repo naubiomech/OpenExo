@@ -1934,8 +1934,15 @@ float AngleBased::calc_motor_cmd()
             normalize_angle(); // finds the max and min estimated angle values in first 5 steps
         }
 
-        float combined_raw_fsr = _side_data->heel_fsr + _side_data->toe_fsr; // sums fsr values and sets combined fsr to that value
-        combined_fsr = combined_raw_fsr / max_combined_fsr;                  // normalizes combined fsr values
+        float raw_heel_fsr = _side_data->heel_fsr;
+        float raw_toe_fsr = _side_data->toe_fsr;
+        normalized_heel_fsr = raw_heel_fsr / max_heel_fsr;
+        normalized_toe_fsr = raw_toe_fsr / max_toe_fsr;
+        combined_fsr = (normalized_toe_fsr + normalized_heel_fsr)/2.0;                  // normalizes combined fsr values
+        _controller_data->combined_fsr = combined_fsr;
+        
+        Serial.print("combined fsr values:   ");
+        Serial.println(combined_fsr);
 
         // does the actual normalization of angles
         if (est_angle < 0.0)
@@ -1959,7 +1966,7 @@ float AngleBased::calc_motor_cmd()
                 steps++;
                 Serial.println("step");
             }
-            cmd_ff = -1 * est_angle*combined_fsr*user_defined_torque;
+            cmd_ff = -1.0* est_angle*combined_fsr*stance_setpoint;
             startFlag = true;
             Serial.println("in stance");
         }
@@ -1970,6 +1977,7 @@ float AngleBased::calc_motor_cmd()
             {
                 swingStartTime = millis();
                 startFlag = false;
+                cmd_ff = swing_setpoint;
             }
             elapsedSwingTime = millis() - swingStartTime;
             if (elapsedSwingTime <= swingAssistDuration)
@@ -1983,7 +1991,8 @@ float AngleBased::calc_motor_cmd()
         }
 
         float cmd = 0.0;
-        _controller_data->ff_setpoint = cmd;
+        _controller_data->ff_setpoint = cmd_ff;
+        _controller_data->steps = steps;
         return cmd;
     //} // end millis() timer may or may not return to use to prevent freezing/crashing
 }

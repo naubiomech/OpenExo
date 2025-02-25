@@ -422,6 +422,9 @@ public:
     byte angle_bytes[4];
     }data;
     
+    float normalized_heel_fsr;
+    float normalized_toe_fsr;
+
     bool startFlag = false;
     double swingStartTime;
     double elapsedSwingTime;
