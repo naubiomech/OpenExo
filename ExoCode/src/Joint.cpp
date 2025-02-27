@@ -785,8 +785,6 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
         logger::println("Ankle : Ankle Constructor");
     #endif
 
-    _ankle_angle.init(_is_left);
-
     //Set _joint_data to point to the data specific to this joint.
     if (_is_left)
     {
