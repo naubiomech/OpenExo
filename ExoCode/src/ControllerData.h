@@ -187,6 +187,14 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t num_parameter = 17;
     }
 
+    namespace angle_based
+    {
+        const uint8_t stance_setpoint = 0;
+        const uint8_t swing_setpoint = 1;
+        const uint8_t swing_assist_duration = 2;
+        const uint8_t num_parameter = 3;
+    }
+
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
 }
 
@@ -292,6 +300,14 @@ class ControllerData {
         //Variables for the PHMC Controller
         float fs;
         float state;
+        
+        //Variables for angle based controller
+        float encoder_angle;
+        float imu_angle;
+        float est_angle;
+        float combined_fsr;
+        int stance;
+        int steps;
 };      
 
 #endif

@@ -145,6 +145,7 @@ namespace config_defs
         chirp = 5,
         step = 6,
         phmc = 7,
+        angle_based = 8,
     };
     
     enum class knee_controllers : uint8_t   //Knee Controller IDs
@@ -412,6 +413,7 @@ namespace config_defs
             {"chirp", (uint8_t)config_defs::hip_controllers::chirp},
             {"step", (uint8_t)config_defs::hip_controllers::step},
             {"phmc", (uint8_t)config_defs::hip_controllers::phmc},
+            {"angleBased", (uint8_t)config_defs::hip_controllers::angle_based},
 
         };
         

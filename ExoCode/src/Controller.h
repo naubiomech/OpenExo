@@ -476,5 +476,72 @@ private:
 
 };
 
+/**
+ * @brief Angle Based Controlle 
+ * 
+ * NOTE: THIS CONTROLLER IS STILL UNDER DEVELOPMENT 
+ * 
+ * See ControllerData.h for details on the parameters used.
+ */
+class AngleBased : public _Controller
+{
+public:
+    AngleBased(config_defs::joint_id id, ExoData* exo_data);
+    ~AngleBased() {};    
+    
+    float last_encoder_angle;       //stores the last recorded encoder angle
+    float encoder_angle;            //stores current enocder angle
+    float imu_angle;                //stores current imu angle
+    float est_angle;                //stores the estimated angle based on the encoder and imu angle (uses kalman filter to estimate)
+    float combined_fsr;             //stores the normilzed combined (toe and heel) fsr values
+    
+    float max_toe_fsr;
+    float max_heel_fsr;
+    bool first_step;
+    float max_combined_fsr;
+
+    float max_angle;
+    float min_angle;
+
+    float encoder_offset;
+    float imu_offset;
+    bool first_loop;
+
+    float user_defined_torque = 5;
+
+    union {
+    float estim_angle;
+    byte angle_bytes[4];
+    }data;
+    
+    float normalized_heel_fsr;
+    float normalized_toe_fsr;
+
+    bool startFlag = false;
+    double swingStartTime;
+    double elapsedSwingTime;
+    double swingAssistDuration = 500;
+    int stance_setpoint = 5;
+    int swing_setpoint = 5;
+    int steps;
+    double prevtime;
+
+    
+
+    float calc_motor_cmd();         /* Function to calcualte the desired motor command. */
+    void calibrate_encoders();      /* Finds the offset angle when the user is standing straight up.*/
+    void normalize_fsr();
+    void normalize_angle();
+
+
+    //float read_imu();
+    //void calibrate_imu();           /* FInds the offset angle when the user is standing straight up.*/
+    
+
+private:
+
+};
+
+
 #endif
 #endif

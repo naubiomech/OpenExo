@@ -51,6 +51,7 @@
             {(uint8_t)config_defs::hip_controllers::chirp,"hipControllers/chirp.csv"},
             {(uint8_t)config_defs::hip_controllers::step,"hipControllers/step.csv"},
             {(uint8_t)config_defs::hip_controllers::phmc,"hipControllers/PHMC.csv"},
+            {(uint8_t)config_defs::hip_controllers::angle_based,"hipControllers/angleBased.csv"},
         };
         
         const ParamFilenameKey knee

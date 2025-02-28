@@ -2163,4 +2163,204 @@ float SPV2::calc_motor_cmd()
 		return 0;
 	}
 }
+
+AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
+    : _Controller(id, exo_data)
+{
+
+//delay(5000);
+
+#ifdef CONTROLLER_DEBUG
+    logger::println("AngleBased::Constructor");
+#endif
+
+    last_encoder_angle = 0.0;
+    encoder_angle = 0.0;
+    imu_angle = 0.0;
+    est_angle = 0.0;
+    combined_fsr = 0.0;
+
+    max_toe_fsr = 0.0;
+    max_heel_fsr = 0.0;
+    first_step = true;
+    max_combined_fsr = 0.0;
+
+    max_angle = 0.0;
+    min_angle = 0.0;
+
+    encoder_offset = 0.0;
+    first_loop = true;
+    steps = 0;
+
+    // calibrate_encoders();
+}
+
+float AngleBased::calc_motor_cmd()
+{
+    //if (millis() >= 60000) // millis() timer to prevent freezing/crashing
+    //{
+
+        // prevtime = millis();
+
+        if (first_loop && (_joint_data->position != 0.0))
+        {
+            calibrate_encoders();
+            //calibrate_imu();
+            first_loop = false;
+        }
+
+        last_encoder_angle = encoder_angle;                     // sets last encoder angle to the previous enocder angle store
+        encoder_angle = _joint_data->position - encoder_offset; // sets encoder angle using position from joint data
+        _controller_data->encoder_angle = encoder_angle;        // sets the controller data encoder angle to the encoder angle to plot
+
+        //imu_angle = _joint_data->imu_position - imu_offset; // setes imu angle from joint data which SHOULD set imu angle when it sets encoder angle
+        //_controller_data->imu_angle = imu_angle;
+
+        //    Serial.print("imu angle:  ");
+        //    Serial.print(_side_data->is_left);
+        //    Serial.print("      ");
+        //    Serial.println(imu_angle);
+
+        est_angle = encoder_angle / 2.0; // SHOULD use kalman filter to estimate the hip angle using the imu and enocder angles
+
+        if (steps < 6)
+        {
+            normalize_fsr();   // finds the max and min fsr values in first 5 steps
+            normalize_angle(); // finds the max and min estimated angle values in first 5 steps
+        }
+
+        float raw_heel_fsr = _side_data->heel_fsr;
+        float raw_toe_fsr = _side_data->toe_fsr;
+        normalized_heel_fsr = raw_heel_fsr / max_heel_fsr;
+        normalized_toe_fsr = raw_toe_fsr / max_toe_fsr;
+        combined_fsr = (normalized_toe_fsr + normalized_heel_fsr)/2.0;                  // normalizes combined fsr values
+        _controller_data->combined_fsr = combined_fsr;
+        
+        Serial.print("combined fsr values:   ");
+        Serial.println(combined_fsr);
+
+        // does the actual normalization of angles
+        if (est_angle < 0.0)
+        {
+            est_angle = est_angle / min_angle; // min angle is also negative so need -1 to keep the angle < 0
+        }
+        else
+        {
+            est_angle = est_angle / max_angle;
+        }
+
+        _controller_data->est_angle = est_angle; // sets estimated angle in controller data for plotting
+
+        float cmd_ff = 0.0;
+
+        if (_side_data->heel_stance || _side_data->toe_stance)
+        {
+            _controller_data->stance = 1;
+            if (_side_data->prev_toe_stance != _side_data->toe_stance)
+            {
+                steps++;
+                Serial.println("step");
+            }
+            cmd_ff = -1.0* est_angle*combined_fsr*stance_setpoint;
+            startFlag = true;
+            Serial.println("in stance");
+        }
+        else
+        {
+            _controller_data->stance = 0;
+            if (startFlag)
+            {
+                swingStartTime = millis();
+                startFlag = false;
+                cmd_ff = swing_setpoint;
+            }
+            elapsedSwingTime = millis() - swingStartTime;
+            if (elapsedSwingTime <= swingAssistDuration)
+            {
+                cmd_ff = swing_setpoint;
+            }
+            else
+            {
+                cmd_ff = 0.0;
+            }
+        }
+
+        float cmd = 0.0;
+        _controller_data->ff_setpoint = cmd_ff;
+        _controller_data->steps = steps;
+        return cmd;
+    //} // end millis() timer may or may not return to use to prevent freezing/crashing
+}
+
+void AngleBased::calibrate_encoders()
+{
+    float sum_encoder_readings = 0.0;
+
+    for (int i = 0; i < 5; i++)
+    {
+        sum_encoder_readings += _joint_data->position;
+    }
+
+    encoder_offset = sum_encoder_readings / 5.0;
+    Serial.print("offset:     ");
+    Serial.println(encoder_offset);
+}
+
+/*void AngleBased::calibrate_imu()
+{
+    float sum_imu_readings = 0.0;
+
+    for (int i = 0; i < 5; i++)
+    {
+        sum_imu_readings += _joint_data->imu_position;
+    }
+
+    imu_offset = sum_imu_readings / 5.0;
+    Serial.print("offset:     ");
+    Serial.println(imu_offset);
+}*/
+
+void AngleBased::normalize_fsr()
+{
+    if (_side_data->heel_fsr > max_heel_fsr)
+    {
+        max_heel_fsr = _side_data->heel_fsr;
+        max_combined_fsr = max_heel_fsr + max_toe_fsr;
+    }
+
+    if (_side_data->toe_fsr > max_toe_fsr)
+    {
+        max_toe_fsr = _side_data->toe_fsr;
+        max_combined_fsr = max_heel_fsr + max_toe_fsr;
+    }
+}
+
+void AngleBased::normalize_angle() // want to rewrite this to normalize imu and encoder individually then use kalman filter
+{
+    if (est_angle > max_angle)
+    {
+        max_angle = est_angle;
+    }
+
+    if (est_angle < min_angle)
+    {
+        min_angle = est_angle;
+    }
+}
+
+/*float AngleBased::read_imu()
+{
+    if(millis()-prevtime >= 100)
+    {
+        prevtime = millis();
+        Wire.requestFrom(9, 4);
+        for(int i = 0; i < 4; i++)
+        {
+            data.angle_bytes[i] = Wire.read();
+        }
+    }
+    return data.estim_angle;
+}*/
+
+
 #endif
