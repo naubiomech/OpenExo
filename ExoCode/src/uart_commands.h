@@ -389,7 +389,8 @@ namespace UART_command_handlers
 			   
 			   
 			   //motor current plot
-			   rx_msg.data[1] = local_scalar * map(analogRead(A1),0,4095,-300,300);
+			   //rx_msg.data[1] = local_scalar * map(analogRead(A1),0,4095,-300,300);//Originally for the left leg
+			   rx_msg.data[1] = local_scalar * map(exo_data->right_side.ankle.controller.SPV2_newCurrent, 0, 2047, 0, 300);
 			   //motor reset plot hijack
 			   //rx_msg.data[1] = exo_data->left_leg.ankle.controller.gasp_motor_reset_plot;
 		//Right Set

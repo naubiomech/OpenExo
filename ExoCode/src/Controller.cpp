@@ -2074,6 +2074,25 @@ void SPV2::_step_counter(uint16_t num_steps_threshold, SideData* side_data, Cont
 	}
 }
 
+void SPV2::_golden_search_advance(uint16_t x_l_current, uint16_t x_u_current, bool do_adv_optimizer)
+{
+	if (do_adv_optimizer) {
+		x_l = _controller_data->x_l;
+		x_u = _controller_data->x_u;
+		if (x1_current > x2_current) {
+			_controller_data->x_l = _controller_data->x2;
+			//x_u = x_u; //unchanged
+		}
+		else {
+			_controller_data->x_u = _controller_data->x1;
+			//x_l = x_l; //unchanged
+		}
+	double _controller_data->x1 = _controller_data->x_l + ((sqrt(5) - 1)/2) * (_controller_data->x_u - _controller_data->x_l);//servo motor angle 1
+	double _controller_data->x2 = _controller_data->x_u - ((sqrt(5) - 1)/2) * (_controller_data->x_u - _controller_data->x_l);//servo motor angle 2
+	//_controller_data->SPV2_newCurrent
+	}
+}
+
 float SPV2::calc_motor_cmd()
 {
 	//Upper servo debugging
@@ -2292,6 +2311,7 @@ float SPV2::calc_motor_cmd()
 				
 				//Debugging——hijack motor command
 				cmd = percent_grf * 100;
+				Serial.print("  |  Maxon motor running...");
 			
 		}	
 	}
