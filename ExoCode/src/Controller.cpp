@@ -2024,7 +2024,6 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 		_controller_data->SPV2_newCurrent = abs((_controller_data->SPV2_motor_current / _controller_data->SPV2_motor_current_count) - 2048);
 		_controller_data->SPV2_motor_current = 0;
 		_controller_data->SPV2_motor_current_count = 0;
-		//_controller_data->SPV2_stiffness_adjustment_ready = true;
 		_controller_data->SPV2_do_count_steps = true;
 		_controller_data->SPV2_do_calc_new_stiffness = true;
 		_controller_data->SPV2_motor_current_ready = false;
@@ -2046,7 +2045,22 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 		uint16_t newCurrent = _controller_data->SPV2_newCurrent;
 		uint16_t oldCurrent = _controller_data->SPV2_oldCurrent;
 		uint8_t adjIncrement = _controller_data->parameters[controller_defs::spv2::spring_stiffness_adj_factor];
-		_controller_data->SPV2_currentAngle = _controller_data->SPV2_currentAngle + (((newCurrent - oldCurrent) > 0) - ((newCurrent - oldCurrent) < 0)) * (-adjIncrement);//"((x>0)-(x<0))" extracts the sign of "x", source: https://forum.arduino.cc/t/sgn-sign-signum-function-suggestions/602445/5 
+		//here to assign the new stiffness adjustment servo angle
+		// _controller_data->SPV2_currentAngle = _controller_data->SPV2_currentAngle + (((newCurrent - oldCurrent) > 0) - ((newCurrent - oldCurrent) < 0)) * (-adjIncrement);//"((x>0)-(x<0))" extracts the sign of "x", source: https://forum.arduino.cc/t/sgn-sign-signum-function-suggestions/602445/5 
+		switch (_controller_data->do_adv_optimizer) {
+			case -1://these numerical switch case values don't make much sense, will update afterward
+			_golden_search_advance();
+			_controller_data->SPV2_currentAngle = _controller_data->x1;
+			_controller_data->do_adv_optimizer = 1;
+			break;
+			case 1:
+			_controller_data->SPV2_currentAngle = _controller_data->x2;
+			_controller_data->do_adv_optimizer = -1;
+			break;
+			default:
+			//
+			break
+		}
 		_controller_data->SPV2_do_calc_new_stiffness = false;
 		_controller_data->SPV2_currentAngle = min(maxAngle, _controller_data->SPV2_currentAngle);
 		_controller_data->SPV2_currentAngle = max(minAngle, _controller_data->SPV2_currentAngle);
@@ -2074,12 +2088,12 @@ void SPV2::_step_counter(uint16_t num_steps_threshold, SideData* side_data, Cont
 	}
 }
 
-void SPV2::_golden_search_advance(uint16_t x_l_current, uint16_t x_u_current, bool do_adv_optimizer)
+void SPV2::_golden_search_advance()
 {
-	if (do_adv_optimizer) {
-		x_l = _controller_data->x_l;
-		x_u = _controller_data->x_u;
-		if (x1_current > x2_current) {
+	if (_controller_data->do_adv_optimizer == -1) {
+		_controller_data->x1_current = _controller_data->SPV2_oldCurrent;
+		_controller_data->x2_current = _controller_data->SPV2_newCurrent;
+		if (_controller_data->x1_current > _controller_data->x2_current) {
 			_controller_data->x_l = _controller_data->x2;
 			//x_u = x_u; //unchanged
 		}
@@ -2087,8 +2101,8 @@ void SPV2::_golden_search_advance(uint16_t x_l_current, uint16_t x_u_current, bo
 			_controller_data->x_u = _controller_data->x1;
 			//x_l = x_l; //unchanged
 		}
-	double _controller_data->x1 = _controller_data->x_l + ((sqrt(5) - 1)/2) * (_controller_data->x_u - _controller_data->x_l);//servo motor angle 1
-	double _controller_data->x2 = _controller_data->x_u - ((sqrt(5) - 1)/2) * (_controller_data->x_u - _controller_data->x_l);//servo motor angle 2
+	_controller_data->x1 = _controller_data->x_l + ((sqrt(5) - 1)/2) * (_controller_data->x_u - _controller_data->x_l);//servo motor angle 1
+	_controller_data->x2 = _controller_data->x_u - ((sqrt(5) - 1)/2) * (_controller_data->x_u - _controller_data->x_l);//servo motor angle 2
 	//_controller_data->SPV2_newCurrent
 	}
 }
@@ -2301,6 +2315,10 @@ float SPV2::calc_motor_cmd()
 					//Pull the initial stiffness angle from the SD card
 					if ((_controller_data->SPV2_oldCurrent == 0) && (_controller_data->SPV2_newCurrent == 0)) {
 						_controller_data->SPV2_currentAngle = _controller_data->parameters[controller_defs::spv2::neutral_angle];
+						
+						//_controller_data->do_adv_optimizer
+						_controller_data->x1 = _controller_data->parameters[controller_defs::spv2::min_angle];
+						_controller_data->x2 = _controller_data->parameters[controller_defs::spv2::max_angle];
 					}
 					
 					_servo1_runner(26, _controller_data->SPV2_currentAngle);
