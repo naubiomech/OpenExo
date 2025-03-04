@@ -13,7 +13,7 @@ pygame.mixer.init()
 
 # Load sound file (ensure the path is correct)
 # Replace 'notification.wav' with your sound file
-notification_sound = pygame.mixer.Sound('notification.wav')
+notification_sound = pygame.mixer.Sound('./Resources/Sound/notification.wav')
 
 # Biofeedback Frame
 class BioFeedback(tk.Frame):
