@@ -3,8 +3,9 @@ from tkinter import (BOTTOM, CENTER, LEFT, RIGHT, TOP, E, N, S, StringVar, W,
                      X, Y, ttk)
 
 from async_tkinter_loop import async_handler
-from custom_keyboard import CustomKeyboard
-
+from Widgets.Keyboard.custom_keyboard import CustomKeyboard
+import json
+import os
 jointMap = {
     "Right hip": 1,
     "Left hip": 2,
@@ -17,6 +18,8 @@ jointMap = {
 }
 
 class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
+    SETTINGS_FILE = "saved_data/last_torque_settings.json"  # File to save and load settings
+
     def __init__(self, parent, controller):  # Constructor for Frame
         super().__init__(parent)  # Correctly initialize the tk.Frame part
         # Initialize variables
@@ -36,7 +39,10 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         self.jointVar = StringVar(value="Select Joint")
 
         self.isBilateral = True
+
         self.create_widgets()
+        # Load previous settings if available
+        self.load_settings()
 
     def create_widgets(self):  # Frame UI elements
         # Back button to go back to Scan Window
@@ -118,8 +124,8 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         )
         updateTorqueButton.pack(side=BOTTOM, fill=X, padx=20, pady=20)
 
+    # Start the keyboard cycle, focusing on the first input field.
     def start_keyboard_cycle(self):
-        """Start the keyboard cycle, focusing on the first input field."""
         self.current_input_index = 0  # Start with the first input field
         if not self.keyboard_window:  # Create the keyboard only if it doesn't already exist
             self.keyboard_window = tk.Toplevel(self)
@@ -134,13 +140,13 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
 
         self.update_keyboard_target()
 
+    # Update the keyboard to target the current input field.
     def update_keyboard_target(self):
-        """Update the keyboard to target the current input field."""
         target_input = self.inputs[self.current_input_index]
         self.keyboard.set_target(target_input)
 
+    # Handle the keyboard submission and move to the next input field.
     def keyboard_submit(self, value):
-        """Handle the keyboard submission and move to the next input field."""
         # Set the value for the current input field
         current_input = self.inputs[self.current_input_index]
         current_input.delete(0, tk.END)
@@ -153,8 +159,8 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         else:
             self.close_keyboard()  # Close the keyboard after the last field
 
+    # Close the keyboard and reset the current input index.
     def close_keyboard(self):
-        """Close the keyboard and reset the current input index."""
         if self.keyboard_window:
             self.keyboard_window.destroy()
             self.keyboard_window = None
@@ -185,10 +191,13 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
             valueInput,
         )
 
+        # Save settings after updating
+        self.save_settings()
+
     async def UpdateButtonClicked(
         self, isBilateral, joint, controllerInput, parameterInput, valueInput,
     ):
-        controllerVal = float(controllerInput.get())  # Corrected line for Entry widget
+        controllerVal = float(controllerInput.get()) 
         parameterVal = float(parameterInput.get())
         valueVal = float(valueInput.get())
 
@@ -211,6 +220,34 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
             self.controller.show_frame("ActiveTrial")
             active_trial_frame = self.controller.frames["ActiveTrial"]
             active_trial_frame.newSelection(self)
+
+    # Save the current settings to a file.
+    def save_settings(self):
+        settings = {
+            "joint": self.jointVar.get(),
+            "controller": self.controllerInput.get(),
+            "parameter": self.parameterInput.get(),
+            "value": self.valueInput.get(),
+            "isBilateral": self.isBilateral,
+        }
+        with open(self.SETTINGS_FILE, "w") as f:
+            json.dump(settings, f, indent=4)
+        print(f"Settings saved: {settings}")
+
+    # Load the last saved settings.
+    def load_settings(self):
+        if os.path.exists(self.SETTINGS_FILE):
+            with open(self.SETTINGS_FILE, "r") as f:
+                settings = json.load(f)
+                self.jointVar.set(settings.get("joint", "Left hip"))
+                self.controllerInput.insert(0, settings.get("controller", ""))
+                self.parameterInput.insert(0, settings.get("parameter", ""))
+                self.valueInput.insert(0, settings.get("value", ""))
+                self.isBilateral = settings.get("isBilateral", True)
+                self.bilateralButtonVar.set(
+                    "Bilateral Mode On" if self.isBilateral else "Bilateral Mode Off"
+                )
+            print(f"Loaded settings: {settings}")
 
     def newSelection(self, event):
         self.jointVar.set(self.jointSelector.get())

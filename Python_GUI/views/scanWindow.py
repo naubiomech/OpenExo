@@ -7,6 +7,8 @@ import os
 
 # Frame to scan for exoskeleton devices
 class ScanWindow(tk.Frame):
+    SETTINGS_FILE = "Saved_Data/saved_device.txt"  # File to save and load previous torque settings
+
     # Initialize class
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -32,18 +34,24 @@ class ScanWindow(tk.Frame):
 
         # Load the background image
         background_image = Image.open("./Resources/Images/LabLogo.png").convert("RGBA")
-        background_image = background_image.resize((800, 150))  # Resize the image (adjust dimensions)
-        
-        # Add an overlay to simulate opacity
-        overlay = Image.new("RGBA", background_image.size, (240, 240, 240, 200))
-        background_image = Image.alpha_composite(background_image, overlay)
-        
-        self.bg_image = ImageTk.PhotoImage(background_image)
+        background_image = background_image.resize((int(1939/3), int(354/3)))  # Resize the image (adjust dimensions)
+        self.background_bg_image = ImageTk.PhotoImage(background_image)
 
         # Create a Canvas to hold the image
-        canvas = tk.Canvas(self, width=800, height=200)
-        canvas.create_image(0, 0, image=self.bg_image, anchor="nw")
+        canvas = tk.Canvas(self, width=int(1939/3), height=int(354/3))
+        canvas.create_image(0, 0, image=self.background_bg_image, anchor="nw")
         canvas.grid(row=0, column=0, columnspan=2, pady=(30,0))  # Place canvas at the top
+
+        # Load and place the smaller image behind the timer and battery
+        small_image = Image.open("./Resources/Images/OpenExo.png").convert("RGBA")
+        small_image = small_image.resize((int(1736*.075), int(336*.075)))  # Resize the image to a smaller size
+        self.small_bg_image = ImageTk.PhotoImage(small_image)
+
+        # Create a Canvas for the smaller image
+        small_canvas = tk.Canvas(self, width=int(1736*.075), height=int(336*.075), highlightthickness=0)
+        small_canvas.create_image(0, 0, image=self.small_bg_image, anchor="nw")
+        small_canvas.grid(row=0, column=1, sticky="ne", padx=5, pady=10)  # Top-right corner
+
 
         # Style configuration
         style = ttk.Style()
@@ -52,7 +60,7 @@ class ScanWindow(tk.Frame):
         style.configure('TListbox', font=(self.fontstyle, 14))
 
         # Title label on top of the image
-        titleLabel = ttk.Label(self, text="ExoSkeleton Controller", font=(self.fontstyle, 30))
+        titleLabel = ttk.Label(self, text="OpenExo GUI V1.01", font=(self.fontstyle, 30))
         titleLabel.grid(row=1, column=0, columnspan=2, pady=0, sticky="n")  # Center instructions
         
         # Initial device name display
@@ -128,7 +136,7 @@ class ScanWindow(tk.Frame):
         self.saveDeviceButton.config(state=DISABLED)
         self.loadDeviceButton.config(state=DISABLED)
         if self.selected_device_address:
-            with open("saved_device.txt", "w") as file:
+            with open(self.SETTINGS_FILE, "w") as file:
                 file.write(self.selected_device_address)
             print(f"Saved device: {self.selected_device_name} - {self.selected_device_address}")
             
@@ -152,8 +160,8 @@ class ScanWindow(tk.Frame):
         self.startScanButton.config(state="normal")
 
     def load_device_available(self):
-        if os.path.exists("saved_device.txt"):
-            with open("saved_device.txt", "r") as file:
+        if os.path.exists(self.SETTINGS_FILE):
+            with open(self.SETTINGS_FILE, "r") as file:
                 self.saved_address = file.read().strip()
                 if self.saved_address:  # Check if the file is not empty
                     self.deviceNameText.set(f"Loading saved device: {self.saved_address}")
@@ -253,7 +261,7 @@ class ScanWindow(tk.Frame):
 
         available_devices = await self.controller.deviceManager.searchDevices()
 
-        if(available_devices != "false"):
+        if(available_devices != "false" and available_devices != "NoDevice"):
             self.deviceNameText.set("Scan Complete")
             self.startScanButton.config(state="normal")
 
@@ -268,6 +276,9 @@ class ScanWindow(tk.Frame):
 
             if self.saved_address is not None:
                 self.loadDeviceButton.config(state="normal")
+        elif available_devices == "NoDevice":
+            self.deviceNameText.set("No Devices Found")
+            self.startScanButton.config(state="normal")
         else:
             self.deviceNameText.set("BlueTooth Error")
             self.startScanButton.config(state="normal")

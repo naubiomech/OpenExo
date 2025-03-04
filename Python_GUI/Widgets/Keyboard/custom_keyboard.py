@@ -5,6 +5,7 @@ class CustomKeyboard(tk.Frame):
         super().__init__(parent)
         self.target_widget = target_widget  # The input widget the keyboard interacts with
         self.on_submit = on_submit  # Callback for when the user submits the value
+        self.new_entry = True  # Flag to indicate that the next key press should replace the current content
 
         # Define button layout
         keys = [
@@ -36,11 +37,20 @@ class CustomKeyboard(tk.Frame):
     def handle_key(self, key):
         if key == "Clear":
             self.target_widget.delete(0, tk.END)  # Clear the widget
+            self.new_entry = True  # Reset flag so next key press starts fresh
         elif key == "Submit":
             if self.on_submit:
                 self.on_submit(self.target_widget.get())  # Trigger callback with the value
+            self.new_entry = True  # Reset flag after submission
+            # Optionally clear the widget after submit:
+            # self.target_widget.delete(0, tk.END)
         else:
-            self.target_widget.insert(tk.END, key)  # Add key value to the widget
+            # If starting a new entry, clear out the old content once
+            if self.new_entry:
+                self.target_widget.delete(0, tk.END)
+                self.new_entry = False
+            # Append the new key to the widget
+            self.target_widget.insert(tk.END, key)
 
         # Update the label to show the current value in the target widget
         if self.value_label.winfo_exists():

@@ -6,7 +6,7 @@ from async_tkinter_loop import async_handler
 from PIL import ImageTk, Image, ImageEnhance
 
 from Widgets.Charts.chart import FSRPlot
-from custom_keyboard import CustomKeyboard
+from Widgets.Keyboard.custom_keyboard import CustomKeyboard
 
 # Initialize Pygame for sound
 pygame.mixer.init()
