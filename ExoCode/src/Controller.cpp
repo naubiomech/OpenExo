@@ -2235,7 +2235,15 @@ float AngleBased::calc_motor_cmd()
         normalized_toe_fsr = raw_toe_fsr / max_toe_fsr;
         combined_fsr = (normalized_toe_fsr + normalized_heel_fsr)/2.0;                  // normalizes combined fsr values
         _controller_data->combined_fsr = combined_fsr;
-        
+        Serial.print("toe fsr:   ");
+        Serial.println(raw_toe_fsr);
+        Serial.print("heel fsr:   ");
+        Serial.println(raw_heel_fsr);
+        Serial.print("normalized toe fsr:   ");
+        Serial.println(normalized_toe_fsr);
+        Serial.print("normalized heel fsr:  ");
+        Serial.println(normalized_heel_fsr);
+
         Serial.print("combined fsr values:   ");
         Serial.println(combined_fsr);
 
