@@ -2057,6 +2057,18 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 			_controller_data->SPV2_currentAngle = _controller_data->x2;
 			_controller_data->do_adv_optimizer = -1;
 			break;
+			case 0:
+			_controller_data->SPV2_gs_ini_itr_count++;
+			if (_controller_data->SPV2_gs_ini_itr_count < 2) {
+				_controller_data->SPV2_currentAngle = _controller_data->x1;
+			}
+			else if (_controller_data->SPV2_gs_ini_itr_count < 3) {
+				_controller_data->SPV2_currentAngle = _controller_data->x2;
+			}
+			else {
+				_controller_data->do_adv_optimizer = -1;
+			}
+			break;
 			default:
 			//
 			break
