@@ -2052,20 +2052,24 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 			_golden_search_advance();
 			_controller_data->SPV2_currentAngle = _controller_data->x1;
 			_controller_data->do_adv_optimizer = 1;
+			Serial.print("  |  NXT x1 set!");
 			break;
 			case 1:
 			_controller_data->SPV2_currentAngle = _controller_data->x2;
 			_controller_data->do_adv_optimizer = -1;
+			Serial.print("  |  NXT x2 set!");
 			break;			
 			default:
 			if (!_controller_data->SPV2_gs_is_ini_itr) {
 				_controller_data->SPV2_currentAngle = _controller_data->x1;
 				_controller_data->SPV2_gs_is_ini_itr = true;
+				Serial.print("  |  OG x1 set!");
 			}
 			else {
 				_controller_data->SPV2_currentAngle = _controller_data->x2;
 				_controller_data->do_adv_optimizer = -1;
 				_controller_data->SPV2_gs_is_ini_itr = false;
+				Serial.print("  |  OG x2 set!");
 			}
 			break;
 		}
@@ -2327,9 +2331,11 @@ float SPV2::calc_motor_cmd()
 						//_controller_data->do_adv_optimizer
 						_controller_data->x1 = _controller_data->parameters[controller_defs::spv2::min_angle];
 						_controller_data->x2 = _controller_data->parameters[controller_defs::spv2::max_angle];
+						Serial.print("\n\n----- OG x1 x2 pulled from SD -----\n\n");
 					}
 					
 					_servo1_runner(26, _controller_data->SPV2_currentAngle);
+					
 				}
 				
 				Serial.print("\nStep count: ");
