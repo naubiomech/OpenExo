@@ -2056,22 +2056,18 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 			case 1:
 			_controller_data->SPV2_currentAngle = _controller_data->x2;
 			_controller_data->do_adv_optimizer = -1;
-			break;
-			case 0:
-			_controller_data->SPV2_gs_ini_itr_count++;
-			if (_controller_data->SPV2_gs_ini_itr_count < 2) {
+			break;			
+			default:
+			if (!_controller_data->SPV2_gs_is_ini_itr) {
 				_controller_data->SPV2_currentAngle = _controller_data->x1;
-			}
-			else if (_controller_data->SPV2_gs_ini_itr_count < 3) {
-				_controller_data->SPV2_currentAngle = _controller_data->x2;
+				_controller_data->SPV2_gs_is_ini_itr = true;
 			}
 			else {
+				_controller_data->SPV2_currentAngle = _controller_data->x2;
 				_controller_data->do_adv_optimizer = -1;
+				_controller_data->SPV2_gs_is_ini_itr = false;
 			}
 			break;
-			default:
-			//
-			break
 		}
 		_controller_data->SPV2_do_calc_new_stiffness = false;
 		_controller_data->SPV2_currentAngle = min(maxAngle, _controller_data->SPV2_currentAngle);
@@ -2340,8 +2336,8 @@ float SPV2::calc_motor_cmd()
 				Serial.print(_controller_data->SPV2_step_count);
 				
 				//Debugging——hijack motor command
-				cmd = percent_grf * 100;
-				Serial.print("  |  Maxon motor running...");
+				//cmd = percent_grf * 100;
+				//Serial.print("  |  Maxon motor running...");
 			
 		}	
 	}
