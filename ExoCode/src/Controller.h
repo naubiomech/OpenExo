@@ -478,6 +478,7 @@ private:
 	void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerData* controller_data);
 	void SPV2::_calc_motor_current(ControllerData* controller_data);
 	void SPV2::_step_counter(uint16_t num_steps_threshold, SideData* side_data, ControllerData* controller_data);
+	void SPV2::_golden_search_advance();
 };
 
 #endif

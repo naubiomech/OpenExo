@@ -273,9 +273,9 @@ void _Controller::_servo1_runner(uint8_t servo_pin, uint8_t target_angle)
 	}
 
 	myservo1.write(target_angle);
-	Serial.print("myservo1.write(");
-	Serial.print(target_angle);
-	Serial.print(") ");
+	// Serial.print("myservo1.write(");
+	// Serial.print(target_angle);
+	// Serial.print(") ");
 
 }
 
@@ -2077,10 +2077,10 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 		_controller_data->SPV2_currentAngle = min(maxAngle, _controller_data->SPV2_currentAngle);
 		_controller_data->SPV2_currentAngle = max(minAngle, _controller_data->SPV2_currentAngle);
 	}
-	Serial.print("  |  newCurrent: ");
+/* 	Serial.print("  |  newCurrent: ");
 	Serial.print(_controller_data->SPV2_newCurrent);
 	Serial.print("  |  oldCurrent: ");
-	Serial.print(_controller_data->SPV2_oldCurrent);
+	Serial.print(_controller_data->SPV2_oldCurrent); */
 }
 
 void SPV2::_step_counter(uint16_t num_steps_threshold, SideData* side_data, ControllerData* controller_data)
@@ -2116,6 +2116,10 @@ void SPV2::_golden_search_advance()
 	_controller_data->x1 = _controller_data->x_l + ((sqrt(5) - 1)/2) * (_controller_data->x_u - _controller_data->x_l);//servo motor angle 1
 	_controller_data->x2 = _controller_data->x_u - ((sqrt(5) - 1)/2) * (_controller_data->x_u - _controller_data->x_l);//servo motor angle 2
 	//_controller_data->SPV2_newCurrent
+	Serial.print("\n_controller_data->x1: ");
+	Serial.print(_controller_data->x1);
+	Serial.print("  |  _controller_data->x2: ");
+	Serial.print(_controller_data->x2);
 	}
 }
 
@@ -2334,12 +2338,15 @@ float SPV2::calc_motor_cmd()
 						Serial.print("\n\n----- OG x1 x2 pulled from SD -----\n\n");
 					}
 					
+					//Servo1 debugging
 					_servo1_runner(26, _controller_data->SPV2_currentAngle);
+					// Serial.print("\n----- currentAngle: ");
+					// Serial.print(_controller_data->SPV2_currentAngle);
 					
 				}
 				
-				Serial.print("\nStep count: ");
-				Serial.print(_controller_data->SPV2_step_count);
+				//Serial.print("\nStep count: ");
+				//Serial.print(_controller_data->SPV2_step_count);
 				
 				//Debugging——hijack motor command
 				//cmd = percent_grf * 100;
@@ -2400,8 +2407,8 @@ float SPV2::calc_motor_cmd()
 		// Serial.print("  |  ==?: ");
 		// Serial.print(_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor);
 
-		return cmd;
-		// return 0;
+		// return cmd;
+		return 0;
 	}
 	else
 	{

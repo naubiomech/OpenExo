@@ -305,6 +305,14 @@ class ControllerData {
 		//bool SPV2_stiffness_adjustment_ready = false;
 		bool SPV2_do_calc_new_stiffness = false;
 		bool SPV2_iniAngle_imported = false;
+		int8_t do_adv_optimizer = 0;
+		uint8_t x1 = 90;
+		uint8_t x2 = 90;
+		bool SPV2_gs_is_ini_itr = false;
+		uint16_t x1_current = 0;
+		uint16_t x2_current = 0;
+		uint8_t x_l = 90;
+		uint8_t x_u = 90;
 		
 
         //Variables for the PHMC Controller
