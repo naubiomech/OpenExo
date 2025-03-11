@@ -498,6 +498,26 @@ _CANMotor(id, exo_data, enable_pin)
     #endif
 };
 
+/*
+ * Constructor for the motor
+ * Takes the joint id and a pointer to the exo_data
+ * Only stores the id, exo_data pointer, and if it is left (for easy access)
+ */
+AK60v3::AK60v3(config_defs::joint_id id, ExoData* exo_data, int enable_pin): //Constructor: type is the motor type
+_CANMotor(id, exo_data, enable_pin)
+{
+    _I_MAX = 10.3f;
+    _V_MAX = 24.0f;
+
+    float kt = 0.135;
+    set_Kt(kt);
+    exo_data->get_joint_with(static_cast<uint8_t>(id))->motor.kt = kt;
+
+#ifdef MOTOR_DEBUG
+    logger::println("AK60::AK60 : Leaving Constructor");
+#endif
+};
+
 
 /*
  * Constructor for the PWM (Maxon) Motor.  
