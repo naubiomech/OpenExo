@@ -664,12 +664,15 @@ void MaxonMotor::maxon_manager(bool manager_active)
             if (millis() - zen_millis >= 2)
             {
                 enable(false);
+				_motor_data->maxon_disabled = true;
             }
 
             //Ten iterations after maxon_counter_actie = true, re-enable motor
             if (millis() - zen_millis >= 10)
             {
                 enable(true);
+				_motor_data->maxon_disabled = false;
+				// Serial.print("\n------  ||||Maxon ENABLED.||||  ------");
             }
             
             //Thirty iterations after maxon_counter_actie = true, start scanning for error again

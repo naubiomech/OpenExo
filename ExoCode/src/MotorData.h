@@ -58,6 +58,7 @@ class MotorData
 		
 		//Real-time Maxon Motor Reset Feedback
 		int maxon_plotting_scalar = 1;
+		bool maxon_disabled = false;
 
 };
 

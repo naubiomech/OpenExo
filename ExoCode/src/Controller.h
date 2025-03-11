@@ -479,6 +479,7 @@ private:
 	void SPV2::_calc_motor_current(ControllerData* controller_data);
 	void SPV2::_step_counter(uint16_t num_steps_threshold, SideData* side_data, ControllerData* controller_data);
 	void SPV2::_golden_search_advance();
+	void SPV2::optimizer_reset();
 };
 
 #endif

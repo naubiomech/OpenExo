@@ -2005,7 +2005,7 @@ void SPV2::_plantar_setpoint_adjuster(SideData* side_data, ControllerData* contr
 				_controller_data->setpoint2use_spv2 --;
 			}
 
-			_controller_data->setpoint2use_spv2 = min(_controller_data->setpoint2use_spv2, 55);
+			_controller_data->setpoint2use_spv2 = min(_controller_data->setpoint2use_spv2, 65);
 			_controller_data->setpoint2use_spv2 = max(_controller_data->setpoint2use_spv2, 0);
 			_controller_data->wasStance_spv2 = false;
 		}
@@ -2060,15 +2060,15 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 			Serial.print("  |  NXT x2 set!");
 			break;			
 			default:
-			if (!_controller_data->SPV2_gs_is_ini_itr) {
+			if (_controller_data->SPV2_gs_is_ini_itr) {
 				_controller_data->SPV2_currentAngle = _controller_data->x1;
-				_controller_data->SPV2_gs_is_ini_itr = true;
+				_controller_data->SPV2_gs_is_ini_itr = false;
 				Serial.print("  |  OG x1 set!");
 			}
 			else {
 				_controller_data->SPV2_currentAngle = _controller_data->x2;
 				_controller_data->do_adv_optimizer = -1;
-				_controller_data->SPV2_gs_is_ini_itr = false;
+				_controller_data->SPV2_gs_is_ini_itr = true;
 				Serial.print("  |  OG x2 set!");
 			}
 			break;
@@ -2123,8 +2123,27 @@ void SPV2::_golden_search_advance()
 	}
 }
 
+void SPV2::optimizer_reset()
+{
+	_controller_data->do_adv_optimizer = 0;
+	_controller_data->SPV2_gs_is_ini_itr = true;
+	
+	_controller_data->SPV2_step_count = 0;
+	_controller_data->SPV2_do_count_steps = true;//always ready to count number of steps once the servo switch is ON
+	_controller_data->SPV2_motor_current_ready = false;
+	
+	_controller_data->SPV2_motor_current = 0;
+	_controller_data->SPV2_motor_current_count = 0;
+	_controller_data->SPV2_oldCurrent = 0;
+	_controller_data->SPV2_newCurrent = 0;
+}
+
 float SPV2::calc_motor_cmd()
 {
+	if (_joint_data->is_left) {
+		return 0;
+	}
+	else {
 	//Upper servo debugging
 	// _servo1_runner(26, 90);
 	// Serial.print("\n_servo1_runner(26, 90);");
@@ -2174,21 +2193,22 @@ float SPV2::calc_motor_cmd()
 	float cmd;
 
     //Only Designed for One Leg at the Moment
-	if (!_joint_data->is_left)
-    {
+	// if (!_joint_data->is_left)
+    // {
 		if (cmd_ff < -6)
         {
 			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 		}
 		else
         {
-			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
+			//cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]); // less jittery during zero-torque mode
+			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 		}
-	}
-	else
+	// }
+/* 	else
     {
 		cmd = 0;
-	}	
+	}	 */
 	
     //Establish Setpoints
 	_controller_data->ff_setpoint = cmd_ff; 
@@ -2224,8 +2244,6 @@ float SPV2::calc_motor_cmd()
 	//	Serial.print("\nheel fsr threshold: ");
 	//	Serial.print(_controller_data->parameters[controller_defs::spv2::fsr_servo_threshold]);
 	//}
-	if (!_joint_data->is_left)
-	{
 	if (_data->user_paused || !active_trial)
 	{
 		
@@ -2287,7 +2305,7 @@ float SPV2::calc_motor_cmd()
 				
 				if (_controller_data->servo_get_ready)
                 {
-					if (millis() - _controller_data->servo_departure_time < 200)
+					if (millis() - _controller_data->servo_departure_time < 300)
                     {
 						servoOutput = _servo_runner(27, 1, servo_home, servo_target);   //Servo goes to the target position (DOWN)
 						_controller_data->servo_did_go_down = true;
@@ -2322,10 +2340,15 @@ float SPV2::calc_motor_cmd()
 				// }
 				
 				//Run Servo1
-				_step_counter(_controller_data->parameters[controller_defs::spv2::motor_current_calc_win], _side_data, _controller_data);
-				_calc_motor_current(_controller_data);
-				_stiffness_adjustment(_controller_data->parameters[controller_defs::spv2::min_angle], _controller_data->parameters[controller_defs::spv2::max_angle], _controller_data);
-				
+				if (servo_switch) {
+					_step_counter(_controller_data->parameters[controller_defs::spv2::motor_current_calc_win], _side_data, _controller_data);
+					_calc_motor_current(_controller_data);
+					_stiffness_adjustment(_controller_data->parameters[controller_defs::spv2::min_angle], _controller_data->parameters[controller_defs::spv2::max_angle], _controller_data);
+				}
+				else {
+					optimizer_reset();//make it a fresh start every time the 
+					
+				}
 				if (!_side_data->toe_stance) {
 					
 					//Pull the initial stiffness angle from the SD card
@@ -2352,13 +2375,15 @@ float SPV2::calc_motor_cmd()
 				//cmd = percent_grf * 100;
 				//Serial.print("  |  Maxon motor running...");
 			
-		}	
+		}
+		else {
+			servoOutput = _servo_runner(27, 1, servo_target, servo_home);//when the FSR is being calibrated, move the servo out of the way
+		}
 	}
 
     //Turn of the motor//
 	//When do we turn the motor OFF?
-	if (!_joint_data->is_left)
-    {
+
 		//Limit post-PID motor command for dorsiflexion torque
 		//if (cmd_ff >= 0)
         //{
@@ -2369,9 +2394,10 @@ float SPV2::calc_motor_cmd()
         {
 			cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
 			cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
+		
 		}
-	}
-}
+
+
 	//if (maxon_standby)
  //   {
 	//	_controller_data->plotting_scalar = -1;
@@ -2391,8 +2417,7 @@ float SPV2::calc_motor_cmd()
 	//	analogWrite(A9,cmdMaxon);   //Left motor: A8; Right motor: A9
 	//}
 	
-	if (!_joint_data->is_left)
-    {
+
 		// Serial.print("\ncmd = ");
 		// Serial.print(cmd);
 		// Serial.print("  |  filtered_torque_reading - cmd_ff: ");
@@ -2406,13 +2431,14 @@ float SPV2::calc_motor_cmd()
 		// Serial.print((uint8_t)config_defs::motor::MaxonMotor);
 		// Serial.print("  |  ==?: ");
 		// Serial.print(_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor);
+		if (_joint_data->motor.maxon_disabled) {
+			cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
+			cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
+		}
+		return cmd;
+		//return 0;
 
-		// return cmd;
-		return 0;
-	}
-	else
-	{
-		return 0;
+
 	}
 }
 #endif
