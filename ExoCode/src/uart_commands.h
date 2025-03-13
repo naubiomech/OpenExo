@@ -452,6 +452,11 @@ namespace UART_command_handlers
 				
 				//rx_msg.data[8] = exo_data->left_leg.ankle.controller.gasp_motor_reset_plot;
 				//rx_msg.data[9] = exo_data->right_leg.ankle.controller.gasp_motor_reset_plot;
+				rx_msg.data[8] = (exo_data->right_side.ankle.motor.maxon_pwm_delivered - 2048)/10;
+				rx_msg.data[9] = 9;
+				
+				rx_msg.data[5] = (exo_data->right_side.ankle.motor.maxon_pwm_delivered - 2048)/10;
+				
                 break;
 			}
 

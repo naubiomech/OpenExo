@@ -609,9 +609,11 @@ void MaxonMotor::send_data(float torque) //Always send motor command regardless 
     {
 	    if (!_motor_data->is_left)  //Only operational on the right side at the moment
         {
-		    uint16_t post_fuse_torque = max(655,2048+(direction_modifier*1*torque));    //Set the lowest allowed PWM command (455)
-		    post_fuse_torque = min(3690,post_fuse_torque);                              //Set the highest allowed PWM command (3890)
+		    // uint16_t post_fuse_torque = max(655,2048+(direction_modifier*1*torque));    //Set the lowest allowed PWM command (455)
+		    // post_fuse_torque = min(3690,post_fuse_torque);                              //Set the highest allowed PWM command (3890)
+			uint16_t post_fuse_torque = constrain(2048+(direction_modifier*1*torque), 410, 3685);
 		    analogWrite(A9,post_fuse_torque);
+			_motor_data->maxon_pwm_delivered = post_fuse_torque;
 	    }
     }
 };

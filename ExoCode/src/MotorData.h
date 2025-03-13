@@ -57,8 +57,9 @@ class MotorData
         int timeout_count_max = 40; /**< Number of timeouts in a row before the motor is disabled */
 		
 		//Real-time Maxon Motor Reset Feedback
-		int maxon_plotting_scalar = 1;
-		bool maxon_disabled = false;
+		int maxon_plotting_scalar = 1;/**< maxon motor debugging*/
+		bool maxon_disabled = false;/**< maxon motor debugging*/
+		uint16_t maxon_pwm_delivered = 2048;/**< maxon motor debugging*/
 
 };
 
