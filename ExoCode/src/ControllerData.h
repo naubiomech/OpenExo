@@ -296,7 +296,7 @@ class ControllerData {
 		unsigned long SPV2_motor_current_count = 0;
 		bool SPV2_motor_current_ready = false;
 		uint16_t SPV2_oldCurrent = 0;
-		uint16_t SPV2_newCurrent = 0;
+		uint16_t SPV2_newCurrent = 10000;
 		uint8_t SPV2_currentAngle = 90;
 		bool SPV2_do_count_steps = true;
 		uint16_t SPV2_step_count = 0;
@@ -313,6 +313,15 @@ class ControllerData {
 		uint16_t x2_current = 0;
 		uint8_t x_l = 90;
 		uint8_t x_u = 90;
+		
+		//SPV2 Simulated Annealing Optimizer
+		float curr = 90;
+		float curr_eval = 0;
+		float candidate = 90;
+		float candidate_eval = 0;
+		uint16_t i_SA = 0;
+		float best = 90;
+		float best_eval = 10000;
 		
 
         //Variables for the PHMC Controller

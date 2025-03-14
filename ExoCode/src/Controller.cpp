@@ -2014,6 +2014,9 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 	if(_controller_data->SPV2_motor_current_ready) {
 		_controller_data->SPV2_oldCurrent = _controller_data->SPV2_newCurrent;
 		_controller_data->SPV2_newCurrent = abs((_controller_data->SPV2_motor_current / _controller_data->SPV2_motor_current_count) - 2048);
+		Serial.print("\nnew Current: ");
+		Serial.print(_controller_data->SPV2_newCurrent);
+		
 		_controller_data->SPV2_motor_current = 0;
 		_controller_data->SPV2_motor_current_count = 0;
 		_controller_data->SPV2_do_count_steps = true;
@@ -2028,6 +2031,9 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 
 void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerData* controller_data)
 {
+	//Simulated Annealing debug
+	//_controller_data->SPV2_do_calc_new_stiffness = true;
+	
 	//Update stiffness adjustment target angle
 	//Use change of motor current to update the stiffness target angle
 	if (_controller_data->SPV2_do_calc_new_stiffness) {
@@ -2036,35 +2042,50 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 		uint8_t adjIncrement = _controller_data->parameters[controller_defs::spv2::spring_stiffness_adj_factor];
 		//here to assign the new stiffness adjustment servo angle
 		// _controller_data->SPV2_currentAngle = _controller_data->SPV2_currentAngle + (((newCurrent - oldCurrent) > 0) - ((newCurrent - oldCurrent) < 0)) * (-adjIncrement);//"((x>0)-(x<0))" extracts the sign of "x", source: https://forum.arduino.cc/t/sgn-sign-signum-function-suggestions/602445/5 
+		
+		// Serial.print("\n _controller_data->do_adv_optimizer: ");
+		// Serial.print(_controller_data->do_adv_optimizer);
+		
 		switch (_controller_data->do_adv_optimizer) {
+			case 2:
+			_SA_point_gen(20, minAngle, maxAngle, 10);
+			_controller_data->SPV2_currentAngle = _controller_data->candidate;
+			break;
 			case -1://these numerical switch case values don't make much sense, will update afterward
 			_golden_search_advance();
 			_controller_data->SPV2_currentAngle = _controller_data->x1;
 			_controller_data->do_adv_optimizer = 1;
+			Serial.print("\n Running golden loop 1");
 			//Serial.print("  |  NXT x1 set!");
 			break;
 			case 1:
 			_controller_data->SPV2_currentAngle = _controller_data->x2;
 			_controller_data->do_adv_optimizer = -1;
 			//Serial.print("  |  NXT x2 set!");
+			Serial.print("\n Running golden loop 1");
 			break;			
 			default:
-			if (_controller_data->SPV2_gs_is_ini_itr) {
-				_controller_data->SPV2_currentAngle = _controller_data->x1;
-				_controller_data->SPV2_gs_is_ini_itr = false;
-				//Serial.print("  |  OG x1 set!");
-			}
-			else {
-				_controller_data->SPV2_currentAngle = _controller_data->x2;
-				_controller_data->do_adv_optimizer = -1;
-				_controller_data->SPV2_gs_is_ini_itr = true;
-				//Serial.print("  |  OG x2 set!");
-			}
+			_SA_point_gen(20, minAngle, maxAngle, 10);
+			_controller_data->SPV2_currentAngle = _controller_data->candidate;
+			_controller_data->do_adv_optimizer = 2;
+			//_controller_data->SPV2_currentAngle = _SA_point_gen(10, true, 60, 120);
+			// if (_controller_data->SPV2_gs_is_ini_itr) {
+				// _controller_data->SPV2_currentAngle = _controller_data->x1;
+				// _controller_data->SPV2_gs_is_ini_itr = false;
+				// Serial.print("  |  OG x1 set!");
+			// }
+			// else {
+				// _controller_data->SPV2_currentAngle = _controller_data->x2;
+				// _controller_data->do_adv_optimizer = -1;
+				// _controller_data->SPV2_gs_is_ini_itr = true;
+				// Serial.print("  |  OG x2 set!");
+			// }
 			break;
 		}
 		_controller_data->SPV2_do_calc_new_stiffness = false;
 		_controller_data->SPV2_currentAngle = min(maxAngle, _controller_data->SPV2_currentAngle);
 		_controller_data->SPV2_currentAngle = max(minAngle, _controller_data->SPV2_currentAngle);
+	
 	}
 }
 
@@ -2109,6 +2130,7 @@ void SPV2::optimizer_reset()
 {
 	_controller_data->do_adv_optimizer = 0;
 	_controller_data->SPV2_gs_is_ini_itr = true;
+	_controller_data->i_SA = 0;
 	
 	_controller_data->SPV2_step_count = 0;
 	_controller_data->SPV2_do_count_steps = true;//always ready to count number of steps once the servo switch is ON
@@ -2117,36 +2139,82 @@ void SPV2::optimizer_reset()
 	_controller_data->SPV2_motor_current = 0;
 	_controller_data->SPV2_motor_current_count = 0;
 	_controller_data->SPV2_oldCurrent = 0;
-	_controller_data->SPV2_newCurrent = 0;
+	_controller_data->SPV2_newCurrent = 10000;
 }
 
-void SPV2::_SA_advance()
+void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp)
 {
+	if (_controller_data->SPV2_newCurrent==0) {
+		return;
+	}
+	_controller_data->i_SA++;
+	//Simulated Annealing debug
+	// Serial.print("\n----i_SA: ");
+	// Serial.print(_controller_data->i_SA);
+	
+	if (_controller_data->i_SA == 1) {
+		randomSeed(analogRead(0));
+		_controller_data->curr = bound_l + random(0, 1) * (bound_u - bound_l);
+		_controller_data->candidate = _controller_data->curr;
+		_controller_data->best = _controller_data->curr;
+		//return best;//initial point
+	}
+
+	else {
+		if (_controller_data->i_SA == 2) {
+			_controller_data->curr_eval = _controller_data->SPV2_newCurrent;
+			_controller_data->best_eval = _controller_data->curr_eval;
+			
+			//Simulated Annealing debug
+			// _controller_data->curr_eval =  pow(_controller_data->candidate, 2);
+			// _controller_data->best_eval = _controller_data->curr_eval;
+		}
+		_controller_data->candidate_eval = _controller_data->SPV2_newCurrent;
+		
+		//Simulated Annealing debug
+		// _controller_data->candidate_eval =  pow(_controller_data->candidate, 2);
+		
+		
+		if (_controller_data->candidate_eval < _controller_data->best_eval) {
+			_controller_data->best = _controller_data->candidate;
+			_controller_data->best_eval = _controller_data->candidate_eval;			
+		}
+		float diff = _controller_data->candidate_eval - _controller_data->curr_eval;
+		float t = temp / _controller_data->i_SA;
+		float metropolis = exp(-diff / t);
+		if ((diff < 0) || (random(0, 1)) < metropolis) {
+			_controller_data->curr = _controller_data->candidate;
+			_controller_data->curr_eval = _controller_data->candidate_eval;
+		}
+		float random_num = random(1000);
+		float random_component = ((random_num - 500)/1000)*(step_size);
+		//float random_component = ((static_cast<float>(random_num) - 500)/1000)*(step_size);
+		_controller_data->candidate = _controller_data->curr + random_component;
+		// Serial.print("  |  candidate: ");
+		// Serial.print(_controller_data->candidate);
+		// Serial.print("  |  random_component: ");
+		// Serial.print(random_component);
+		
+		//Simulated Annealing debug
+		if (_controller_data->i_SA < 100000) {
+			Serial.print("\n----i_SA: ");
+			Serial.print(_controller_data->i_SA);
+			Serial.print("  |  candidate: ");
+			Serial.print(_controller_data->candidate);
+			Serial.print("  |  candidate_eval: ");
+			Serial.print(_controller_data->candidate_eval);
+			
+			Serial.print("  |  best: ");
+			Serial.print(_controller_data->best);
+			Serial.print("  |  best_eval: ");
+			Serial.print(_controller_data->best_eval);
+			
+			
+		}
+	}
+	
+	
 	//example from https://machinelearningmastery.com/simulated-annealing-from-scratch-in-python/
-	
-	best = _controller_data->SPV2_SA_initial;//generate an initial point
-	best_eval = _controller_data->SPV2_newCurrent;//evaluate the initial point
-	curr = best;//current working solution
-	curr_eval = best_eval;
-	
-	candidate = curr + (random(-0.5, 0.5))*(step_size);
-	
-	//here to evaluate the objective function again
-	//continue
-	if (candidate_eval < best_eval) {
-		best = candidate;
-		best_eval = candidate_eval;
-	}
-	
-	diff = candidate_eval - curr_eval;
-	t = temp / (i + 1);//need to fix this
-	metropolis = exp(-diff / t);//need to fix this
-	
-	if (diff < 0) || (random(-0.5, 0.5) < metropolis) {
-		curr = candidate;
-		curr_eval = candidate_eval;
-	}
-	
 	
 }
 
@@ -2228,9 +2296,11 @@ float SPV2::calc_motor_cmd()
 	
 
 	if (!SD_content_imported) {
-		randomSeed(analogRead(0));
 		return 0;
 	}
+	
+
+
 	if (_data->user_paused || !active_trial)
 	{
 		
@@ -2246,7 +2316,7 @@ float SPV2::calc_motor_cmd()
         {
 			servoOutput = _servo_runner(27, 1, servo_target, servo_home);
 		}
-
+		
 		if (exo_status == status_defs::messages::fsr_refinement)
         {
                 //Servo movement
@@ -2288,6 +2358,7 @@ float SPV2::calc_motor_cmd()
 					_step_counter(_controller_data->parameters[controller_defs::spv2::motor_current_calc_win], _side_data, _controller_data);
 					_calc_motor_current(_controller_data);
 					_stiffness_adjustment(_controller_data->parameters[controller_defs::spv2::min_angle], _controller_data->parameters[controller_defs::spv2::max_angle], _controller_data);
+					// Serial.print(" -- Another itr.");
 				}
 				else {
 					optimizer_reset();//make it a fresh start every time the servo switch is ON again
@@ -2295,7 +2366,8 @@ float SPV2::calc_motor_cmd()
 				if (!_side_data->toe_stance) {
 					
 					//Pull the initial stiffness angle from the SD card
-					if ((_controller_data->SPV2_oldCurrent == 0) && (_controller_data->SPV2_newCurrent == 0)) {
+					// if ((_controller_data->SPV2_oldCurrent == 0) && (_controller_data->SPV2_newCurrent == 0)) {
+					if (_controller_data->SPV2_oldCurrent == 0)  {
 						_controller_data->SPV2_currentAngle = _controller_data->parameters[controller_defs::spv2::neutral_angle];
 						
 						_controller_data->x1 = _controller_data->parameters[controller_defs::spv2::min_angle];

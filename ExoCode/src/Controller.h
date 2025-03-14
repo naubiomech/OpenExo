@@ -480,6 +480,7 @@ private:
 	void SPV2::_step_counter(uint16_t num_steps_threshold, SideData* side_data, ControllerData* controller_data);
 	void SPV2::_golden_search_advance();
 	void SPV2::optimizer_reset();
+	void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp);
 };
 
 #endif
