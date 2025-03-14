@@ -2120,6 +2120,36 @@ void SPV2::optimizer_reset()
 	_controller_data->SPV2_newCurrent = 0;
 }
 
+void SPV2::_SA_advance()
+{
+	//example from https://machinelearningmastery.com/simulated-annealing-from-scratch-in-python/
+	
+	best = _controller_data->SPV2_SA_initial;//generate an initial point
+	best_eval = _controller_data->SPV2_newCurrent;//evaluate the initial point
+	curr = best;//current working solution
+	curr_eval = best_eval;
+	
+	candidate = curr + (random(-0.5, 0.5))*(step_size);
+	
+	//here to evaluate the objective function again
+	//continue
+	if (candidate_eval < best_eval) {
+		best = candidate;
+		best_eval = candidate_eval;
+	}
+	
+	diff = candidate_eval - curr_eval;
+	t = temp / (i + 1);//need to fix this
+	metropolis = exp(-diff / t);//need to fix this
+	
+	if (diff < 0) || (random(-0.5, 0.5) < metropolis) {
+		curr = candidate;
+		curr_eval = candidate_eval;
+	}
+	
+	
+}
+
 float SPV2::calc_motor_cmd()
 {
 	if (_joint_data->is_left) {
@@ -2198,6 +2228,7 @@ float SPV2::calc_motor_cmd()
 	
 
 	if (!SD_content_imported) {
+		randomSeed(analogRead(0));
 		return 0;
 	}
 	if (_data->user_paused || !active_trial)
