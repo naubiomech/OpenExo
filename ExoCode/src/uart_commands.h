@@ -457,7 +457,7 @@ namespace UART_command_handlers
 				
 				rx_msg.data[5] = (exo_data->right_side.ankle.motor.maxon_pwm_delivered - 2048)/10;
 				
-				rx_msg.data[3] = 10*map(exo_data->right_side.ankle.controller.best_eval,-2048,2048,-300,300);
+				rx_msg.data[3] = 10*map(exo_data->right_side.ankle.controller.candidate_eval,0,2047,0,300);
 				rx_msg.data[5] = exo_data->right_side.ankle.controller.candidate;
                 break;
 			}

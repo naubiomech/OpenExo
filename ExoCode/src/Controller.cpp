@@ -2013,7 +2013,7 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 	
 	if(_controller_data->SPV2_motor_current_ready) {
 		_controller_data->SPV2_oldCurrent = _controller_data->SPV2_newCurrent;
-		_controller_data->SPV2_newCurrent = abs((_controller_data->SPV2_motor_current / _controller_data->SPV2_motor_current_count) - 2048);
+		_controller_data->SPV2_newCurrent = _controller_data->SPV2_motor_current / _controller_data->SPV2_motor_current_count ;
 		Serial.print("\nnew Current: ");
 		Serial.print(_controller_data->SPV2_newCurrent);
 		
@@ -2024,7 +2024,7 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 		_controller_data->SPV2_motor_current_ready = false;
 	}
 	else {
-		_controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + analogRead(A1);
+		_controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + abs(analogRead(A1) - 2047);
 		_controller_data->SPV2_motor_current_count++;//number of frames (not number of steps)
 	}
 }
@@ -2164,6 +2164,7 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 		if (_controller_data->i_SA == 2) {
 			_controller_data->curr_eval = _controller_data->SPV2_newCurrent;
 			_controller_data->best_eval = _controller_data->curr_eval;
+			Serial.print("\n_controller_data->i_SA == 2");
 			
 			//Simulated Annealing debug
 			// _controller_data->curr_eval =  pow(_controller_data->candidate, 2);
