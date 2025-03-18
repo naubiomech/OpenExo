@@ -2022,10 +2022,26 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 		_controller_data->SPV2_do_count_steps = true;
 		_controller_data->SPV2_do_calc_new_stiffness = true;
 		_controller_data->SPV2_motor_current_ready = false;
+		
+		//here to hijack _controller_data->SPV2_newCurrent since it's being used as the cost function output
+		//here, we're redefining the cost function.
+		_controller_data->SPV2_RMSE = sqrt((_controller_data->SPV2_error_sum) / _controller_data->SPV2_error_count);
+		_controller_data->SPV2_CF_output = _controller_data->SPV2_RMSE / (_controller_data->parameters[controller_defs::spv2::plantar_scaling] + 1);
+		//the above cost function output is tracking RMSE normalized by the nominal plantarflexion
+		
+		_controller_data->SPV2_CF_output = _controller_data->SPV2_CF_output * _controller_data->SPV2_newCurrent;
+		Serial.print("\n----- CF: ");
+		Serial.print(_controller_data->SPV2_CF_output);
+		Serial.print(" -----");
 	}
 	else {
 		_controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + abs(analogRead(A1) - 2047);
 		_controller_data->SPV2_motor_current_count++;//number of frames (not number of steps)
+		
+		//calculation for the updated cost function. The goal for the updated cost function is to evaluate both the motor current and the tracking error.
+		//First, let's calculate the tracking errors
+		_controller_data->SPV2_error_sum = _controller_data->SPV2_error_sum + pow(_controller_data->ff_setpoint - _controller_data->filtered_torque_reading, 2);
+		_controller_data->SPV2_error_count++;
 	}
 }
 
@@ -2140,6 +2156,10 @@ void SPV2::optimizer_reset()
 	_controller_data->SPV2_motor_current_count = 0;
 	_controller_data->SPV2_oldCurrent = 0;
 	_controller_data->SPV2_newCurrent = 10000;
+	
+	_controller_data->SPV2_error_sum = 0;
+	_controller_data->SPV2_error_count = 0;
+	
 }
 
 void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp)
@@ -2162,7 +2182,8 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 
 	else {
 		if (_controller_data->i_SA == 2) {
-			_controller_data->curr_eval = _controller_data->SPV2_newCurrent;
+			//_controller_data->curr_eval = _controller_data->SPV2_newCurrent;
+			_controller_data->curr_eval = _controller_data->SPV2_CF_output;
 			_controller_data->best_eval = _controller_data->curr_eval;
 			Serial.print("\n_controller_data->i_SA == 2");
 			
@@ -2170,7 +2191,8 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 			// _controller_data->curr_eval =  pow(_controller_data->candidate, 2);
 			// _controller_data->best_eval = _controller_data->curr_eval;
 		}
-		_controller_data->candidate_eval = _controller_data->SPV2_newCurrent;
+		//_controller_data->candidate_eval = _controller_data->SPV2_newCurrent;
+		_controller_data->candidate_eval = _controller_data->SPV2_CF_output;
 		
 		//Simulated Annealing debug
 		// _controller_data->candidate_eval =  pow(_controller_data->candidate, 2);

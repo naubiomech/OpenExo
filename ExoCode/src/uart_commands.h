@@ -459,6 +459,7 @@ namespace UART_command_handlers
 				
 				rx_msg.data[3] = 10*map(exo_data->right_side.ankle.controller.candidate_eval,0,2047,0,300);
 				rx_msg.data[5] = exo_data->right_side.ankle.controller.candidate;
+				rx_msg.data[3] = exo_data->right_side.ankle.controller.candidate;
                 break;
 			}
 

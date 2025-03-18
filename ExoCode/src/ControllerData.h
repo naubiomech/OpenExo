@@ -323,6 +323,12 @@ class ControllerData {
 		float best = 90;
 		float best_eval = 10000;
 		
+		//SPV2 Cost Function
+		float SPV2_error_sum = 0;
+		unsigned long SPV2_error_count = 0;
+		float SPV2_RMSE = 0;
+		float SPV2_CF_output = 0;
+		
 
         //Variables for the PHMC Controller
         float fs;
