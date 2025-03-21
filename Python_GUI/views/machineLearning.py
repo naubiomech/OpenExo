@@ -282,10 +282,10 @@ class MachineLearning(tk.Frame):
     # Handle back button press
     def handle_back_button(self):
         self.stop_plot_updates()  # Stop ongoing plot updates
-        self.controller.show_frame("ActiveTrial")  # Switch to ActiveTrial frame
         active_trial_frame = self.controller.frames["ActiveTrial"]
         active_trial_frame.newSelection(self)  # Start plotting in the active trial
-
+        active_trial_frame.clear_both_plot()  # Start plotting in the active trial
+        self.controller.show_frame("ActiveTrial")  # Switch to ActiveTrial frame
     # Show frame and update plots
     def show(self):
         # Show the frame and update plots
@@ -419,7 +419,16 @@ class MachineLearning(tk.Frame):
 
         # Enable interactions after the first plot update is complete
         self.after(20, self.enable_interactions)
+        
+    def clear_top_plot(self):
+        self.topPlot.clear_plot()
 
+    def clear_bottom_plot(self):
+        self.bottomPlot.clear_plot()
+
+    def clear_both_plot(self):
+        self.bottomPlot.clear_plot()
+        self.topPlot.clear_plot()
     # Handle new selection in dropdown
     def newSelection(self, event=None):
         # Disable buttons and dropdown until process completes

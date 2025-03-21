@@ -329,7 +329,8 @@ class ScanWindow(tk.Frame):
         """Switches frame to ActiveTrial and begins the trial."""
         active_trial_frame = self.controller.frames["ActiveTrial"]
         active_trial_frame.disable_interactions()  # Disable buttons in ActiveTrial frame
-        
+        active_trial_frame.clear_both_plot()
+
         # Show ActiveTrial frame
         self.controller.show_frame("ActiveTrial")
         await self.controller.trial.calibrate(self.controller.deviceManager)  # Calibrate devices
@@ -357,6 +358,19 @@ class ScanWindow(tk.Frame):
         self.connectButton.config(state=DISABLED)
         self.saveDeviceButton.config(state=DISABLED)
         self.loadDeviceAvailible()
+
+    def disable_elements(self):
+        """disable the UI elements."""
+        self.deviceNameText.set("Not Connected")
+        self.deviceListbox.delete(0, tk.END)
+        self.selected_device_name = None
+        self.selected_device_address = None
+        self.startScanButton.config(state=DISABLED)
+        self.startTrialButton.config(state=DISABLED)
+        self.calTorqueButton.config(state=DISABLED)
+        self.connectButton.config(state=DISABLED)
+        self.saveDeviceButton.config(state=DISABLED)
+        self.loadDeviceButton.config(state=DISABLED)
         
     def show(self):
         """Resets elements and shows the frame."""

@@ -22,7 +22,15 @@ class BioFeedback(tk.Frame):
         super().__init__(parent)
         self.controller = controller  # Reference to the main application controller
         self.is_plotting = False  # Flag to control if plotting should happen
+        self.paused_flag = False
 
+        # Load pause and play icons
+        pause_img = Image.open("Resources/Images/pause.png").convert("RGBA")
+        play_img = Image.open("Resources/Images//play.png").convert("RGBA")
+        # Optionally resize them to the desired dimensions
+        self.pause_icon = ImageTk.PhotoImage(pause_img.resize((40, 40)))
+        self.play_icon = ImageTk.PhotoImage(play_img.resize((40, 40)))
+        
         self.chartVar = StringVar()  # Variable for storing the selected leg
         self.chartVar.set("Left Leg")  # Default selection
 
@@ -50,6 +58,11 @@ class BioFeedback(tk.Frame):
         # Back button to return to the Active Trial frame
         backButton = ttk.Button(self, text="Back", command=self.handle_back_button)
         backButton.grid(row=0, column=0, pady=10)
+
+        # Pause/Play Icon as a Label (no button border)
+        self.pauseIconLabel = tk.Label(self, image=self.pause_icon, borderwidth=0, cursor="hand2")
+        self.pauseIconLabel.grid(row=0, column=0, pady=10, sticky = E)
+        self.pauseIconLabel.bind("<Button-1>", lambda event: async_handler(self.on_pause_button_clicked)())
 
         # Biofeedback title label
         calibrationMenuLabel = ttk.Label(self, text="Biofeedback", font=(self.fontstyle, 40))
@@ -172,10 +185,25 @@ class BioFeedback(tk.Frame):
     def handle_back_button(self):
         # Stops plotting and goes back to Active Trial
         self.stop_plot_updates()  # Stop any ongoing plot updates
-        self.controller.show_frame("ActiveTrial")  # Switch to ActiveTrial frame
         active_trial_frame = self.controller.frames["ActiveTrial"]
         active_trial_frame.newSelection(self)  # Start the plotting on active trial
+        active_trial_frame.clear_both_plot()
+        self.controller.show_frame("ActiveTrial")  # Switch to ActiveTrial frame
 
+    async def on_pause_button_clicked(self):
+        if not self.paused_flag:
+            # Pause the system
+            await self.controller.deviceManager.motorOff()  # Turn off motors
+            self.paused_flag = True
+            # Update the label to show the "play" icon (for resuming)
+            self.pauseIconLabel.config(image=self.play_icon)
+        else:
+            # Resume the system
+            await self.controller.deviceManager.startExoMotors()  # Enable motors
+            self.paused_flag = False
+            # Update the label to show the "pause" icon (for pausing again)
+            self.pauseIconLabel.config(image=self.pause_icon)
+        
     def newSelection(self, event=None):
         # Determine which plots to show based on user selection
         selection = self.chartVar.get()

@@ -168,14 +168,11 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
 
     def handle_back_button(self):
         # Return to the previous frame
-        if self.previous_frame:
-            self.controller.show_frame(self.previous_frame)
-            active_trial_frame = self.controller.frames[self.previous_frame]
-            active_trial_frame.newSelection(self)
-        else:
-            self.controller.show_frame("ActiveTrial")
-            active_trial_frame = self.controller.frames["ActiveTrial"]
-            active_trial_frame.newSelection(self)
+        active_trial_frame = self.controller.frames[self.previous_frame]
+        active_trial_frame.newSelection(self)
+        active_trial_frame.clear_both_plot()
+        self.controller.show_frame(self.previous_frame)
+
         
     async def on_update_button_clicked(
         self, controllerInput, parameterInput, valueInput,
