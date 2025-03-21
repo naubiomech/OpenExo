@@ -32,15 +32,21 @@ class ScanWindow(tk.Frame):
     # Create all UI elements
     def create_widgets(self):
 
-        # Load the background image
+        original_width, original_height = 1939, 354
+        scale_factor = 9  # or whatever you prefer
+
+        resized_width = int(original_width / scale_factor)
+        resized_height = int(original_height / scale_factor)
+
+        # Open + Resize
         background_image = Image.open("./Resources/Images/LabLogo.png").convert("RGBA")
-        background_image = background_image.resize((int(1939/3), int(354/3)))  # Resize the image (adjust dimensions)
+        background_image = background_image.resize((resized_width, resized_height), Image.Resampling.LANCZOS)
         self.background_bg_image = ImageTk.PhotoImage(background_image)
 
-        # Create a Canvas to hold the image
-        canvas = tk.Canvas(self, width=int(1939/3), height=int(354/3))
+        # Make the Canvas match the new width/height
+        canvas = tk.Canvas(self, width=resized_width, height=resized_height, highlightthickness=0)
         canvas.create_image(0, 0, image=self.background_bg_image, anchor="nw")
-        canvas.grid(row=0, column=0, columnspan=2, pady=(30,0))  # Place canvas at the top
+        canvas.grid(row=7, column=1, sticky="se", padx=5, pady=10)
 
         # Load and place the smaller image behind the timer and battery
         small_image = Image.open("./Resources/Images/OpenExo.png").convert("RGBA")
@@ -60,7 +66,7 @@ class ScanWindow(tk.Frame):
         style.configure('TListbox', font=(self.fontstyle, 14))
 
         # Title label on top of the image
-        titleLabel = ttk.Label(self, text="OpenExo GUI V1.01", font=(self.fontstyle, 30))
+        titleLabel = ttk.Label(self, text="OpenExo GUI V1.03", font=(self.fontstyle, 30))
         titleLabel.grid(row=1, column=0, columnspan=2, pady=0, sticky="n")  # Center instructions
         
         # Initial device name display
@@ -115,7 +121,7 @@ class ScanWindow(tk.Frame):
         self.saveDeviceButton.grid(row=0, column=3, padx=5)
 
         # Configure grid weights for centering
-        for i in range(7):  # Assuming there are 7 rows
+        for i in range(8):  # Assuming there are 7 rows
             self.grid_rowconfigure(i, weight=1)
         for j in range(2):  # Assuming 2 columns
             self.grid_columnconfigure(j, weight=1)

@@ -61,13 +61,12 @@ class ActiveTrial(tk.Frame):
 
         # Load and place the smaller image behind the timer and battery
         small_image = Image.open("./Resources/Images/OpenExo.png").convert("RGBA")
-        small_image = small_image.resize((80, 40))  # Resize the image to a smaller size
+        small_image = small_image.resize((int(1736*.06), int(336*.06)))  # Resize the image to a smaller size
         self.small_bg_image = ImageTk.PhotoImage(small_image)
 
         # Create a Canvas for the smaller image
-        small_canvas = tk.Canvas(self, width=80, height=50, highlightthickness=0)
-        small_canvas.create_image(0, 0, image=self.small_bg_image, anchor="nw")
-        small_canvas.grid(row=0, column=4, sticky="ne", padx=5, pady=10)  # Top-right corner
+        small_label = ttk.Label(self, image=self.small_bg_image)
+        small_label.grid(row=0, column=4, sticky="ne", padx=5, pady=10)
 
         # Timer label
         self.timer_label = ttk.Label(self, text="Time: 0:00", font=(self.fontstyle, 12))
@@ -82,11 +81,11 @@ class ActiveTrial(tk.Frame):
 
         # Create and place the top plot
         self.topPlot = TopPlot(self)
-        self.topPlot.canvas.get_tk_widget().grid(row=1, column=1, columnspan=6, sticky="NSEW", pady=5, padx=5)
+        self.topPlot.canvas.get_tk_widget().grid(row=1, column=1, columnspan=5, sticky="NSEW", pady=5, padx=5)
 
         # Create and place the bottom plot
         self.bottomPlot = BottomPlot(self)
-        self.bottomPlot.canvas.get_tk_widget().grid(row=2, column=1, columnspan=6, sticky="NSEW", pady=5, padx=5)
+        self.bottomPlot.canvas.get_tk_widget().grid(row=2, column=1, columnspan=5, sticky="NSEW", pady=5, padx=5)
             
         # Chart selection button
         self.chartButton = ttk.Button(
