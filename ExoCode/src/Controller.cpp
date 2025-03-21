@@ -2218,6 +2218,8 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 		// Serial.print("  |  random_component: ");
 		// Serial.print(random_component);
 		
+		_controller_data->candidate = constrain(_controller_data->candidate, bound_l, bound_u);
+		
 		//Simulated Annealing debug
 		if (_controller_data->i_SA < 100000) {
 			Serial.print("\n----i_SA: ");
@@ -2361,7 +2363,7 @@ float SPV2::calc_motor_cmd()
 				
 				if (_controller_data->servo_get_ready)
                 {
-					if (millis() - _controller_data->servo_departure_time < 300)
+					if ((millis() - _controller_data->servo_departure_time) < 300)
                     {
 						servoOutput = _servo_runner(27, 1, servo_home, servo_target);   //Servo goes to the target position (DOWN)
 						_controller_data->servo_did_go_down = true;
