@@ -516,22 +516,26 @@ public:
     
     float normalized_heel_fsr;
     float normalized_toe_fsr;
+    float stance_moment;
 
     bool startFlag = false;
     double swingStartTime;
     double elapsedSwingTime;
-    double swingAssistDuration = 500;
-    int stance_setpoint = 5;
-    int swing_setpoint = 5;
+    double swingAssistDuration = 200;
+    float stance_setpoint = 15.0;
+    float swing_setpoint = 2.50;
     int steps;
     double prevtime;
 
+    float max_stance_moment = 0.1;
+    float min_stance_moment = 0.1;
     
 
     float calc_motor_cmd();         /* Function to calcualte the desired motor command. */
     void calibrate_encoders();      /* Finds the offset angle when the user is standing straight up.*/
     void normalize_fsr();
     void normalize_angle();
+    void normalize_stance_moment();
 
 
     //float read_imu();

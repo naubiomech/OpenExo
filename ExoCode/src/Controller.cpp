@@ -2202,6 +2202,12 @@ float AngleBased::calc_motor_cmd()
 
         // prevtime = millis();
 
+    //swing_setpoint = _controller_data->parameters[controller_defs::angle_based::swingsetpoint_idx];
+    //stance_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_setpoint_idx];
+    
+        float raw_heel_fsr = _side_data->heel_fsr;
+        float raw_toe_fsr = _side_data->toe_fsr;
+
         if (first_loop && (_joint_data->position != 0.0))
         {
             calibrate_encoders();
@@ -2221,7 +2227,11 @@ float AngleBased::calc_motor_cmd()
         //    Serial.print("      ");
         //    Serial.println(imu_angle);
 
-        est_angle = encoder_angle / 2.0; // SHOULD use kalman filter to estimate the hip angle using the imu and enocder angles
+
+        est_angle = encoder_angle / 2.0;                                  // SHOULD use kalman filter to estimate the hip angle using the imu and enocder angles
+        combined_fsr = (raw_toe_fsr + raw_heel_fsr)/2.0;                  // normalizes combined fsr values
+
+        stance_moment = est_angle*combined_fsr;                           // our approximation for the hip moment 
 
         if (steps < 6)
         {
@@ -2229,11 +2239,10 @@ float AngleBased::calc_motor_cmd()
             normalize_angle(); // finds the max and min estimated angle values in first 5 steps
         }
 
-        float raw_heel_fsr = _side_data->heel_fsr;
-        float raw_toe_fsr = _side_data->toe_fsr;
+
         normalized_heel_fsr = raw_heel_fsr / max_heel_fsr;
         normalized_toe_fsr = raw_toe_fsr / max_toe_fsr;
-        combined_fsr = (normalized_toe_fsr + normalized_heel_fsr)/2.0;                  // normalizes combined fsr values
+        combined_fsr = (raw_toe_fsr + raw_heel_fsr)/2.0;                  // normalizes combined fsr values
         _controller_data->combined_fsr = combined_fsr;
         Serial.print("toe fsr:   ");
         Serial.println(raw_toe_fsr);
@@ -2250,11 +2259,19 @@ float AngleBased::calc_motor_cmd()
         // does the actual normalization of angles
         if (est_angle < 0.0)
         {
-            est_angle = est_angle / min_angle; // min angle is also negative so need -1 to keep the angle < 0
+            est_angle = -1* est_angle / min_angle; // min angle is also negative so need -1 to keep the angle < 0
         }
         else
         {
             est_angle = est_angle / max_angle;
+        }
+
+        if (stance_moment > 0.0)
+        {
+            stance_moment = stance_moment/max_stance_moment;
+        }
+        else{
+            stance_moment = -1*stance_moment/min_stance_moment;
         }
 
         _controller_data->est_angle = est_angle; // sets estimated angle in controller data for plotting
@@ -2269,7 +2286,7 @@ float AngleBased::calc_motor_cmd()
                 steps++;
                 Serial.println("step");
             }
-            cmd_ff = -1.0* est_angle*combined_fsr*stance_setpoint;
+            cmd_ff = -1.0*stance_moment*stance_setpoint;
             startFlag = true;
             Serial.println("in stance");
         }
@@ -2293,9 +2310,20 @@ float AngleBased::calc_motor_cmd()
             }
         }
 
-        float cmd = 0.0;
+        if(cmd_ff > swing_setpoint) // set upperbound on motor assistance
+        {
+            cmd_ff = swing_setpoint;
+        } 
+        else if(cmd_ff < -1 * swing_setpoint) // set lower bound on motor assistance
+        {
+            cmd_ff = -1 * swing_setpoint;
+        }
+
+        float cmd = cmd_ff;
         _controller_data->ff_setpoint = cmd_ff;
         _controller_data->steps = steps;
+        Serial.print("command = ");
+        Serial.println(cmd_ff);
         return cmd;
     //} // end millis() timer may or may not return to use to prevent freezing/crashing
 }
@@ -2353,6 +2381,19 @@ void AngleBased::normalize_angle() // want to rewrite this to normalize imu and 
     if (est_angle < min_angle)
     {
         min_angle = est_angle;
+    }
+}
+
+void AngleBased::normalize_stance_moment() // want to rewrite this to normalize imu and encoder individually then use kalman filter
+{
+    if (stance_moment > max_stance_moment)
+    {
+        max_stance_moment = max_stance_moment;
+    }
+
+    if (stance_moment < min_stance_moment)
+    {
+        min_stance_moment = stance_moment;
     }
 }
 
