@@ -2256,6 +2256,8 @@ float SPV2::calc_motor_cmd()
 	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.6);
 	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.6);
 	
+
+	
 	if (_controller_data->parameters[controller_defs::spv2::turn_on_peak_limiter]) 
     {
 		plantar_setpoint = _controller_data->setpoint2use_spv2;
@@ -2319,12 +2321,26 @@ float SPV2::calc_motor_cmd()
 	uint8_t servo_target = _controller_data->parameters[controller_defs::spv2::servo_terminal];
 	bool SD_content_imported = (((servo_home == 0)&&(servo_target == 0)&&(servo_fsr_threshold == 0))?false: true);
 	
+	
+		//magnet-driven pawl-ratchet engagement/disengagement mechanism proof-of-concept
+	unsigned long millis_time = millis();
+	if (millis() - _controller_data->magnet_watch < 1000) {
+		servoOutput = _servo_runner(27, 1, 20, 40);
+	}
+	else if (millis() - _controller_data->magnet_watch < 2000) {
+		servoOutput = _servo_runner(27, 1, 40, 20);
+	}
+	else {
+		_controller_data->magnet_watch = millis();
+	}
+	return 0;
+	//
 
 	if (!SD_content_imported) {
 		return 0;
 	}
 	
-
+	
 
 	if (_data->user_paused || !active_trial)
 	{

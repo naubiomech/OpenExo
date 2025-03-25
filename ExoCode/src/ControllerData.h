@@ -329,6 +329,9 @@ class ControllerData {
 		float SPV2_RMSE = 0;
 		float SPV2_CF_output = 0;
 		
+		//magnet troubleshooting
+		unsigned long magnet_watch = 0;;
+		
 
         //Variables for the PHMC Controller
         float fs;
