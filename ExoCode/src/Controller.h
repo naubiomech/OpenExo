@@ -517,18 +517,19 @@ public:
     float normalized_heel_fsr;
     float normalized_toe_fsr;
     float stance_moment;
+    float normalized_stance_moment;
+    float max_stance_moment;
+    float min_stance_moment;
+    float max_torque;
 
     bool startFlag = false;
     double swingStartTime;
     double elapsedSwingTime;
-    double swingAssistDuration = 200;
+    double swing_assist_duration = 200;
     float stance_setpoint = 15.0;
     float swing_setpoint = 2.50;
     int steps;
     double prevtime;
-
-    float max_stance_moment = 0.1;
-    float min_stance_moment = 0.1;
     
 
     float calc_motor_cmd();         /* Function to calcualte the desired motor command. */

@@ -2180,6 +2180,9 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     est_angle = 0.0;
     combined_fsr = 0.0;
 
+    max_stance_moment = -100.0;
+    min_stance_moment = 100.0;
+
     max_toe_fsr = 0.0;
     max_heel_fsr = 0.0;
     first_step = true;
@@ -2202,8 +2205,11 @@ float AngleBased::calc_motor_cmd()
 
         // prevtime = millis();
 
-    //swing_setpoint = _controller_data->parameters[controller_defs::angle_based::swingsetpoint_idx];
-    //stance_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_setpoint_idx];
+    swing_setpoint = _controller_data->parameters[controller_defs::angle_based::swing_setpoint_idx];
+    stance_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_setpoint_idx];
+    swing_assist_duration = _controller_data->parameters[controller_defs::angle_based::swing_assist_duration_idx];
+    max_torque = _controller_data->parameters[controller_defs::angle_based::max_torque_idx];
+
     
         float raw_heel_fsr = _side_data->heel_fsr;
         float raw_toe_fsr = _side_data->toe_fsr;
@@ -2228,18 +2234,20 @@ float AngleBased::calc_motor_cmd()
         //    Serial.println(imu_angle);
 
 
-        est_angle = encoder_angle / 2.0;                                  // SHOULD use kalman filter to estimate the hip angle using the imu and enocder angles
-        combined_fsr = (raw_toe_fsr + raw_heel_fsr)/2.0;                  // normalizes combined fsr values
+        est_angle = encoder_angle;                                  // SHOULD use kalman filter to estimate the hip angle using the imu and enocder angles
+        combined_fsr = (raw_toe_fsr + raw_heel_fsr);                  // normalizes combined fsr values
 
         stance_moment = est_angle*combined_fsr;                           // our approximation for the hip moment 
 
         if (steps < 6)
         {
-            normalize_fsr();   // finds the max and min fsr values in first 5 steps
-            normalize_angle(); // finds the max and min estimated angle values in first 5 steps
+            //normalize_fsr();   // finds the max and min fsr values in first 5 steps
+            //normalize_angle(); // finds the max and min estimated angle values in first 5 steps
+            normalize_stance_moment(); //finds the max and min stance_moment in the first 5 steps
         }
 
-
+        _controller_data->combined_fsr = combined_fsr;
+        /*
         normalized_heel_fsr = raw_heel_fsr / max_heel_fsr;
         normalized_toe_fsr = raw_toe_fsr / max_toe_fsr;
         combined_fsr = (raw_toe_fsr + raw_heel_fsr)/2.0;                  // normalizes combined fsr values
@@ -2255,8 +2263,10 @@ float AngleBased::calc_motor_cmd()
 
         Serial.print("combined fsr values:   ");
         Serial.println(combined_fsr);
+        */
 
         // does the actual normalization of angles
+        /*
         if (est_angle < 0.0)
         {
             est_angle = -1* est_angle / min_angle; // min angle is also negative so need -1 to keep the angle < 0
@@ -2265,16 +2275,18 @@ float AngleBased::calc_motor_cmd()
         {
             est_angle = est_angle / max_angle;
         }
+        */
 
         if (stance_moment > 0.0)
         {
-            stance_moment = stance_moment/max_stance_moment;
+            normalized_stance_moment = stance_moment/max_stance_moment;
         }
         else{
-            stance_moment = -1*stance_moment/min_stance_moment;
+            normalized_stance_moment = -1*stance_moment/min_stance_moment;
         }
 
         _controller_data->est_angle = est_angle; // sets estimated angle in controller data for plotting
+        _controller_data->normalized_stance_moment = normalized_stance_moment;
 
         float cmd_ff = 0.0;
 
@@ -2300,7 +2312,7 @@ float AngleBased::calc_motor_cmd()
                 cmd_ff = swing_setpoint;
             }
             elapsedSwingTime = millis() - swingStartTime;
-            if (elapsedSwingTime <= swingAssistDuration)
+            if (elapsedSwingTime <= swing_assist_duration)
             {
                 cmd_ff = swing_setpoint;
             }
@@ -2310,13 +2322,13 @@ float AngleBased::calc_motor_cmd()
             }
         }
 
-        if(cmd_ff > swing_setpoint) // set upperbound on motor assistance
+        if(cmd_ff > max_torque) // set upperbound on motor assistance
         {
-            cmd_ff = swing_setpoint;
+            cmd_ff = max_torque;
         } 
-        else if(cmd_ff < -1 * swing_setpoint) // set lower bound on motor assistance
+        else if(cmd_ff < -1 * max_torque) // set lower bound on motor assistance
         {
-            cmd_ff = -1 * swing_setpoint;
+            cmd_ff = -1 * max_torque;
         }
 
         float cmd = cmd_ff;
@@ -2388,12 +2400,14 @@ void AngleBased::normalize_stance_moment() // want to rewrite this to normalize 
 {
     if (stance_moment > max_stance_moment)
     {
-        max_stance_moment = max_stance_moment;
+        max_stance_moment = stance_moment;
+       // _controller_data->normalized_stance_moment = max_stance_moment;
     }
 
     if (stance_moment < min_stance_moment)
     {
         min_stance_moment = stance_moment;
+        //_controller_data->normalized_stance_moment = max_stance_moment;
     }
 }
 

@@ -189,10 +189,11 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 
     namespace angle_based
     {
-        const uint8_t stance_setpoint = 0;
-        const uint8_t swing_setpoint = 1;
-        const uint8_t swing_assist_duration = 2;
-        const uint8_t num_parameter = 3;
+        const uint8_t stance_setpoint_idx = 0;
+        const uint8_t swing_setpoint_idx = 1;
+        const uint8_t swing_assist_duration_idx = 2;
+        const uint8_t max_torque_idx = 3;
+        const uint8_t num_parameter = 4;
     }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
@@ -308,6 +309,7 @@ class ControllerData {
         float combined_fsr;
         int stance;
         int steps;
+        float normalized_stance_moment;
 };      
 
 #endif

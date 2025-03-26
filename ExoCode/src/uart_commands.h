@@ -365,8 +365,8 @@ namespace UART_command_handlers
 
         case (uint8_t)config_defs::exo_name::bilateral_hip:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.hip.controller.encoder_angle;
-            rx_msg.data[1] = exo_data->left_side.hip.controller.encoder_angle; 
+            rx_msg.data[0] = exo_data->right_side.hip.controller.normalized_stance_moment;
+            rx_msg.data[1] = exo_data->left_side.hip.controller.normalized_stance_moment; 
             rx_msg.data[2] = exo_data->right_side.hip.controller.combined_fsr;
             rx_msg.data[3] = exo_data->right_side.hip.controller.ff_setpoint;
             rx_msg.data[4] = exo_data->left_side.hip.controller.ff_setpoint;      

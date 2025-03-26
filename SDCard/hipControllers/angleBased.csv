@@ -1,6 +1,6 @@
-5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",
-3,"parameter number, the number of parameters to read per line",
-,Parameter list for the ZeroTorque controller,
-,Parameter order: ,
-Stance Setpoint,swing_setpoint,swing assist duration
-5,5,500
+5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,
+4,"parameter number, the number of parameters to read per line",,
+,Parameter list for the ZeroTorque controller,,
+,Parameter order: ,,
+Stance Setpoint,swing_setpoint,swing assist duration,max torque
+15,2.5,200,2.5
