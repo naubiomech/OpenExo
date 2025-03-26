@@ -530,6 +530,7 @@ public:
     float swing_setpoint = 2.50;
     int steps;
     double prevtime;
+    int stance = 0;
     
 
     float calc_motor_cmd();         /* Function to calcualte the desired motor command. */

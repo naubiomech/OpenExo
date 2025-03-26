@@ -163,7 +163,7 @@ class Side
         
         //FSR objects for the side. 
         FSR _heel_fsr;                        /**< Heel force sensitive resistor, typically is a raw value */
-		FSR_Regressed _toe_fsr;               /**< Toe force sensitive resistor, typically is a regressed value */
+		FSR _toe_fsr;               /**< Toe force sensitive resistor, typically is a regressed value */
 
         //Inclination object for the side
         InclinationDetector* inclination_detector;

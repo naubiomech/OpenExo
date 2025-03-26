@@ -310,6 +310,9 @@ class ControllerData {
         int stance;
         int steps;
         float normalized_stance_moment;
+        float stance_moment;
+        float min_stance_moment;
+        float max_stance_moment;
 };      
 
 #endif

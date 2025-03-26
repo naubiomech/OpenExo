@@ -2237,7 +2237,8 @@ float AngleBased::calc_motor_cmd()
         est_angle = encoder_angle;                                  // SHOULD use kalman filter to estimate the hip angle using the imu and enocder angles
         combined_fsr = (raw_toe_fsr + raw_heel_fsr);                  // normalizes combined fsr values
 
-        stance_moment = est_angle*combined_fsr;                           // our approximation for the hip moment 
+        stance_moment = est_angle*combined_fsr;                           // our approximation for the hip moment
+        _controller_data->stance_moment = stance_moment; 
 
         if (steps < 6)
         {
@@ -2292,18 +2293,20 @@ float AngleBased::calc_motor_cmd()
 
         if (_side_data->heel_stance || _side_data->toe_stance)
         {
+            stance = 1;
             _controller_data->stance = 1;
-            if (_side_data->prev_toe_stance != _side_data->toe_stance)
+            if (_side_data->prev_toe_stance < _side_data->toe_stance)
             {
                 steps++;
                 Serial.println("step");
             }
-            cmd_ff = -1.0*stance_moment*stance_setpoint;
+            cmd_ff = -1.0*normalized_stance_moment*stance_setpoint;
             startFlag = true;
             Serial.println("in stance");
         }
         else
         {
+            stance = 0;
             _controller_data->stance = 0;
             if (startFlag)
             {
@@ -2398,16 +2401,16 @@ void AngleBased::normalize_angle() // want to rewrite this to normalize imu and 
 
 void AngleBased::normalize_stance_moment() // want to rewrite this to normalize imu and encoder individually then use kalman filter
 {
-    if (stance_moment > max_stance_moment)
+    if ((_side_data->heel_stance || _side_data->toe_stance) && (stance_moment > max_stance_moment))
     {
         max_stance_moment = stance_moment;
-       // _controller_data->normalized_stance_moment = max_stance_moment;
+        _controller_data->max_stance_moment = max_stance_moment;
     }
 
-    if (stance_moment < min_stance_moment)
+    if ((_side_data->heel_stance || _side_data->toe_stance) && (stance_moment < min_stance_moment))
     {
         min_stance_moment = stance_moment;
-        //_controller_data->normalized_stance_moment = max_stance_moment;
+        _controller_data->min_stance_moment = min_stance_moment;
     }
 }
 
