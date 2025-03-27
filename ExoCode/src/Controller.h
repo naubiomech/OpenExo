@@ -477,11 +477,11 @@ private:
 };
 
 /**
- * @brief Angle Based Controlle 
+ * @brief Angle Based Controller 
  * 
  * NOTE: THIS CONTROLLER IS STILL UNDER DEVELOPMENT 
  * 
- * See ControllerData.h for details on the parameters used.
+ * See ControllerData.h for details on the user defined parameters utilized.
  */
 class AngleBased : public _Controller
 {
@@ -489,60 +489,27 @@ public:
     AngleBased(config_defs::joint_id id, ExoData* exo_data);
     ~AngleBased() {};    
     
-    float last_encoder_angle;       //stores the last recorded encoder angle
-    float encoder_angle;            //stores current enocder angle
-    float imu_angle;                //stores current imu angle
-    float est_angle;                //stores the estimated angle based on the encoder and imu angle (uses kalman filter to estimate)
-    float combined_fsr;             //stores the normilzed combined (toe and heel) fsr values
+    float encoder_angle;            /* Stores current encoder angle, after being normalized to the calibrated offset. */
+    float combined_fsr;             /* Stores the combined(toeand heel) fsr value. */
+
+    float encoder_offset;           /* Store the encoder offset from the calibarition phase at the initation of the trial. */
+
+    bool first_loop;                /* Flag to initiate encoder calibration at the initiation of the trial.*/
     
-    float max_toe_fsr;
-    float max_heel_fsr;
-    bool first_step;
-    float max_combined_fsr;
+    float stance_moment;            /* Estimate stance moment by multiplying hip angle by combined fsr. */
+    float normalized_stance_moment; /* Normalized stance_moment to - 1 to 1 range. */
+    float max_stance_moment;        /* Maxium stance_moment from calibration period. */
+    float min_stance_moment;        /* Minimum stance_moment from calibration period. */
 
-    float max_angle;
-    float min_angle;
+    bool startFlag;                 /* Flag to mark the time at which the lastest instance of swing phase began. */
+    double swingStartTime;          /* Stores the time at which the latest instance of swing phase began. */
 
-    float encoder_offset;
-    float imu_offset;
-    bool first_loop;
-
-    float user_defined_torque = 5;
-
-    union {
-    float estim_angle;
-    byte angle_bytes[4];
-    }data;
+    int steps;                      /* Number of steps that have occured. */
     
-    float normalized_heel_fsr;
-    float normalized_toe_fsr;
-    float stance_moment;
-    float normalized_stance_moment;
-    float max_stance_moment;
-    float min_stance_moment;
-    float max_torque;
-
-    bool startFlag = false;
-    double swingStartTime;
-    double elapsedSwingTime;
-    double swing_assist_duration = 200;
-    float stance_setpoint = 15.0;
-    float swing_setpoint = 2.50;
-    int steps;
-    double prevtime;
-    int stance = 0;
-    
-
+    //Functions
     float calc_motor_cmd();         /* Function to calcualte the desired motor command. */
-    void calibrate_encoders();      /* Finds the offset angle when the user is standing straight up.*/
-    void normalize_fsr();
-    void normalize_angle();
-    void normalize_stance_moment();
-
-
-    //float read_imu();
-    //void calibrate_imu();           /* FInds the offset angle when the user is standing straight up.*/
-    
+    void calibrate_encoders();      /* Function to finds the offset angle when the user is standing still upon initiation of the trial. */
+    void normalize_stance_moment(); /* Function to calucalte the max and min stance_moment to normalize to the variable between -1 and 1. */
 
 private:
 

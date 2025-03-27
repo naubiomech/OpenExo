@@ -189,10 +189,10 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 
     namespace angle_based
     {
-        const uint8_t stance_setpoint_idx = 0;
-        const uint8_t swing_setpoint_idx = 1;
-        const uint8_t swing_assist_duration_idx = 2;
-        const uint8_t max_torque_idx = 3;
+        const uint8_t stance_setpoint_idx = 0;                  //Stance Phase Setpoint (Nm)
+        const uint8_t swing_setpoint_idx = 1;                   //Swing Phase Setpoint (Nm)
+        const uint8_t swing_assist_duration_idx = 2;            //Duration of Swing Phase Assistance (ms)
+        const uint8_t max_torque_idx = 3;                       //Maximum Torque Limit (Nm)
         const uint8_t num_parameter = 4;
     }
 
@@ -304,13 +304,9 @@ class ControllerData {
         
         //Variables for angle based controller
         float encoder_angle;
-        float imu_angle;
-        float est_angle;
         float combined_fsr;
-        int stance;
-        int steps;
-        float normalized_stance_moment;
         float stance_moment;
+        float normalized_stance_moment;
         float min_stance_moment;
         float max_stance_moment;
 };      

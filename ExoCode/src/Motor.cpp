@@ -385,8 +385,8 @@ void _CANMotor::set_Kt(float Kt)
 
 void _CANMotor::_handle_read_failure()
 {
-    logger::println("CAN Motor - Handle Read Failure", LogLevel::Error);
-    _motor_data->timeout_count++;
+    //logger::println("CAN Motor - Handle Read Failure", LogLevel::Error);
+    //_motor_data->timeout_count++;
 };
 
 float _CANMotor::_float_to_uint(float x, float x_min, float x_max, int bits)

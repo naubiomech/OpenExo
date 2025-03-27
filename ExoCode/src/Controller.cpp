@@ -2164,188 +2164,139 @@ float SPV2::calc_motor_cmd()
 	}
 }
 
+//****************************************************
+
 AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     : _Controller(id, exo_data)
 {
 
-//delay(5000);
+    #ifdef CONTROLLER_DEBUG
+        logger::println("AngleBased::Constructor");
+    #endif
 
-#ifdef CONTROLLER_DEBUG
-    logger::println("AngleBased::Constructor");
-#endif
-
-    last_encoder_angle = 0.0;
     encoder_angle = 0.0;
-    imu_angle = 0.0;
-    est_angle = 0.0;
     combined_fsr = 0.0;
+    encoder_offset = 0.0;
 
+    first_loop = true;
+
+    stance_moment = 0.0;
+    normalized_stance_moment = 0.0;
     max_stance_moment = -100.0;
     min_stance_moment = 100.0;
 
-    max_toe_fsr = 0.0;
-    max_heel_fsr = 0.0;
-    first_step = true;
-    max_combined_fsr = 0.0;
+    startFlag = false;
+    swingStartTime = 0;
 
-    max_angle = 0.0;
-    min_angle = 0.0;
-
-    encoder_offset = 0.0;
-    first_loop = true;
     steps = 0;
 
-    // calibrate_encoders();
 }
 
 float AngleBased::calc_motor_cmd()
 {
-    //if (millis() >= 60000) // millis() timer to prevent freezing/crashing
-    //{
+    //Pull in user defined parameters
+    float swing_setpoint = _controller_data->parameters[controller_defs::angle_based::swing_setpoint_idx];
+    float stance_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_setpoint_idx];
+    double swing_assist_duration = _controller_data->parameters[controller_defs::angle_based::swing_assist_duration_idx];
+    float max_torque = _controller_data->parameters[controller_defs::angle_based::max_torque_idx];
 
-        // prevtime = millis();
+    //Pull in FSR values (double check that Toe FSR, located in Side.h, is not drawing from the FSR_Regressed Function)
+    float raw_heel_fsr = _side_data->heel_fsr;
+    float raw_toe_fsr = _side_data->toe_fsr;
 
-    swing_setpoint = _controller_data->parameters[controller_defs::angle_based::swing_setpoint_idx];
-    stance_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_setpoint_idx];
-    swing_assist_duration = _controller_data->parameters[controller_defs::angle_based::swing_assist_duration_idx];
-    max_torque = _controller_data->parameters[controller_defs::angle_based::max_torque_idx];
+    //If we just started, calculate the offset for the angle encoders
+    if (first_loop && (_joint_data->position != 0.0))
+    {
+        calibrate_encoders();
+        first_loop = false;
+    }
 
+    //Handle the Angle Data
+    encoder_angle = _joint_data->position - encoder_offset; //Get the encoder angle from the motors and normalize if by the offset
+    _controller_data->encoder_angle = encoder_angle;        //Store the offset angle for plotting
+
+    //Calculate the combined FSR value (Toe + Heel)
+    combined_fsr = (raw_toe_fsr + raw_heel_fsr);            //Calculates value
+    _controller_data->combined_fsr = combined_fsr;          //Stores the combined FSR term for plotting
+
+    //Calculate the Approximated Hip Moment 
+    stance_moment = encoder_angle*combined_fsr;             //Define Stance Moment as Encoder Angle * Combined Heel and Toe FSR                          
+    _controller_data->stance_moment = stance_moment;        //Store the Stance Moment Term for plotting
+
+    //Find the Min and Max stance_moment values to scale the term to a 0 to 1 range
+    if (steps < 6)
+    {
+        normalize_stance_moment();                          //Finds the max and min stance_moment in the first 5 steps
+    }
+
+    //Normalize the stance_moment term to range from -1 to 1
+    if (stance_moment >= 0.0)                                            //If the term is positive, normalize by its maximum value
+    {
+        normalized_stance_moment = stance_moment/max_stance_moment;
+    }
+    else                                                                //If the term is negative, normalize by its minimum value
+    {
+        normalized_stance_moment = -1*stance_moment/min_stance_moment;
+    }
+
+    _controller_data->normalized_stance_moment = normalized_stance_moment;  //Store the normalized_stance_moment for plotting
+
+    //Determine the Torque Setpoint
+    float cmd_ff = 0.0;                                             //Initialize the feed-foward command to 0
+
+    if (_side_data->heel_stance || _side_data->toe_stance)          //If we are in stance 
+    {
+        if (_side_data->prev_toe_stance < _side_data->toe_stance)   //If we just entered stance
+        {
+            steps++;                                                //Increase the step count by 1
+        }
+
+        cmd_ff = -1.0*normalized_stance_moment*stance_setpoint;     //Calculate the setpoint by multiplying the normalized_stance_moment (ranging from -1 to 1) by the user defined setpoint
+
+        startFlag = true;                                           //Reset the swing phase start flag when we are in stance 
+    }
+    else                                                            //If we are in swing
+    {
+        if (startFlag)                                              //If this is the first instance of swing, record the time at which it occured and send the swing propulsive assistance
+        {
+            swingStartTime = millis();
+            startFlag = false;
+            cmd_ff = swing_setpoint;
+        }
+        
+        if ((millis() - swingStartTime) <= swing_assist_duration)   //If we are within the user defined assistive duration, provide swing assistance 
+        {
+            cmd_ff = swing_setpoint;
+        }
+        else                                                        //If we are not within the user defined assistive duration, send zero torque
+        {
+            cmd_ff = 0.0;
+        }
+    }
+
+    //Saftey Factor to ensure we do not exceed a user defined maximum torque threshold
+    if(cmd_ff > max_torque)                                         //Set upperbound on motor assistance
+    {
+        cmd_ff = max_torque;
+    } 
+    else if(cmd_ff < -1 * max_torque)                               //Set lower bound on motor assistance
+    {
+        cmd_ff = -1 * max_torque;
+    }
+
+    //Store the feed-foward setpoint for plotting
+    _controller_data->ff_setpoint = cmd_ff;
     
-        float raw_heel_fsr = _side_data->heel_fsr;
-        float raw_toe_fsr = _side_data->toe_fsr;
+    //Set the motor command to be equal to the feed-foward setpoint (Note: if doing closed-loop control, this is where you would do PID)
+    float cmd = cmd_ff;
 
-        if (first_loop && (_joint_data->position != 0.0))
-        {
-            calibrate_encoders();
-            //calibrate_imu();
-            first_loop = false;
-        }
-
-        last_encoder_angle = encoder_angle;                     // sets last encoder angle to the previous enocder angle store
-        encoder_angle = _joint_data->position - encoder_offset; // sets encoder angle using position from joint data
-        _controller_data->encoder_angle = encoder_angle;        // sets the controller data encoder angle to the encoder angle to plot
-
-        //imu_angle = _joint_data->imu_position - imu_offset; // setes imu angle from joint data which SHOULD set imu angle when it sets encoder angle
-        //_controller_data->imu_angle = imu_angle;
-
-        //    Serial.print("imu angle:  ");
-        //    Serial.print(_side_data->is_left);
-        //    Serial.print("      ");
-        //    Serial.println(imu_angle);
-
-
-        est_angle = encoder_angle;                                  // SHOULD use kalman filter to estimate the hip angle using the imu and enocder angles
-        combined_fsr = (raw_toe_fsr + raw_heel_fsr);                  // normalizes combined fsr values
-
-        stance_moment = est_angle*combined_fsr;                           // our approximation for the hip moment
-        _controller_data->stance_moment = stance_moment; 
-
-        if (steps < 6)
-        {
-            //normalize_fsr();   // finds the max and min fsr values in first 5 steps
-            //normalize_angle(); // finds the max and min estimated angle values in first 5 steps
-            normalize_stance_moment(); //finds the max and min stance_moment in the first 5 steps
-        }
-
-        _controller_data->combined_fsr = combined_fsr;
-        /*
-        normalized_heel_fsr = raw_heel_fsr / max_heel_fsr;
-        normalized_toe_fsr = raw_toe_fsr / max_toe_fsr;
-        combined_fsr = (raw_toe_fsr + raw_heel_fsr)/2.0;                  // normalizes combined fsr values
-        _controller_data->combined_fsr = combined_fsr;
-        Serial.print("toe fsr:   ");
-        Serial.println(raw_toe_fsr);
-        Serial.print("heel fsr:   ");
-        Serial.println(raw_heel_fsr);
-        Serial.print("normalized toe fsr:   ");
-        Serial.println(normalized_toe_fsr);
-        Serial.print("normalized heel fsr:  ");
-        Serial.println(normalized_heel_fsr);
-
-        Serial.print("combined fsr values:   ");
-        Serial.println(combined_fsr);
-        */
-
-        // does the actual normalization of angles
-        /*
-        if (est_angle < 0.0)
-        {
-            est_angle = -1* est_angle / min_angle; // min angle is also negative so need -1 to keep the angle < 0
-        }
-        else
-        {
-            est_angle = est_angle / max_angle;
-        }
-        */
-
-        if (stance_moment > 0.0)
-        {
-            normalized_stance_moment = stance_moment/max_stance_moment;
-        }
-        else{
-            normalized_stance_moment = -1*stance_moment/min_stance_moment;
-        }
-
-        _controller_data->est_angle = est_angle; // sets estimated angle in controller data for plotting
-        _controller_data->normalized_stance_moment = normalized_stance_moment;
-
-        float cmd_ff = 0.0;
-
-        if (_side_data->heel_stance || _side_data->toe_stance)
-        {
-            stance = 1;
-            _controller_data->stance = 1;
-            if (_side_data->prev_toe_stance < _side_data->toe_stance)
-            {
-                steps++;
-                Serial.println("step");
-            }
-            cmd_ff = -1.0*normalized_stance_moment*stance_setpoint;
-            startFlag = true;
-            Serial.println("in stance");
-        }
-        else
-        {
-            stance = 0;
-            _controller_data->stance = 0;
-            if (startFlag)
-            {
-                swingStartTime = millis();
-                startFlag = false;
-                cmd_ff = swing_setpoint;
-            }
-            elapsedSwingTime = millis() - swingStartTime;
-            if (elapsedSwingTime <= swing_assist_duration)
-            {
-                cmd_ff = swing_setpoint;
-            }
-            else
-            {
-                cmd_ff = 0.0;
-            }
-        }
-
-        if(cmd_ff > max_torque) // set upperbound on motor assistance
-        {
-            cmd_ff = max_torque;
-        } 
-        else if(cmd_ff < -1 * max_torque) // set lower bound on motor assistance
-        {
-            cmd_ff = -1 * max_torque;
-        }
-
-        float cmd = cmd_ff;
-        _controller_data->ff_setpoint = cmd_ff;
-        _controller_data->steps = steps;
-        Serial.print("command = ");
-        Serial.println(cmd_ff);
-        return cmd;
-    //} // end millis() timer may or may not return to use to prevent freezing/crashing
+    //Return the desired command to the motor
+    return cmd;
 }
 
 void AngleBased::calibrate_encoders()
 {
-    float sum_encoder_readings = 0.0;
+    float sum_encoder_readings = 0.0;                                        
 
     for (int i = 0; i < 5; i++)
     {
@@ -2353,53 +2304,9 @@ void AngleBased::calibrate_encoders()
     }
 
     encoder_offset = sum_encoder_readings / 5.0;
-    Serial.print("offset:     ");
-    Serial.println(encoder_offset);
 }
 
-/*void AngleBased::calibrate_imu()
-{
-    float sum_imu_readings = 0.0;
-
-    for (int i = 0; i < 5; i++)
-    {
-        sum_imu_readings += _joint_data->imu_position;
-    }
-
-    imu_offset = sum_imu_readings / 5.0;
-    Serial.print("offset:     ");
-    Serial.println(imu_offset);
-}*/
-
-void AngleBased::normalize_fsr()
-{
-    if (_side_data->heel_fsr > max_heel_fsr)
-    {
-        max_heel_fsr = _side_data->heel_fsr;
-        max_combined_fsr = max_heel_fsr + max_toe_fsr;
-    }
-
-    if (_side_data->toe_fsr > max_toe_fsr)
-    {
-        max_toe_fsr = _side_data->toe_fsr;
-        max_combined_fsr = max_heel_fsr + max_toe_fsr;
-    }
-}
-
-void AngleBased::normalize_angle() // want to rewrite this to normalize imu and encoder individually then use kalman filter
-{
-    if (est_angle > max_angle)
-    {
-        max_angle = est_angle;
-    }
-
-    if (est_angle < min_angle)
-    {
-        min_angle = est_angle;
-    }
-}
-
-void AngleBased::normalize_stance_moment() // want to rewrite this to normalize imu and encoder individually then use kalman filter
+void AngleBased::normalize_stance_moment() 
 {
     if ((_side_data->heel_stance || _side_data->toe_stance) && (stance_moment > max_stance_moment))
     {
@@ -2413,20 +2320,5 @@ void AngleBased::normalize_stance_moment() // want to rewrite this to normalize 
         _controller_data->min_stance_moment = min_stance_moment;
     }
 }
-
-/*float AngleBased::read_imu()
-{
-    if(millis()-prevtime >= 100)
-    {
-        prevtime = millis();
-        Wire.requestFrom(9, 4);
-        for(int i = 0; i < 4; i++)
-        {
-            data.angle_bytes[i] = Wire.read();
-        }
-    }
-    return data.estim_angle;
-}*/
-
 
 #endif
