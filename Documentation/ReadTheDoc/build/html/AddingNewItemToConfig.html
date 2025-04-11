@@ -3,25 +3,25 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Search &mdash; OpenExo Documentation 0.1-dev documentation</title>
+  <title>Adding New Item to Config &mdash; OpenExo Documentation 0.1-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css" />
 
   
-    
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=4f578d93"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
-    <script src="_static/searchtools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Adding a New Joint" href="AddingNewJoint.html" />
+    <link rel="prev" title="Adding a New Error Case" href="AddingNewErrorCase.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
             OpenExo Documentation
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -44,7 +44,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="BuildAndFlash.html">Build And Flash</a><ul>
@@ -57,7 +57,7 @@
 <li class="toctree-l2"><a class="reference internal" href="another_sub_page.html">Sub Tree</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#ble-commands-h">ble_commands.h</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#comsmcu-cpp">ComsMCU.cpp</a></li>
@@ -101,12 +101,12 @@
 <li class="toctree-l3"><a class="reference internal" href="AddingNewErrorCase.html#done">Done</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="AddingNewItemToConfig.html">Adding New Item to Config</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewItemToConfig.html#config-ini">config.ini</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewItemToConfig.html#parseini-h">ParseIni.h</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewItemToConfig.html#parseini-cpp">ParseIni.cpp</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewItemToConfig.html#uart-commands-h">uart_commands.h</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewItemToConfig.html#wrap-up">Wrap up</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding New Item to Config</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#config-ini">config.ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parseini-h">ParseIni.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parseini-cpp">ParseIni.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#uart-commands-h">uart_commands.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#wrap-up">Wrap up</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html">Adding a New Joint</a><ul>
@@ -189,8 +189,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Search</li>
+          <li class="breadcrumb-item"><a href="addingelements.html">Adding Elements</a></li>
+      <li class="breadcrumb-item active">Adding New Item to Config</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="_sources/AddingNewItemToConfig.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -198,22 +200,140 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search functionality.
-    </p>
-  </div>
-  </noscript>
+  <section id="adding-new-item-to-config">
+<h1>Adding New Item to Config<a class="headerlink" href="#adding-new-item-to-config" title="Link to this heading"></a></h1>
+<section id="config-ini">
+<h2>config.ini<a class="headerlink" href="#config-ini" title="Link to this heading"></a></h2>
+<p>### Overview
+- The ini file is broken into <strong>Sections</strong>, which are large categories that store data such as:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>board, battery, or types of exoskeletons.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p>Within sections there are <strong>Keys</strong>, which are where the actual data gets stored.
+- Examples include board name, board number, and motors that are used.</p></li>
+<li><p>For our specific config file, the <strong>Exo</strong> section’s key named <em>name</em> stores the type of exoskeleton that the system will use.
+- This enables storing common configurations so that if we need to change the system, all that needs to be done from the code side is to change the name on the SD card and the system will configure itself correctly.</p></li>
+<li><p>A semicolon (<cite>;</cite>) starts a line comment (e.g., <code class="docutils literal notranslate"><span class="pre">;</span> <span class="pre">this</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">comment</span></code>).</p></li>
+<li><p>If you are just adding new values to existing keys, ensure you update all the required locations.</p></li>
+</ul>
+<p>### Adding New Section
+- To add a new section, simply enclose the section name in square brackets, for example, <code class="docutils literal notranslate"><span class="pre">[bluetooth]</span></code>.
+- You will then need to populate it with keys.
+- <strong>Note:</strong> Section names should be less than 10 characters.</p>
+<p>### Adding New Keys
+- Under the section, add the keys in the format <code class="docutils literal notranslate"><span class="pre">name</span> <span class="pre">=</span> <span class="pre">value</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">name</span> <span class="pre">=</span> <span class="pre">smart</span></code>).
+- For each key, add a comment describing its purpose and possible values, e.g.,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">;</span> <span class="pre">describes</span> <span class="pre">the</span> <span class="pre">type</span> <span class="pre">of</span> <span class="pre">battery</span> <span class="pre">used,</span> <span class="pre">values:</span> <span class="pre">smart</span> <span class="pre">(inspired</span> <span class="pre">energy),</span> <span class="pre">dumb</span> <span class="pre">(simple</span> <span class="pre">lipo)</span></code>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>If you are adding a key to an exoskeleton section (e.g., <code class="docutils literal notranslate"><span class="pre">[bilateralHipAnkle]</span></code>), be sure to add the key to all existing exoskeleton sections.</p></li>
+<li><p><strong>Note:</strong> Key lengths should be less than 25 characters.</p></li>
+</ul>
+</section>
+<section id="parseini-h">
+<h2>ParseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading"></a></h2>
+<ul>
+<li><p><strong>namespace ini_config</strong>
+- Update <code class="docutils literal notranslate"><span class="pre">number_of_keys</span></code> with the total number of keys that will be parsed.</p>
+<blockquote>
+<div><p><em>Example:</em> If you added 3 keys to each exoskeleton, add 3 to the existing number.</p>
+</div></blockquote>
+</li>
+<li><p><strong>namespace config_defs</strong>
+- Create an enum class to encode the key into a <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Your key must be encoded to a <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code> when passed between parts of the code.</p></li>
+<li><p>Create a class with all valid key values, following the existing enum classes as a template.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p>At the bottom of the list, add new index values for the keys you have added.
+- Values should be unique and consecutive.
+- As a check, confirm that the value of <code class="docutils literal notranslate"><span class="pre">number_of_keys</span></code> in <code class="docutils literal notranslate"><span class="pre">namespace</span> <span class="pre">ini_config</span></code> matches the number of indexes (which should be one more than the largest index, since we started at zero).</p></li>
+</ul>
+</li>
+<li><p><strong>namespace config_map</strong>
+- The config file will be interpreted as text. Create a map to convert the text into the <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code> declared above.
+- An <code class="docutils literal notranslate"><span class="pre">IniKeyCode</span></code> type is provided that is indexed with a <code class="docutils literal notranslate"><span class="pre">std::string</span></code>.</p>
+<blockquote>
+<div><p><em>Example:</em>
+<code class="docutils literal notranslate"><span class="pre">config_map::hip_controllers[&quot;extensionAngle&quot;]</span></code> returns <code class="docutils literal notranslate"><span class="pre">config_defs::hip_controllers::extension_angle</span></code>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Create a new <code class="docutils literal notranslate"><span class="pre">IniKeyCode</span></code> for your new key (follow the others as a template).
+- The string portion should include all valid values from the ini file, and the <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code> should be defined in the <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> namespace.</p></li>
+</ul>
+</li>
+<li><p><strong>struct ConfigData</strong>
+- This structure stores the string values during parsing.
+- Create additional <code class="docutils literal notranslate"><span class="pre">std::string</span></code> fields for the new keys.</p></li>
+</ul>
+</section>
+<section id="parseini-cpp">
+<h2>ParseIni.cpp<a class="headerlink" href="#parseini-cpp" title="Link to this heading"></a></h2>
+<ul>
+<li><p>In the function <code class="docutils literal notranslate"><span class="pre">ini_parser(char*</span> <span class="pre">filename,</span> <span class="pre">uint8_t*</span> <span class="pre">config_to_send)</span></code>, you can use the existing keys as a template.</p></li>
+<li><p>For each new key, there are three main steps:
+1. <strong>Read the key:</strong></p>
+<blockquote>
+<div><p>Use
+<code class="docutils literal notranslate"><span class="pre">get_section_key(filename,</span> <span class="pre">section_name,</span> <span class="pre">key_name,</span> <span class="pre">buffer,</span> <span class="pre">buffer_len)</span></code>
+- This function places the value of the key into the buffer.
+- If the key belongs to an exoskeleton type, then <code class="docutils literal notranslate"><span class="pre">temp_exo_name</span></code> will hold the section name (which corresponds to the appropriate exoskeleton type stored in the ini file).
+- Update the section and key names in this step according to the ini file.</p>
+</div></blockquote>
+<ol class="arabic" start="2">
+<li><p><strong>Store the value from the buffer:</strong>
+- Use the corresponding field in the structure we created (<strong>ConfigData</strong>).
+- The field name (<code class="docutils literal notranslate"><span class="pre">data.&lt;field&gt;</span></code>) should match the one defined in <code class="docutils literal notranslate"><span class="pre">ParseIni.h</span></code>.</p></li>
+<li><p><strong>Encode the value:</strong>
+- Convert the value to a <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code> and place it into the configuration array using:</p>
+<blockquote>
+<div><div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">config_to_send</span><span class="p">[</span><span class="n">config_defs</span><span class="o">::&lt;</span><span class="n">key_idx</span><span class="o">&gt;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config_map</span><span class="o">::&lt;</span><span class="n">key_name</span><span class="o">&gt;</span><span class="p">[</span><span class="n">data</span><span class="p">.</span><span class="o">&lt;</span><span class="n">field</span><span class="o">&gt;</span><span class="p">];</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Here:
+- <code class="docutils literal notranslate"><span class="pre">&lt;key_idx&gt;</span></code> is the index defined in <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> (in <code class="docutils literal notranslate"><span class="pre">ParseIni.h</span></code>).
+- <code class="docutils literal notranslate"><span class="pre">&lt;key_name&gt;</span></code> is the IniKeyCode name from <code class="docutils literal notranslate"><span class="pre">config_map</span></code> (in <code class="docutils literal notranslate"><span class="pre">ParseIni.h</span></code>).
+- <code class="docutils literal notranslate"><span class="pre">&lt;field&gt;</span></code> is the field that was updated in step 2.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</li>
+</ul>
+</section>
+<section id="uart-commands-h">
+<h2>uart_commands.h<a class="headerlink" href="#uart-commands-h" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>get_config</strong>:
+- Use the existing keys as a template.</p></li>
+<li><p><strong>update_config</strong>:
+- Use the existing keys as a template.</p></li>
+</ul>
+</section>
+<section id="wrap-up">
+<h2>Wrap up<a class="headerlink" href="#wrap-up" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>That should be everything you need to do to parse the ini file.</p></li>
+<li><p>You will still need to update other parts of the code to use the new values, which depends on what you have added.</p></li>
+</ul>
+</section>
+</section>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="AddingNewErrorCase.html" class="btn btn-neutral float-left" title="Adding a New Error Case" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="AddingNewJoint.html" class="btn btn-neutral float-right" title="Adding a New Joint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
@@ -235,14 +355,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-  <script>
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script id="searchindexloader"></script>
-   
-
+  </script> 
 
 </body>
 </html>

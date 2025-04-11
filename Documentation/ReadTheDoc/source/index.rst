@@ -63,5 +63,5 @@ The GPL license ensures that these freedoms are upheld, requiring contributors t
 
    introduction
    installation
-   usage
+   addingelements
 

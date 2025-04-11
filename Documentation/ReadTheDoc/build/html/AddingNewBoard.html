@@ -3,25 +3,25 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Search &mdash; OpenExo Documentation 0.1-dev documentation</title>
+  <title>Adding a New Board &mdash; OpenExo Documentation 0.1-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css" />
 
   
-    
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=4f578d93"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
-    <script src="_static/searchtools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Adding a New CAN Motor" href="AddingNewCanMotor.html" />
+    <link rel="prev" title="Adding a New BLE Message" href="AddingNewBLEMessage.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
             OpenExo Documentation
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -44,7 +44,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="BuildAndFlash.html">Build And Flash</a><ul>
@@ -57,18 +57,18 @@
 <li class="toctree-l2"><a class="reference internal" href="another_sub_page.html">Sub Tree</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#ble-commands-h">ble_commands.h</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#comsmcu-cpp">ComsMCU.cpp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#done">Done</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="AddingNewBoard.html">Adding a New Board</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewBoard.html#config-h">Config.h</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewBoard.html#parseini-h">ParseIni.h</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewBoard.html#board-h">Board.h</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewBoard.html#done">Done!!</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding a New Board</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#config-h">Config.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parseini-h">ParseIni.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#board-h">Board.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#done">Done!!</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html">Adding a New CAN Motor</a><ul>
@@ -189,8 +189,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Search</li>
+          <li class="breadcrumb-item"><a href="addingelements.html">Adding Elements</a></li>
+      <li class="breadcrumb-item active">Adding a New Board</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="_sources/AddingNewBoard.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -198,22 +200,58 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search functionality.
-    </p>
-  </div>
-  </noscript>
+  <section id="adding-a-new-board">
+<h1>Adding a New Board<a class="headerlink" href="#adding-a-new-board" title="Link to this heading"></a></h1>
+<section id="config-h">
+<h2>Config.h<a class="headerlink" href="#config-h" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Add the name of your new board using a <code class="docutils literal notranslate"><span class="pre">#define</span></code> at the top of the file:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define AK_Board_V0_4 3</span>
+</pre></div>
+</div>
+</li>
+<li><p>Change the current board to your new board if you intend to use it immediately.
+This helps ensure all changes function properly.</p></li>
+</ol>
+</section>
+<section id="parseini-h">
+<h2>ParseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This file is not currently used but <strong>should be updated for future-proofing</strong>.</p>
+</div>
+<ol class="arabic simple">
+<li><p>In <code class="docutils literal notranslate"><span class="pre">config_def::board_name</span></code>, add your board’s name if it’s different from existing ones.</p></li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">config_def::board_version</span></code>, add your board version if it’s not currently present.</p></li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">config_map::board_name</span></code>, specify how the new board name should be referenced in the INI file.</p></li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">config_map::board_version</span></code>, specify how the new version should be referenced in the INI file.</p></li>
+</ol>
+</section>
+<section id="board-h">
+<h2>Board.h<a class="headerlink" href="#board-h" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Use an <code class="docutils literal notranslate"><span class="pre">#if</span> <span class="pre">defined(YOUR_BOARD_NAME_AND_VERSION)</span></code> block to define the connections on your board.</p></li>
+<li><p>Following the format of existing boards, assign pins and behavior for your microcontroller components:</p>
+<ul class="simple">
+<li><p>You should have both a <code class="docutils literal notranslate"><span class="pre">logic_micro_pins</span></code> namespace and a <code class="docutils literal notranslate"><span class="pre">coms_micro_pins</span></code> namespace.</p></li>
+<li><p>Avoid straying too far from the existing structure to prevent potential issues.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="done">
+<h2>Done!!<a class="headerlink" href="#done" title="Link to this heading"></a></h2>
+<p>Once you’ve updated these files, your new board should be recognized and configurable within the system.</p>
+</section>
+</section>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="AddingNewBLEMessage.html" class="btn btn-neutral float-left" title="Adding a New BLE Message" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="AddingNewCanMotor.html" class="btn btn-neutral float-right" title="Adding a New CAN Motor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
@@ -235,14 +273,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-  <script>
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script id="searchindexloader"></script>
-   
-
+  </script> 
 
 </body>
 </html>

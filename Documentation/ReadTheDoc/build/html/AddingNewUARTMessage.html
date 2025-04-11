@@ -3,25 +3,24 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Search &mdash; OpenExo Documentation 0.1-dev documentation</title>
+  <title>Adding New UART Messages &mdash; OpenExo Documentation 0.1-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css" />
 
   
-    
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=4f578d93"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
-    <script src="_static/searchtools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Adding New Sensors" href="AddingNewSensors.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +35,7 @@
             OpenExo Documentation
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -44,7 +43,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="BuildAndFlash.html">Build And Flash</a><ul>
@@ -57,7 +56,7 @@
 <li class="toctree-l2"><a class="reference internal" href="another_sub_page.html">Sub Tree</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#ble-commands-h">ble_commands.h</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#comsmcu-cpp">ComsMCU.cpp</a></li>
@@ -163,12 +162,12 @@
 <li class="toctree-l3"><a class="reference internal" href="AddingNewSensors.html#integrating-new-sensors-into-the-codebase">Integrating New Sensors into the Codebase</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewUARTMessage.html#messaging-structure">Messaging Structure</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewUARTMessage.html#declare-message-id-s">Declare Message ID(s)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewUARTMessage.html#declare-message-handler">Declare Message Handler</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewUARTMessage.html#add-your-function-to-the-list-of-callable-functions">Add Your Function to the List of Callable Functions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewUARTMessage.html#done">Done</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding New UART Messages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#messaging-structure">Messaging Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#declare-message-id-s">Declare Message ID(s)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#declare-message-handler">Declare Message Handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-your-function-to-the-list-of-callable-functions">Add Your Function to the List of Callable Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#done">Done</a></li>
 </ul>
 </li>
 </ul>
@@ -189,8 +188,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Search</li>
+          <li class="breadcrumb-item"><a href="addingelements.html">Adding Elements</a></li>
+      <li class="breadcrumb-item active">Adding New UART Messages</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="_sources/AddingNewUARTMessage.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -198,22 +199,59 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search functionality.
-    </p>
-  </div>
-  </noscript>
+  <section id="adding-new-uart-messages">
+<h1>Adding New UART Messages<a class="headerlink" href="#adding-new-uart-messages" title="Link to this heading"></a></h1>
+<section id="messaging-structure">
+<h2>Messaging Structure<a class="headerlink" href="#messaging-structure" title="Link to this heading"></a></h2>
+<p>Each message consists of a <strong>get</strong> and an <strong>update</strong> ID:</p>
+<ul class="simple">
+<li><p><strong>Get ID</strong>: Used to request data from the other microcontroller.</p></li>
+<li><p><strong>Update ID</strong>: Used to set data received from the other microcontroller.</p></li>
+</ul>
+<p>Each message must have both a get and an update ID; however, every message ID must be unique.
+Every message ID also has an associated message handler—this is the code that executes on the microcontroller when a message is received from the other microcontroller.</p>
+</section>
+<section id="declare-message-id-s">
+<h2>Declare Message ID(s)<a class="headerlink" href="#declare-message-id-s" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Navigate to the <code class="docutils literal notranslate"><span class="pre">src</span></code> folder and open the file <code class="docutils literal notranslate"><span class="pre">uart_commands.h</span></code>.</p></li>
+<li><p>Locate the namespace <code class="docutils literal notranslate"><span class="pre">UART_command_names</span></code>.</p></li>
+<li><p>Declare your message ID(s) within this namespace.</p></li>
+</ol>
+</section>
+<section id="declare-message-handler">
+<h2>Declare Message Handler<a class="headerlink" href="#declare-message-handler" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>In the same file (<code class="docutils literal notranslate"><span class="pre">uart_commands.h</span></code>), locate the namespace <code class="docutils literal notranslate"><span class="pre">UART_command_handlers</span></code>.</p></li>
+<li><p>Create your message handler function with the following signature:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">your_function_name</span><span class="p">(</span><span class="n">UARTHandler</span><span class="o">*</span><span class="w"> </span><span class="n">handler</span><span class="p">,</span><span class="w"> </span><span class="n">ExoData</span><span class="o">*</span><span class="w"> </span><span class="n">exo_data</span><span class="p">,</span><span class="w"> </span><span class="n">UART_msg_t</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">your_function_name</span></code> with the appropriate function name for your new message.</p>
+</li>
+</ol>
+</section>
+<section id="add-your-function-to-the-list-of-callable-functions">
+<h2>Add Your Function to the List of Callable Functions<a class="headerlink" href="#add-your-function-to-the-list-of-callable-functions" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Again in <code class="docutils literal notranslate"><span class="pre">uart_commands.h</span></code>, locate the namespace <code class="docutils literal notranslate"><span class="pre">UART_command_utils</span></code>.</p></li>
+<li><p>Within that namespace, find the function named <code class="docutils literal notranslate"><span class="pre">handle_msg</span></code>.</p></li>
+<li><p>Add a switch case (or cases) for your new message ID(s) in the <code class="docutils literal notranslate"><span class="pre">handle_msg</span></code> function, so that your handler is called when the corresponding message is received.</p></li>
+</ol>
+</section>
+<section id="done">
+<h2>Done<a class="headerlink" href="#done" title="Link to this heading"></a></h2>
+<p>You have now integrated your new UART message!
+Test your new function to ensure it handles messages as expected.</p>
+</section>
+</section>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="AddingNewSensors.html" class="btn btn-neutral float-left" title="Adding New Sensors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 
@@ -235,14 +273,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-  <script>
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script id="searchindexloader"></script>
-   
-
+  </script> 
 
 </body>
 </html>

@@ -3,25 +3,25 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Search &mdash; OpenExo Documentation 0.1-dev documentation</title>
+  <title>Adding a New Motor Type &mdash; OpenExo Documentation 0.1-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css" />
 
   
-    
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=4f578d93"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
-    <script src="_static/searchtools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Adding New Sensors" href="AddingNewSensors.html" />
+    <link rel="prev" title="Adding a New Microcontroller" href="AddingNewMicrocontroller.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
             OpenExo Documentation
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -44,7 +44,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="BuildAndFlash.html">Build And Flash</a><ul>
@@ -57,7 +57,7 @@
 <li class="toctree-l2"><a class="reference internal" href="another_sub_page.html">Sub Tree</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#ble-commands-h">ble_commands.h</a></li>
 <li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#comsmcu-cpp">ComsMCU.cpp</a></li>
@@ -150,10 +150,10 @@
 <li class="toctree-l3"><a class="reference internal" href="AddingNewMicrocontroller.html#other-files">Other Files</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewMotorType.html#motor-h">Motor.h</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewMotorType.html#motor-cpp">Motor.cpp</a></li>
-<li class="toctree-l3"><a class="reference internal" href="AddingNewMotorType.html#connect-to-everything-else">Connect to Everything Else</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding a New Motor Type</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#motor-h">Motor.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#motor-cpp">Motor.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#connect-to-everything-else">Connect to Everything Else</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a><ul>
@@ -189,8 +189,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Search</li>
+          <li class="breadcrumb-item"><a href="addingelements.html">Adding Elements</a></li>
+      <li class="breadcrumb-item active">Adding a New Motor Type</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="_sources/AddingNewMotorType.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -198,22 +200,68 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search functionality.
-    </p>
-  </div>
-  </noscript>
+  <section id="adding-a-new-motor-type">
+<h1>Adding a New Motor Type<a class="headerlink" href="#adding-a-new-motor-type" title="Link to this heading"></a></h1>
+<section id="motor-h">
+<h2>Motor.h<a class="headerlink" href="#motor-h" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Create a class for your new motor type that inherits its interface from the <code class="docutils literal notranslate"><span class="pre">_Motor</span></code> class:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">_YourMotorType</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">_Motor</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">public</span><span class="o">:</span>
+<span class="w">        </span><span class="n">_YourMotorType</span><span class="p">(</span><span class="n">config_defs</span><span class="o">::</span><span class="n">joint_id</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">ExoData</span><span class="o">*</span><span class="w"> </span><span class="n">exo_data</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">enable_pin</span><span class="p">);</span>
+<span class="w">        </span><span class="k">virtual</span><span class="w"> </span><span class="o">~</span><span class="n">_YourMotorType</span><span class="p">(){};</span>
+<span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="nf">transaction</span><span class="p">(</span><span class="kt">float</span><span class="w"> </span><span class="n">torque</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="nf">read_data</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="nf">send_data</span><span class="p">(</span><span class="kt">float</span><span class="w"> </span><span class="n">torque</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="nf">on_off</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">bool</span><span class="w"> </span><span class="nf">enable</span><span class="p">();</span>
+<span class="w">        </span><span class="kt">bool</span><span class="w"> </span><span class="nf">enable</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">overide</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="nf">zero</span><span class="p">();</span>
+<span class="w">    </span><span class="k">protected</span><span class="o">:</span>
+<span class="w">        </span><span class="p">...</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add any protected member variables or functions that will be needed to operate your motor.</p></li>
+<li><p>Create a specific motor class of this type that inherits the motor type class you just created:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ANewMotor</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">_YourMotorType</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">public</span><span class="o">:</span>
+<span class="w">        </span><span class="n">ANewMotor</span><span class="p">(</span><span class="n">config_defs</span><span class="o">::</span><span class="n">joint_id</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">ExoData</span><span class="o">*</span><span class="w"> </span><span class="n">exo_data</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">enable_pin</span><span class="p">);</span><span class="w"> </span><span class="c1">// constructor: type is the motor type</span>
+<span class="w">        </span><span class="o">~</span><span class="n">ANewMotor</span><span class="p">(){};</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add any additional protected member variables or functions needed to operate your motor.</p></li>
+</ol>
+</section>
+<section id="motor-cpp">
+<h2>Motor.cpp<a class="headerlink" href="#motor-cpp" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Define the behavior of the member functions of <code class="docutils literal notranslate"><span class="pre">_YourMotorType</span></code>.
+- Ideally, these behaviors will be shared by all motors of this type.</p></li>
+<li><p>Define the behavior of the member functions and any class-specific variables for <code class="docutils literal notranslate"><span class="pre">ANewMotor</span></code>.</p></li>
+</ol>
+</section>
+<section id="connect-to-everything-else">
+<h2>Connect to Everything Else<a class="headerlink" href="#connect-to-everything-else" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Follow the steps in <span class="xref std std-doc">AddingNewCanMotor</span> to connect this new motor type to the rest of the codebase.
+- This step is detailed in the referenced document so that you only need to update information in one place.</p></li>
+</ol>
+</section>
+</section>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="AddingNewMicrocontroller.html" class="btn btn-neutral float-left" title="Adding a New Microcontroller" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="AddingNewSensors.html" class="btn btn-neutral float-right" title="Adding New Sensors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
@@ -235,14 +283,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-  <script>
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script id="searchindexloader"></script>
-   
-
+  </script> 
 
 </body>
 </html>
