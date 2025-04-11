@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenExo Documentation documentation &mdash; OpenExo Documentation 0.1-dev documentation</title>
+  <title>An Open-Source Platform for Numerical Modeling, Data Acquisition, and Control of Lower-Limb Assistive Exoskeletons &mdash; OpenExo Documentation 0.1-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css" />
@@ -42,7 +42,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Additional Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
@@ -67,7 +67,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">OpenExo Documentation documentation</li>
+      <li class="breadcrumb-item active">An Open-Source Platform for Numerical Modeling, Data Acquisition, and Control of Lower-Limb Assistive Exoskeletons</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -77,13 +77,56 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="openexo-documentation-documentation">
-<h1>OpenExo Documentation documentation<a class="headerlink" href="#openexo-documentation-documentation" title="Link to this heading"></a></h1>
-<p>Add your content using <code class="docutils literal notranslate"><span class="pre">reStructuredText</span></code> syntax. See the
-<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">reStructuredText</a>
-documentation for details.</p>
+  <section id="an-open-source-platform-for-numerical-modeling-data-acquisition-and-control-of-lower-limb-assistive-exoskeletons">
+<h1>An Open-Source Platform for Numerical Modeling, Data Acquisition, and Control of Lower-Limb Assistive Exoskeletons<a class="headerlink" href="#an-open-source-platform-for-numerical-modeling-data-acquisition-and-control-of-lower-limb-assistive-exoskeletons" title="Link to this heading"></a></h1>
+<img alt="OpenSourceLeg Banner" class="align-center" src="_images/banner.gif" />
+<div align="center">
+   <a href="https://travis-ci.org/your_repo"><img src="https://img.shields.io/travis/your_repo.svg" alt="Build Status"></a>
+   <a href="https://readthedocs.org/"><img src="https://readthedocs.org/projects/your_project/badge/?version=latest" alt="Docs Status"></a>
+   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.9%2B-blue" alt="Python Versions"></a>
+   <a href="https://opensource.org/licenses/GPL-3.0"><img src="https://img.shields.io/badge/license-GPL--3.0-green" alt="License"></a>
+</div><section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<p>Before installing the <strong>opensourceleg</strong> library, ensure you have the following installed:</p>
+<ul class="simple">
+<li><p><strong>Python 3.9</strong> or later</p></li>
+<li><p><strong>pip</strong> package manager</p></li>
+</ul>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>The easiest and quickest way to install the <strong>opensourceleg</strong> library is via pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>opensourceleg
+</pre></div>
+</div>
+<p>If you plan on installing the <strong>opensourceleg</strong> library on a Raspberry Pi, it is recommended to use the <strong>opensourcelegpi</strong> tool. This tool is a cloud-based CI service that builds an up-to-date OS for a Raspberry Pi. It bundles the <strong>opensourceleg</strong> library and its dependencies into a single OS image, which can be flashed onto a microSD card for headless or GUI-less operation to control autonomous/remote robotic systems. For more information, click the provided link in the original README.</p>
+</section>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h2>
+<p>For new users, visit the <strong>Getting Started</strong> page for an overview of the library and its documentation.</p>
+</section>
+<section id="developing">
+<h2>Developing<a class="headerlink" href="#developing" title="Link to this heading"></a></h2>
+<p>If you wish to modify, develop, or contribute to the <strong>opensourceleg</strong> library, it is recommended to install <strong>Poetry</strong>, a Python packaging and dependency management tool. Once Poetry is installed, clone the repository and set up the environment using the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/neurobionics/opensourceleg.git
+<span class="nb">cd</span><span class="w"> </span>opensourceleg
+poetry<span class="w"> </span>install
+poetry<span class="w"> </span>shell
+</pre></div>
+</div>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading"></a></h2>
+<p>The <strong>opensourceleg</strong> library is licensed under the GPL-3.0 license. This license grants you the following freedoms:</p>
+<ul class="simple">
+<li><p><strong>Use</strong>: You are free to use the library for any purpose.</p></li>
+<li><p><strong>Modify</strong>: You may modify the library to suit your needs.</p></li>
+<li><p><strong>Study</strong>: You can study and change how the library works.</p></li>
+<li><p><strong>Distribute</strong>: You are allowed to distribute modified versions of the library.</p></li>
+</ul>
+<p>The GPL license ensures that these freedoms are upheld, requiring contributors to share their modifications publicly if they distribute the library.</p>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
@@ -94,6 +137,7 @@ documentation for details.</p>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 </ul>
 </div>
+</section>
 </section>
 
 
