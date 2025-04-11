@@ -1,7 +1,7 @@
 An Open-Source Platform for Numerical Modeling, Data Acquisition, and Control of Lower-Limb Assistive Exoskeletons
 =============================================================================================================
 
-.. image:: _images/banner.gif
+.. image:: 1042_exoskeleton_20250205.jpg
    :alt: OpenSourceLeg Banner
    :align: center
 
