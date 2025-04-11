@@ -7,5 +7,5 @@ Overview of the installation process.
    :maxdepth: 2
    :caption: Installation Subcategories:
 
-   prerequisites
+   BuildAndFlash
    another_sub_page

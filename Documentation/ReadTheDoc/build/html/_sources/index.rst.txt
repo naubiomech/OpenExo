@@ -59,7 +59,7 @@ The GPL license ensures that these freedoms are upheld, requiring contributors t
 
 .. toctree::
    :maxdepth: 2
-   :caption: Additional Contents:
+   :caption: Tutorials:
 
    introduction
    installation
