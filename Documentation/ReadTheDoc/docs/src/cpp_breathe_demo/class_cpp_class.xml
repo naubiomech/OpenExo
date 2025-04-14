@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="class_cpp_class" kind="class" language="C++" prot="public">
+    <compoundname>CppClass</compoundname>
+    <includes refid="func_8h" local="no">func.hpp</includes>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_cpp_class_1a5ffd5399e21eb5b0f94fafe4c55d3124" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>const char *</type>
+        <definition>const char * CppClass::member_function</definition>
+        <argsstring>(char, int)</argsstring>
+        <name>member_function</name>
+        <param>
+          <type>char</type>
+          <defname>c</defname>
+        </param>
+        <param>
+          <type>int</type>
+          <defname>n</defname>
+        </param>
+        <exceptions> throw (std::out_of_range)</exceptions>
+        <briefdescription>
+<para>A member function. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>c</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a character. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>an integer. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>std::out_of_range</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>parameter is out of range. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>a character pointer. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="func.hpp" line="4" column="16" bodyfile="func.hpp" bodystart="7" bodyend="7"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para><ref refid="class_cpp_class" kindref="compound">CppClass</ref> class. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>Details about <ref refid="class_cpp_class" kindref="compound">CppClass</ref>. </para>
+    </detaileddescription>
+    <location file="func.hpp" line="2" column="1" bodyfile="func.hpp" bodystart="1" bodyend="5"/>
+    <listofallmembers>
+      <member refid="class_cpp_class_1a5ffd5399e21eb5b0f94fafe4c55d3124" prot="public" virt="non-virtual"><scope>CppClass</scope><name>member_function</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

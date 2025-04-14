@@ -1,0 +1,8 @@
+dist/
+*.pyc
+.vscode
+.nvmrc
+piccolo_theme.egg-info/
+build/
+docs/_build/
+videos/
