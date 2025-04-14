@@ -1,4 +1,4 @@
-import piccolo_theme
+import piccolo_theme  # Import the Piccolo Theme
 
 # -- Project information -----------------------------------------------------
 project = 'OpenExo Documentation'
@@ -10,7 +10,7 @@ release = '0.1-dev'
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
-    # Removed "sphinx_rtd_theme" as it's not needed with piccolo_theme.
+    # Removed "sphinx_rtd_theme" since we’re using piccolo_theme.
 ]
 
 templates_path = ['_templates']
@@ -18,14 +18,14 @@ exclude_patterns = []
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "piccolo_theme"
-# Remove the following line because piccolo_theme does not provide get_html_theme_path()
-# html_theme_path = [piccolo_theme.get_html_theme_path()]
-
+# No need to set html_theme_path: Sphinx will find the theme via entry points.
 html_static_path = ['_static']
 html_css_files = [
     'custom.css',
 ]
 
+# Optional: Add any Piccolo Theme specific options here if desired.
 html_theme_options = {
-    # Add any piccolo_theme specific options here if needed.
+    # For example, you might set a navigation title if supported:
+    # 'nav_title': "OpenExo Documentation",
 }
