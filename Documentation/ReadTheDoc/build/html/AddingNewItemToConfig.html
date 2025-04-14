@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adding New Item to Config &mdash; OpenExo Documentation 0.1-dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=4f578d93"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Adding a New Joint" href="AddingNewJoint.html" />
+    <link rel="prev" title="Adding a New Error Case" href="AddingNewErrorCase.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenExo Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="BuildAndFlash.html">Build And Flash</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="BuildAndFlash.html#downloads">Downloads</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BuildAndFlash.html#flashing">Flashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BuildAndFlash.html#libraries">Libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BuildAndFlash.html#arduino-boards-manager">Arduino Boards Manager</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#ble-commands-h">ble_commands.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#comsmcu-cpp">ComsMCU.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewBLEMessage.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBoard.html">Adding a New Board</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewBoard.html#config-h">Config.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewBoard.html#parseini-h">ParseIni.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewBoard.html#board-h">Board.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewBoard.html#done">Done!!</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html">Adding a New CAN Motor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewCanMotor.html#config-ini">config.ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewCanMotor.html#parseini-h">parseIni.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewCanMotor.html#motor-h">Motor.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewCanMotor.html#motor-cpp">Motor.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewCanMotor.html#joint-cpp">Joint.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewCanMotor.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html">Adding a New Controller</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#parseini-h">parseIni.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#controllerdata-h-controller-definition">ControllerData.h (Controller Definition)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#controller-h">Controller.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#controllerdata-h-optional-additional-data">ControllerData.h (Optional Additional Data)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#controller-cpp">Controller.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#joint-h">Joint.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#joint-cpp">Joint.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#create-parameter-file">Create Parameter File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#paramsfromsd-h">ParamsFromSD.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#uart-commands-h">uart_commands.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewController.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewErrorCase.html">Adding a New Error Case</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewErrorCase.html#error-codes-h">error_codes.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewErrorCase.html#error-types-h">error_types.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewErrorCase.html#error-map-h">error_map.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewErrorCase.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding New Item to Config</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#config-ini">config.ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parseini-h">ParseIni.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parseini-cpp">ParseIni.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#uart-commands-h">uart_commands.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#wrap-up">Wrap up</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html">Adding a New Joint</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#exocode-ini">Exocode.ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#parseini-h">ParseIni.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#parseini-cpp">ParseIni.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#exodata-h">ExoData.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#exodata-cpp">ExoData.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#uart-commands-h">UART_commands.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#side-h">Side.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#side-cpp">Side.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#sidedata-h">SideData.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#sidedata-cpp">SideData.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#joint-h">Joint.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#joint-cpp">Joint.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#jointdata-cpp">JointData.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#motor-cpp">Motor.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#motordata-cpp">MotorData.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#controllerdata-cpp">ControllerData.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#controller-cpp">Controller.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#ble-commands-h">ble_commands.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#paramsfromsd-h">ParamsfromSD.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#paramsfromsd-cpp">ParamsfromSD.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#realtimei2c-h">RealTimeI2C.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#statusdefs-h">StatusDefs.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#statusdefs-cpp">StatusDefs.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#statusled-h">StatusLED.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#config-ini">Config.ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#sd-card">SD Card</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#python-gui-activetrialsettings-py">Python GUI - ActiveTrialSettings.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#python-gui-exodevicemanager-py">Python GUI - exoDeviceManager.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewJoint.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMicrocontroller.html">Adding a New Microcontroller</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewMicrocontroller.html#selecting-microcontroller">Selecting Microcontroller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewMicrocontroller.html#design-board">Design Board</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewMicrocontroller.html#board-h">Board.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewMicrocontroller.html#config-ini">config.ini</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewMicrocontroller.html#parseini-h">ParseIni.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewMicrocontroller.html#other-files">Other Files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewMotorType.html#motor-h">Motor.h</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewMotorType.html#motor-cpp">Motor.cpp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewMotorType.html#connect-to-everything-else">Connect to Everything Else</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewSensors.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewSensors.html#analog-input">Analog Input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewSensors.html#bus-protocols">Bus Protocols</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewSensors.html#integrating-new-sensors-into-the-codebase">Integrating New Sensors into the Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewUARTMessage.html#messaging-structure">Messaging Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewUARTMessage.html#declare-message-id-s">Declare Message ID(s)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewUARTMessage.html#declare-message-handler">Declare Message Handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewUARTMessage.html#add-your-function-to-the-list-of-callable-functions">Add Your Function to the List of Callable Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="AddingNewUARTMessage.html#done">Done</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ProportionalJointMoment.html">Proportional Joint Moment Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="TREC.html">Terrain Responsive Exoskeleton Controller (TREC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="TREC.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="TREC.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ZhangCollins.html">Zhang Collins Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ZhangCollins.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ZhangCollins.html#parameters">Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="elbow.html#description">Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elbow.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#purposes">Purposes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#motor-directions">Motor Directions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#torque-sensor-signs-positive-negative">Torque Sensor Signs (Positive/Negative)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#how-to-calibrate">How to Calibrate</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Chirp.html">Chirp Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Chirp.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Chirp.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ConstantTorque.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ConstantTorque.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Step.html">Step Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Step.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Step.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ZeroTorque.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ZeroTorque.html#parameters">Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#calibration-manager-controller">Calibration Manager Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#chirp-controller">Chirp Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#constant-torque-controller">Constant Torque Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#step-controller">Step Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#zero-torque-controller">Zero Torque Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#controller-subfolders-by-joint">Controller Subfolders by Joint</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenExo Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="addingelements.html">Adding Elements</a></li>
+      <li class="breadcrumb-item active">Adding New Item to Config</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/AddingNewItemToConfig.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="adding-new-item-to-config">
+<h1>Adding New Item to Config<a class="headerlink" href="#adding-new-item-to-config" title="Link to this heading"></a></h1>
+<section id="config-ini">
+<h2>config.ini<a class="headerlink" href="#config-ini" title="Link to this heading"></a></h2>
+<p>### Overview
+- The ini file is broken into <strong>Sections</strong>, which are large categories that store data such as:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>board, battery, or types of exoskeletons.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p>Within sections there are <strong>Keys</strong>, which are where the actual data gets stored.
+- Examples include board name, board number, and motors that are used.</p></li>
+<li><p>For our specific config file, the <strong>Exo</strong> section’s key named <em>name</em> stores the type of exoskeleton that the system will use.
+- This enables storing common configurations so that if we need to change the system, all that needs to be done from the code side is to change the name on the SD card and the system will configure itself correctly.</p></li>
+<li><p>A semicolon (<cite>;</cite>) starts a line comment (e.g., <code class="docutils literal notranslate"><span class="pre">;</span> <span class="pre">this</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">comment</span></code>).</p></li>
+<li><p>If you are just adding new values to existing keys, ensure you update all the required locations.</p></li>
+</ul>
+<p>### Adding New Section
+- To add a new section, simply enclose the section name in square brackets, for example, <code class="docutils literal notranslate"><span class="pre">[bluetooth]</span></code>.
+- You will then need to populate it with keys.
+- <strong>Note:</strong> Section names should be less than 10 characters.</p>
+<p>### Adding New Keys
+- Under the section, add the keys in the format <code class="docutils literal notranslate"><span class="pre">name</span> <span class="pre">=</span> <span class="pre">value</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">name</span> <span class="pre">=</span> <span class="pre">smart</span></code>).
+- For each key, add a comment describing its purpose and possible values, e.g.,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">;</span> <span class="pre">describes</span> <span class="pre">the</span> <span class="pre">type</span> <span class="pre">of</span> <span class="pre">battery</span> <span class="pre">used,</span> <span class="pre">values:</span> <span class="pre">smart</span> <span class="pre">(inspired</span> <span class="pre">energy),</span> <span class="pre">dumb</span> <span class="pre">(simple</span> <span class="pre">lipo)</span></code>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>If you are adding a key to an exoskeleton section (e.g., <code class="docutils literal notranslate"><span class="pre">[bilateralHipAnkle]</span></code>), be sure to add the key to all existing exoskeleton sections.</p></li>
+<li><p><strong>Note:</strong> Key lengths should be less than 25 characters.</p></li>
+</ul>
+</section>
+<section id="parseini-h">
+<h2>ParseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading"></a></h2>
+<ul>
+<li><p><strong>namespace ini_config</strong>
+- Update <code class="docutils literal notranslate"><span class="pre">number_of_keys</span></code> with the total number of keys that will be parsed.</p>
+<blockquote>
+<div><p><em>Example:</em> If you added 3 keys to each exoskeleton, add 3 to the existing number.</p>
+</div></blockquote>
+</li>
+<li><p><strong>namespace config_defs</strong>
+- Create an enum class to encode the key into a <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Your key must be encoded to a <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code> when passed between parts of the code.</p></li>
+<li><p>Create a class with all valid key values, following the existing enum classes as a template.</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p>At the bottom of the list, add new index values for the keys you have added.
+- Values should be unique and consecutive.
+- As a check, confirm that the value of <code class="docutils literal notranslate"><span class="pre">number_of_keys</span></code> in <code class="docutils literal notranslate"><span class="pre">namespace</span> <span class="pre">ini_config</span></code> matches the number of indexes (which should be one more than the largest index, since we started at zero).</p></li>
+</ul>
+</li>
+<li><p><strong>namespace config_map</strong>
+- The config file will be interpreted as text. Create a map to convert the text into the <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code> declared above.
+- An <code class="docutils literal notranslate"><span class="pre">IniKeyCode</span></code> type is provided that is indexed with a <code class="docutils literal notranslate"><span class="pre">std::string</span></code>.</p>
+<blockquote>
+<div><p><em>Example:</em>
+<code class="docutils literal notranslate"><span class="pre">config_map::hip_controllers[&quot;extensionAngle&quot;]</span></code> returns <code class="docutils literal notranslate"><span class="pre">config_defs::hip_controllers::extension_angle</span></code>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Create a new <code class="docutils literal notranslate"><span class="pre">IniKeyCode</span></code> for your new key (follow the others as a template).
+- The string portion should include all valid values from the ini file, and the <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code> should be defined in the <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> namespace.</p></li>
+</ul>
+</li>
+<li><p><strong>struct ConfigData</strong>
+- This structure stores the string values during parsing.
+- Create additional <code class="docutils literal notranslate"><span class="pre">std::string</span></code> fields for the new keys.</p></li>
+</ul>
+</section>
+<section id="parseini-cpp">
+<h2>ParseIni.cpp<a class="headerlink" href="#parseini-cpp" title="Link to this heading"></a></h2>
+<ul>
+<li><p>In the function <code class="docutils literal notranslate"><span class="pre">ini_parser(char*</span> <span class="pre">filename,</span> <span class="pre">uint8_t*</span> <span class="pre">config_to_send)</span></code>, you can use the existing keys as a template.</p></li>
+<li><p>For each new key, there are three main steps:
+1. <strong>Read the key:</strong></p>
+<blockquote>
+<div><p>Use
+<code class="docutils literal notranslate"><span class="pre">get_section_key(filename,</span> <span class="pre">section_name,</span> <span class="pre">key_name,</span> <span class="pre">buffer,</span> <span class="pre">buffer_len)</span></code>
+- This function places the value of the key into the buffer.
+- If the key belongs to an exoskeleton type, then <code class="docutils literal notranslate"><span class="pre">temp_exo_name</span></code> will hold the section name (which corresponds to the appropriate exoskeleton type stored in the ini file).
+- Update the section and key names in this step according to the ini file.</p>
+</div></blockquote>
+<ol class="arabic" start="2">
+<li><p><strong>Store the value from the buffer:</strong>
+- Use the corresponding field in the structure we created (<strong>ConfigData</strong>).
+- The field name (<code class="docutils literal notranslate"><span class="pre">data.&lt;field&gt;</span></code>) should match the one defined in <code class="docutils literal notranslate"><span class="pre">ParseIni.h</span></code>.</p></li>
+<li><p><strong>Encode the value:</strong>
+- Convert the value to a <code class="docutils literal notranslate"><span class="pre">uint8_t</span></code> and place it into the configuration array using:</p>
+<blockquote>
+<div><div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">config_to_send</span><span class="p">[</span><span class="n">config_defs</span><span class="o">::&lt;</span><span class="n">key_idx</span><span class="o">&gt;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config_map</span><span class="o">::&lt;</span><span class="n">key_name</span><span class="o">&gt;</span><span class="p">[</span><span class="n">data</span><span class="p">.</span><span class="o">&lt;</span><span class="n">field</span><span class="o">&gt;</span><span class="p">];</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Here:
+- <code class="docutils literal notranslate"><span class="pre">&lt;key_idx&gt;</span></code> is the index defined in <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> (in <code class="docutils literal notranslate"><span class="pre">ParseIni.h</span></code>).
+- <code class="docutils literal notranslate"><span class="pre">&lt;key_name&gt;</span></code> is the IniKeyCode name from <code class="docutils literal notranslate"><span class="pre">config_map</span></code> (in <code class="docutils literal notranslate"><span class="pre">ParseIni.h</span></code>).
+- <code class="docutils literal notranslate"><span class="pre">&lt;field&gt;</span></code> is the field that was updated in step 2.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</li>
+</ul>
+</section>
+<section id="uart-commands-h">
+<h2>uart_commands.h<a class="headerlink" href="#uart-commands-h" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>get_config</strong>:
+- Use the existing keys as a template.</p></li>
+<li><p><strong>update_config</strong>:
+- Use the existing keys as a template.</p></li>
+</ul>
+</section>
+<section id="wrap-up">
+<h2>Wrap up<a class="headerlink" href="#wrap-up" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>That should be everything you need to do to parse the ini file.</p></li>
+<li><p>You will still need to update other parts of the code to use the new values, which depends on what you have added.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="AddingNewErrorCase.html" class="btn btn-neutral float-left" title="Adding a New Error Case" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="AddingNewJoint.html" class="btn btn-neutral float-right" title="Adding a New Joint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Landon Coonrod, Jack Williams, and Prof. Zach Lerner.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
