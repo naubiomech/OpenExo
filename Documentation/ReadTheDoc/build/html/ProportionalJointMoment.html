@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hip &mdash; OpenExo Documentation 0.1-dev documentation</title>
+  <title>Proportional Joint Moment Controller &mdash; OpenExo Documentation 0.1-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css" />
@@ -20,8 +20,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Calibration Manager Controller" href="CalbrManager.html" />
-    <link rel="prev" title="Elbow Min Max Controller" href="elbow.html" /> 
+    <link rel="next" title="Terrain Responsive Exoskeleton Controller (TREC)" href="TREC.html" />
+    <link rel="prev" title="Ankle" href="ankle.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -174,10 +174,10 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="controllers.html">Controllers</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ProportionalJointMoment.html">Proportional Joint Moment Controller</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#description">Description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#parameters">Parameters</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ankle.html">Ankle</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Proportional Joint Moment Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="TREC.html">Terrain Responsive Exoskeleton Controller (TREC)</a><ul>
@@ -197,7 +197,7 @@
 <li class="toctree-l3"><a class="reference internal" href="elbow.html#parameters">Parameters</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Hip</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
 <li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
@@ -254,9 +254,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="controllers.html">Controllers</a></li>
-      <li class="breadcrumb-item active">Hip</li>
+          <li class="breadcrumb-item"><a href="ankle.html">Ankle</a></li>
+      <li class="breadcrumb-item active">Proportional Joint Moment Controller</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/hip.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/ProportionalJointMoment.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -264,51 +265,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="hip">
-<h1>Hip<a class="headerlink" href="#hip" title="Link to this heading"></a></h1>
-<p>Overview of the hip process.</p>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Installation Subcategories:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#purposes">Purposes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#motor-directions">Motor Directions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#torque-sensor-signs-positive-negative">Torque Sensor Signs (Positive/Negative)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#how-to-calibrate">How to Calibrate</a></li>
+  <section id="proportional-joint-moment-controller">
+<h1>Proportional Joint Moment Controller<a class="headerlink" href="#proportional-joint-moment-controller" title="Link to this heading"></a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h2>
+<p>This controller applies a torque to the ankle proportional to the normalized FSR reading of the toe.
+More details on this controller can be found in:</p>
+<p>G. M. Gasparri, J. Luque and Z. F. Lerner,
+“[Proportional Joint-Moment Control for Instantaneously Adaptive Ankle Exoskeleton Assistance](<a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/8669971">https://ieeexplore.ieee.org/abstract/document/8669971</a>),”
+in IEEE Transactions on Neural Systems and Rehabilitation Engineering, vol. 27, no. 4, pp. 751-759, April 2019, doi: 10.1109/TNSRE.2019.2905979.</p>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<p>Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>.</p>
+<ul class="simple">
+<li><p><strong>stance_max</strong>
+The peak torque (in Nm) during stance. When the normalized FSR is 1, this will be the torque applied to the ankle.</p></li>
+<li><p><strong>swing_max</strong>
+The constant torque (in Nm) during swing. This value is rarely used.</p></li>
+<li><p><strong>is_assitance</strong>
+When set to 1 (assistive), the system applies the torque in the plantar flexion direction; when set to 0 (resistive), the torque is applied in the dorsiflexion direction.</p></li>
+<li><p><strong>use_pid</strong>
+This flag turns PID control on (1) or off (0).</p></li>
+<li><p><strong>p_gain</strong>
+Proportional gain for closed-loop control.</p></li>
+<li><p><strong>i_gain</strong>
+Integral gain for closed-loop control.</p></li>
+<li><p><strong>d_gain</strong>
+Derivative gain for closed-loop control.</p></li>
+<li><p><strong>torque_alpha</strong>
+Filtering term for the exponentially weighted moving average (EWMA) filter used on the torque sensor to reduce noise. Lower values increase the delay due to filtering.</p></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Chirp.html">Chirp Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Chirp.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Chirp.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ConstantTorque.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ConstantTorque.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Step.html">Step Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Step.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Step.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ZeroTorque.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ZeroTorque.html#parameters">Parameters</a></li>
-</ul>
-</li>
-</ul>
-</div>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="elbow.html" class="btn btn-neutral float-left" title="Elbow Min Max Controller" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="CalbrManager.html" class="btn btn-neutral float-right" title="Calibration Manager Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ankle.html" class="btn btn-neutral float-left" title="Ankle" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="TREC.html" class="btn btn-neutral float-right" title="Terrain Responsive Exoskeleton Controller (TREC)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

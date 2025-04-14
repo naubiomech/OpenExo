@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hip &mdash; OpenExo Documentation 0.1-dev documentation</title>
+  <title>Zhang Collins Controller &mdash; OpenExo Documentation 0.1-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css" />
@@ -20,8 +20,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Calibration Manager Controller" href="CalbrManager.html" />
-    <link rel="prev" title="Elbow Min Max Controller" href="elbow.html" /> 
+    <link rel="next" title="Elbow Min Max Controller" href="elbow.html" />
+    <link rel="prev" title="Terrain Responsive Exoskeleton Controller (TREC)" href="TREC.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -174,7 +174,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="controllers.html">Controllers</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a><ul>
+<li class="toctree-l2 current"><a class="reference internal" href="ankle.html">Ankle</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="ProportionalJointMoment.html">Proportional Joint Moment Controller</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#description">Description</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#parameters">Parameters</a></li>
@@ -185,9 +185,9 @@
 <li class="toctree-l4"><a class="reference internal" href="TREC.html#parameters">Parameters</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="ZhangCollins.html">Zhang Collins Controller</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="ZhangCollins.html#description">Description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="ZhangCollins.html#parameters">Parameters</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Zhang Collins Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
 </ul>
 </li>
 </ul>
@@ -197,7 +197,7 @@
 <li class="toctree-l3"><a class="reference internal" href="elbow.html#parameters">Parameters</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Hip</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
 <li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
@@ -254,9 +254,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="controllers.html">Controllers</a></li>
-      <li class="breadcrumb-item active">Hip</li>
+          <li class="breadcrumb-item"><a href="ankle.html">Ankle</a></li>
+      <li class="breadcrumb-item active">Zhang Collins Controller</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/hip.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/ZhangCollins.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -264,51 +265,47 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="hip">
-<h1>Hip<a class="headerlink" href="#hip" title="Link to this heading"></a></h1>
-<p>Overview of the hip process.</p>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Installation Subcategories:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#purposes">Purposes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#motor-directions">Motor Directions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#torque-sensor-signs-positive-negative">Torque Sensor Signs (Positive/Negative)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#how-to-calibrate">How to Calibrate</a></li>
+  <section id="zhang-collins-controller">
+<h1>Zhang Collins Controller<a class="headerlink" href="#zhang-collins-controller" title="Link to this heading"></a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h2>
+<p>This controller applies a spline defined as a percent of gait. It requires a heel FSR for proper operation. The torque profile implemented by this controller is based on the following publication:</p>
+<p>Zhang, J., Fiers, P., Witte, K. A., Jackson, R. W., Poggensee, K. L., Atkeson, C. G., &amp; Collins, S. H. (2017).
+[Human-in-the-loop optimization of exoskeleton assistance during walking.](<a class="reference external" href="https://www.science.org/doi/full/10.1126/science.aal5054">https://www.science.org/doi/full/10.1126/science.aal5054</a>)
+<em>Science, 356(6344), 1280-1284.</em></p>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<p>Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>.</p>
+<ul class="simple">
+<li><p><strong>torque</strong>
+Magnitude of the peak torque in Nm.</p></li>
+<li><p><strong>peak_time</strong>
+Time when the peak torque occurs (expressed as a percentage of the gait cycle).</p></li>
+<li><p><strong>rise_time</strong>
+Duration from zero torque to peak torque (expressed as a percentage of the gait cycle).</p></li>
+<li><p><strong>fall_time</strong>
+Duration from peak torque back to zero torque (expressed as a percentage of the gait cycle).</p></li>
+<li><p><strong>direction</strong>
+Flag to flip the torque from plantarflexion (PF) to dorsiflexion (DF); essentially an assistance/resistance flag.</p></li>
+<li><p><strong>use_pid</strong>
+Flag to enable PID control (1 = on, 0 = off).</p></li>
+<li><p><strong>p_gain</strong>
+Proportional gain for closed-loop control.</p></li>
+<li><p><strong>i_gain</strong>
+Integral gain for closed-loop control.</p></li>
+<li><p><strong>d_gain</strong>
+Derivative gain for closed-loop control.</p></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Chirp.html">Chirp Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Chirp.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Chirp.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ConstantTorque.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ConstantTorque.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Step.html">Step Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Step.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Step.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ZeroTorque.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ZeroTorque.html#parameters">Parameters</a></li>
-</ul>
-</li>
-</ul>
-</div>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="elbow.html" class="btn btn-neutral float-left" title="Elbow Min Max Controller" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="CalbrManager.html" class="btn btn-neutral float-right" title="Calibration Manager Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="TREC.html" class="btn btn-neutral float-left" title="Terrain Responsive Exoskeleton Controller (TREC)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="elbow.html" class="btn btn-neutral float-right" title="Elbow Min Max Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

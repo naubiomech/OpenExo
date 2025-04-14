@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Elbow &mdash; OpenExo Documentation 0.1-dev documentation</title>
+  <title>Elbow Min Max Controller &mdash; OpenExo Documentation 0.1-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css" />
@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Hip" href="hip.html" />
-    <link rel="prev" title="Ankle" href="ankle.html" /> 
+    <link rel="prev" title="Zhang Collins Controller" href="ZhangCollins.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -174,9 +174,67 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="controllers.html">Controllers</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Elbow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ProportionalJointMoment.html">Proportional Joint Moment Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="TREC.html">Terrain Responsive Exoskeleton Controller (TREC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="TREC.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="TREC.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ZhangCollins.html">Zhang Collins Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ZhangCollins.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ZhangCollins.html#parameters">Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Elbow Min Max Controller</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#description">Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#purposes">Purposes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#motor-directions">Motor Directions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#torque-sensor-signs-positive-negative">Torque Sensor Signs (Positive/Negative)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#how-to-calibrate">How to Calibrate</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Chirp.html">Chirp Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Chirp.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Chirp.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ConstantTorque.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ConstantTorque.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Step.html">Step Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Step.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Step.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ZeroTorque.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ZeroTorque.html#parameters">Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#calibration-manager-controller">Calibration Manager Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#chirp-controller">Chirp Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#constant-torque-controller">Constant Torque Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#step-controller">Step Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#zero-torque-controller">Zero Torque Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#controller-subfolders-by-joint">Controller Subfolders by Joint</a></li>
 </ul>
 </li>
 </ul>
@@ -196,7 +254,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="controllers.html">Controllers</a></li>
-      <li class="breadcrumb-item active">Elbow</li>
+      <li class="breadcrumb-item active">Elbow Min Max Controller</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/elbow.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -206,16 +264,56 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="elbow">
-<h1>Elbow<a class="headerlink" href="#elbow" title="Link to this heading"></a></h1>
-<p>Overview of the elbow process.</p>
+  <section id="elbow-min-max-controller">
+<h1>Elbow Min Max Controller<a class="headerlink" href="#elbow-min-max-controller" title="Link to this heading"></a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h2>
+<p>This controller applies a torque to the elbow based on FSRs placed on the hand. It is meant to be used for weighted lifting. More details on this controller can be found in:</p>
+<p>D Colley, C. D. Bowersock, and Z. F. Lerner,
+“[A Lightweight Powered Elbow Exoskeleton for Manual Handling Tasks]”
+in IEEE Transactions on Medical Robotics and Bionics.</p>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<p>Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>. The parameters for this controller are:</p>
+<ul class="simple">
+<li><p><strong>FLEXamplitude</strong>
+Torque setpoint, in Nm, for flexion assistance.</p></li>
+<li><p><strong>DigitFSR_threshold</strong>
+Upper threshold for finger (grip) FSRs.</p></li>
+<li><p><strong>PalmFSR_threshold</strong>
+Upper threshold for palm FSR.</p></li>
+<li><p><strong>DigitFSR_LOWthreshold</strong>
+Lower threshold for finger (grip) FSRs.</p></li>
+<li><p><strong>PalmFSR_LOWthreshold</strong>
+Lower threshold for palm FSR.</p></li>
+<li><p><strong>CaliRequest</strong>
+Flag to request calibration of sensors.</p></li>
+<li><p><strong>TrqProfile</strong>
+Flag that toggles between torque states (1 = spring, 0 = constant).</p></li>
+<li><p><strong>p_gain</strong>
+Proportional gain for closed-loop controls.</p></li>
+<li><p><strong>i_gain</strong>
+Integral gain for closed-loop controls.</p></li>
+<li><p><strong>d_gain</strong>
+Derivative gain for closed-loop controls.</p></li>
+<li><p><strong>TorqueLimit</strong>
+Torque safety limit, in Nm; prevents the controller from prescribing a torque larger than this value.</p></li>
+<li><p><strong>SpringPkTorque</strong>
+Sets the maximum spring torque in Nm.</p></li>
+<li><p><strong>EXTamplitude</strong>
+Extension torque setpoint in Nm.</p></li>
+<li><p><strong>FiltStrength</strong>
+Sets the strength of the setpoint filter.</p></li>
+</ul>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="ankle.html" class="btn btn-neutral float-left" title="Ankle" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ZhangCollins.html" class="btn btn-neutral float-left" title="Zhang Collins Controller" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="hip.html" class="btn btn-neutral float-right" title="Hip" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

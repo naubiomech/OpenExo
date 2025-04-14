@@ -174,9 +174,67 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Controllers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ProportionalJointMoment.html">Proportional Joint Moment Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="TREC.html">Terrain Responsive Exoskeleton Controller (TREC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="TREC.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="TREC.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ZhangCollins.html">Zhang Collins Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ZhangCollins.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ZhangCollins.html#parameters">Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="elbow.html#description">Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elbow.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#purposes">Purposes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#motor-directions">Motor Directions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#torque-sensor-signs-positive-negative">Torque Sensor Signs (Positive/Negative)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#how-to-calibrate">How to Calibrate</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Chirp.html">Chirp Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Chirp.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Chirp.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ConstantTorque.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ConstantTorque.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Step.html">Step Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Step.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Step.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ZeroTorque.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ZeroTorque.html#parameters">Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#calibration-manager-controller">Calibration Manager Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chirp-controller">Chirp Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#constant-torque-controller">Constant Torque Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#step-controller">Step Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zero-torque-controller">Zero Torque Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#controller-subfolders-by-joint">Controller Subfolders by Joint</a></li>
 </ul>
 </li>
 </ul>
@@ -209,13 +267,118 @@
 <h1>Controllers<a class="headerlink" href="#controllers" title="Link to this heading"></a></h1>
 <p>Overview of the controller process.</p>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Controller Subcategories:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Joint-Specific Controllers:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="ankle.html">Ankle</a></li>
-<li class="toctree-l1"><a class="reference internal" href="elbow.html">Elbow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hip.html">Hip</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ankle.html">Ankle</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ProportionalJointMoment.html">Proportional Joint Moment Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="TREC.html">Terrain Responsive Exoskeleton Controller (TREC)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ZhangCollins.html">Zhang Collins Controller</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html#description">Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hip.html">Hip</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Chirp.html">Chirp Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Step.html">Step Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a></li>
+</ul>
+</li>
 </ul>
 </div>
+<section id="calibration-manager-controller">
+<h2>Calibration Manager Controller<a class="headerlink" href="#calibration-manager-controller" title="Link to this heading"></a></h2>
+<p><strong>Description</strong>
+This controller applies a small, constant torque while printing statements of relevance (command value/sign, torque sensor value/sign, angle sensor value/sign) to the Arduino Serial Monitor.</p>
+<p><strong>Parameters</strong>
+There are no user-defined parameters associated with this controller.</p>
+<p><strong>Purposes</strong>
+After you have built an exo, one of the first things to check is the motor directions and the signs (positive/negative) of any of your external sensors (torque, angle, etc.). Having correct motor directions is important as it allows the exo controller designers to focus solely on the control logic—knowing that if the system is calibrated properly, the exo assistance will always be in the correct direction. The same principle applies to the sensors: since PID control is implemented in many of our controllers, matching the sign of sensor readings to motor commands is crucial.
+This article elaborates how to conduct the direction calibration using the Calibration Manager Controller. On each exo, this calibration process needs to be run <strong>once</strong>; its results are then <strong>manually</strong> saved on the SD card and loaded <strong>automatically</strong> at startup.</p>
+<p><strong>Motor Directions</strong>
+When designing a controller, the output of the <cite>calc_motor_cmd()</cite> function determines the motor torque command (feedforward). To simplify controller design, we propose the following directional conventions for torque commands:
+- <strong>Ankle joints:</strong> Positive for Dorsiflexion, negative for Plantarflexion.
+- <strong>Knee joints:</strong> Positive for Extension, negative for Flexion.
+- <strong>Hip joints:</strong> Positive for Flexion, negative for Extension.
+- <strong>Shoulder joints:</strong> Positive for Flexion, negative for Extension.
+- <strong>Elbow joints:</strong> Positive for Flexion, negative for Extension.</p>
+<p>This overall approach follows the <strong>right-hand rule</strong>.</p>
+<p><strong>Torque Sensor Signs (Positive/Negative)</strong>
+Ensure that when the motor outputs a positive torque command, the torque sensors—when zeroed properly—also return a positive value when the motor shaft is stationary.</p>
+<p><strong>How to Calibrate</strong>
+1. Set the Direction Calibration Manager as the default controller for the current exo. Connect the Teensy via USB, open the Arduino Serial Monitor, connect the exo (Arduino Nano) with the Python app, power on the exo, and start a new session. The Calibration Manager will send a positive torque command (3.5 Nm by default) to each motor.
+2. Verify the torque by feeling the force (e.g., via the foot plates on an ankle exo). If a motor (e.g., on the left side) does not produce the expected positive rotation, modify the <cite>config.ini</cite> on the SD card to flip the motor direction for that side.
+3. Restart the process and, this time, focus on sensor readings displayed on the Serial Monitor. Manually return the foot plate (or another joint element) to its neutral position (for example, 0°). If the sensor does not report a positive value, adjust the sensor direction in the <cite>config.ini</cite>. Repeat this calibration for all relevant sensors.</p>
+</section>
+<section id="chirp-controller">
+<h2>Chirp Controller<a class="headerlink" href="#chirp-controller" title="Link to this heading"></a></h2>
+<p><strong>Description</strong>
+This controller applies a user-defined sine wave that increases in frequency at a set rate. It is designed to help characterize the system’s bandwidth.</p>
+<p><strong>Parameters</strong>
+Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>.
+- <strong>amplitude</strong>: Amplitude (in Nm) of the torque sine wave.
+- <strong>start_frequency</strong>: Starting frequency for the chirp.
+- <strong>end_frequency</strong>: Ending frequency for the chirp.
+- <strong>duration</strong>: How long the chirp is applied.
+- <strong>yshift</strong>: Shifts the center of the chirp if it is to be non-zero.
+- <strong>use_pid</strong>: Flag to enable (1) or disable (0) PID control.
+- <strong>p_gain</strong>: Proportional gain for closed-loop control.
+- <strong>i_gain</strong>: Integral gain for closed-loop control.
+- <strong>d_gain</strong>: Derivative gain for closed-loop control.</p>
+</section>
+<section id="constant-torque-controller">
+<h2>Constant Torque Controller<a class="headerlink" href="#constant-torque-controller" title="Link to this heading"></a></h2>
+<p><strong>Description</strong>
+This controller attempts to apply a constant torque at the joint. It can be operated with or without closed-loop control.</p>
+<p><strong>Parameters</strong>
+Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>.
+- <strong>amplitude</strong>: Magnitude of the applied torque (in Nm).
+- <strong>direction</strong>: Flag to flip the direction of the applied torque.
+- <strong>alpha</strong>: Filtering term for the exponentially weighted moving average (EWMA) filter applied to the torque sensor to reduce noise. Lower values increase delay.
+- <strong>use_pid</strong>: Flag to enable (1) or disable (0) PID control.
+- <strong>p_gain</strong>: Proportional gain.
+- <strong>i_gain</strong>: Integral gain.
+- <strong>d_gain</strong>: Derivative gain.</p>
+</section>
+<section id="step-controller">
+<h2>Step Controller<a class="headerlink" href="#step-controller" title="Link to this heading"></a></h2>
+<p><strong>Description</strong>
+This controller applies a constant torque at the joint repeatedly for a set duration and number of times.</p>
+<p><strong>Parameters</strong>
+Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>.
+- <strong>amplitude</strong>: Magnitude of the applied torque (in Nm).
+- <strong>duration</strong>: Duration of each torque application.
+- <strong>repetitions</strong>: Number of times the torque is applied.
+- <strong>spacing</strong>: Time between torque applications.
+- <strong>use_pid</strong>: Flag to enable (1) or disable (0) PID control.
+- <strong>p_gain</strong>: Proportional gain.
+- <strong>i_gain</strong>: Integral gain.
+- <strong>d_gain</strong>: Derivative gain.
+- <strong>alpha</strong>: Filtering term for the EWMA filter.</p>
+</section>
+<section id="zero-torque-controller">
+<h2>Zero Torque Controller<a class="headerlink" href="#zero-torque-controller" title="Link to this heading"></a></h2>
+<p><strong>Description</strong>
+This controller attempts to regulate the joint so that the output torque is zero. It can be operated with or without closed-loop control.</p>
+<p><strong>Parameters</strong>
+Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>.
+- <strong>use_pid</strong>: Flag to enable (1) or disable (0) PID control.
+- <strong>p_gain</strong>: Proportional gain.
+- <strong>i_gain</strong>: Integral gain.
+- <strong>d_gain</strong>: Derivative gain.</p>
+</section>
+<section id="controller-subfolders-by-joint">
+<h2>Controller Subfolders by Joint<a class="headerlink" href="#controller-subfolders-by-joint" title="Link to this heading"></a></h2>
+<p>For implementation details specific to individual joints, refer to the subfolders for:
+- <strong>Ankle Controllers</strong>
+- <strong>Elbow Controllers</strong>
+- <strong>Hip Controllers</strong></p>
+<p>The subfolders (each with its own <code class="docutils literal notranslate"><span class="pre">index.rst</span></code> file) are linked above in the toctree. They provide additional documentation and examples for configuring and tuning controllers tailored to the specific dynamics of each joint.</p>
+</section>
 </section>
 
 

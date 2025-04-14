@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hip &mdash; OpenExo Documentation 0.1-dev documentation</title>
+  <title>Chirp Controller &mdash; OpenExo Documentation 0.1-dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css" />
@@ -20,8 +20,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Calibration Manager Controller" href="CalbrManager.html" />
-    <link rel="prev" title="Elbow Min Max Controller" href="elbow.html" /> 
+    <link rel="next" title="Constant Torque Controller" href="ConstantTorque.html" />
+    <link rel="prev" title="Calibration Manager Controller" href="CalbrManager.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -197,7 +197,7 @@
 <li class="toctree-l3"><a class="reference internal" href="elbow.html#parameters">Parameters</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Hip</a><ul>
+<li class="toctree-l2 current"><a class="reference internal" href="hip.html">Hip</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
 <li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
@@ -207,9 +207,9 @@
 <li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#how-to-calibrate">How to Calibrate</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="Chirp.html">Chirp Controller</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="Chirp.html#description">Description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="Chirp.html#parameters">Parameters</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Chirp Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a><ul>
@@ -254,9 +254,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="controllers.html">Controllers</a></li>
-      <li class="breadcrumb-item active">Hip</li>
+          <li class="breadcrumb-item"><a href="hip.html">Hip</a></li>
+      <li class="breadcrumb-item active">Chirp Controller</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/hip.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/Chirp.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -264,51 +265,44 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="hip">
-<h1>Hip<a class="headerlink" href="#hip" title="Link to this heading"></a></h1>
-<p>Overview of the hip process.</p>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Installation Subcategories:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#purposes">Purposes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#motor-directions">Motor Directions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#torque-sensor-signs-positive-negative">Torque Sensor Signs (Positive/Negative)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#how-to-calibrate">How to Calibrate</a></li>
+  <section id="chirp-controller">
+<h1>Chirp Controller<a class="headerlink" href="#chirp-controller" title="Link to this heading"></a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h2>
+<p>This controller applies a user-defined sine wave that increases in frequency at a set rate. It can be used to characterize the bandwidth of the system.</p>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<p>Parameter index order can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>.</p>
+<ul class="simple">
+<li><p><strong>amplitude</strong>
+Amplitude, in Nm, of the torque sine wave.</p></li>
+<li><p><strong>start_frequency</strong>
+Starting frequency for the chirp.</p></li>
+<li><p><strong>end_frequency</strong>
+Ending frequency for the chirp.</p></li>
+<li><p><strong>duration</strong>
+The duration for which the chirp is applied.</p></li>
+<li><p><strong>yshift</strong>
+Shifts the center of the chirp if a value other than zero is desired.</p></li>
+<li><p><strong>use_pid</strong>
+This flag turns PID control on (1) or off (0).</p></li>
+<li><p><strong>p_gain</strong>
+Proportional gain for closed-loop control.</p></li>
+<li><p><strong>i_gain</strong>
+Integral gain for closed-loop control.</p></li>
+<li><p><strong>d_gain</strong>
+Derivative gain for closed-loop control.</p></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Chirp.html">Chirp Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Chirp.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Chirp.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ConstantTorque.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ConstantTorque.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Step.html">Step Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Step.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Step.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ZeroTorque.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ZeroTorque.html#parameters">Parameters</a></li>
-</ul>
-</li>
-</ul>
-</div>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="elbow.html" class="btn btn-neutral float-left" title="Elbow Min Max Controller" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="CalbrManager.html" class="btn btn-neutral float-right" title="Calibration Manager Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="CalbrManager.html" class="btn btn-neutral float-left" title="Calibration Manager Controller" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ConstantTorque.html" class="btn btn-neutral float-right" title="Constant Torque Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
