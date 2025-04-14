@@ -8,8 +8,8 @@ An Open-Source Platform for Numerical Modeling, Data Acquisition, and Control of
 .. raw:: html
 
    <div align="center">
-      <a href="https://travis-ci.org/naubiomech/OpenExo"><img src="https://img.shields.io/travis/naubiomech/OpenExo.svg" alt="Build Status"></a>
-      <a href="https://readthedocs.org/"><img src="https://readthedocs.org/projects/your_project/badge/?version=latest" alt="Docs Status"></a>
+      <a href="https://github.com/naubiomech/OpenExo"><img src="https://github.com/naubiomech/OpenExo" alt="Build Status"></a>
+      <a href="https://readthedocs.org/"><img src="https://readthedocs.org/projects/projects/openexo/badge/?version=latest" alt="Docs Status"></a>
       <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.9%2B-blue" alt="Python Versions"></a>
       <a href="https://opensource.org/licenses/GPL-3.0"><img src="https://img.shields.io/badge/license-GPL--3.0-green" alt="License"></a>
    </div>
