@@ -10,7 +10,7 @@ build:
     python: "3.11"
 
 sphinx:
-   configuration: docs/src/conf.py
+   configuration: Documentation\ReadTheDoc\docs\src\conf.py
 
 formats:
    - pdf
@@ -18,7 +18,7 @@ formats:
 
 python:
    install:
-   - requirements: requirements/doc-requirements.txt
-   - requirements: requirements/dev-requirements.txt
+   - requirements: Documentation\ReadTheDoc\requirements\doc-requirements.txt
+   - requirements: Documentation\ReadTheDoc\requirements\dev-requirements.txt
    - method: setuptools
      path: .
