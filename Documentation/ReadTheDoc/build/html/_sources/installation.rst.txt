@@ -8,4 +8,3 @@ Overview of the installation process.
    :caption: Installation Subcategories:
 
    BuildAndFlash
-   another_sub_page

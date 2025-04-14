@@ -53,7 +53,6 @@
 <li class="toctree-l3"><a class="reference internal" href="BuildAndFlash.html#arduino-boards-manager">Arduino Boards Manager</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="another_sub_page.html">Sub Tree</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul>
@@ -173,9 +172,61 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ProportionalJointMoment.html">Proportional Joint Moment Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ProportionalJointMoment.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="TREC.html">Terrain Responsive Exoskeleton Controller (TREC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="TREC.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="TREC.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ZhangCollins.html">Zhang Collins Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ZhangCollins.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ZhangCollins.html#parameters">Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="elbow.html#description">Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elbow.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#purposes">Purposes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#motor-directions">Motor Directions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#torque-sensor-signs-positive-negative">Torque Sensor Signs (Positive/Negative)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CalbrManager.html#how-to-calibrate">How to Calibrate</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Chirp.html">Chirp Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Chirp.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Chirp.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ConstantTorque.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ConstantTorque.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Step.html">Step Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Step.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Step.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ZeroTorque.html#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ZeroTorque.html#parameters">Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="controllers.html#calibration-manager-controller">Calibration Manager Controller</a></li>
 <li class="toctree-l2"><a class="reference internal" href="controllers.html#chirp-controller">Chirp Controller</a></li>
 <li class="toctree-l2"><a class="reference internal" href="controllers.html#constant-torque-controller">Constant Torque Controller</a></li>
@@ -214,13 +265,13 @@
 <h1>An Open-Source Platform for Numerical Modeling, Data Acquisition, and Control of Lower-Limb Assistive Exoskeletons<a class="headerlink" href="#an-open-source-platform-for-numerical-modeling-data-acquisition-and-control-of-lower-limb-assistive-exoskeletons" title="Link to this heading"></a></h1>
 <img alt="OpenSourceLeg Banner" class="align-center" src="_images/1042_exoskeleton_20250205.jpg" />
 <div align="center">
-   <a href="https://travis-ci.org/your_repo"><img src="https://img.shields.io/travis/your_repo.svg" alt="Build Status"></a>
+   <a href="https://travis-ci.org/naubiomech/OpenExo"><img src="https://img.shields.io/travis/naubiomech/OpenExo.svg" alt="Build Status"></a>
    <a href="https://readthedocs.org/"><img src="https://readthedocs.org/projects/your_project/badge/?version=latest" alt="Docs Status"></a>
    <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.9%2B-blue" alt="Python Versions"></a>
    <a href="https://opensource.org/licenses/GPL-3.0"><img src="https://img.shields.io/badge/license-GPL--3.0-green" alt="License"></a>
 </div><section id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
-<p>Before installing the <strong>opensourceleg</strong> library, ensure you have the following installed:</p>
+<p>Before installing the <strong>OpenExo</strong> library, ensure you have the following installed:</p>
 <ul class="simple">
 <li><p><strong>Python 3.9</strong> or later</p></li>
 <li><p><strong>pip</strong> package manager</p></li>
@@ -228,11 +279,19 @@
 </section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>The easiest and quickest way to install the <strong>opensourceleg</strong> library is via pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>opensourceleg
+<p>The easiest and quickest way to install the <strong>OpenExo</strong> library is to clone the repository directly from GitHub:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/naubiomech/OpenExo.git
+<span class="nb">cd</span><span class="w"> </span>OpenExo
+pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
-<p>If you plan on installing the <strong>opensourceleg</strong> library on a Raspberry Pi, it is recommended to use the <strong>opensourcelegpi</strong> tool. This tool is a cloud-based CI service that builds an up-to-date OS for a Raspberry Pi. It bundles the <strong>opensourceleg</strong> library and its dependencies into a single OS image, which can be flashed onto a microSD card for headless or GUI-less operation to control autonomous/remote robotic systems. For more information, click the provided link in the original README.</p>
+<p>Alternatively, if you are interested in contributing or modifying the code, it is recommended to use <strong>Poetry</strong> for dependency management:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/naubiomech/OpenExo.git
+<span class="nb">cd</span><span class="w"> </span>OpenExo
+poetry<span class="w"> </span>install
+poetry<span class="w"> </span>shell
+</pre></div>
+</div>
 </section>
 <section id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h2>
@@ -240,9 +299,9 @@
 </section>
 <section id="developing">
 <h2>Developing<a class="headerlink" href="#developing" title="Link to this heading"></a></h2>
-<p>If you wish to modify, develop, or contribute to the <strong>opensourceleg</strong> library, it is recommended to install <strong>Poetry</strong>, a Python packaging and dependency management tool. Once Poetry is installed, clone the repository and set up the environment using the following commands:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/neurobionics/opensourceleg.git
-<span class="nb">cd</span><span class="w"> </span>opensourceleg
+<p>If you wish to modify, develop, or contribute to the <strong>OpenExo</strong> library, it is recommended to install <strong>Poetry</strong>, a Python packaging and dependency management tool. Once Poetry is installed, clone the repository and set up your development environment using the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/naubiomech/OpenExo.git
+<span class="nb">cd</span><span class="w"> </span>OpenExo
 poetry<span class="w"> </span>install
 poetry<span class="w"> </span>shell
 </pre></div>
@@ -250,7 +309,7 @@ poetry<span class="w"> </span>shell
 </section>
 <section id="license">
 <h2>License<a class="headerlink" href="#license" title="Link to this heading"></a></h2>
-<p>The <strong>opensourceleg</strong> library is licensed under the GPL-3.0 license. This license grants you the following freedoms:</p>
+<p>The <strong>OpenExo</strong> library is licensed under the GPL-3.0 license. This license grants you the following freedoms:</p>
 <ul class="simple">
 <li><p><strong>Use</strong>: You are free to use the library for any purpose.</p></li>
 <li><p><strong>Modify</strong>: You may modify the library to suit your needs.</p></li>
@@ -264,7 +323,6 @@ poetry<span class="w"> </span>shell
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="BuildAndFlash.html">Build And Flash</a></li>
-<li class="toctree-l2"><a class="reference internal" href="another_sub_page.html">Sub Tree</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul>
@@ -283,7 +341,7 @@ poetry<span class="w"> </span>shell
 </li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a></li>
 <li class="toctree-l2"><a class="reference internal" href="controllers.html#calibration-manager-controller">Calibration Manager Controller</a></li>
 <li class="toctree-l2"><a class="reference internal" href="controllers.html#chirp-controller">Chirp Controller</a></li>
