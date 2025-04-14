@@ -9,8 +9,6 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
-    <script src="_static/jquery.js?v=5d32c60e"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=4f578d93"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -152,9 +150,9 @@
           <div class="body" role="main">
             
   <section id="adding-a-new-board">
-<h1>Adding a New Board<a class="headerlink" href="#adding-a-new-board" title="Link to this heading"></a></h1>
+<h1>Adding a New Board<a class="headerlink" href="#adding-a-new-board" title="Link to this heading">¶</a></h1>
 <section id="config-h">
-<h2>Config.h<a class="headerlink" href="#config-h" title="Link to this heading"></a></h2>
+<h2>Config.h<a class="headerlink" href="#config-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>Add the name of your new board using a <code class="docutils literal notranslate"><span class="pre">#define</span></code> at the top of the file:</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define AK_Board_V0_4 3</span>
@@ -166,7 +164,7 @@ This helps ensure all changes function properly.</p></li>
 </ol>
 </section>
 <section id="parseini-h">
-<h2>ParseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading"></a></h2>
+<h2>ParseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This file is not currently used but <strong>should be updated for future-proofing</strong>.</p>
@@ -179,7 +177,7 @@ This helps ensure all changes function properly.</p></li>
 </ol>
 </section>
 <section id="board-h">
-<h2>Board.h<a class="headerlink" href="#board-h" title="Link to this heading"></a></h2>
+<h2>Board.h<a class="headerlink" href="#board-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Use an <code class="docutils literal notranslate"><span class="pre">#if</span> <span class="pre">defined(YOUR_BOARD_NAME_AND_VERSION)</span></code> block to define the connections on your board.</p></li>
 <li><p>Following the format of existing boards, assign pins and behavior for your microcontroller components:</p>
@@ -191,7 +189,7 @@ This helps ensure all changes function properly.</p></li>
 </ol>
 </section>
 <section id="done">
-<h2>Done!!<a class="headerlink" href="#done" title="Link to this heading"></a></h2>
+<h2>Done!!<a class="headerlink" href="#done" title="Link to this heading">¶</a></h2>
 <p>Once you’ve updated these files, your new board should be recognized and configurable within the system.</p>
 </section>
 </section>

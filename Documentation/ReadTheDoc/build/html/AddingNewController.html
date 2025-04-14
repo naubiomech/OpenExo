@@ -9,8 +9,6 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
-    <script src="_static/jquery.js?v=5d32c60e"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=4f578d93"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -152,17 +150,17 @@
           <div class="body" role="main">
             
   <section id="adding-a-new-controller">
-<h1>Adding a New Controller<a class="headerlink" href="#adding-a-new-controller" title="Link to this heading"></a></h1>
+<h1>Adding a New Controller<a class="headerlink" href="#adding-a-new-controller" title="Link to this heading">¶</a></h1>
 <p>This section provides instructions on how to add a new controller to the platform.</p>
 <section id="parseini-h">
-<h2>parseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading"></a></h2>
+<h2>parseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> namespace for the joint(s) you are creating a controller for, add the new controller to the enum class so it can be referenced.</p></li>
 <li><p>In the <code class="docutils literal notranslate"><span class="pre">config_map</span></code> namespace, add an entry for the joint(s) you are creating a controller for with the name that will be used in the <code class="docutils literal notranslate"><span class="pre">config.ini</span></code> file.</p></li>
 </ol>
 </section>
 <section id="controllerdata-h-controller-definition">
-<h2>ControllerData.h (Controller Definition)<a class="headerlink" href="#controllerdata-h-controller-definition" title="Link to this heading"></a></h2>
+<h2>ControllerData.h (Controller Definition)<a class="headerlink" href="#controllerdata-h-controller-definition" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the <code class="docutils literal notranslate"><span class="pre">controller_defs</span></code> namespace, add a namespace for your controller following the template from the existing controllers:
 - Create <strong>idx</strong> values that will be used to access the different parameters (remember, indexing starts at 0).
@@ -171,7 +169,7 @@
 </ol>
 </section>
 <section id="controller-h">
-<h2>Controller.h<a class="headerlink" href="#controller-h" title="Link to this heading"></a></h2>
+<h2>Controller.h<a class="headerlink" href="#controller-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>In <code class="docutils literal notranslate"><span class="pre">Controller.h</span></code>, create a new controller that inherits from the <code class="docutils literal notranslate"><span class="pre">_Controller</span></code> class.
 - This new controller must include:</p>
@@ -189,7 +187,7 @@
 </ol>
 </section>
 <section id="controllerdata-h-optional-additional-data">
-<h2>ControllerData.h (Optional Additional Data)<a class="headerlink" href="#controllerdata-h-optional-additional-data" title="Link to this heading"></a></h2>
+<h2>ControllerData.h (Optional Additional Data)<a class="headerlink" href="#controllerdata-h-optional-additional-data" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>(Optional) At the bottom of <code class="docutils literal notranslate"><span class="pre">ControllerData.h</span></code>, you can add any extra variables for your controller that you would like to plot. These would serve as replacements or supplements to the variables defined in <code class="docutils literal notranslate"><span class="pre">Controller.h</span></code>.
 - To assign values to these parameters in <code class="docutils literal notranslate"><span class="pre">Controller.cpp</span></code>, use the following formatting:</p>
@@ -202,20 +200,20 @@
 </ol>
 </section>
 <section id="controller-cpp">
-<h2>Controller.cpp<a class="headerlink" href="#controller-cpp" title="Link to this heading"></a></h2>
+<h2>Controller.cpp<a class="headerlink" href="#controller-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Define all the functions for your new controller.
 - When calling the constructor, make sure to use an initializer list for the base class <code class="docutils literal notranslate"><span class="pre">_Controller</span></code>.</p></li>
 </ol>
 </section>
 <section id="joint-h">
-<h2>Joint.h<a class="headerlink" href="#joint-h" title="Link to this heading"></a></h2>
+<h2>Joint.h<a class="headerlink" href="#joint-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Within the header file for the joint (hip, knee, ankle) where the controller applies, add an object instance of your new controller.</p></li>
 </ol>
 </section>
 <section id="joint-cpp">
-<h2>Joint.cpp<a class="headerlink" href="#joint-cpp" title="Link to this heading"></a></h2>
+<h2>Joint.cpp<a class="headerlink" href="#joint-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>For each joint that your controller is valid for:
 1. Add the constructor for the new controller object in the initializer list.
@@ -235,7 +233,7 @@
 </ol>
 </section>
 <section id="create-parameter-file">
-<h2>Create Parameter File<a class="headerlink" href="#create-parameter-file" title="Link to this heading"></a></h2>
+<h2>Create Parameter File<a class="headerlink" href="#create-parameter-file" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the SDCard folder corresponding to the joint your controller is for, create a new parameter CSV file. It is recommended to copy one of the existing files as a starting template.</p></li>
 <li><p>The first cell in the first line should indicate the number of header lines. Parameter reading will begin after this number of lines.</p></li>
@@ -245,14 +243,14 @@
 </ol>
 </section>
 <section id="paramsfromsd-h">
-<h2>ParamsFromSD.h<a class="headerlink" href="#paramsfromsd-h" title="Link to this heading"></a></h2>
+<h2>ParamsFromSD.h<a class="headerlink" href="#paramsfromsd-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Within the <code class="docutils literal notranslate"><span class="pre">controller_parameter_filenames</span></code> namespace, navigate to the appropriate joint.</p></li>
 <li><p>Link the controller ID from <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> with the path on the SD card for the parameter file you just created.</p></li>
 </ol>
 </section>
 <section id="uart-commands-h">
-<h2>uart_commands.h<a class="headerlink" href="#uart-commands-h" title="Link to this heading"></a></h2>
+<h2>uart_commands.h<a class="headerlink" href="#uart-commands-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>(Optional) If you want to plot or save one of the variables defined in <code class="docutils literal notranslate"><span class="pre">ControllerData.h</span></code>, proceed as follows in <code class="docutils literal notranslate"><span class="pre">get_real_time_data()</span></code>:
 - Find the case corresponding to the joint where your controller is used (e.g., <code class="docutils literal notranslate"><span class="pre">bilateral_hip</span></code>).
@@ -280,7 +278,7 @@
 </ol>
 </section>
 <section id="done">
-<h2>Done<a class="headerlink" href="#done" title="Link to this heading"></a></h2>
+<h2>Done<a class="headerlink" href="#done" title="Link to this heading">¶</a></h2>
 <p>Your new controller should now be integrated and ready to use!
 Remember to change the active controller and update the parameters as necessary.</p>
 </section>

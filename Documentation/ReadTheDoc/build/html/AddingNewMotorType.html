@@ -9,8 +9,6 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
-    <script src="_static/jquery.js?v=5d32c60e"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=4f578d93"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -152,9 +150,9 @@
           <div class="body" role="main">
             
   <section id="adding-a-new-motor-type">
-<h1>Adding a New Motor Type<a class="headerlink" href="#adding-a-new-motor-type" title="Link to this heading"></a></h1>
+<h1>Adding a New Motor Type<a class="headerlink" href="#adding-a-new-motor-type" title="Link to this heading">¶</a></h1>
 <section id="motor-h">
-<h2>Motor.h<a class="headerlink" href="#motor-h" title="Link to this heading"></a></h2>
+<h2>Motor.h<a class="headerlink" href="#motor-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>Create a class for your new motor type that inherits its interface from the <code class="docutils literal notranslate"><span class="pre">_Motor</span></code> class:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">_YourMotorType</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">_Motor</span>
@@ -190,7 +188,7 @@
 </ol>
 </section>
 <section id="motor-cpp">
-<h2>Motor.cpp<a class="headerlink" href="#motor-cpp" title="Link to this heading"></a></h2>
+<h2>Motor.cpp<a class="headerlink" href="#motor-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Define the behavior of the member functions of <code class="docutils literal notranslate"><span class="pre">_YourMotorType</span></code>.
 - Ideally, these behaviors will be shared by all motors of this type.</p></li>
@@ -198,7 +196,7 @@
 </ol>
 </section>
 <section id="connect-to-everything-else">
-<h2>Connect to Everything Else<a class="headerlink" href="#connect-to-everything-else" title="Link to this heading"></a></h2>
+<h2>Connect to Everything Else<a class="headerlink" href="#connect-to-everything-else" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Follow the steps in <span class="xref std std-doc">AddingNewCanMotor</span> to connect this new motor type to the rest of the codebase.
 - This step is detailed in the referenced document so that you only need to update information in one place.</p></li>

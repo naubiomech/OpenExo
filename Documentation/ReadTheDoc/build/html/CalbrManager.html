@@ -9,8 +9,6 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
-    <script src="_static/jquery.js?v=5d32c60e"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=4f578d93"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -151,22 +149,22 @@
           <div class="body" role="main">
             
   <section id="calibration-manager-controller">
-<h1>Calibration Manager Controller<a class="headerlink" href="#calibration-manager-controller" title="Link to this heading"></a></h1>
+<h1>Calibration Manager Controller<a class="headerlink" href="#calibration-manager-controller" title="Link to this heading">¶</a></h1>
 <section id="description">
-<h2>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h2>
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
 <p>This controller applies a small, constant torque while printing statements of relevance (command value/sign, torque sensor value/sign, angle sensor value/sign) to the Arduino Serial Monitor.</p>
 </section>
 <section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
 <p>There are no user-defined parameters associated with this controller.</p>
 </section>
 <section id="purposes">
-<h2>Purposes<a class="headerlink" href="#purposes" title="Link to this heading"></a></h2>
+<h2>Purposes<a class="headerlink" href="#purposes" title="Link to this heading">¶</a></h2>
 <p>After you have built an exo, one of the first things to check is the motor directions and the signs (positive/negative) of any external sensors (such as torque or angle sensors). Having correct motor directions is important because it allows the exo controller designers to concentrate solely on control logic—knowing that if the system is calibrated properly before use, the exo assistance will always operate in the intended directions. The same principle applies to the sensors involved in control; since PID control is implemented in many of our controllers, it is crucial that sensor readings match the motor command signs.</p>
 <p>This document explains how to perform the calibration using the Calibration Manager Controller. Note that on each exo, this calibration process needs to be done <strong>once</strong>; its results must then be <strong>manually</strong> saved to the SD card and will be loaded <strong>automatically</strong> each time the exo starts up.</p>
 </section>
 <section id="motor-directions">
-<h2>Motor Directions<a class="headerlink" href="#motor-directions" title="Link to this heading"></a></h2>
+<h2>Motor Directions<a class="headerlink" href="#motor-directions" title="Link to this heading">¶</a></h2>
 <p>When designing a controller, the values returned by the <code class="docutils literal notranslate"><span class="pre">calc_motor_cmd()</span></code> function determine the motor torque command (feedforward). To simplify the controller design process, we propose that designers adhere to the following directional conventions for torque commands:</p>
 <ul class="simple">
 <li><p><strong>Ankle joints:</strong>
@@ -183,11 +181,11 @@ Positive for Flexion, negative for Extension.</p></li>
 <p>In summary, this approach follows the <strong>right-hand rule</strong>.</p>
 </section>
 <section id="torque-sensor-signs-positive-negative">
-<h2>Torque Sensor Signs (Positive/Negative)<a class="headerlink" href="#torque-sensor-signs-positive-negative" title="Link to this heading"></a></h2>
+<h2>Torque Sensor Signs (Positive/Negative)<a class="headerlink" href="#torque-sensor-signs-positive-negative" title="Link to this heading">¶</a></h2>
 <p>Based on the motor direction definitions above, verify that when the motor supplies a positive torque command, the torque sensors (when properly zeroed) also return a positive value when the motor shaft is not spinning.</p>
 </section>
 <section id="how-to-calibrate">
-<h2>How to Calibrate<a class="headerlink" href="#how-to-calibrate" title="Link to this heading"></a></h2>
+<h2>How to Calibrate<a class="headerlink" href="#how-to-calibrate" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p><strong>Set Up the Controller:</strong>
 Set the Direction Calibration Manager as the default controller for the current exo. Connect the Teensy to a computer via USB and open the Arduino Serial Monitor. Also, connect the exo (Arduino Nano) with the Python application. Power on the exo and start a new session. The Calibration Manager will send a positive torque command (3.5 Nm by default) to each motor.</p></li>

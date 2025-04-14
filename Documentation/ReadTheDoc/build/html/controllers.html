@@ -9,8 +9,6 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
-    <script src="_static/jquery.js?v=5d32c60e"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=4f578d93"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -144,7 +142,7 @@
           <div class="body" role="main">
             
   <section id="controllers">
-<h1>Controllers<a class="headerlink" href="#controllers" title="Link to this heading"></a></h1>
+<h1>Controllers<a class="headerlink" href="#controllers" title="Link to this heading">¶</a></h1>
 <p>Overview of the controller process.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Joint-Specific Controllers:</span></p>
@@ -171,7 +169,7 @@
 </ul>
 </div>
 <section id="calibration-manager-controller">
-<h2>Calibration Manager Controller<a class="headerlink" href="#calibration-manager-controller" title="Link to this heading"></a></h2>
+<h2>Calibration Manager Controller<a class="headerlink" href="#calibration-manager-controller" title="Link to this heading">¶</a></h2>
 <p><strong>Description</strong>
 This controller applies a small, constant torque while printing statements of relevance (command value/sign, torque sensor value/sign, angle sensor value/sign) to the Arduino Serial Monitor.</p>
 <p><strong>Parameters</strong>
@@ -195,7 +193,7 @@ Ensure that when the motor outputs a positive torque command, the torque sensors
 3. Restart the process and, this time, focus on sensor readings displayed on the Serial Monitor. Manually return the foot plate (or another joint element) to its neutral position (for example, 0°). If the sensor does not report a positive value, adjust the sensor direction in the <cite>config.ini</cite>. Repeat this calibration for all relevant sensors.</p>
 </section>
 <section id="chirp-controller">
-<h2>Chirp Controller<a class="headerlink" href="#chirp-controller" title="Link to this heading"></a></h2>
+<h2>Chirp Controller<a class="headerlink" href="#chirp-controller" title="Link to this heading">¶</a></h2>
 <p><strong>Description</strong>
 This controller applies a user-defined sine wave that increases in frequency at a set rate. It is designed to help characterize the system’s bandwidth.</p>
 <p><strong>Parameters</strong>
@@ -211,7 +209,7 @@ Parameter index order can be found in <span class="xref std std-doc">ControllerD
 - <strong>d_gain</strong>: Derivative gain for closed-loop control.</p>
 </section>
 <section id="constant-torque-controller">
-<h2>Constant Torque Controller<a class="headerlink" href="#constant-torque-controller" title="Link to this heading"></a></h2>
+<h2>Constant Torque Controller<a class="headerlink" href="#constant-torque-controller" title="Link to this heading">¶</a></h2>
 <p><strong>Description</strong>
 This controller attempts to apply a constant torque at the joint. It can be operated with or without closed-loop control.</p>
 <p><strong>Parameters</strong>
@@ -225,7 +223,7 @@ Parameter index order can be found in <span class="xref std std-doc">ControllerD
 - <strong>d_gain</strong>: Derivative gain.</p>
 </section>
 <section id="step-controller">
-<h2>Step Controller<a class="headerlink" href="#step-controller" title="Link to this heading"></a></h2>
+<h2>Step Controller<a class="headerlink" href="#step-controller" title="Link to this heading">¶</a></h2>
 <p><strong>Description</strong>
 This controller applies a constant torque at the joint repeatedly for a set duration and number of times.</p>
 <p><strong>Parameters</strong>
@@ -241,7 +239,7 @@ Parameter index order can be found in <span class="xref std std-doc">ControllerD
 - <strong>alpha</strong>: Filtering term for the EWMA filter.</p>
 </section>
 <section id="zero-torque-controller">
-<h2>Zero Torque Controller<a class="headerlink" href="#zero-torque-controller" title="Link to this heading"></a></h2>
+<h2>Zero Torque Controller<a class="headerlink" href="#zero-torque-controller" title="Link to this heading">¶</a></h2>
 <p><strong>Description</strong>
 This controller attempts to regulate the joint so that the output torque is zero. It can be operated with or without closed-loop control.</p>
 <p><strong>Parameters</strong>
@@ -252,7 +250,7 @@ Parameter index order can be found in <span class="xref std std-doc">ControllerD
 - <strong>d_gain</strong>: Derivative gain.</p>
 </section>
 <section id="controller-subfolders-by-joint">
-<h2>Controller Subfolders by Joint<a class="headerlink" href="#controller-subfolders-by-joint" title="Link to this heading"></a></h2>
+<h2>Controller Subfolders by Joint<a class="headerlink" href="#controller-subfolders-by-joint" title="Link to this heading">¶</a></h2>
 <p>For implementation details specific to individual joints, refer to the subfolders for:
 - <strong>Ankle Controllers</strong>
 - <strong>Elbow Controllers</strong>

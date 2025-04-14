@@ -9,8 +9,6 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
-    <script src="_static/jquery.js?v=5d32c60e"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=4f578d93"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -152,9 +150,9 @@
           <div class="body" role="main">
             
   <section id="adding-a-new-ble-message">
-<h1>Adding a New BLE Message<a class="headerlink" href="#adding-a-new-ble-message" title="Link to this heading"></a></h1>
+<h1>Adding a New BLE Message<a class="headerlink" href="#adding-a-new-ble-message" title="Link to this heading">¶</a></h1>
 <section id="ble-commands-h">
-<h2>ble_commands.h<a class="headerlink" href="#ble-commands-h" title="Link to this heading"></a></h2>
+<h2>ble_commands.h<a class="headerlink" href="#ble-commands-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>In the <code class="docutils literal notranslate"><span class="pre">names</span></code> namespace, assign a <strong>name</strong> to the character you want to use.</p></li>
 <li><p>In the <code class="docutils literal notranslate"><span class="pre">commands</span></code> array, add your new message and specify the number of variables the system should expect to receive or transmit.</p></li>
@@ -168,7 +166,7 @@
 </ol>
 </section>
 <section id="comsmcu-cpp">
-<h2>ComsMCU.cpp<a class="headerlink" href="#comsmcu-cpp" title="Link to this heading"></a></h2>
+<h2>ComsMCU.cpp<a class="headerlink" href="#comsmcu-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p><strong>If your message is received by the Exo</strong>, open the switch statement in the function:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">ComsMCU</span><span class="o">::</span><span class="n">_process_complete_gui_command</span><span class="p">(</span><span class="n">BleMessage</span><span class="o">*</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span>
@@ -180,7 +178,7 @@ The case should call the corresponding function in the <code class="docutils lit
 </ol>
 </section>
 <section id="done">
-<h2>Done<a class="headerlink" href="#done" title="Link to this heading"></a></h2>
+<h2>Done<a class="headerlink" href="#done" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>If your command is sent by the Exo</strong>, the parser recognizes and packages your data automatically.</p></li>
 <li><p><strong>If your command is received</strong>, the parser packages your data and calls the function defined in the <code class="docutils literal notranslate"><span class="pre">handlers</span></code> namespace.</p></li>

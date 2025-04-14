@@ -9,8 +9,6 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
-    <script src="_static/jquery.js?v=5d32c60e"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=4f578d93"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -152,17 +150,17 @@
           <div class="body" role="main">
             
   <section id="adding-a-new-error-case">
-<h1>Adding a New Error Case<a class="headerlink" href="#adding-a-new-error-case" title="Link to this heading"></a></h1>
+<h1>Adding a New Error Case<a class="headerlink" href="#adding-a-new-error-case" title="Link to this heading">¶</a></h1>
 <p>Error cases should be specific and are structured to operate on a single joint’s data.</p>
 <section id="error-codes-h">
-<h2>error_codes.h<a class="headerlink" href="#error-codes-h" title="Link to this heading"></a></h2>
+<h2>error_codes.h<a class="headerlink" href="#error-codes-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the <code class="docutils literal notranslate"><span class="pre">ErrorCodes</span></code> enum, create a name for your new error case.
 - This name should be placed below the <code class="docutils literal notranslate"><span class="pre">NO_ERROR</span></code> case and above the <code class="docutils literal notranslate"><span class="pre">ERROR_CODE_LENGTH</span></code> case.</p></li>
 </ol>
 </section>
 <section id="error-types-h">
-<h2>error_types.h<a class="headerlink" href="#error-types-h" title="Link to this heading"></a></h2>
+<h2>error_types.h<a class="headerlink" href="#error-types-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>Create a new error type class (use the other error types as a reference).</p></li>
 <li><p>The class should inherit from <code class="docutils literal notranslate"><span class="pre">ErrorType</span></code> and must implement both a <code class="docutils literal notranslate"><span class="pre">check</span></code> and a <code class="docutils literal notranslate"><span class="pre">handle</span></code> function.</p></li>
@@ -179,7 +177,7 @@ If your error case requires its own data, add that data to the ``JointData`` cla
 </ol>
 </section>
 <section id="error-map-h">
-<h2>error_map.h<a class="headerlink" href="#error-map-h" title="Link to this heading"></a></h2>
+<h2>error_map.h<a class="headerlink" href="#error-map-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>In <code class="docutils literal notranslate"><span class="pre">error_map.h</span></code>, add a new key-value pair for your new error case.
 - Use the following format:</p>
@@ -190,7 +188,7 @@ If your error case requires its own data, add that data to the ``JointData`` cla
 </ol>
 </section>
 <section id="done">
-<h2>Done<a class="headerlink" href="#done" title="Link to this heading"></a></h2>
+<h2>Done<a class="headerlink" href="#done" title="Link to this heading">¶</a></h2>
 <p>Your new error case will now be:
 - Checked by the <code class="docutils literal notranslate"><span class="pre">run</span></code> method in <strong>Joint.cpp</strong> (applied to the hip, knee, and ankle).
 - Handled by your <code class="docutils literal notranslate"><span class="pre">handle</span></code> function when it occurs.

@@ -9,8 +9,6 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
-    <script src="_static/jquery.js?v=5d32c60e"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=4f578d93"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -152,9 +150,9 @@
           <div class="body" role="main">
             
   <section id="adding-new-uart-messages">
-<h1>Adding New UART Messages<a class="headerlink" href="#adding-new-uart-messages" title="Link to this heading"></a></h1>
+<h1>Adding New UART Messages<a class="headerlink" href="#adding-new-uart-messages" title="Link to this heading">¶</a></h1>
 <section id="messaging-structure">
-<h2>Messaging Structure<a class="headerlink" href="#messaging-structure" title="Link to this heading"></a></h2>
+<h2>Messaging Structure<a class="headerlink" href="#messaging-structure" title="Link to this heading">¶</a></h2>
 <p>Each message consists of a <strong>get</strong> and an <strong>update</strong> ID:</p>
 <ul class="simple">
 <li><p><strong>Get ID</strong>: Used to request data from the other microcontroller.</p></li>
@@ -164,7 +162,7 @@
 Every message ID also has an associated message handler—this is the code that executes on the microcontroller when a message is received from the other microcontroller.</p>
 </section>
 <section id="declare-message-id-s">
-<h2>Declare Message ID(s)<a class="headerlink" href="#declare-message-id-s" title="Link to this heading"></a></h2>
+<h2>Declare Message ID(s)<a class="headerlink" href="#declare-message-id-s" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Navigate to the <code class="docutils literal notranslate"><span class="pre">src</span></code> folder and open the file <code class="docutils literal notranslate"><span class="pre">uart_commands.h</span></code>.</p></li>
 <li><p>Locate the namespace <code class="docutils literal notranslate"><span class="pre">UART_command_names</span></code>.</p></li>
@@ -172,7 +170,7 @@ Every message ID also has an associated message handler—this is the code that 
 </ol>
 </section>
 <section id="declare-message-handler">
-<h2>Declare Message Handler<a class="headerlink" href="#declare-message-handler" title="Link to this heading"></a></h2>
+<h2>Declare Message Handler<a class="headerlink" href="#declare-message-handler" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>In the same file (<code class="docutils literal notranslate"><span class="pre">uart_commands.h</span></code>), locate the namespace <code class="docutils literal notranslate"><span class="pre">UART_command_handlers</span></code>.</p></li>
 <li><p>Create your message handler function with the following signature:</p>
@@ -184,7 +182,7 @@ Every message ID also has an associated message handler—this is the code that 
 </ol>
 </section>
 <section id="add-your-function-to-the-list-of-callable-functions">
-<h2>Add Your Function to the List of Callable Functions<a class="headerlink" href="#add-your-function-to-the-list-of-callable-functions" title="Link to this heading"></a></h2>
+<h2>Add Your Function to the List of Callable Functions<a class="headerlink" href="#add-your-function-to-the-list-of-callable-functions" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Again in <code class="docutils literal notranslate"><span class="pre">uart_commands.h</span></code>, locate the namespace <code class="docutils literal notranslate"><span class="pre">UART_command_utils</span></code>.</p></li>
 <li><p>Within that namespace, find the function named <code class="docutils literal notranslate"><span class="pre">handle_msg</span></code>.</p></li>
@@ -192,7 +190,7 @@ Every message ID also has an associated message handler—this is the code that 
 </ol>
 </section>
 <section id="done">
-<h2>Done<a class="headerlink" href="#done" title="Link to this heading"></a></h2>
+<h2>Done<a class="headerlink" href="#done" title="Link to this heading">¶</a></h2>
 <p>You have now integrated your new UART message!
 Test your new function to ensure it handles messages as expected.</p>
 </section>

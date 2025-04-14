@@ -9,8 +9,6 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
-    <script src="_static/jquery.js?v=5d32c60e"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=4f578d93"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -152,9 +150,9 @@
           <div class="body" role="main">
             
   <section id="adding-a-new-joint">
-<h1>Adding a New Joint<a class="headerlink" href="#adding-a-new-joint" title="Link to this heading"></a></h1>
+<h1>Adding a New Joint<a class="headerlink" href="#adding-a-new-joint" title="Link to this heading">¶</a></h1>
 <section id="exocode-ini">
-<h2>Exocode.ini<a class="headerlink" href="#exocode-ini" title="Link to this heading"></a></h2>
+<h2>Exocode.ini<a class="headerlink" href="#exocode-ini" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p><strong>Line 118:</strong>
 Add the new joint to the debug statement that determines if the joint is used.</p></li>
@@ -172,7 +170,7 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="parseini-h">
-<h2>ParseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading"></a></h2>
+<h2>ParseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Update <strong>exo_name</strong> in the <cite>config_defs</cite> namespace—ensure this encompasses any configuration for the new joint (e.g., bilateral, unilateral, multi-joint).</p></li>
 <li><p>Update <strong>JointType</strong> in the <cite>config_defs</cite> namespace.</p></li>
@@ -188,19 +186,19 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="parseini-cpp">
-<h2>ParseIni.cpp<a class="headerlink" href="#parseini-cpp" title="Link to this heading"></a></h2>
+<h2>ParseIni.cpp<a class="headerlink" href="#parseini-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>From line 174 onward, copy the template from each section to add the new joint so that it is formatted identically to the other joints.</p></li>
 </ol>
 </section>
 <section id="exodata-h">
-<h2>ExoData.h<a class="headerlink" href="#exodata-h" title="Link to this heading"></a></h2>
+<h2>ExoData.h<a class="headerlink" href="#exodata-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the function <cite>for_each_joint</cite>, add the new joint following the formatting of the existing joints.</p></li>
 </ol>
 </section>
 <section id="exodata-cpp">
-<h2>ExoData.cpp<a class="headerlink" href="#exodata-cpp" title="Link to this heading"></a></h2>
+<h2>ExoData.cpp<a class="headerlink" href="#exodata-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the function <cite>get_used_joints</cite> (line 36), add the new joint following the format of the existing joints—make sure to include both the left and right sides.</p></li>
 <li><p>In the function <cite>get_joint_with</cite> (line 59), add the new joint following the established format for both left and right sides.</p></li>
@@ -208,7 +206,7 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="uart-commands-h">
-<h2>UART_commands.h<a class="headerlink" href="#uart-commands-h" title="Link to this heading"></a></h2>
+<h2>UART_commands.h<a class="headerlink" href="#uart-commands-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the function <cite>get_config</cite> (line 196), update the mapping with the new <cite>config_defs</cite> values you added in ParseIni.h.
 - Refer to the added static const int values at the end of the <cite>config_defs</cite> namespace.</p></li>
@@ -218,13 +216,13 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="side-h">
-<h2>Side.h<a class="headerlink" href="#side-h" title="Link to this heading"></a></h2>
+<h2>Side.h<a class="headerlink" href="#side-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Create a Joint object specific to the new joint (refer to line 158 where other joint objects are specified; follow their formatting).</p></li>
 </ol>
 </section>
 <section id="side-cpp">
-<h2>Side.cpp<a class="headerlink" href="#side-cpp" title="Link to this heading"></a></h2>
+<h2>Side.cpp<a class="headerlink" href="#side-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the Side constructor, add the new joint object (created in the header) following the format of the other joints.</p></li>
 <li><p>In the function <cite>disable_motors</cite> (line 58), add the new joint following the existing formatting.</p></li>
@@ -234,20 +232,20 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="sidedata-h">
-<h2>SideData.h<a class="headerlink" href="#sidedata-h" title="Link to this heading"></a></h2>
+<h2>SideData.h<a class="headerlink" href="#sidedata-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>At line 42, create a new instance of JointData and add an object for the new joint, following the format of existing joints.</p></li>
 </ol>
 </section>
 <section id="sidedata-cpp">
-<h2>SideData.cpp<a class="headerlink" href="#sidedata-cpp" title="Link to this heading"></a></h2>
+<h2>SideData.cpp<a class="headerlink" href="#sidedata-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the SideData constructor, add the new joint object (as defined in the header) following the established format.</p></li>
 <li><p>On the last line, add a statement to reconfigure the new joint—model this on the formatting for other joints.</p></li>
 </ol>
 </section>
 <section id="joint-h">
-<h2>Joint.h<a class="headerlink" href="#joint-h" title="Link to this heading"></a></h2>
+<h2>Joint.h<a class="headerlink" href="#joint-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Create a new class for the joint; ensure it inherits from the public <cite>_joint</cite> class.
 - Include a joint-specific constructor, destructor, and the two essential functions: <cite>run_joint</cite> and <cite>set_controller</cite> in the public section.
@@ -256,7 +254,7 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="joint-cpp">
-<h2>Joint.cpp<a class="headerlink" href="#joint-cpp" title="Link to this heading"></a></h2>
+<h2>Joint.cpp<a class="headerlink" href="#joint-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the <cite>_Joint</cite> constructor (around line 40), add the new joint to the Joint Debug statement.</p></li>
 <li><p>In the function <cite>get_torque_sensor_pin</cite>, add a new case to the switch statement for your added joint, following the existing format.</p></li>
@@ -271,7 +269,7 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="jointdata-cpp">
-<h2>JointData.cpp<a class="headerlink" href="#jointdata-cpp" title="Link to this heading"></a></h2>
+<h2>JointData.cpp<a class="headerlink" href="#jointdata-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Update the switch statement in the JointData initializer (line 31) to include the new joint.
 - Include the segment that sets the value for <cite>is_used</cite> and the if statement that flips the direction.
@@ -280,13 +278,13 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="motor-cpp">
-<h2>Motor.cpp<a class="headerlink" href="#motor-cpp" title="Link to this heading"></a></h2>
+<h2>Motor.cpp<a class="headerlink" href="#motor-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Update the switch statement in the motor initializer (line 39) to include the new joint.</p></li>
 </ol>
 </section>
 <section id="motordata-cpp">
-<h2>MotorData.cpp<a class="headerlink" href="#motordata-cpp" title="Link to this heading"></a></h2>
+<h2>MotorData.cpp<a class="headerlink" href="#motordata-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Update the switch statement in the initializer (line 16) to incorporate the new joint.
 - Include both the gearing and the flip direction portions.</p></li>
@@ -294,20 +292,20 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="controllerdata-cpp">
-<h2>ControllerData.cpp<a class="headerlink" href="#controllerdata-cpp" title="Link to this heading"></a></h2>
+<h2>ControllerData.cpp<a class="headerlink" href="#controllerdata-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Update the switch statement in the constructor (line 16) to include the new joint.</p></li>
 <li><p>Repeat the process for the <cite>reconfigure</cite> function (line 56).</p></li>
 </ol>
 </section>
 <section id="controller-cpp">
-<h2>Controller.cpp<a class="headerlink" href="#controller-cpp" title="Link to this heading"></a></h2>
+<h2>Controller.cpp<a class="headerlink" href="#controller-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Update the switch statement in the constructor of <cite>_Controller</cite> to incorporate the new joint (line 35).</p></li>
 </ol>
 </section>
 <section id="ble-commands-h">
-<h2>ble_commands.h<a class="headerlink" href="#ble-commands-h" title="Link to this heading"></a></h2>
+<h2>ble_commands.h<a class="headerlink" href="#ble-commands-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the function <cite>new_trq</cite>, update the joint_id mapping to include the new joint (ensure you update both left and right sides).
 - Adjust the joint id number to maintain a logical order (e.g., left_hip = 1, left_knee = 2, left_ankle = 3, left_elbow = 4, …).</p></li>
@@ -315,13 +313,13 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="paramsfromsd-h">
-<h2>ParamsfromSD.h<a class="headerlink" href="#paramsfromsd-h" title="Link to this heading"></a></h2>
+<h2>ParamsfromSD.h<a class="headerlink" href="#paramsfromsd-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the <cite>controller_parameter_filenames</cite> namespace, add a new <cite>ParamFilenameKey</cite> for the new joint and associate it with the appropriate controllers.</p></li>
 </ol>
 </section>
 <section id="paramsfromsd-cpp">
-<h2>ParamsfromSD.cpp<a class="headerlink" href="#paramsfromsd-cpp" title="Link to this heading"></a></h2>
+<h2>ParamsfromSD.cpp<a class="headerlink" href="#paramsfromsd-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the function <cite>print_param_error_message</cite>, update the switch statement to include the new joint.
 - Update the entire switch statement (around line 10) and add a case for the new joint.</p></li>
@@ -331,13 +329,13 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="realtimei2c-h">
-<h2>RealTimeI2C.h<a class="headerlink" href="#realtimei2c-h" title="Link to this heading"></a></h2>
+<h2>RealTimeI2C.h<a class="headerlink" href="#realtimei2c-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the <cite>rt_data</cite> namespace, update the static int <cite>RT_LEN</cite> to include the new configurations added in <cite>get_real_time_data</cite> from <cite>uart_commands.h</cite>.</p></li>
 </ol>
 </section>
 <section id="statusdefs-h">
-<h2>StatusDefs.h<a class="headerlink" href="#statusdefs-h" title="Link to this heading"></a></h2>
+<h2>StatusDefs.h<a class="headerlink" href="#statusdefs-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the <cite>messages</cite> namespace, update the error messages to include the new joint:
 - Update for Torque Sensor, Motor, and Controller messages for both sides (left and right).
@@ -346,21 +344,21 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="statusdefs-cpp">
-<h2>StatusDefs.cpp<a class="headerlink" href="#statusdefs-cpp" title="Link to this heading"></a></h2>
+<h2>StatusDefs.cpp<a class="headerlink" href="#statusdefs-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Update the switch statement in <cite>print_status_message</cite> to include the new joint.
 - Include cases for Torque Sensor, Motor, and Controller for both sides.</p></li>
 </ol>
 </section>
 <section id="statusled-h">
-<h2>StatusLED.h<a class="headerlink" href="#statusled-h" title="Link to this heading"></a></h2>
+<h2>StatusLED.h<a class="headerlink" href="#statusled-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Update the <cite>IdxRemap status_led_idx</cite> in the <cite>status_led_defs</cite> namespace to include the new joint, following the format of the other joints.</p></li>
 <li><p>Remove any now invalid “error_to_be_used_#” sections.</p></li>
 </ol>
 </section>
 <section id="config-ini">
-<h2>Config.ini<a class="headerlink" href="#config-ini" title="Link to this heading"></a></h2>
+<h2>Config.ini<a class="headerlink" href="#config-ini" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Copy the settings for one existing joint (e.g., <cite>[bilateralHipAnkle]</cite>) and paste them later in the file.</p></li>
 <li><p>Rename the newly copied section to reflect your new joint.</p></li>
@@ -368,13 +366,13 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="sd-card">
-<h2>SD Card<a class="headerlink" href="#sd-card" title="Link to this heading"></a></h2>
+<h2>SD Card<a class="headerlink" href="#sd-card" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Create a folder named <cite>jointControllers</cite> and include the CSV files for the controllers specific to the new joint.</p></li>
 </ol>
 </section>
 <section id="python-gui-activetrialsettings-py">
-<h2>Python GUI - ActiveTrialSettings.py<a class="headerlink" href="#python-gui-activetrialsettings-py" title="Link to this heading"></a></h2>
+<h2>Python GUI - ActiveTrialSettings.py<a class="headerlink" href="#python-gui-activetrialsettings-py" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Find the section titled <strong>“jointMap”</strong>.
 - Add the new joint name and increment the integer value following the format of the other joints.</p></li>
@@ -382,7 +380,7 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="python-gui-exodevicemanager-py">
-<h2>Python GUI - exoDeviceManager.py<a class="headerlink" href="#python-gui-exodevicemanager-py" title="Link to this heading"></a></h2>
+<h2>Python GUI - exoDeviceManager.py<a class="headerlink" href="#python-gui-exodevicemanager-py" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Locate <strong>“jointDictionary”</strong> under the <cite>ExoDeviceManager</cite> class.
 - Update the dictionary with the new joint numbers you added in <cite>ActiveTrialSettings.py</cite> and associate them with the Motor ID number set via RLink and in the software.
@@ -390,7 +388,7 @@ Update the section that sets the controller for each joint (while in headless mo
 </ol>
 </section>
 <section id="done">
-<h2>Done<a class="headerlink" href="#done" title="Link to this heading"></a></h2>
+<h2>Done<a class="headerlink" href="#done" title="Link to this heading">¶</a></h2>
 <p>It should now be good to go.</p>
 </section>
 </section>
