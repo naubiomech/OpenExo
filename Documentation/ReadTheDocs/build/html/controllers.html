@@ -196,7 +196,7 @@ Ensure that when the motor outputs a positive torque command, the torque sensors
 <p><strong>Description</strong>
 This controller applies a user-defined sine wave that increases in frequency at a set rate. It is designed to help characterize the system’s bandwidth.</p>
 <p><strong>Parameters</strong>
-Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>.
+Parameter index order can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>.
 - <strong>amplitude</strong>: Amplitude (in Nm) of the torque sine wave.
 - <strong>start_frequency</strong>: Starting frequency for the chirp.
 - <strong>end_frequency</strong>: Ending frequency for the chirp.
@@ -212,7 +212,7 @@ Parameter index order can be found in <span class="xref std std-doc">ControllerD
 <p><strong>Description</strong>
 This controller attempts to apply a constant torque at the joint. It can be operated with or without closed-loop control.</p>
 <p><strong>Parameters</strong>
-Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>.
+Parameter index order can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>.
 - <strong>amplitude</strong>: Magnitude of the applied torque (in Nm).
 - <strong>direction</strong>: Flag to flip the direction of the applied torque.
 - <strong>alpha</strong>: Filtering term for the exponentially weighted moving average (EWMA) filter applied to the torque sensor to reduce noise. Lower values increase delay.
@@ -226,7 +226,7 @@ Parameter index order can be found in <span class="xref std std-doc">ControllerD
 <p><strong>Description</strong>
 This controller applies a constant torque at the joint repeatedly for a set duration and number of times.</p>
 <p><strong>Parameters</strong>
-Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>.
+Parameter index order can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>.
 - <strong>amplitude</strong>: Magnitude of the applied torque (in Nm).
 - <strong>duration</strong>: Duration of each torque application.
 - <strong>repetitions</strong>: Number of times the torque is applied.
@@ -242,7 +242,7 @@ Parameter index order can be found in <span class="xref std std-doc">ControllerD
 <p><strong>Description</strong>
 This controller attempts to regulate the joint so that the output torque is zero. It can be operated with or without closed-loop control.</p>
 <p><strong>Parameters</strong>
-Parameter index order can be found in <span class="xref std std-doc">ControllerData</span>.
+Parameter index order can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>.
 - <strong>use_pid</strong>: Flag to enable (1) or disable (0) PID control.
 - <strong>p_gain</strong>: Proportional gain.
 - <strong>i_gain</strong>: Integral gain.

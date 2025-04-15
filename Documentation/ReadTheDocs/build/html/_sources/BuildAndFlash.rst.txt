@@ -4,12 +4,12 @@ Build And Flash
 Downloads
 ---------
 1. **Download Arduino IDE 1.8.19:**  
-   - Available `here <https://www.arduino.cc/en/software>`_  
-   - or `here <https://drive.google.com/drive/folders/1IRxJFNm2gxUtCeU8Dcavg_Mv2ubANOHK?usp=drive_link>`_.
+   - Available on the Arduino website: `Arduino Software <https://www.arduino.cc/en/software>`_  
+   - Or download via Google Drive: `Arduino IDE on Google Drive <https://drive.google.com/drive/folders/1IRxJFNm2gxUtCeU8Dcavg_Mv2ubANOHK?usp=drive_link>`_.
 
 2. **Install Teensyduino:**  
-   - Download it `here <https://www.pjrc.com/teensy/td_download.html>`_  
-   - or `here <https://drive.google.com/drive/folders/1IRxJFNm2gxUtCeU8Dcavg_Mv2ubANOHK?usp=drive_link>`_.
+   - Download it on the PJRC website: `Teensyduino <https://www.pjrc.com/teensy/td_download.html>`_  
+   - Or download via Google Drive: `Teensyduino on Google Drive <https://drive.google.com/drive/folders/1IRxJFNm2gxUtCeU8Dcavg_Mv2ubANOHK?usp=drive_link>`_.  
    - **Note:** Install **version 1.56** for your system.
 
 3. **Install the Arduino Nano 33 BLE:**  
@@ -17,7 +17,6 @@ Downloads
 
 4. **Install the Arduino libraries:**  
    - Follow the instructions provided in the :ref:`libraries` section below.
-
 
 Flashing
 --------
@@ -34,7 +33,6 @@ Once you have all the tools installed, follow these steps to flash your device:
 8. Press the **Upload** button.  
    *Note: The Nano will take significantly longer to build than the Teensy.*
 
-
 .. _libraries:
 
 Libraries
@@ -47,7 +45,6 @@ All files within the **libraries** directory of this codebase should be copied t
 
 This will "install" the libraries on your system.  
 Details on the libraries can be found in the `Libraries Folder <https://github.com/naubiomech/OpenExo/tree/main/Libraries>`_.
-
 
 Arduino Boards Manager
 ----------------------

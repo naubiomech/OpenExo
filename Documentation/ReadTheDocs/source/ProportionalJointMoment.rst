@@ -12,7 +12,7 @@ in IEEE Transactions on Neural Systems and Rehabilitation Engineering, vol. 27, 
 
 Parameters
 ----------
-Parameter index order can be found in :doc:`ControllerData <ExoCode/src/ControllerData.h>`.
+Parameter index order can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`_.
 
 - **stance_max**  
   The peak torque (in Nm) during stance. When the normalized FSR is 1, this will be the torque applied to the ankle.

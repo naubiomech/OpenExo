@@ -11,6 +11,6 @@ For more information, please refer to the following link:
 
 Parameters
 ----------
-Parameter index order can be found in :doc:`ControllerData <ExoCode/src/ControllerData.h>`.
+Parameter index order can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`_.
 
 - **Information Pending**

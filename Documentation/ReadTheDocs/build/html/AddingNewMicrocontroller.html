@@ -153,7 +153,7 @@
 <p>This file assumes you are still using Arduino. If you are moving away from Arduino, you will need to remove Arduino-specific items (e.g., <code class="docutils literal notranslate"><span class="pre">logger::prints</span></code>, pin definitions using <code class="docutils literal notranslate"><span class="pre">A#</span></code>, etc.). Most of the code should run with little modification, but some reformatting may be necessary. If you are migrating away from Arduino, it is assumed that you have sufficient knowledge to handle those changes without further direction.</p>
 <section id="selecting-microcontroller">
 <h2>Selecting Microcontroller<a class="headerlink" href="#selecting-microcontroller" title="Link to this heading">¶</a></h2>
-<p>You should confirm that the microcontroller includes the required elements. As of 20220517, these include:</p>
+<p>You should confirm that the microcontroller includes the required elements. As of 20220517, the microcontroller should include:</p>
 <p><strong>Controller:</strong>
 - SPI
 - CAN
@@ -180,9 +180,9 @@
 <h2>Design Board<a class="headerlink" href="#design-board" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>When designing the board, start from the current board as a template.</p></li>
-<li><p>In the schematic, place components close to where they are needed on the board—this is particularly important for capacitors and resistors, where proximity matters.</p></li>
-<li><p>For the board layout file, ensure those capacitors and resistors are placed correctly.</p></li>
-<li><p>For the CAN bus, place a restriction (or shield) above the traces to prevent capacitive coupling on the lines.</p></li>
+<li><p>In the schematic, place components close to where they are needed on the board—this is particularly important for capacitors and resistors.</p></li>
+<li><p>For the board layout, ensure those components are placed correctly.</p></li>
+<li><p>For the CAN bus, place a restriction (or shield) above the traces to prevent capacitive coupling.</p></li>
 </ul>
 </section>
 <section id="board-h">
@@ -211,16 +211,15 @@
 <section id="other-files">
 <h2>Other Files<a class="headerlink" href="#other-files" title="Link to this heading">¶</a></h2>
 <p>This section gets more involved. You will need to update multiple files with preprocessor directives and specific includes to ensure that the code compiles correctly for your microcontroller.</p>
-<ol class="arabic">
-<li><p><strong>Preprocessor Defines:</strong>
-Go through each file and add preprocessor defines around the areas that should compile for your microcontroller.
-- For the <strong>controller micro</strong>, add your micro in a condition similar to:</p>
-<blockquote>
-<div><div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#if defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)</span>
+<section id="preprocessor-defines">
+<h3>Preprocessor Defines<a class="headerlink" href="#preprocessor-defines" title="Link to this heading">¶</a></h3>
+<p>Go through each file and add preprocessor defines around the areas that should compile for your microcontroller.</p>
+<ul>
+<li><p>For the <strong>controller micro</strong>, add your micro in a condition similar to:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#if defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)</span>
 </pre></div>
 </div>
-</div></blockquote>
-<ul>
+</li>
 <li><p>For the <strong>coms micro</strong>, add your micro in a condition like:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#if defined(ARDUINO_ARDUINO_NANO33BLE)</span>
 </pre></div>
@@ -228,20 +227,18 @@ Go through each file and add preprocessor defines around the areas that should c
 </li>
 <li><p>In some cases, you may need to add specific includes (for example, include SPI in <code class="docutils literal notranslate"><span class="pre">ExoCode.ino</span></code>).</p></li>
 </ul>
-</li>
-<li><p><strong>Determining the Correct Microcontroller Name for Defines:</strong>
-- Navigate to your Arduino directory: <code class="docutils literal notranslate"><span class="pre">arduino/hardware/[type]/boards.txt</span></code>.
-- Locate your microcontroller and look for an entry like <code class="docutils literal notranslate"><span class="pre">*.board.name=[name]</span></code>.
-- In your define, prepend the obtained board name with <code class="docutils literal notranslate"><span class="pre">ARDUINO_</span></code>.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>For example, if the board name is <code class="docutils literal notranslate"><span class="pre">TEENSY41</span></code> (for Teensy 4.1), then you will use <code class="docutils literal notranslate"><span class="pre">ARDUINO_TEENSY41</span></code>.</p></li>
-<li><p>Note: The Nano 33 appears as <code class="docutils literal notranslate"><span class="pre">ARDUINO_NANO33BLE</span></code>, so the corresponding define will be <code class="docutils literal notranslate"><span class="pre">ARDUINO_ARDUINO_NANO33BLE</span></code>.
+</section>
+<section id="determining-the-correct-microcontroller-name-for-defines">
+<h3>Determining the Correct Microcontroller Name for Defines<a class="headerlink" href="#determining-the-correct-microcontroller-name-for-defines" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Navigate to your Arduino directory: <code class="docutils literal notranslate"><span class="pre">arduino/hardware/[type]/boards.txt</span></code>.</p></li>
+<li><p>Locate your microcontroller and look for an entry like <code class="docutils literal notranslate"><span class="pre">*.board.name=[name]</span></code>.</p></li>
+<li><p>In your define, prepend the obtained board name with <code class="docutils literal notranslate"><span class="pre">ARDUINO_</span></code>.
+- For example, if the board name is <code class="docutils literal notranslate"><span class="pre">TEENSY41</span></code> (for Teensy 4.1), then you will use <code class="docutils literal notranslate"><span class="pre">ARDUINO_TEENSY41</span></code>.
+- Note: The Nano 33 appears as <code class="docutils literal notranslate"><span class="pre">ARDUINO_NANO33BLE</span></code>, so the corresponding define will be <code class="docutils literal notranslate"><span class="pre">ARDUINO_ARDUINO_NANO33BLE</span></code>.
 <strong>Be careful</strong> to follow the naming conventions exactly to ensure consistency.</p></li>
 </ul>
-</div></blockquote>
-</li>
-</ol>
+</section>
 </section>
 </section>
 
@@ -265,7 +262,11 @@ Go through each file and add preprocessor defines around the areas that should c
 <li><a class="reference internal" href="#board-h">Board.h</a></li>
 <li><a class="reference internal" href="#config-ini">config.ini</a></li>
 <li><a class="reference internal" href="#parseini-h">ParseIni.h</a></li>
-<li><a class="reference internal" href="#other-files">Other Files</a></li>
+<li><a class="reference internal" href="#other-files">Other Files</a><ul>
+<li><a class="reference internal" href="#preprocessor-defines">Preprocessor Defines</a></li>
+<li><a class="reference internal" href="#determining-the-correct-microcontroller-name-for-defines">Determining the Correct Microcontroller Name for Defines</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

@@ -11,7 +11,8 @@ in IEEE Transactions on Medical Robotics and Bionics.
 
 Parameters
 ----------
-Parameter index order can be found in :doc:`ControllerData <ExoCode/src/ControllerData.h>`. The parameters for this controller are:
+Parameter index order can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`_.
+ The parameters for this controller are:
 
 - **FLEXamplitude**  
   Torque setpoint, in Nm, for flexion assistance.

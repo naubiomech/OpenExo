@@ -5,7 +5,7 @@ Error cases should be specific and are structured to operate on a single joint's
 
 error_codes.h
 -------------
-1. In the ``ErrorCodes`` enum, create a name for your new error case.  
+1. In the ``ErrorCodes`` enum, create a name for your new error case.
    - This name should be placed below the ``NO_ERROR`` case and above the ``ERROR_CODE_LENGTH`` case.
 
 error_types.h
@@ -15,14 +15,16 @@ error_types.h
 3. The ``check`` function should:
    - Return ``True`` if your error has occurred.
    - Return ``False`` if it has not.
-   - .. note::  
-         The ``check`` function only has access to the ``JointData`` class and is executed for every joint.  
-         If your error case requires its own data, add that data to the ``JointData`` class (in **JointData.h**).
+
+   .. note::
+      The ``check`` function only has access to the ``JointData`` class and is executed for every joint.
+      If your error case requires its own data, add that data to the ``JointData`` class (in **JointData.h**).
+
 4. The ``handle`` function decides what action to take when your error occurs, such as disabling the motors.
 
 error_map.h
 -----------
-1. In ``error_map.h``, add a new key-value pair for your new error case.  
+1. In ``error_map.h``, add a new key-value pair for your new error case.
    - Use the following format:
 
    .. code-block:: c++

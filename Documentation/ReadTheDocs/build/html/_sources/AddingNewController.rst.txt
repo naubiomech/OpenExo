@@ -19,19 +19,22 @@ Controller.h
 ------------
 1. In ``Controller.h``, create a new controller that inherits from the ``_Controller`` class.
    - This new controller must include:
+
      - A **constructor** that takes in the joint ID and an ``exo_data`` pointer.
      - A **destructor**.
      - A ``calc_motor_cmd()`` function that returns the torque command in mNm.
+
    - Additional private functions or variables can be added as needed, but note that external calls will only invoke these three required functions.
 
 ControllerData.h (Optional Additional Data)
 ---------------------------------------------
 1. (Optional) At the bottom of ``ControllerData.h``, you can add any extra variables for your controller that you would like to plot. These would serve as replacements or supplements to the variables defined in ``Controller.h``.
-   - To assign values to these parameters in ``Controller.cpp``, use the following formatting:
+   
+   To assign values to these parameters in ``Controller.cpp``, use the following formatting:
 
-     .. code-block:: c++
+   .. code-block:: c++
 
-        controller_data->NAMEOFVARIABLE = VALUE;
+      controller_data->NAMEOFVARIABLE = VALUE;
 
 Controller.cpp
 --------------
@@ -45,13 +48,16 @@ Joint.h
 Joint.cpp
 ---------
 1. For each joint that your controller is valid for:
+
    1. Add the constructor for the new controller object in the initializer list.
    2. In the ``set_controller()`` function, add a new case to the switch statement:
+
       - Reference the joint controller namespace in the ``config_defs`` namespace.
       - Use one of the existing controllers as a template.
       - This case will determine which controller object the ``_controller`` pointer uses.
       - **Remember:** End the case with a ``break;`` statement.
-   - *Note:* The switch statement references the ``config_defs`` name, and the value passed to ``_controller`` should reference the object created in ``Joint.h``.
+
+   *Note:* The switch statement references the ``config_defs`` name, and the value passed to ``_controller`` should reference the object created in ``Joint.h``.
 
 Create Parameter File
 ---------------------
@@ -71,23 +77,26 @@ uart_commands.h
 1. (Optional) If you want to plot or save one of the variables defined in ``ControllerData.h``, proceed as follows in ``get_real_time_data()``:
    - Find the case corresponding to the joint where your controller is used (e.g., ``bilateral_hip``).
    - Assign the variable to one of the data spots in the ``rx_msg`` structure (e.g., ``rx_msg.data[0]``).
-     - For controller-specific variables, format the assignment like this:
 
-       .. code-block:: c++
+   For controller-specific variables, format the assignment like this:
 
-          rx_msg.data[#] = exo_data->NAME_side.JOINT.controller.VARIABLENAME;
+   .. code-block:: none
 
-         where:
-         - ``NAME_side`` should be either ``left_side`` or ``right_side``,
-         - ``JOINT`` is the joint you are working with, and
-         - ``VARIABLENAME`` is the variable to plot.
-     - To plot variables specific to a side (defined in ``SideData.h``), you may use:
+      rx_msg.data[#] = exo_data->NAME_side.JOINT.controller.VARIABLENAME;
 
-       .. code-block:: c++
+   where:
+   - ``NAME_side`` should be either ``left_side`` or ``right_side``,
+   - ``JOINT`` is the joint you are working with, and
+   - ``VARIABLENAME`` is the variable to plot.
 
-          rx_msg.data[#] = exo_data->NAME_side.VARIABLENAME;
+   To plot variables specific to a side (defined in ``SideData.h``), you may use:
+
+   .. code-block:: none
+
+      rx_msg.data[#] = exo_data->NAME_side.VARIABLENAME;
 
 Done
 ----
 Your new controller should now be integrated and ready to use!  
+
 Remember to change the active controller and update the parameters as necessary.

@@ -33,15 +33,5 @@ html_static_path = ['_static']
 html_css_files = []
 
 html_theme_options = {
-    # The maximum depth of the global table of contents (on the left).
-    'navigation_depth': 4,
-    
-    # Whether to collapse nested navigation sections.
-    'collapse_navigation': False,
-    
-    # Keeps the navigation pane “fixed” when scrolling.
-    'sticky_navigation': True,
-    
-    # If you only want to show headings for the current page in the left menu, set titles_only=True
-    # 'titles_only': True,
+
 }

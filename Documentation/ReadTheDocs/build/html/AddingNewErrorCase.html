@@ -165,11 +165,11 @@
 <li><p>The class should inherit from <code class="docutils literal notranslate"><span class="pre">ErrorType</span></code> and must implement both a <code class="docutils literal notranslate"><span class="pre">check</span></code> and a <code class="docutils literal notranslate"><span class="pre">handle</span></code> function.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">check</span></code> function should:
 - Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if your error has occurred.
-- Return <code class="docutils literal notranslate"><span class="pre">False</span></code> if it has not.
-- .. note:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>The ``check`` function only has access to the ``JointData`` class and is executed for every joint.
-If your error case requires its own data, add that data to the ``JointData`` class (in **JointData.h**).
-</pre></div>
+- Return <code class="docutils literal notranslate"><span class="pre">False</span></code> if it has not.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">check</span></code> function only has access to the <code class="docutils literal notranslate"><span class="pre">JointData</span></code> class and is executed for every joint.
+If your error case requires its own data, add that data to the <code class="docutils literal notranslate"><span class="pre">JointData</span></code> class (in <strong>JointData.h</strong>).</p>
 </div>
 </li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">handle</span></code> function decides what action to take when your error occurs, such as disabling the motors.</p></li>

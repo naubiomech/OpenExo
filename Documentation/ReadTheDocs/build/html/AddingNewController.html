@@ -188,13 +188,11 @@
 <section id="controllerdata-h-optional-additional-data">
 <h2>ControllerData.h (Optional Additional Data)<a class="headerlink" href="#controllerdata-h-optional-additional-data" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>(Optional) At the bottom of <code class="docutils literal notranslate"><span class="pre">ControllerData.h</span></code>, you can add any extra variables for your controller that you would like to plot. These would serve as replacements or supplements to the variables defined in <code class="docutils literal notranslate"><span class="pre">Controller.h</span></code>.
-- To assign values to these parameters in <code class="docutils literal notranslate"><span class="pre">Controller.cpp</span></code>, use the following formatting:</p>
-<blockquote>
-<div><div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">controller_data</span><span class="o">-&gt;</span><span class="n">NAMEOFVARIABLE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VALUE</span><span class="p">;</span>
+<li><p>(Optional) At the bottom of <code class="docutils literal notranslate"><span class="pre">ControllerData.h</span></code>, you can add any extra variables for your controller that you would like to plot. These would serve as replacements or supplements to the variables defined in <code class="docutils literal notranslate"><span class="pre">Controller.h</span></code>.</p>
+<p>To assign values to these parameters in <code class="docutils literal notranslate"><span class="pre">Controller.cpp</span></code>, use the following formatting:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">controller_data</span><span class="o">-&gt;</span><span class="n">NAMEOFVARIABLE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VALUE</span><span class="p">;</span>
 </pre></div>
 </div>
-</div></blockquote>
 </li>
 </ol>
 </section>
@@ -214,20 +212,19 @@
 <section id="joint-cpp">
 <h2>Joint.cpp<a class="headerlink" href="#joint-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>For each joint that your controller is valid for:
-1. Add the constructor for the new controller object in the initializer list.
-2. In the <code class="docutils literal notranslate"><span class="pre">set_controller()</span></code> function, add a new case to the switch statement:</p>
-<blockquote>
-<div><ul class="simple">
+<li><p>For each joint that your controller is valid for:</p>
+<ol class="arabic simple">
+<li><p>Add the constructor for the new controller object in the initializer list.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">set_controller()</span></code> function, add a new case to the switch statement:</p>
+<ul class="simple">
 <li><p>Reference the joint controller namespace in the <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> namespace.</p></li>
 <li><p>Use one of the existing controllers as a template.</p></li>
 <li><p>This case will determine which controller object the <code class="docutils literal notranslate"><span class="pre">_controller</span></code> pointer uses.</p></li>
 <li><p><strong>Remember:</strong> End the case with a <code class="docutils literal notranslate"><span class="pre">break;</span></code> statement.</p></li>
 </ul>
-</div></blockquote>
-<ul class="simple">
-<li><p><em>Note:</em> The switch statement references the <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> name, and the value passed to <code class="docutils literal notranslate"><span class="pre">_controller</span></code> should reference the object created in <code class="docutils literal notranslate"><span class="pre">Joint.h</span></code>.</p></li>
-</ul>
+</li>
+</ol>
+<p><em>Note:</em> The switch statement references the <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> name, and the value passed to <code class="docutils literal notranslate"><span class="pre">_controller</span></code> should reference the object created in <code class="docutils literal notranslate"><span class="pre">Joint.h</span></code>.</p>
 </li>
 </ol>
 </section>
@@ -254,32 +251,25 @@
 <li><p>(Optional) If you want to plot or save one of the variables defined in <code class="docutils literal notranslate"><span class="pre">ControllerData.h</span></code>, proceed as follows in <code class="docutils literal notranslate"><span class="pre">get_real_time_data()</span></code>:
 - Find the case corresponding to the joint where your controller is used (e.g., <code class="docutils literal notranslate"><span class="pre">bilateral_hip</span></code>).
 - Assign the variable to one of the data spots in the <code class="docutils literal notranslate"><span class="pre">rx_msg</span></code> structure (e.g., <code class="docutils literal notranslate"><span class="pre">rx_msg.data[0]</span></code>).</p>
-<blockquote>
-<div><ul>
-<li><p>For controller-specific variables, format the assignment like this:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="n">rx_msg</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="err">#</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">NAME_side</span><span class="p">.</span><span class="n">JOINT</span><span class="p">.</span><span class="n">controller</span><span class="p">.</span><span class="n">VARIABLENAME</span><span class="p">;</span>
-
-<span class="nl">where</span><span class="p">:</span>
-<span class="o">-</span><span class="w"> </span><span class="err">``</span><span class="n">NAME_side</span><span class="err">``</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">either</span><span class="w"> </span><span class="err">``</span><span class="n">left_side</span><span class="err">``</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="err">``</span><span class="n">right_side</span><span class="err">``</span><span class="p">,</span>
-<span class="o">-</span><span class="w"> </span><span class="err">``</span><span class="n">JOINT</span><span class="err">``</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">joint</span><span class="w"> </span><span class="n">you</span><span class="w"> </span><span class="n">are</span><span class="w"> </span><span class="n">working</span><span class="w"> </span><span class="n">with</span><span class="p">,</span><span class="w"> </span><span class="k">and</span>
-<span class="o">-</span><span class="w"> </span><span class="err">``</span><span class="n">VARIABLENAME</span><span class="err">``</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">variable</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">plot</span><span class="p">.</span>
+<p>For controller-specific variables, format the assignment like this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rx_msg.data[#] = exo_data-&gt;NAME_side.JOINT.controller.VARIABLENAME;
 </pre></div>
 </div>
-</li>
-<li><p>To plot variables specific to a side (defined in <code class="docutils literal notranslate"><span class="pre">SideData.h</span></code>), you may use:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rx_msg</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="err">#</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">NAME_side</span><span class="p">.</span><span class="n">VARIABLENAME</span><span class="p">;</span>
+<p>where:
+- <code class="docutils literal notranslate"><span class="pre">NAME_side</span></code> should be either <code class="docutils literal notranslate"><span class="pre">left_side</span></code> or <code class="docutils literal notranslate"><span class="pre">right_side</span></code>,
+- <code class="docutils literal notranslate"><span class="pre">JOINT</span></code> is the joint you are working with, and
+- <code class="docutils literal notranslate"><span class="pre">VARIABLENAME</span></code> is the variable to plot.</p>
+<p>To plot variables specific to a side (defined in <code class="docutils literal notranslate"><span class="pre">SideData.h</span></code>), you may use:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rx_msg.data[#] = exo_data-&gt;NAME_side.VARIABLENAME;
 </pre></div>
 </div>
-</li>
-</ul>
-</div></blockquote>
 </li>
 </ol>
 </section>
 <section id="done">
 <h2>Done<a class="headerlink" href="#done" title="Link to this heading">¶</a></h2>
-<p>Your new controller should now be integrated and ready to use!
-Remember to change the active controller and update the parameters as necessary.</p>
+<p>Your new controller should now be integrated and ready to use!</p>
+<p>Remember to change the active controller and update the parameters as necessary.</p>
 </section>
 </section>
 

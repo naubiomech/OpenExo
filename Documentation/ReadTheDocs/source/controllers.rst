@@ -48,7 +48,7 @@ Chirp Controller
 This controller applies a user-defined sine wave that increases in frequency at a set rate. It is designed to help characterize the system's bandwidth.
 
 **Parameters**  
-Parameter index order can be found in :doc:`ControllerData <ExoCode/src/ControllerData.h>`.
+Parameter index order can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`_.
 - **amplitude**: Amplitude (in Nm) of the torque sine wave.
 - **start_frequency**: Starting frequency for the chirp.
 - **end_frequency**: Ending frequency for the chirp.
@@ -65,7 +65,7 @@ Constant Torque Controller
 This controller attempts to apply a constant torque at the joint. It can be operated with or without closed-loop control.
 
 **Parameters**  
-Parameter index order can be found in :doc:`ControllerData <ExoCode/src/ControllerData.h>`.
+Parameter index order can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`_.
 - **amplitude**: Magnitude of the applied torque (in Nm).
 - **direction**: Flag to flip the direction of the applied torque.
 - **alpha**: Filtering term for the exponentially weighted moving average (EWMA) filter applied to the torque sensor to reduce noise. Lower values increase delay.
@@ -80,7 +80,7 @@ Step Controller
 This controller applies a constant torque at the joint repeatedly for a set duration and number of times.
 
 **Parameters**  
-Parameter index order can be found in :doc:`ControllerData <ExoCode/src/ControllerData.h>`.
+Parameter index order can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`_.
 - **amplitude**: Magnitude of the applied torque (in Nm).
 - **duration**: Duration of each torque application.
 - **repetitions**: Number of times the torque is applied.
@@ -97,7 +97,7 @@ Zero Torque Controller
 This controller attempts to regulate the joint so that the output torque is zero. It can be operated with or without closed-loop control.
 
 **Parameters**  
-Parameter index order can be found in :doc:`ControllerData <ExoCode/src/ControllerData.h>`.
+Parameter index order can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`_.
 - **use_pid**: Flag to enable (1) or disable (0) PID control.
 - **p_gain**: Proportional gain.
 - **i_gain**: Integral gain.

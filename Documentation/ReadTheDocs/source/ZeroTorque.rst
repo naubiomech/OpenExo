@@ -7,7 +7,7 @@ This controller attempts to control the joint so that the output torque is zero.
 
 Parameters
 ----------
-Parameter index order can be found in :doc:`ControllerData <ExoCode/src/ControllerData.h>`.
+Parameter index order can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`_.
 
 - **use_pid**  
   This flag turns PID on (1) or off (0).

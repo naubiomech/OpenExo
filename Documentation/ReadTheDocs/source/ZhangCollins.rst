@@ -11,7 +11,7 @@ Zhang, J., Fiers, P., Witte, K. A., Jackson, R. W., Poggensee, K. L., Atkeson, C
 
 Parameters
 ----------
-Parameter index order can be found in :doc:`ControllerData <ExoCode/src/ControllerData.h>`.
+Parameter index order can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`_.
 
 - **torque**  
   Magnitude of the peak torque in Nm.

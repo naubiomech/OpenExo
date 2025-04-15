@@ -8,7 +8,7 @@ It can be operated with or without closed-loop control.
 
 Parameters
 ----------
-Parameter index order can be found in :doc:`ControllerData <ExoCode/src/ControllerData.h>`.
+Parameter index order can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`_.
 
 - **amplitude**  
   Magnitude of the applied torque, in Nm.
