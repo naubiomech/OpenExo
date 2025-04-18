@@ -1,4 +1,4 @@
-An Open-Source Platform for Numerical Modeling, Data Acquisition, and Control of Lower-Limb Assistive Exoskeletons
+Firmware and Software Documentation for OpenExo: An Open-Source Modular Exoskeleton to Augment Human Function
 ===================================================================================================================
 
 .. image:: 1042_exoskeleton_20250205.jpg
@@ -28,16 +28,6 @@ The easiest and quickest way to install the **OpenExo** library is to clone the 
 
    git clone https://github.com/naubiomech/OpenExo.git
    cd OpenExo
-   pip install .
-
-Alternatively, if you are interested in contributing or modifying the code, it is recommended to use **Poetry** for dependency management:
-
-.. code-block:: bash
-
-   git clone https://github.com/naubiomech/OpenExo.git
-   cd OpenExo
-   poetry install
-   poetry shell
 
 Getting Started
 ---------------

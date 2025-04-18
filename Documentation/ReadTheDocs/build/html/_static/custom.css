@@ -1,0 +1,5 @@
+/* Force all nested navigation items in the sidebar to be displayed */
+
+.toctree-wrapper ul ul {
+    display: block !important;
+}
