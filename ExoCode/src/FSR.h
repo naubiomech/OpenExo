@@ -121,7 +121,7 @@ class FSR
         //Used for ground_contact()
         bool _ground_contact;                                   /**< Is the FSR in contact with the ground */
         const uint8_t _ground_state_count_threshold = 4;        /**< Used to track if the FSR has been in contact with the ground for a while. */
-        float _lower_threshold_percent_ground_contact = .15;    /**< Lower threshold for the schmitt trigger. This should be relatively low as we want to detect as close to ground contact as possible. */
+        float _lower_threshold_percent_ground_contact = .15;    /**< Lower threshold for the schmitt trigger. This should be relatively low as we want to detect toe off as closely as possible. */
         float _upper_threshold_percent_ground_contact = .25;    /**< Should be slightly higher than the lower threshold but by as little as you can get by with as the sensor must go above this value to register contact. */
 };
 

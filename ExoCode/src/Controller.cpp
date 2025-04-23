@@ -2184,21 +2184,33 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     normalized_stance_moment = 0.0;
     max_stance_moment = -100.0;
     min_stance_moment = 100.0;
+    local_max = -100.0;
+    local_min = 100.0;
 
     startFlag = false;
     swingStartTime = 0;
 
-    steps = 0;
+    prev_recalibrate_value = 0;
 
+    recal_loop_flag = 0;
+
+    steps = 0;
+    ending_step = 0;
+
+    prev_toe_fsr = 0.0;
+
+    state = 0;
 }
 
 float AngleBased::calc_motor_cmd()
 {
     //Pull in user defined parameters
+    float stance_extension_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_extension_setpoint_idx];
+    float stance_flexion_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_flexion_setpoint_idx];
     float swing_setpoint = _controller_data->parameters[controller_defs::angle_based::swing_setpoint_idx];
-    float stance_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_setpoint_idx];
     double swing_assist_duration = _controller_data->parameters[controller_defs::angle_based::swing_assist_duration_idx];
     float max_torque = _controller_data->parameters[controller_defs::angle_based::max_torque_idx];
+    int recalibrate_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_flag_idx];
 
     //Pull in FSR values (double check that Toe FSR, located in Side.h, is not drawing from the FSR_Regressed Function)
     float raw_heel_fsr = _side_data->heel_fsr;
@@ -2215,7 +2227,7 @@ float AngleBased::calc_motor_cmd()
     encoder_angle = _joint_data->position - encoder_offset; //Get the encoder angle from the motors and normalize if by the offset
     _controller_data->encoder_angle = encoder_angle;        //Store the offset angle for plotting
 
-    //Calculate the combined FSR value (Toe + Heel)
+    //Calculate the Combined FSR value (Toe + Heel)
     combined_fsr = (raw_toe_fsr + raw_heel_fsr);            //Calculates value
     _controller_data->combined_fsr = combined_fsr;          //Stores the combined FSR term for plotting
 
@@ -2223,18 +2235,67 @@ float AngleBased::calc_motor_cmd()
     stance_moment = encoder_angle*combined_fsr;             //Define Stance Moment as Encoder Angle * Combined Heel and Toe FSR                          
     _controller_data->stance_moment = stance_moment;        //Store the Stance Moment Term for plotting
 
-    //Find the Min and Max stance_moment values to scale the term to a 0 to 1 range
-    if (steps < 6)
+    //Increase step count for every time stance is detected
+    if (_side_data->prev_toe_stance < _side_data->toe_stance)   //If we just entered stance
     {
-        normalize_stance_moment();                          //Finds the max and min stance_moment in the first 5 steps
+        steps++;                                                //Increase the step count by 1
     }
+
+    //Allow FSRs to scale 
+    if (steps < 8)
+    {
+        return 0;
+    }
+    
+    //Find the max and min stance_moment for normalization
+    if (steps >= 8 && steps < 14)
+    {
+        normalize_stance_moment();
+    }
+
+    //If we want to recalibrate the normalized moment start the recalibration loop
+    if (recalibrate_flag != prev_recalibrate_value)
+    {
+        recal_loop_flag = 1;
+        ending_step = steps + 7;
+    }
+
+    //Recalibrate 
+    if (recal_loop_flag == 1)
+    {
+        if (steps <= ending_step)
+        {
+            if ((_side_data->heel_stance || _side_data->toe_stance) && (stance_moment > local_max))
+            {
+                local_max = stance_moment;
+            }
+
+            if ((_side_data->heel_stance || _side_data->toe_stance) && (stance_moment < local_min))
+            {
+                local_min = stance_moment;
+            }
+        }
+        else
+        {
+            max_stance_moment = local_max;
+            min_stance_moment = local_min;
+            local_max = -100.0;
+            local_min = 100.0;
+            recal_loop_flag = 0;
+        }
+    }
+
+    _controller_data->recal_flag = recal_loop_flag;
+
+    _controller_data->max_stance_moment = max_stance_moment;
+    _controller_data->min_stance_moment = min_stance_moment;
 
     //Normalize the stance_moment term to range from -1 to 1
     if (stance_moment >= 0.0)                                            //If the term is positive, normalize by its maximum value
     {
         normalized_stance_moment = stance_moment/max_stance_moment;
     }
-    else                                                                //If the term is negative, normalize by its minimum value
+    else                                                                //If the term is negative, normalize by its minimum value (multiply by -1 to keep sign correct)
     {
         normalized_stance_moment = -1*stance_moment/min_stance_moment;
     }
@@ -2244,27 +2305,58 @@ float AngleBased::calc_motor_cmd()
     //Determine the Torque Setpoint
     float cmd_ff = 0.0;                                             //Initialize the feed-foward command to 0
 
-    if (_side_data->heel_stance || _side_data->toe_stance)          //If we are in stance 
+    //State Logic
+    if ((_side_data->heel_stance || _side_data->toe_stance) && normalized_stance_moment > 0)
     {
-        if (_side_data->prev_toe_stance < _side_data->toe_stance)   //If we just entered stance
-        {
-            steps++;                                                //Increase the step count by 1
-        }
+        state = 1;
+    }
 
-        cmd_ff = -1.0*normalized_stance_moment*stance_setpoint;     //Calculate the setpoint by multiplying the normalized_stance_moment (ranging from -1 to 1) by the user defined setpoint
+    if ((_side_data->heel_stance || _side_data->toe_stance) && normalized_stance_moment <= 0)
+    {
+        state = 2;
+    }
+
+    if ((raw_toe_fsr < prev_toe_fsr && _side_data->toe_stance) || (!_side_data->heel_stance && !_side_data->toe_stance))
+    {
+        state = 3;
+    }
+
+    _controller_data->control_state = state;
+
+    //Determine Torque Setpoint
+    if (state == 1)       //If we are in early stance 
+    {
+        cmd_ff = -1.0 * normalized_stance_moment * stance_extension_setpoint;     //Calculate the setpoint by multiplying the normalized_stance_moment (ranging from -1 to 1) by the user defined setpoint
+
+        if (recal_loop_flag == 1)
+        {
+            cmd_ff = cmd_ff * 2;
+        }
 
         startFlag = true;                                           //Reset the swing phase start flag when we are in stance 
     }
-    else                                                            //If we are in swing
+    
+    if (state == 2)   //If we are in late stance
+    {
+        cmd_ff = -1.0 * normalized_stance_moment * stance_flexion_setpoint; //Calculate the setpoint by multiplying the normalized_stance_moment (ranging from -1 to 1) by the user defined setpoint
+
+        if (recal_loop_flag == 1)
+        {
+            cmd_ff = cmd_ff * 2;
+        }
+
+        startFlag = true;                                           //Reset the swing phase start flag when we are in stance
+    }
+    
+    if (state == 3)                                                           //If we are in swing
     {
         if (startFlag)                                              //If this is the first instance of swing, record the time at which it occured and send the swing propulsive assistance
         {
             swingStartTime = millis();
-            startFlag = false;
             cmd_ff = swing_setpoint;
+            startFlag = false;
         }
-        
-        if ((millis() - swingStartTime) <= swing_assist_duration)   //If we are within the user defined assistive duration, provide swing assistance 
+        else if ((millis() - swingStartTime) <= swing_assist_duration)   //If we are within the user defined assistive duration, provide swing assistance 
         {
             cmd_ff = swing_setpoint;
         }
@@ -2284,11 +2376,17 @@ float AngleBased::calc_motor_cmd()
         cmd_ff = -1 * max_torque;
     }
 
-    //Store the feed-foward setpoint for plotting
+    //Store the feed-forward setpoint for plotting
     _controller_data->ff_setpoint = cmd_ff;
     
     //Set the motor command to be equal to the feed-foward setpoint (Note: if doing closed-loop control, this is where you would do PID)
     float cmd = cmd_ff;
+
+    //Store the current Toe FSR as the previous one for the next iteration. 
+    prev_toe_fsr = raw_toe_fsr;
+
+    //Store the current recalibrate flag value as the previous one for the next iteration. 
+    prev_recalibrate_value = recalibrate_flag;
 
     //Return the desired command to the motor
     return cmd;
@@ -2311,13 +2409,11 @@ void AngleBased::normalize_stance_moment()
     if ((_side_data->heel_stance || _side_data->toe_stance) && (stance_moment > max_stance_moment))
     {
         max_stance_moment = stance_moment;
-        _controller_data->max_stance_moment = max_stance_moment;
     }
 
     if ((_side_data->heel_stance || _side_data->toe_stance) && (stance_moment < min_stance_moment))
     {
         min_stance_moment = stance_moment;
-        _controller_data->min_stance_moment = min_stance_moment;
     }
 }
 

@@ -505,7 +505,20 @@ public:
     double swingStartTime;          /* Stores the time at which the latest instance of swing phase began. */
 
     int steps;                      /* Number of steps that have occured. */
+
+    int prev_recalibrate_value;
+
+    int recal_loop_flag;
+
+    float local_max;
+    float local_min;
+
+    int ending_step;
+
+    float prev_toe_fsr;
     
+    int state;
+
     //Functions
     float calc_motor_cmd();         /* Function to calcualte the desired motor command. */
     void calibrate_encoders();      /* Function to finds the offset angle when the user is standing still upon initiation of the trial. */
