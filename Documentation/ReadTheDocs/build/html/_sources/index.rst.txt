@@ -55,6 +55,15 @@ The **OpenExo** library is licensed under the GPL-3.0 license. This license gran
 
 The GPL license ensures that these freedoms are upheld, requiring contributors to share their modifications publicly if they distribute the library.
 
+Contact & Resources
+-------------------
+For questions, issues, or further assistance, reach out to us at:
+
+- **Email:** theopenexo@gmail.com
+- **GitHub:** https://github.com/naubiomech/OpenExo
+- **Website:** http://theopenexo.org
+- **Biomechanics Lab:** https://biomech.nau.edu
+
 .. toctree::
    :maxdepth: 2
    :caption: Tutorials:
@@ -63,3 +72,4 @@ The GPL license ensures that these freedoms are upheld, requiring contributors t
    installation
    addingelements
    controllers
+   gui
