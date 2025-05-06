@@ -252,16 +252,15 @@ float _Controller::_pjmc_generic(float current_fsr, float fsr_threshold, float s
 //****************************************************
 
 //Specific function for Servo Control, will be moved to appropriate location in future 
-int _Controller::_servo_runner(uint8_t servo_pin, uint8_t speed_level, long angle_initial, long angle_final)
+void _Controller::_servo_runner(uint8_t servo_pin, uint8_t target_angle)
 {
 	if (!myservo.attached())
     {
 		myservo.attach(servo_pin,500,2500);     //Attach the servo object
 	}
-
-	myservo.write(angle_final);
-
-	return 0;
+	
+	myservo.write(target_angle);
+	
 }
 
 //Specific function for Servo Control, will be moved to appropriate location in future 
@@ -273,9 +272,6 @@ void _Controller::_servo1_runner(uint8_t servo_pin, uint8_t target_angle)
 	}
 
 	myservo1.write(target_angle);
-	// Serial.print("myservo1.write(");
-	// Serial.print(target_angle);
-	// Serial.print(") ");
 
 }
 
@@ -1328,7 +1324,7 @@ float CalibrManager::calc_motor_cmd()
             //The range of PWM motor control signals differ from that of CAN motors
 			if (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor)
             {
-				cmd = 100;
+				cmd = 200;
 			}
 
             Serial.print("  |  Left cmd: ");
@@ -1349,7 +1345,7 @@ float CalibrManager::calc_motor_cmd()
             //The range of PWM motor control signals differ from that of CAN motors
 			if (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor)
             {
-				cmd = 100;
+				cmd = 200;
 			}
 
             Serial.print("  |  Right cmd: ");
@@ -2321,20 +2317,22 @@ float SPV2::calc_motor_cmd()
 	uint8_t servo_target = _controller_data->parameters[controller_defs::spv2::servo_terminal];
 	bool SD_content_imported = (((servo_home == 0)&&(servo_target == 0)&&(servo_fsr_threshold == 0))?false: true);
 	
+	// servo_home = 40;
+	// servo_target = 20;
 	
-		//magnet-driven pawl-ratchet engagement/disengagement mechanism proof-of-concept
+/* 		//magnet-driven pawl-ratchet engagement/disengagement mechanism proof-of-concept
 	unsigned long millis_time = millis();
 	if (millis() - _controller_data->magnet_watch < 1000) {
-		servoOutput = _servo_runner(27, 1, 20, 40);
+		_servo_runner(27, 40);
 	}
 	else if (millis() - _controller_data->magnet_watch < 2000) {
-		servoOutput = _servo_runner(27, 1, 40, 20);
+		_servo_runner(27, 20);
 	}
 	else {
 		_controller_data->magnet_watch = millis();
 	}
 	return 0;
-	//
+	// */
 
 	if (!SD_content_imported) {
 		return 0;
@@ -2348,14 +2346,14 @@ float SPV2::calc_motor_cmd()
 
 			if (SD_content_imported)
             {
-				servoOutput = _servo_runner(27, 1, servo_target, servo_home);
+				_servo_runner(27, servo_home);
 			}
 	}
 	else
     {
 		if (!servo_switch)
         {
-			servoOutput = _servo_runner(27, 1, servo_target, servo_home);
+			_servo_runner(27, servo_home);
 		}
 		
 		if (exo_status == status_defs::messages::fsr_refinement)
@@ -2381,7 +2379,7 @@ float SPV2::calc_motor_cmd()
                 {
 					if ((millis() - _controller_data->servo_departure_time) < 300)
                     {
-						servoOutput = _servo_runner(27, 1, servo_home, servo_target);   //Servo goes to the target position (DOWN)
+						_servo_runner(27, servo_target);   //Servo goes to the target position (DOWN)
 						_controller_data->servo_did_go_down = true;
 					}
 					else
@@ -2391,7 +2389,7 @@ float SPV2::calc_motor_cmd()
 				}
 				else
                 {
-					servoOutput = _servo_runner(27, 1, servo_target, servo_home);       //Servo goes back to the home position (UP)
+					_servo_runner(27, servo_home);       //Servo goes back to the home position (UP)
 				}
 				
 				//Run Servo1
@@ -2432,7 +2430,7 @@ float SPV2::calc_motor_cmd()
 			
 		}
 		else {
-			servoOutput = _servo_runner(27, 1, servo_target, servo_home);//when the FSR is being calibrated, move the servo out of the way
+			_servo_runner(27, servo_home);//when the FSR is being calibrated, move the servo out of the way
 		}
 	}
 

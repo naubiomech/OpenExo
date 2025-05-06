@@ -78,12 +78,12 @@ class _Controller
         float _prev_de_dt;                  /**< Prev error derivative used if the timestep is not good*/
         float _prev_pid_time;               /**< Prev time the PID was called */
         
-        //Parameters for Servo Control (SPV2)
-		long pos;
-		unsigned long servoWatch;
-		int pos1;
-		int pos2;
-		bool _do_stop_servo = false;
+        // Parameters for Servo Control (SPV2)
+		// long pos;
+		// unsigned long servoWatch;
+		// int pos1;
+		// int pos2;
+		// bool _do_stop_servo = false;
 		
         /**
          * @brief Calculates the current PID contribution to the motor command. 
@@ -99,12 +99,10 @@ class _Controller
 		/**
          * @brief Actuate the servo motor (might need to move this out of the controller class) 
          * 
-         * @param signal pin 
-         * @param not used
-         * @param start angle
-         * @param end angle
+         * @param signal pin
+         * @param target angle
          */
-		int _servo_runner(uint8_t servo_pin, uint8_t speed_level, long angle_initial, long angle_final);
+		void _servo_runner(uint8_t servo_pin, uint8_t target_angle);
 		void _servo1_runner(uint8_t servo_pin, uint8_t target_angle);
 		
 		/**
