@@ -12,9 +12,11 @@
 #include <random>
 #include <cmath>
 #include <Servo.h>
+#include <Adafruit_INA260.h>
 
 Servo myservo;          //TO DO: Move servo definition code out of Controller.cpp
 Servo myservo1;			// TO DO: Move servo definition code out of Controller.cpp
+Adafruit_INA260 ina260 = Adafruit_INA260();
 
 _Controller::_Controller(config_defs::joint_id id, ExoData* exo_data)
 {
@@ -2241,6 +2243,24 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 
 float SPV2::calc_motor_cmd()
 {
+	if (!_controller_data->ps_connected) {
+		if (!ina260.begin()) {
+			Serial.println("Couldn't find INA260 chip");
+			while (1);
+		}
+		else {
+			_controller_data->ps_connected = true;
+		}
+	}
+	Serial.print("\nEpoch time: ");
+	float ps_current_time = micros();
+	Serial.print(ps_current_time-_controller_data->ps_old_time);
+	_controller_data->ps_old_time = ps_current_time;
+	Serial.print("  |  Power: ");
+	Serial.print(ina260.readPower());
+	Serial.println(" mW");
+	
+	
 	if (_joint_data->is_left) {
 		return 0;
 	}

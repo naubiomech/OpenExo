@@ -329,6 +329,10 @@ class ControllerData {
 		float SPV2_RMSE = 0;
 		float SPV2_CF_output = 0;
 		
+		//SPV2 POWER SENSOR TROUBLESHOOTING
+		float ps_old_time = 0;
+		bool ps_connected = false;
+		
 		//magnet troubleshooting
 		unsigned long magnet_watch = 0;;
 		
