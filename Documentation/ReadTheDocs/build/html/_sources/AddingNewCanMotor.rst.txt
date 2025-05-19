@@ -1,3 +1,5 @@
+.. _AddingNewCanMotor:
+
 Adding a New CAN Motor
 ======================
 

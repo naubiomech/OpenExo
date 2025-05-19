@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>User Guide &#8212; OpenExo Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=0ac4fbd8" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <script src="_static/js/petite-vue.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="index.html" title="Go to homepage">OpenExo</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h1>
+<section id="outline">
+<h2>Outline<a class="headerlink" href="#outline" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#background">Background</a></p></li>
+<li><p><a class="reference external" href="#introduction">Introduction</a></p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#code-location">Code location</a></p></li>
+<li><p><a class="reference external" href="#style-guide">Style Guide</a></p></li>
+<li><p><a class="reference external" href="#system-structure">System Structure</a></p></li>
+<li><p><a class="reference external" href="#how-to-deploy">How to Deploy</a></p></li>
+</ol>
+</li>
+<li><p><a class="reference external" href="#high-level-functionality">High level functionality</a></p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#code-structure">Code Structure</a></p></li>
+<li><p><a class="reference external" href="#guiding-principals">Guiding Principles</a></p></li>
+<li><p><a class="reference external" href="#operation">Operation</a></p></li>
+</ol>
+</li>
+<li><p><a class="reference external" href="#sd-card">SD Card</a></p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#sd-configuration">SD Configuration</a></p></li>
+<li><p><a class="reference external" href="#sd-controller-parameters">SD Controller Parameters</a></p></li>
+</ol>
+</li>
+<li><p><a class="reference external" href="#sensors">Sensors</a></p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#sensor-structure">Sensor Structure</a></p></li>
+<li><p><a class="reference external" href="#adding-new-sensors">Adding New Sensors</a></p></li>
+</ol>
+</li>
+<li><p><a class="reference external" href="#displays">Displays</a></p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#status-led">Status LED</a></p></li>
+<li><p><a class="reference external" href="#sync-led">Sync LED</a></p></li>
+</ol>
+</li>
+<li><p><a class="reference external" href="#actuators">Actuators</a></p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#actuator-structure">Actuator Structure</a></p></li>
+<li><p><a class="reference external" href="#adding-new-actuators">Adding New Actuators</a></p></li>
+<li><p><a class="reference external" href="#t-motor-initialization">T-motor Initialization</a> (Get info from Chance)</p></li>
+</ol>
+</li>
+<li><p><a class="reference external" href="#controllers">Controllers</a></p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#controller-structure">Controller Structure</a></p></li>
+<li><p><a class="reference external" href="#adding-new-controllers">Adding New Controllers</a></p></li>
+<li><p><a class="reference external" href="#controller-parameters">Controller Parameters</a></p></li>
+</ol>
+</li>
+<li><p><a class="reference external" href="#bluetooth">Bluetooth Communication</a> (Get info from Chance)</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#bluetooth-background">Bluetooth Background</a></p></li>
+<li><p><a class="reference external" href="#bluetooth-structure">Bluetooth Structure</a></p></li>
+<li><p><a class="reference external" href="#sending-a-message">Sending a Message</a></p></li>
+</ol>
+</li>
+<li><p><a class="reference external" href="#debug">Debugging</a></p></li>
+<li><p><a class="reference external" href="#adding-new">Adding New</a></p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#adding-new-board">Adding New Board</a></p></li>
+<li><p><a class="reference external" href="#adding-new-microcontroller">Adding New Microcontroller</a></p></li>
+<li><p><a class="reference external" href="#adding-new-item-to-config">Adding New Item To Config</a></p></li>
+</ol>
+</li>
+<li><p><a class="reference external" href="#resources">Resources</a></p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#lab-resources">Lab Resources</a></p></li>
+<li><p><a class="reference external" href="#c-resources">C++ Resources</a></p></li>
+<li><p><a class="reference external" href="#bluetooth-resources">Bluetooth Resources</a></p></li>
+</ol>
+</li>
+<li><p><a class="reference external" href="#known-issues">Known Issues</a> **</p></li>
+</ol>
+</section>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading">¶</a></h2>
+<p>The code is written in Arduino and C++. This background section is intended to give you and understanding about the different things you may see in the code and how to interpret them. More detailed information can be found on the internet, <a class="reference external" href="https://www.tutorialspoint.com/cplusplus/index.htm">tutorialspoint</a> and <a class="reference external" href="https://www.w3schools.com/cpp/default.asp">w3schools</a> are good but there are other resources that are as well.</p>
+<section id="bits-and-bytes">
+<h3>Bits and Bytes<a class="headerlink" href="#bits-and-bytes" title="Link to this heading">¶</a></h3>
+<p>A bit is the smallest unit of information that a computer can work with and store. It is represented by one of two states, either a 0 or a 1.</p>
+<p>Bytes are composed of 8 bits and are typically the units used on a computer as a single bit is usually too small. One byte is usually capable of holding information for one character (e.g., ‘D’, ‘o’, ‘g’, ‘!’) whereas 4 or 8 bytes are usually used to store intergers (e.g., 1, 4, 6, 8).</p>
+<section id="bitwise-operators">
+<h4>Bitwise Operators<a class="headerlink" href="#bitwise-operators" title="Link to this heading">¶</a></h4>
+<p>&amp; - bitwise AND; takes two bytes and performs AND on every bit. Will result in a 1 only if both bits are 1.</p>
+<div class="line-block">
+<div class="line">- bitwise OR; takes two bytes and performs OR on every bit. Will result in a 1 if either of the two bits is a 1.</div>
+</div>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">V0</span><span class="p">:</span>     <span class="mb">0b10101010</span>
+<span class="n">V1</span><span class="p">:</span>     <span class="mb">0b11110000</span>
+<span class="o">-------------------</span>
+<span class="n">V0</span> <span class="o">&amp;</span> <span class="n">V1</span><span class="p">:</span><span class="mb">0b10100000</span>
+<span class="n">V0</span> <span class="o">|</span> <span class="n">V1</span><span class="p">:</span><span class="mb">0b11111010</span>
+</pre></div>
+</div>
+</section>
+<section id="bit-shifting">
+<h4>Bit Shifting<a class="headerlink" href="#bit-shifting" title="Link to this heading">¶</a></h4>
+<p>Bit Shifting, as its name implies, moves the binary value of the bit of interest some determined number of places to the left or right. This is traditionally used for data storage purposes. For example, if you have a boolien (see section below) that will either have a 0 or a 1 it would be inefficient to store only that in a single byte. Thus, we can use bit shifting to store multiple booliens (e.g., 8) into a single byte, which is much more efficient.</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Utilities.cpp">Utilities.cpp</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uint8_t</span> <span class="n">update_bit</span><span class="p">(</span><span class="n">uint8_t</span> <span class="n">original</span><span class="p">,</span> <span class="nb">bool</span> <span class="n">val</span><span class="p">,</span> <span class="n">uint8_t</span> <span class="n">loc</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">uint8_t</span> <span class="n">keep_bit</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">loc</span><span class="p">);</span>  <span class="o">//</span><span class="nb">set</span> <span class="n">a</span> <span class="n">mask</span> <span class="k">for</span> <span class="n">the</span> <span class="n">bits</span> <span class="n">we</span> <span class="n">aren</span><span class="s1">&#39;t setting</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">original</span> <span class="o">&amp;</span> <span class="n">keep_bit</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">val</span><span class="o">&lt;&lt;</span><span class="n">loc</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li><p>This shifts a 1 into the loc position, so if loc is 2 it shifts the 1 two positions to the left 0b00000001&lt;&lt;2 becomes 0b00000100.</p></li>
+<li><p>Then the ~ inverts the bits to: 0b11111011</p></li>
+<li><p>Move the val to the current position val&lt;&lt;loc, for our 2 example this would put a 1 or 0 in the 2nd position with zeros for everything else.</p></li>
+<li><p>original &amp; keep_bit, keep_bit is the value from step 1, when added with the original it will return the original but with a 0 in the loc position</p></li>
+<li><p>Or the values from 3 and 4, which will return the original with the bit in the loc position set to whatever was in val.</p></li>
+</ol>
+</section>
+</section>
+<section id="addresses">
+<h3>Addresses<a class="headerlink" href="#addresses" title="Link to this heading">¶</a></h3>
+<p>Data on the microcontroller are stored in a loctaion. The address represents the location that said data is stored. An example of what an address looks like would be: 0x7ffcccc2f420</p>
+</section>
+<section id="variables">
+<h3>Variables<a class="headerlink" href="#variables" title="Link to this heading">¶</a></h3>
+<p>Variables are used as a means to store data/information. Variables have a name that pertains to its identity and helps distinguish it from other pieces of data/information. When creating a variable you must declare (specify) its type. Information on types can be found in the section below.</p>
+<p><strong>Syntax:</strong> type variable_name = value;</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/BleMessage.h">BleMessage.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">parameters</span> <span class="n">to</span> <span class="n">expect</span> <span class="k">with</span> <span class="n">the</span> <span class="n">command</span>
+<span class="nb">int</span> <span class="n">expecting</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="types">
+<h3>Types<a class="headerlink" href="#types" title="Link to this heading">¶</a></h3>
+<p>Data types specify the type of information that can be stored as well as the size of the information that can be stored. The types encountered in our code are as follows:</p>
+<section id="bool">
+<h4>Bool<a class="headerlink" href="#bool" title="Link to this heading">¶</a></h4>
+<p>The Bool (Boolean) type can store true (1) or false (0) values.</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/ExoCode.ino">ExoCode.ino</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="nb">bool</span> <span class="n">first_run</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This variable stores if it is the first run of the loop(). If it is we do some startup stuff, then change it to false. A bool is still stored in a byte so it doesn’t save a ton of room unless you pack a bunch of them into another type.</p>
+<section id="logical-operators">
+<h5>Logical Operators<a class="headerlink" href="#logical-operators" title="Link to this heading">¶</a></h5>
+<p>&amp;&amp; - Logical AND; Returns “true” if both statements are true.</p>
+<p>|| - Logical OR; Returns “true” if at least one statement is true.</p>
+<p>! - Logical NOT; Changes the result to its opposite (e.g., would display false if the result was true)</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>bool dogs_are_cute = true;
+bool cats_are_nice = false;
+bool dogs_bark = true;
+
+cout &lt;&lt; dogs_are_cute &amp;&amp; dogs_bark;         //Would output true
+cout &lt;&lt; dogs_are_cute &amp;&amp; cats_are_nice;     //Would output false
+
+cout &lt;&lt; dogs_are_cute || cats_are_nice;     //Would output true
+
+cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
+</pre></div>
+</div>
+</section>
+</section>
+<section id="char">
+<h4>Char<a class="headerlink" href="#char" title="Link to this heading">¶</a></h4>
+<p>The Char type can store one character. The character should be surrounded by single quotes (e.g., ‘P’,‘u’,‘p’,‘p’,‘y’).</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/BleMessage.h">BleMessage.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">GUI</span> <span class="n">command</span>
+<span class="n">char</span> <span class="n">command</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="int">
+<h4>Int<a class="headerlink" href="#int" title="Link to this heading">¶</a></h4>
+<p>The int type is used when storing numbers without a decimal.</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/BleMessage.h">BleMessage.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">parameters</span> <span class="n">to</span> <span class="n">expect</span> <span class="k">with</span> <span class="n">the</span> <span class="n">command</span>
+<span class="nb">int</span> <span class="n">expecting</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="float">
+<h4>Float<a class="headerlink" href="#float" title="Link to this heading">¶</a></h4>
+<p>The float type is used when storing numbers that have a decimal. It is capable of occupying 32 bits which is approximately 7 decimal places.</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/TorqueSensor.h">TorqueSensor.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">float</span> <span class="n">_calibrated_reading</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="double">
+<h4>Double<a class="headerlink" href="#double" title="Link to this heading">¶</a></h4>
+<p>A double also stores numbers that have a decimal place but has double the precision of the float (hence the name). That is, it can occupy 64 bits which is approximately 15 decimal places.</p>
+<p><strong>ex.</strong> We don’t really use doubles but it is here for completeness.</p>
+</section>
+<section id="arrays">
+<h4>Arrays<a class="headerlink" href="#arrays" title="Link to this heading">¶</a></h4>
+<p>Arrays are used to store several values witin one variable. Similar to other variables, arrays need a data type (e.g., int, bool, float…). Each value in the array is called an element which has its own index (place within the array). It should be noted that the indexing starts at 0 rather than 1. So to access the first element in the array you would use index 0.</p>
+<p><strong>Syntax:</strong> type name[number_of_elements] = {element1, element2, ….};</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">numbers</span> <span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">};</span>
+
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="o">//</span><span class="n">Would</span> <span class="n">output</span> <span class="mi">10</span>
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">numbers</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="o">//</span><span class="n">Would</span> <span class="n">output</span> <span class="mi">20</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/ExoCode.ino">ExoCode.ino</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uint8_t</span> <span class="p">(</span><span class="n">config_to_send</span><span class="p">)[</span><span class="n">ini_config</span><span class="p">::</span><span class="n">number_of_keys</span><span class="p">];</span>
+</pre></div>
+</div>
+</section>
+<section id="void">
+<h4>Void<a class="headerlink" href="#void" title="Link to this heading">¶</a></h4>
+<p>Void means that there is no type, thus variables cannot be defined with “void”. The primary utilization of void is for functions that return no values (more on those later).</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/SyncLed.cpp">SyncLed.cpp</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span>
+<span class="o">*</span> <span class="n">Sets</span> <span class="n">the</span> <span class="n">flags</span> <span class="n">to</span> <span class="n">start</span> <span class="ow">or</span> <span class="n">stop</span> <span class="n">the</span> <span class="n">blink</span> <span class="n">sequence</span>
+<span class="o">*/</span>
+<span class="n">void</span> <span class="n">SyncLed</span><span class="p">::</span><span class="n">trigger</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">_do_start_stop_sequence</span> <span class="o">=</span> <span class="n">_do_start_stop_sequence</span> <span class="o">^</span> <span class="n">true</span><span class="p">;</span>  <span class="o">//</span> <span class="n">xor</span> <span class="k">with</span> <span class="n">one</span> <span class="n">to</span> <span class="n">change</span> <span class="n">boolean</span> <span class="n">state</span>
+    <span class="n">_do_blink</span> <span class="o">=</span> <span class="n">_do_blink</span> <span class="o">^</span> <span class="n">true</span><span class="p">;</span>  <span class="o">//</span> <span class="n">xor</span> <span class="k">with</span> <span class="n">one</span> <span class="n">to</span> <span class="n">change</span> <span class="n">boolean</span> <span class="n">state</span>
+    <span class="n">_state_change_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  <span class="o">//</span> <span class="n">reset</span> <span class="n">the</span> <span class="n">state</span> <span class="n">change</span> <span class="n">count</span><span class="o">.</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</section>
+<section id="typecasting">
+<h4>Typecasting<a class="headerlink" href="#typecasting" title="Link to this heading">¶</a></h4>
+<p>Typecasting converts a variable of one type into a different type. There are two types of typecasting: Implicit and Explicit.</p>
+<p>Implicit typecasting occurs when the compiler automatically converts one data type to another without explicit programmer intervention.</p>
+<p><strong>ex.</strong> Implicit Typecasting - Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">40</span><span class="p">;</span>
+<span class="n">char</span> <span class="n">letter</span> <span class="o">=</span> <span class="s1">&#39;d&#39;</span><span class="p">;</span>
+
+<span class="nb">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">value</span> <span class="o">+</span> <span class="n">letter</span><span class="p">;</span>
+
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">result</span><span class="p">;</span> <span class="o">//</span><span class="n">Prints</span> <span class="n">out</span> <span class="n">the</span> <span class="n">value</span> <span class="n">of</span> <span class="n">result</span><span class="p">,</span> <span class="n">which</span> <span class="ow">is</span> <span class="mi">140</span>
+</pre></div>
+</div>
+<p>Explicit typecasting occurs when the programmer manually changes a variable from one data type to another. Format: (new type) variable;</p>
+<p><strong>ex.</strong> Explicit Typecasting - Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">value</span><span class="p">;</span>
+<span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="mf">12.2333</span><span class="p">;</span>
+
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">;</span> <span class="o">//</span><span class="n">Prints</span> <span class="n">out</span> <span class="n">the</span> <span class="n">value</span><span class="p">,</span> <span class="n">which</span> <span class="ow">is</span> <span class="mi">12</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Utilities.h">Utilities.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">val</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">short</span> <span class="nb">int</span><span class="p">)</span> <span class="p">(</span><span class="n">num_to_convert</span> <span class="o">*</span> <span class="n">factor</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="modifiers">
+<h4>Modifiers<a class="headerlink" href="#modifiers" title="Link to this heading">¶</a></h4>
+<p>Modifiers are used to alter the meaning of varilabe types (e.g., int, double, char) in order to better match the requirements of different circumstances. There are 4 type modifiers in C++: Signed, Unsigned, Long, Short. It should be noted that you can use combination of modifyers (e.g., unsigned long int)</p>
+<section id="signed-vs-unsigned">
+<h5>Signed vs Unsigned<a class="headerlink" href="#signed-vs-unsigned" title="Link to this heading">¶</a></h5>
+<p>Signed and unsigned modifiers can only be used with int and char data types.</p>
+<p>Signed variables are capable of storing postitive and negative values as well as zero. The type int by defult is signed. (Signed Int Value Range: -2,147,483,648 to 2,147,483,647)</p>
+<p>Unsigned variables are only capable of storing postive values and zero. These can never be negative. (Unsigned Int Value Range: 0 to 4,294,967,295)</p>
+<p>Signed variables use one extra bit to account for the sign of the value (compared to unsigned), hence unsigned can be used to save extra space.</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/BleParser.cpp">BleParser.cpp</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">Get</span> <span class="n">the</span> <span class="n">amount</span> <span class="n">of</span> <span class="n">characters</span> <span class="n">to</span> <span class="n">wait</span> <span class="k">for</span>
+<span class="k">for</span><span class="p">(</span><span class="n">unsigned</span> <span class="nb">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">ble</span><span class="p">::</span><span class="n">commands</span><span class="p">)</span><span class="o">/</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ble</span><span class="p">::</span><span class="n">commands</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="p">{</span>
+</pre></div>
+</div>
+</section>
+<section id="long-and-short">
+<h5>Long and Short<a class="headerlink" href="#long-and-short" title="Link to this heading">¶</a></h5>
+<p>The long modifier modifies the maximum value that a data type can hold. Long can be used for int and double data types. Long modifiers can be used twice (int only) to create larger numbers (e.g., long long int).</p>
+<p>The short modifier modifies the minimum value that a data type can hold. Short can be used for int.</p>
+<p>The primary value of using these modifiers is for memory usage purposes. A short int will use less bytes than an int whereas a long int will use more bytes than an int.</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Utilities.h">Utilities.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">val</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">short</span> <span class="nb">int</span><span class="p">)</span> <span class="p">(</span><span class="n">num_to_convert</span> <span class="o">*</span> <span class="n">factor</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="static">
+<h5>Static<a class="headerlink" href="#static" title="Link to this heading">¶</a></h5>
+<p>A static variable means that the variable is created at the start of the program and destroyed at the end of the program. This allows the variable to maintain its value even after going beyond its scope.</p>
+<p>Scope helps determine where the variable can be accessed within the code. There are generally two types: Local and Global.</p>
+<p>Local Scope: variables can only be accessed within the block of code that they are declared.</p>
+<p>Global Scope: variables can be access from the time of declaration within the code until the end of the code.</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/ExoCode.ino">ExoCode.ino</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="nb">bool</span> <span class="n">first_run</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="volatile">
+<h5>Volatile<a class="headerlink" href="#volatile" title="Link to this heading">¶</a></h5>
+<p>A volatile variable means that the value may change between accesses to the variable, even if said variable appears unmodified. The use of volatile guarantees that the varilabe will be read again before any usage. This may be useful in a situation when a controller may try to use a previous copy of the variable value (that it assumes are unchanged) rather than reading and writing using the current value. This is common in situations when the variable value can change due to something outside of the code (e.g., hardware that changes the value).</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/SyncLed.h">SyncLed.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">volatile</span> <span class="nb">int</span> <span class="n">_current_sync_period</span><span class="p">;</span> <span class="o">//</span> <span class="n">The</span> <span class="n">current</span> <span class="n">period</span> <span class="n">to</span> <span class="n">use</span><span class="o">.</span>  <span class="n">Whenever</span> <span class="n">syncLedHandler</span> <span class="ow">is</span> <span class="n">called</span> <span class="n">the</span> <span class="n">interupt</span> <span class="n">should</span> <span class="n">have</span> <span class="n">another</span> <span class="n">begin</span> <span class="n">call</span> <span class="n">to</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">the</span> <span class="n">period</span> <span class="ow">is</span> <span class="n">correct</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="extern">
+<h5>Extern<a class="headerlink" href="#extern" title="Link to this heading">¶</a></h5>
+<p>Extern is useful when using multiple modules. You can define a variable in one .cpp file and then use that variable in another .cpp file without defining it.</p>
+<p><strong>ex.</strong> Simple Example</p>
+<p>FileOne.cpp</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">variable</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>FileTwo.cpp</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">extern</span> <span class="nb">int</span> <span class="n">variable</span><span class="p">;</span>
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">variable</span><span class="p">;</span> <span class="o">//</span><span class="n">This</span> <span class="n">would</span> <span class="n">output</span> <span class="mi">20</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/SPIHandler.h">SPIHandler.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">extern</span> <span class="n">uint8_t</span> <span class="n">is_ff</span><span class="p">[</span><span class="n">num_bytes</span><span class="p">];</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="conditions">
+<h3>Conditions<a class="headerlink" href="#conditions" title="Link to this heading">¶</a></h3>
+<p>Expressions within the code that will be either true or false. Typically the outcome of these conditions will determine how/if certain sections of code are run.</p>
+<section id="if-else-statments">
+<h4>If-Else Statments<a class="headerlink" href="#if-else-statments" title="Link to this heading">¶</a></h4>
+<p>If statements specify a section of code that will run if the condition is evaluated as true. Else statments specify a section of code that will run if the condition is evaluated as false. Else statments are not required (that is, you do not need to have a section of code that runs if the condition is evaluated as false). It is possible to have multiple conditions, in which case we can use “else if” statements as part of the evaluation.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">condition_one</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="o">//</span><span class="n">Code</span> <span class="n">to</span> <span class="n">run</span> <span class="k">if</span> <span class="n">true</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">condition_two</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="o">//</span><span class="n">Code</span> <span class="n">to</span> <span class="n">run</span> <span class="k">if</span> <span class="n">true</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+    <span class="o">//</span><span class="n">Code</span> <span class="n">to</span> <span class="n">run</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+<span class="nb">int</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;The dog is really really good.&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;The dog is really good.&quot;</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;The dog is good.&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There is an alternative way to formulate if-else statments within the code that signficantly reduces the amount of space used by these statments. Note that this only works if there is one condition to be evaluated (does not work for “else if”). This formulation is commonly used throughout our code.</p>
+<p><strong>Syntax:</strong> variable = (condition) ? if_true : if_false;</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>int x = 20;
+int y = 42;
+
+string result = (x &lt; y) ? &quot;The dog is really really good.&quot; : &quot;The dog is really good.&quot;
+cout &lt;&lt; result;
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>float ZeroTorque::calc_motor_cmd()
+{
+    float cmd_ff = 0;
+
+    // add the PID contribution to the feed forward command
+    float cmd = cmd_ff + (_controller_data-&gt;parameters[controller_defs::zero_torque::use_pid_idx]
+                ? _pid(cmd_ff, _joint_data-&gt;torque_reading,_controller_data-&gt;parameters[controller_defs::zero_torque::p_gain_idx], _controller_data-&gt;parameters[controller_defs::zero_torque::i_gain_idx], _controller_data-&gt;parameters[controller_defs::zero_torque::d_gain_idx])
+                : 0);
+
+    return cmd;
+};
+</pre></div>
+</div>
+<p>In the above example, the condition being evaluated is whether or not we are using PID control and if it is true then it augments the feed forward command appropriately.</p>
+</section>
+<section id="switch-statements">
+<h4>Switch Statements<a class="headerlink" href="#switch-statements" title="Link to this heading">¶</a></h4>
+<p>Switch statements are valuable when there are several different blocks of code that could be run depending on if an expression is true.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">switch</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">case</span> <span class="n">x</span><span class="p">:</span>
+        <span class="o">//</span><span class="n">Code</span> <span class="n">to</span> <span class="n">be</span> <span class="n">run</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">y</span><span class="p">:</span>
+        <span class="o">//</span><span class="n">Code</span> <span class="n">to</span> <span class="n">be</span> <span class="n">run</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">z</span><span class="p">:</span>
+        <span class="o">//</span><span class="n">Code</span> <span class="n">to</span> <span class="n">be</span> <span class="n">run</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="n">default</span><span class="p">:</span>
+        <span class="o">//</span><span class="n">Code</span> <span class="n">to</span> <span class="n">be</span> <span class="n">run</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If the expression matches the case value (x, y, z in the above syntax), then the block of code for that case runs. The code will run until it reaches the “break” keyword, this is useful as this will cause the code to skip the rest of the switch blocks which can save considerable time. In some instances it is useful to have a section of code that runs if the expression does not match any of the cases. This is where the “default” keyword comes into use. Importantly, this default must be the last statment used (no break is required). Also note that the expression used in these statments must be of type int or enum.</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">month</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+
+<span class="n">switch</span> <span class="p">(</span><span class="n">month</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;January&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;February&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;March&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;April&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;May&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;June&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">7</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;July&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">8</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;August&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">9</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;September&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;October&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">11</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;November&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">12</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;December&quot;</span><span class="p">;</span>
+       <span class="k">break</span><span class="p">;</span>
+    <span class="n">default</span><span class="p">:</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;This is not a month.&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">switch</span> <span class="p">(</span><span class="n">utils</span><span class="p">::</span><span class="n">get_joint_type</span><span class="p">(</span><span class="n">_id</span><span class="p">))</span>
+   <span class="p">{</span>
+       <span class="k">case</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">hip</span><span class="p">:</span>
+           <span class="c1">#ifdef CONTROLLER_DEBUG</span>
+               <span class="n">logger</span><span class="p">::</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;HIP &quot;</span><span class="p">);</span>
+           <span class="c1">#endif</span>
+           <span class="k">if</span> <span class="p">(</span><span class="n">is_left</span><span class="p">)</span>
+           <span class="p">{</span>
+               <span class="n">_controller_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">left_side</span><span class="o">.</span><span class="n">hip</span><span class="o">.</span><span class="n">controller</span><span class="p">);</span>
+               <span class="n">_joint_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">left_side</span><span class="o">.</span><span class="n">hip</span><span class="p">);</span>
+           <span class="p">}</span>
+           <span class="k">else</span>
+           <span class="p">{</span>
+               <span class="n">_controller_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">right_side</span><span class="o">.</span><span class="n">hip</span><span class="o">.</span><span class="n">controller</span><span class="p">);</span>
+               <span class="n">_joint_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">right_side</span><span class="o">.</span><span class="n">hip</span><span class="p">);</span>
+           <span class="p">}</span>
+           <span class="k">break</span><span class="p">;</span>
+
+       <span class="k">case</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">knee</span><span class="p">:</span>
+           <span class="c1">#ifdef CONTROLLER_DEBUG</span>
+               <span class="n">logger</span><span class="p">::</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;KNEE &quot;</span><span class="p">);</span>
+           <span class="c1">#endif</span>
+           <span class="k">if</span> <span class="p">(</span><span class="n">is_left</span><span class="p">)</span>
+           <span class="p">{</span>
+               <span class="n">_controller_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">left_side</span><span class="o">.</span><span class="n">knee</span><span class="o">.</span><span class="n">controller</span><span class="p">);</span>
+               <span class="n">_joint_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">left_side</span><span class="o">.</span><span class="n">knee</span><span class="p">);</span>
+           <span class="p">}</span>
+           <span class="k">else</span>
+           <span class="p">{</span>
+               <span class="n">_controller_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">right_side</span><span class="o">.</span><span class="n">knee</span><span class="o">.</span><span class="n">controller</span><span class="p">);</span>
+               <span class="n">_joint_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">right_side</span><span class="o">.</span><span class="n">knee</span><span class="p">);</span>
+           <span class="p">}</span>
+           <span class="k">break</span><span class="p">;</span>
+
+       <span class="k">case</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">ankle</span><span class="p">:</span>
+           <span class="c1">#ifdef CONTROLLER_DEBUG</span>
+               <span class="n">logger</span><span class="p">::</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ANKLE &quot;</span><span class="p">);</span>
+           <span class="c1">#endif</span>
+           <span class="k">if</span> <span class="p">(</span><span class="n">is_left</span><span class="p">)</span>
+           <span class="p">{</span>
+               <span class="n">_controller_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">left_side</span><span class="o">.</span><span class="n">ankle</span><span class="o">.</span><span class="n">controller</span><span class="p">);</span>
+               <span class="n">_joint_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">left_side</span><span class="o">.</span><span class="n">ankle</span><span class="p">);</span>
+           <span class="p">}</span>
+           <span class="k">else</span>
+           <span class="p">{</span>
+               <span class="n">_controller_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">right_side</span><span class="o">.</span><span class="n">ankle</span><span class="o">.</span><span class="n">controller</span><span class="p">);</span>
+               <span class="n">_joint_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">right_side</span><span class="o">.</span><span class="n">ankle</span><span class="p">);</span>
+           <span class="p">}</span>
+           <span class="k">break</span><span class="p">;</span>
+       <span class="k">case</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">elbow</span><span class="p">:</span>
+           <span class="c1">#ifdef CONTROLLER_DEBUG</span>
+                       <span class="n">logger</span><span class="p">::</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ELBOW &quot;</span><span class="p">);</span>
+           <span class="c1">#endif</span>
+           <span class="k">if</span> <span class="p">(</span><span class="n">is_left</span><span class="p">)</span>
+           <span class="p">{</span>
+               <span class="n">_controller_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">left_side</span><span class="o">.</span><span class="n">elbow</span><span class="o">.</span><span class="n">controller</span><span class="p">);</span>
+               <span class="n">_joint_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">left_side</span><span class="o">.</span><span class="n">elbow</span><span class="p">);</span>
+           <span class="p">}</span>
+           <span class="k">else</span>
+           <span class="p">{</span>
+               <span class="n">_controller_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">right_side</span><span class="o">.</span><span class="n">elbow</span><span class="o">.</span><span class="n">controller</span><span class="p">);</span>
+               <span class="n">_joint_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">right_side</span><span class="o">.</span><span class="n">elbow</span><span class="p">);</span>
+           <span class="p">}</span>
+           <span class="k">break</span><span class="p">;</span>
+   <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h3>
+<p>Functions, sometimes refered to as methods or procdures, are a reusable block of code designed to do a particular task. Functions allow for code to be split into smaller, modular pieces and are particularly useful when sets of code need to be used several times.</p>
+<p>There are typically two parts to creating a function:</p>
+<p>Declaration - tells the code’s compiler what the functions name, return type, and parameters are</p>
+<p>Definintion - the main body of the function, the instructions for what the function does</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">return_type</span> <span class="n">function_name</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">//</span><span class="n">Declaration</span>
+<span class="p">{</span>
+    <span class="o">//</span><span class="n">Definition</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If the function has a return, the return will be the last line of code within the block that executes, even if there are lines after it.</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">square</span><span class="p">(</span><span class="nb">int</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nb">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">result</span><span class="p">;</span>             <span class="o">//</span><span class="n">Will</span> <span class="n">output</span> <span class="mi">4</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Utilities.cpp">Utilities.cpp</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">bool</span> <span class="n">get_is_left</span><span class="p">(</span><span class="n">uint8_t</span> <span class="nb">id</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">id</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">left</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">left</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<section id="overloading">
+<h4>Overloading<a class="headerlink" href="#overloading" title="Link to this heading">¶</a></h4>
+<p>Function overloading is when there are multiple functions of the same name but with different parameters. These differences in parameters could manifest as type differences, number of parameters in the function, or as both. Overloading is useful when you have multiple functions that do the same thing.</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">multiply</span><span class="p">(</span><span class="nb">int</span> <span class="n">x</span><span class="p">,</span> <span class="nb">int</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">double</span> <span class="n">multiply</span><span class="p">(</span><span class="n">double</span> <span class="n">x</span><span class="p">,</span> <span class="n">double</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">int</span> <span class="n">multiply</span> <span class="p">(</span><span class="nb">int</span> <span class="n">x</span><span class="p">,</span> <span class="nb">int</span> <span class="n">y</span><span class="p">,</span> <span class="nb">int</span> <span class="n">z</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">z</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">multiply</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>      <span class="o">//</span><span class="n">Outputs</span> <span class="n">a</span> <span class="n">value</span> <span class="n">of</span> <span class="mi">6</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">multiply</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">3.2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>  <span class="o">//</span><span class="n">Outputs</span> <span class="n">a</span> <span class="n">value</span> <span class="n">of</span> <span class="mf">8.0</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">multiply</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>    <span class="o">//</span><span class="n">Outputs</span> <span class="n">a</span> <span class="n">value</span> <span class="n">of</span> <span class="mi">24</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Utilities.cpp">Utilities.cpp</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span>
+ <span class="o">*</span> <span class="n">From</span> <span class="n">the</span> <span class="n">joint_id</span> <span class="n">returns</span> <span class="n">the</span> <span class="n">bit</span> <span class="k">for</span> <span class="n">is_left</span><span class="o">.</span>
+ <span class="o">*/</span>
+<span class="nb">bool</span> <span class="n">get_is_left</span><span class="p">(</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="nb">id</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">get_is_left</span><span class="p">((</span><span class="n">uint8_t</span><span class="p">)</span> <span class="nb">id</span><span class="p">);</span><span class="o">//</span><span class="p">((</span><span class="n">uint8_t</span><span class="p">)</span><span class="nb">id</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">left</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">left</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="nb">bool</span> <span class="n">get_is_left</span><span class="p">(</span><span class="n">uint8_t</span> <span class="nb">id</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">id</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">left</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">left</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h3>
+<p>Classes are user defined data types. Objects are instanaces of the class. Classes are the template/blueprint for the object, where as the object gets its characteristics and behaviors from the class. A class can contain both attributes (variables) and methods (functions). Both of these are usually referred to as members of the class.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Class_Name</span>
+<span class="p">{</span>
+    <span class="o">//</span><span class="n">Specifiers_Attributes_and_Methods</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>Note:</strong> After the final bracket of a class, you must place a ‘;’</p>
+<p>Similar to functions, classes need to be declared and defined. These are usually done separately with the declaration occuring in a header file (.h, more on that later) and the definition occuring within a .cpp file.</p>
+<p>To create an object of a class you need to use the following synatx: class_name object_name;</p>
+<p>To assign attributes to an object or utilize a method for an object, use the following syntax: object_name.attribute_or_method_name;</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Dogs</span>
+<span class="p">{</span>
+    <span class="n">public</span><span class="p">:</span>
+    <span class="n">string</span> <span class="n">name</span><span class="p">;</span>    <span class="o">//</span><span class="n">The</span> <span class="n">Dog</span><span class="s1">&#39;s Name</span>
+    <span class="n">string</span> <span class="n">breed</span><span class="p">;</span>   <span class="o">//</span><span class="n">The</span> <span class="n">Dog</span><span class="s1">&#39;s Breed</span>
+    <span class="nb">int</span> <span class="n">age</span><span class="p">;</span>        <span class="o">//</span><span class="n">The</span> <span class="n">Dog</span><span class="s1">&#39;s Age</span>
+
+    <span class="n">void</span> <span class="n">dog_information</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">name</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; is a &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">age</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; year old &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">breed</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">Dogs</span> <span class="n">dog1</span><span class="p">;</span>      <span class="o">//</span><span class="n">Creates</span> <span class="n">an</span> <span class="nb">object</span> <span class="n">of</span> <span class="n">Dogs</span>
+    <span class="n">dog1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Mr.Pebbles&quot;</span><span class="p">;</span>       <span class="o">//</span><span class="n">Assigns</span> <span class="n">a</span> <span class="n">value</span> <span class="n">to</span> <span class="n">the</span> <span class="n">name</span> <span class="n">attribute</span>
+    <span class="n">dog1</span><span class="o">.</span><span class="n">breed</span> <span class="o">=</span> <span class="s2">&quot;Golden Retriever&quot;</span><span class="p">;</span>        <span class="o">//</span><span class="n">Assigns</span> <span class="n">a</span> <span class="n">value</span> <span class="n">to</span> <span class="n">the</span> <span class="n">breed</span> <span class="n">attribute</span>
+    <span class="n">dog1</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>       <span class="o">//</span><span class="n">Assigns</span> <span class="n">a</span> <span class="n">value</span> <span class="n">to</span> <span class="n">the</span> <span class="n">age</span> <span class="n">attribute</span>
+
+    <span class="n">dog1</span><span class="o">.</span><span class="n">dog_information</span><span class="p">();</span>     <span class="o">//</span><span class="n">Utilizes</span> <span class="n">the</span> <span class="n">class</span><span class="s1">&#39;s method to output &quot;Mr. Pebbles is a 4 year old Golden Retriever&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You may have noticed the word “public” in the above example. This is an instance of a classes’ access specifier. Specifiers determine how attributes and methods of a class can be accessed. Generally, there are three types:</p>
+<p>Public - attributes and methods accessible outside of the class.</p>
+<p>Private - attributes and methods are not accessible outside of the class. (private is the defult specification for members of a class).</p>
+<p>Protected - attributes and methods are not accessible outside of the class but can be accessed via inherited classes (more on those later).</p>
+<p>While some functions are definied within the class itself, such as above, there is also a way to define a funciton for a class outside of the class itself. To do so, you need to utilize the scope resolution operator: “::”. It should be noted while the function can be defined outside of the class it still must be declared within it.</p>
+<p><strong>Syntax</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>class class_name
+{
+    //Attributes
+    type function_name(parameters); //You still must declare the function within the class
+};
+
+type function_name(parameters)
+{
+    //Block of Code
+}
+</pre></div>
+</div>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Dogs</span>
+<span class="p">{</span>
+    <span class="n">public</span><span class="p">:</span>
+    <span class="n">string</span> <span class="n">name</span><span class="p">;</span>    <span class="o">//</span><span class="n">The</span> <span class="n">Dog</span><span class="s1">&#39;s Name</span>
+    <span class="n">string</span> <span class="n">breed</span><span class="p">;</span>   <span class="o">//</span><span class="n">The</span> <span class="n">Dog</span><span class="s1">&#39;s Breed</span>
+    <span class="nb">int</span> <span class="n">age</span><span class="p">;</span>        <span class="o">//</span><span class="n">The</span> <span class="n">Dog</span><span class="s1">&#39;s Age</span>
+
+    <span class="n">void</span> <span class="n">dog_information</span><span class="p">();</span> <span class="o">//</span><span class="n">Method</span> <span class="n">Declaration</span>
+<span class="p">};</span>
+
+<span class="n">void</span> <span class="n">Dog</span><span class="p">::</span><span class="n">dog_information</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">name</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; is a &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">age</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; year old &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">breed</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">Dogs</span> <span class="n">dog1</span><span class="p">;</span>                          <span class="o">//</span><span class="n">Creates</span> <span class="n">an</span> <span class="nb">object</span> <span class="n">of</span> <span class="n">Dogs</span>
+    <span class="n">dog1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Mr.Pebbles&quot;</span><span class="p">;</span>           <span class="o">//</span><span class="n">Assigns</span> <span class="n">a</span> <span class="n">value</span> <span class="n">to</span> <span class="n">the</span> <span class="n">name</span> <span class="n">attribute</span>
+    <span class="n">dog1</span><span class="o">.</span><span class="n">breed</span> <span class="o">=</span> <span class="s2">&quot;Golden Retriever&quot;</span><span class="p">;</span>    <span class="o">//</span><span class="n">Assigns</span> <span class="n">a</span> <span class="n">value</span> <span class="n">to</span> <span class="n">the</span> <span class="n">breed</span> <span class="n">attribute</span>
+    <span class="n">dog1</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>                       <span class="o">//</span><span class="n">Assigns</span> <span class="n">a</span> <span class="n">value</span> <span class="n">to</span> <span class="n">the</span> <span class="n">age</span> <span class="n">attribute</span>
+
+    <span class="n">dog1</span><span class="o">.</span><span class="n">dog_information</span><span class="p">();</span>     <span class="o">//</span><span class="n">Utilizes</span> <span class="n">the</span> <span class="n">class</span><span class="s1">&#39;s method to output &quot;Mr. Pebbles is a 4 year old Golden Retriever&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.h">Controller.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ProportionalJointMoment</span> <span class="p">:</span> <span class="n">public</span> <span class="n">_Controller</span>
+<span class="p">{</span>
+    <span class="n">public</span><span class="p">:</span>
+        <span class="n">ProportionalJointMoment</span><span class="p">(</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="nb">id</span><span class="p">,</span> <span class="n">ExoData</span><span class="o">*</span> <span class="n">exo_data</span><span class="p">);</span>
+        <span class="o">~</span><span class="n">ProportionalJointMoment</span><span class="p">(){};</span>
+
+
+        <span class="nb">float</span> <span class="n">calc_motor_cmd</span><span class="p">();</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<section id="constructor">
+<h4>Constructor<a class="headerlink" href="#constructor" title="Link to this heading">¶</a></h4>
+<p>Constructors are a method within a class that is automatically called upon creation of an object. The primary purpose of a constructor is to initialize members of the object with data. It makes sure that an object is created with specific attributes. Constructors construct the values of the objects (hence it’s name). These methods have no return value (thus they do not have a return type).</p>
+<p>Note: Constructors must have the same name as the class and all members within a constructor are public.</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.h">Controller.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ProportionalJointMoment</span> <span class="p">:</span> <span class="n">public</span> <span class="n">_Controller</span>
+<span class="p">{</span>
+    <span class="n">public</span><span class="p">:</span>
+        <span class="n">ProportionalJointMoment</span><span class="p">(</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="nb">id</span><span class="p">,</span> <span class="n">ExoData</span><span class="o">*</span> <span class="n">exo_data</span><span class="p">);</span> <span class="o">//</span><span class="n">This</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">constructor</span>
+        <span class="o">~</span><span class="n">ProportionalJointMoment</span><span class="p">(){};</span>
+
+
+        <span class="nb">float</span> <span class="n">calc_motor_cmd</span><span class="p">();</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</section>
+<section id="inheritance">
+<h4>Inheritance<a class="headerlink" href="#inheritance" title="Link to this heading">¶</a></h4>
+<p>Inheritance is when a class (called a child, derived, or sub class) takes (inherits, hence the name) attributes and methods from another class (called a partent, base, or super class). Typically this new class then extends upon the inherited members of the parent class through new attributes and/or methods. This can be used in a modular sense to considerablly reduce the amount of potentially redundent code within a program. It is possible to inherit from a class which itself inherited from another class. This can allow us to start with a very general class that then becomes progressivly more specific with each instance of inheritance.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Class</span> <span class="n">Child</span><span class="p">:</span> <span class="n">Class</span> <span class="n">Parent</span>
+<span class="p">{</span>
+    <span class="o">//</span><span class="n">Code_Block</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Class</span> <span class="n">Person</span>                <span class="o">//</span><span class="n">Parent</span> <span class="n">Class</span>
+<span class="p">{</span>
+    <span class="n">public</span><span class="p">:</span>
+    <span class="n">string</span> <span class="n">name</span><span class="p">;</span>
+    <span class="nb">int</span> <span class="n">age</span><span class="p">;</span>
+    <span class="nb">int</span> <span class="n">height</span><span class="p">;</span>
+    <span class="nb">int</span> <span class="n">weight</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">Class</span> <span class="n">Football_Player</span> <span class="p">:</span> <span class="n">Person</span>      <span class="o">//</span><span class="n">Child</span> <span class="n">Class</span> <span class="n">inheriting</span> <span class="kn">from</span><span class="w"> </span><span class="nn">Parent</span> <span class="n">Class</span>
+<span class="p">{</span>
+    <span class="n">public</span><span class="p">:</span>
+    <span class="nb">int</span> <span class="n">pass_yards</span><span class="p">;</span>
+    <span class="nb">int</span> <span class="n">rushing_yards</span><span class="p">;</span>
+    <span class="nb">int</span> <span class="n">sacks</span><span class="p">;</span>
+    <span class="nb">int</span> <span class="n">interceptions</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.h">Controller.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ProportionalJointMoment</span> <span class="p">:</span> <span class="n">public</span> <span class="n">_Controller</span>
+<span class="p">{</span>
+    <span class="n">public</span><span class="p">:</span>
+        <span class="n">ProportionalJointMoment</span><span class="p">(</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="nb">id</span><span class="p">,</span> <span class="n">ExoData</span><span class="o">*</span> <span class="n">exo_data</span><span class="p">);</span>
+        <span class="o">~</span><span class="n">ProportionalJointMoment</span><span class="p">(){};</span>
+
+
+        <span class="nb">float</span> <span class="n">calc_motor_cmd</span><span class="p">();</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>In the above example we have a specific controller class (ProportionalJointMoment) inherit members from a more generic controller class (_Controller).</p>
+<p>More info on inheritance can be found on <a class="reference external" href="https://www.tutorialspoint.com/cplusplus/cpp_inheritance.htm">tutorialspoint</a> or <a class="reference external" href="https://www.w3schools.com/cpp/cpp_inheritance.asp">w3schools</a>.</p>
+</section>
+<section id="friend-classes">
+<h4>Friend Classes<a class="headerlink" href="#friend-classes" title="Link to this heading">¶</a></h4>
+<p>Friend classes can access private/protected memebers of other classes.</p>
+<p><strong>Syntax:</strong> friend class name_of_class_you_want_to_befriend;</p>
+<p><strong>ex.</strong> We don’t really use friend classes but it is here for completeness.</p>
+</section>
+<section id="abstract-classes">
+<h4>Abstract Classes<a class="headerlink" href="#abstract-classes" title="Link to this heading">¶</a></h4>
+<p>Abstact classess (also called interfaces) provide a base class from which other classes can inherit. These classes can not be used to create objects, they only serve as an interface. A class is made abstract when at least one of its functions is made to be a pure virtual function (syntax: virtual type function_name(parameters) = 0;).</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.h">Controller.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">_Controller</span>
+<span class="p">{</span>
+    <span class="n">public</span><span class="p">:</span>
+        <span class="o">/**</span>
+         <span class="o">*</span> <span class="nd">@brief</span> <span class="n">Constructor</span>
+         <span class="o">*</span>
+         <span class="o">*</span> <span class="nd">@param</span> <span class="nb">id</span> <span class="n">of</span> <span class="n">the</span> <span class="n">joint</span> <span class="n">being</span> <span class="n">used</span>
+         <span class="o">*</span> <span class="nd">@param</span> <span class="n">pointer</span> <span class="n">to</span> <span class="n">the</span> <span class="n">full</span> <span class="n">ExoData</span> <span class="n">instance</span>
+         <span class="o">*/</span>
+        <span class="n">_Controller</span><span class="p">(</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="nb">id</span><span class="p">,</span> <span class="n">ExoData</span><span class="o">*</span> <span class="n">exo_data</span><span class="p">);</span>
+
+        <span class="o">/**</span>
+         <span class="o">*</span> <span class="nd">@brief</span> <span class="n">Virtual</span> <span class="n">destructor</span> <span class="ow">is</span> <span class="n">needed</span> <span class="n">to</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">the</span> <span class="n">correct</span> <span class="n">destructor</span> <span class="ow">is</span> <span class="n">called</span> <span class="n">when</span> <span class="n">the</span> <span class="n">derived</span> <span class="k">class</span><span class="w"> </span><span class="nc">is</span> <span class="n">deleted</span><span class="o">.</span>
+         <span class="o">*/</span>
+        <span class="n">virtual</span> <span class="o">~</span><span class="n">_Controller</span><span class="p">(){};</span>
+
+        <span class="o">/**</span>
+         <span class="o">*</span> <span class="nd">@brief</span> <span class="n">Virtual</span> <span class="n">function</span> <span class="n">so</span> <span class="n">that</span> <span class="n">each</span> <span class="n">controller</span> <span class="n">must</span> <span class="n">create</span> <span class="n">a</span> <span class="n">function</span> <span class="n">that</span> <span class="n">will</span> <span class="n">calculate</span> <span class="n">the</span> <span class="n">motor</span> <span class="n">command</span>
+         <span class="o">*</span>
+         <span class="o">*</span> <span class="nd">@return</span> <span class="n">Torque</span> <span class="ow">in</span> <span class="n">Nm</span><span class="o">.</span>
+         <span class="o">*/</span>
+        <span class="n">virtual</span> <span class="nb">float</span> <span class="n">calc_motor_cmd</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="o">/**</span>
+         <span class="o">*</span> <span class="nd">@brief</span> <span class="n">Resets</span> <span class="n">the</span> <span class="n">integral</span> <span class="nb">sum</span> <span class="k">for</span> <span class="n">the</span> <span class="n">controller</span>
+         <span class="o">*/</span>
+        <span class="n">void</span> <span class="n">reset_integral</span><span class="p">();</span>
+
+    <span class="n">protected</span><span class="p">:</span>
+
+        <span class="n">ExoData</span><span class="o">*</span> <span class="n">_data</span><span class="p">;</span>                     <span class="o">/**&lt;</span> <span class="n">Pointer</span> <span class="n">to</span> <span class="n">the</span> <span class="n">full</span> <span class="n">data</span> <span class="n">instance</span><span class="o">*/</span>
+        <span class="n">ControllerData</span><span class="o">*</span> <span class="n">_controller_data</span><span class="p">;</span>   <span class="o">/**&lt;</span> <span class="n">Pointer</span> <span class="n">to</span> <span class="n">the</span> <span class="n">data</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">this</span> <span class="n">controller</span> <span class="o">*/</span>
+        <span class="n">SideData</span><span class="o">*</span> <span class="n">_side_data</span><span class="p">;</span>                 <span class="o">/**&lt;</span> <span class="n">Pointer</span> <span class="k">for</span> <span class="n">the</span> <span class="n">side</span> <span class="n">data</span> <span class="n">the</span> <span class="n">controller</span> <span class="ow">is</span> <span class="n">associated</span> <span class="k">with</span> <span class="o">*/</span>
+        <span class="n">JointData</span><span class="o">*</span> <span class="n">_joint_data</span><span class="p">;</span>             <span class="o">/**&lt;</span> <span class="n">Pointer</span> <span class="n">to</span> <span class="n">the</span> <span class="n">joint</span> <span class="n">data</span> <span class="n">the</span> <span class="n">controller</span> <span class="ow">is</span> <span class="n">associated</span> <span class="k">with</span> <span class="o">*/</span>
+
+        <span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="n">_id</span><span class="p">;</span>          <span class="o">/**&lt;</span> <span class="n">Id</span> <span class="n">of</span> <span class="n">the</span> <span class="n">joint</span> <span class="n">this</span> <span class="n">controller</span> <span class="ow">is</span> <span class="n">attached</span> <span class="n">to</span><span class="o">.</span> <span class="o">*/</span>
+
+        <span class="n">Time_Helper</span><span class="o">*</span> <span class="n">_t_helper</span><span class="p">;</span>             <span class="o">/**&lt;</span> <span class="n">Instance</span> <span class="n">of</span> <span class="n">the</span> <span class="n">time</span> <span class="n">helper</span> <span class="n">to</span> <span class="n">track</span> <span class="n">when</span> <span class="n">things</span> <span class="n">happen</span> <span class="n">used</span> <span class="n">to</span> <span class="n">check</span> <span class="k">if</span> <span class="n">we</span> <span class="n">have</span> <span class="n">a</span> <span class="nb">set</span> <span class="n">time</span> <span class="k">for</span> <span class="n">the</span> <span class="n">PID</span> <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">_t_helper_context</span><span class="p">;</span>            <span class="o">/**&lt;</span> <span class="n">Store</span> <span class="n">the</span> <span class="n">context</span> <span class="k">for</span> <span class="n">the</span> <span class="n">timer</span> <span class="n">helper</span> <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">_t_helper_delta_t</span><span class="p">;</span>            <span class="o">/**&lt;</span> <span class="n">Time</span> <span class="n">time</span> <span class="n">since</span> <span class="n">the</span> <span class="n">last</span> <span class="n">event</span> <span class="o">*/</span>
+
+        <span class="o">//</span><span class="n">Values</span> <span class="k">for</span> <span class="n">the</span> <span class="n">PID</span> <span class="n">controller</span>
+        <span class="nb">float</span> <span class="n">_pid_error_sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>           <span class="o">/**&lt;</span> <span class="n">Summed</span> <span class="n">error</span> <span class="n">term</span> <span class="k">for</span> <span class="n">calucating</span> <span class="n">intergral</span> <span class="n">term</span> <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">_prev_input</span><span class="p">;</span>                  <span class="o">/**&lt;</span> <span class="n">Prev</span> <span class="n">error</span> <span class="n">term</span> <span class="k">for</span> <span class="n">calculating</span> <span class="n">derivative</span> <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">_prev_de_dt</span><span class="p">;</span>                  <span class="o">/**&lt;</span> <span class="n">Prev</span> <span class="n">error</span> <span class="n">derivative</span> <span class="n">used</span> <span class="k">if</span> <span class="n">the</span> <span class="n">timestep</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">good</span><span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">_prev_pid_time</span><span class="p">;</span>               <span class="o">/**&lt;</span> <span class="n">Prev</span> <span class="n">time</span> <span class="n">the</span> <span class="n">PID</span> <span class="n">was</span> <span class="n">called</span> <span class="o">*/</span>
+
+        <span class="o">/**</span>
+         <span class="o">*</span> <span class="nd">@brief</span> <span class="n">calculates</span> <span class="n">the</span> <span class="n">current</span> <span class="n">PID</span> <span class="n">contribution</span> <span class="n">to</span> <span class="n">the</span> <span class="n">motor</span> <span class="n">command</span><span class="o">.</span>
+         <span class="o">*</span>
+         <span class="o">*</span> <span class="nd">@param</span> <span class="n">controller</span> <span class="n">command</span>
+         <span class="o">*</span> <span class="nd">@param</span> <span class="n">measured</span> <span class="n">controlled</span> <span class="n">value</span>
+         <span class="o">*</span> <span class="nd">@param</span> <span class="n">proportional</span> <span class="n">gain</span>
+         <span class="o">*</span> <span class="nd">@param</span> <span class="n">integral</span> <span class="n">gain</span>
+         <span class="o">*</span> <span class="nd">@param</span> <span class="n">derivative</span> <span class="n">gain</span>
+         <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">_pid</span><span class="p">(</span><span class="nb">float</span> <span class="n">cmd</span><span class="p">,</span> <span class="nb">float</span> <span class="n">measurement</span><span class="p">,</span> <span class="nb">float</span> <span class="n">p_gain</span><span class="p">,</span> <span class="nb">float</span> <span class="n">i_gain</span><span class="p">,</span> <span class="nb">float</span> <span class="n">d_gain</span><span class="p">);</span>
+
+        <span class="o">//</span><span class="n">Values</span> <span class="k">for</span> <span class="n">the</span> <span class="n">Compact</span> <span class="n">Form</span> <span class="n">Model</span> <span class="n">Free</span> <span class="n">Adaptive</span> <span class="n">Controller</span>
+        <span class="n">std</span><span class="p">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="o">&gt;</span> <span class="n">measurements</span><span class="p">;</span>
+        <span class="n">std</span><span class="p">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="o">&gt;</span> <span class="n">outputs</span><span class="p">;</span>
+        <span class="n">std</span><span class="p">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="o">&gt;</span> <span class="n">phi</span><span class="p">;</span>            <span class="o">/**&lt;</span> <span class="n">Psuedo</span> <span class="n">partial</span> <span class="n">derivative</span> <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">rho</span><span class="p">;</span>                              <span class="o">/**&lt;</span> <span class="n">Penalty</span> <span class="n">factor</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">lamda</span><span class="p">;</span>                            <span class="o">/**&lt;</span> <span class="n">Weighting</span> <span class="n">factor</span> <span class="n">limits</span> <span class="n">delta</span> <span class="n">u</span> <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">etta</span><span class="p">;</span>                             <span class="o">/**&lt;</span> <span class="n">Step</span> <span class="n">size</span> <span class="n">constant</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">mu</span><span class="p">;</span>                               <span class="o">/**&lt;</span> <span class="n">Weighting</span> <span class="n">factor</span> <span class="n">that</span> <span class="n">limits</span> <span class="n">the</span> <span class="n">variance</span> <span class="n">of</span> <span class="n">u</span> <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">upsilon</span><span class="p">;</span>                          <span class="o">/**&lt;</span> <span class="n">A</span> <span class="n">sufficiently</span> <span class="n">small</span> <span class="n">integer</span> <span class="o">~</span><span class="mi">10</span><span class="o">^-</span><span class="mi">5</span> <span class="o">*/</span>
+        <span class="nb">float</span> <span class="n">phi_1</span><span class="p">;</span>                            <span class="o">/**&lt;</span> <span class="n">Initial</span><span class="o">/</span><span class="n">reset</span> <span class="n">condition</span> <span class="k">for</span> <span class="n">estimation</span> <span class="n">of</span> <span class="n">psuedo</span> <span class="n">partial</span> <span class="n">derivitave</span> <span class="o">*/</span>
+
+        <span class="nb">float</span> <span class="n">_cf_mfac</span><span class="p">(</span><span class="nb">float</span> <span class="n">reference</span><span class="p">,</span> <span class="nb">float</span> <span class="n">current_measurement</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</section>
+<section id="initializer-list">
+<h4>Initializer List<a class="headerlink" href="#initializer-list" title="Link to this heading">¶</a></h4>
+<p>Initializer lists are used to initializing members of classes with data.</p>
+<p><strong>Syntax:</strong> constructor(parameters): initializaiton</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Class</span> <span class="n">Example</span>
+<span class="p">{</span>
+    <span class="n">private</span><span class="p">:</span>
+        <span class="nb">int</span> <span class="n">number</span><span class="p">;</span>
+    <span class="n">public</span><span class="p">:</span>
+        <span class="n">Example</span><span class="p">(</span><span class="nb">int</span> <span class="n">number</span><span class="p">):</span><span class="n">number</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ZeroTorque</span><span class="p">::</span><span class="n">ZeroTorque</span><span class="p">(</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="nb">id</span><span class="p">,</span> <span class="n">ExoData</span><span class="o">*</span> <span class="n">exo_data</span><span class="p">)</span>
+<span class="p">:</span> <span class="n">_Controller</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>
+<span class="p">{</span>
+
+    <span class="c1">#ifdef CONTROLLER_DEBUG</span>
+        <span class="n">logger</span><span class="p">::</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;ZeroTorque::Constructor&quot;</span><span class="p">);</span>
+    <span class="c1">#endif</span>
+
+<span class="p">};</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="pointers">
+<h3>Pointers<a class="headerlink" href="#pointers" title="Link to this heading">¶</a></h3>
+<p>Pointers are variables that contain the memory address as a value. These variables point to a data type of the same type.</p>
+<p><strong>Synatx:</strong> type* variable_name or type *variable_name</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Joint.h">Joint.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_Motor</span><span class="o">*</span> <span class="n">_motor</span><span class="p">;</span> <span class="o">//</span> <span class="n">using</span> <span class="n">pointer</span> <span class="n">to</span> <span class="n">the</span> <span class="n">base</span> <span class="k">class</span><span class="w"> </span><span class="nc">so</span> <span class="n">we</span> <span class="n">can</span> <span class="n">use</span> <span class="nb">any</span> <span class="n">motor</span> <span class="nb">type</span><span class="o">.</span>
+<span class="n">JointData</span><span class="o">*</span> <span class="n">_joint_data</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>To get the address of a varilable, you can use “&amp;” in front of the variable.</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">age</span> <span class="o">=</span> <span class="mi">34</span><span class="p">;</span>
+
+<span class="nb">int</span><span class="o">*</span> <span class="n">pointer</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">age</span><span class="p">;</span>
+
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">pointer</span><span class="p">;</span> <span class="o">//</span><span class="n">outputs</span> <span class="n">the</span> <span class="n">address</span> <span class="n">stored</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">pointer</span>
+</pre></div>
+</div>
+<p>You can also do the opposite and get the value of a variable from it’s memory address through a technique called dereferencing.</p>
+<p><strong>Syntax:</strong> *pointer</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">age</span> <span class="o">=</span> <span class="mi">34</span><span class="p">;</span>
+
+<span class="nb">int</span><span class="o">*</span> <span class="n">pointer</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">age</span><span class="p">;</span>
+
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">pointer</span><span class="p">;</span>            <span class="o">//</span><span class="n">Outputs</span> <span class="n">the</span> <span class="n">address</span> <span class="n">stored</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">pointer</span>
+
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">pointer</span><span class="p">;</span>   <span class="o">//</span><span class="n">Outputs</span> <span class="n">the</span> <span class="n">value</span> <span class="n">of</span> <span class="n">the</span> <span class="n">variable</span> <span class="n">at</span> <span class="n">the</span> <span class="n">location</span> <span class="n">given</span> <span class="n">by</span> <span class="n">the</span> <span class="n">pointer</span> <span class="p">(</span><span class="n">aka</span> <span class="n">age</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Within the code you may run into “-&gt;”. This is used with pointers and is equivalent to using “object.attribute” within classes.</p>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">is_left</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">_side_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">left_side</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+    <span class="n">_side_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">right_side</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="function-pointers">
+<h4>Function Pointers<a class="headerlink" href="#function-pointers" title="Link to this heading">¶</a></h4>
+<p>Function pointers are similar to regular pointers except that they store the address to functions rather than variables. These can be used to call a function indirectly.</p>
+<p><strong>Syntax:</strong> type (*function_pointer)(argument);</p>
+<p>These can also be initialized via the following synatx: type (*function_pointer)(argument){&amp;function};</p>
+<p><strong>ex.</strong> Simple Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">multiply</span><span class="p">(</span><span class="nb">int</span> <span class="n">x</span><span class="p">,</span> <span class="nb">int</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nb">int</span> <span class="p">(</span><span class="o">*</span><span class="n">Function_Pointer</span><span class="p">)(</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">);</span>           <span class="o">//</span><span class="n">Declares</span> <span class="n">function</span> <span class="n">pointer</span>
+    <span class="n">Function_Pointer</span> <span class="o">=</span> <span class="n">multiply</span><span class="p">;</span>                <span class="o">//</span><span class="n">Points</span> <span class="n">to</span> <span class="n">the</span> <span class="n">function</span>
+    <span class="nb">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">Function_Pointer</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>         <span class="o">//</span><span class="n">Uses</span> <span class="n">the</span> <span class="n">function</span> <span class="n">pointer</span> <span class="n">to</span> <span class="n">call</span> <span class="n">a</span> <span class="n">function</span> <span class="n">indirectly</span>
+    <span class="nb">int</span> <span class="n">result2</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">Function_Pointer</span><span class="p">)(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>     <span class="o">//</span><span class="n">Another</span> <span class="n">way</span> <span class="n">to</span> <span class="n">use</span> <span class="n">the</span> <span class="n">function</span> <span class="n">pointer</span> <span class="n">to</span> <span class="n">call</span> <span class="n">a</span> <span class="n">function</span> <span class="n">indirectly</span> <span class="p">(</span><span class="n">will</span> <span class="n">output</span> <span class="n">the</span> <span class="n">same</span> <span class="n">result</span> <span class="k">as</span> <span class="n">above</span><span class="p">)</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">result</span><span class="p">;</span>                             <span class="o">//</span><span class="n">Outputs</span> <span class="n">the</span> <span class="n">result</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/ExoData.h">ExoData.h</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Type</span> <span class="n">used</span> <span class="k">for</span> <span class="n">the</span> <span class="k">for</span> <span class="n">each</span> <span class="n">joint</span> <span class="n">method</span><span class="p">,</span> <span class="n">the</span> <span class="n">function</span> <span class="n">should</span> <span class="n">take</span> <span class="n">JointData</span> <span class="k">as</span> <span class="nb">input</span> <span class="ow">and</span> <span class="k">return</span> <span class="n">void</span>
+<span class="n">typedef</span> <span class="n">void</span> <span class="p">(</span><span class="o">*</span><span class="n">for_each_joint_function_t</span><span class="p">)</span> <span class="p">(</span><span class="n">JointData</span><span class="o">*</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>One other useful feature of function pointers is that they can be used as an argument to another function.</p>
+</section>
+</section>
+<section id="h-vs-cpp-files">
+<h3>.h vs .cpp files<a class="headerlink" href="#h-vs-cpp-files" title="Link to this heading">¶</a></h3>
+<p>You may notice two files with the same name but different extensions, one .h and one .cpp. The .h file is known as a <a class="reference external" href="https://www.learncpp.com/cpp-tutorial/header-files/">header file</a> and is a place where you declare different items you want to use in a different file. If you look at the top of the Arduino code <a class="reference external" href="/ExoCode/ExoCode.ino">ExoCode.ino</a> you will see includes like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &quot;src\ExoData.h&quot;</span>
+</pre></div>
+</div>
+<p>This tells the code that you want to use the stuff that is declared in that file, this example file declares a class called ExoData that we use to store data.</p>
+<p>I have said declare a bunch of times now but it may be unclear what that means. A “declaration” tells the compiler that puts everything together for the processor what things are available and how they are called, but nothing about what they do. In our example we have a class named ExoData which contains some other stuff, like the classes, functions, and variables we already discussed. Within this class there is a member function <code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">reconfigure(uint8_t*</span> <span class="pre">config_to_send);</span></code>, so the complier knows that we can call reconfigure if we give it a uint8_t pointer and it won’t send anything back. What happens when we call it? The compiler doesn’t care at this point, it just wants to know that we can use it. Similarly there are some variables inside that we can also call, <code class="docutils literal notranslate"><span class="pre">bool</span> <span class="pre">estop;</span></code> is a Boolean that lets us know the status of the emergency stop button, but we can also store objects for other classes like <code class="docutils literal notranslate"><span class="pre">SideData</span> <span class="pre">left_side;</span></code>.</p>
+<p><strong>ExoData.h</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ExoData</span>
+<span class="p">{</span>
+    <span class="n">public</span><span class="p">:</span>
+        <span class="n">ExoData</span><span class="p">(</span><span class="n">uint8_t</span><span class="o">*</span> <span class="n">config_to_send</span><span class="p">);</span> <span class="o">//</span> <span class="n">constructor</span>
+        <span class="n">void</span> <span class="n">reconfigure</span><span class="p">(</span><span class="n">uint8_t</span><span class="o">*</span> <span class="n">config_to_send</span><span class="p">);</span>
+        <span class="n">void</span> <span class="n">for_each_joint</span><span class="p">(</span><span class="n">for_each_joint_function_t</span> <span class="n">function</span><span class="p">);</span>
+
+        <span class="n">uint16_t</span> <span class="n">status</span><span class="p">;</span>
+        <span class="nb">bool</span> <span class="n">sync_led_state</span><span class="p">;</span>
+        <span class="nb">bool</span> <span class="n">estop</span><span class="p">;</span>
+        <span class="nb">float</span> <span class="n">battery_value</span><span class="p">;</span> <span class="o">//</span> <span class="n">Could</span> <span class="n">be</span> <span class="n">Voltage</span> <span class="ow">or</span> <span class="n">SOC</span><span class="p">,</span> <span class="n">depending</span> <span class="n">on</span> <span class="n">the</span> <span class="n">battery</span> <span class="nb">type</span>
+        <span class="n">SideData</span> <span class="n">left_side</span><span class="p">;</span>
+        <span class="n">SideData</span> <span class="n">right_side</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>So when we want to actually say what values the variables have or what happens when we call the function we need to “define” them. This is where the .cpp file comes in. If we want to define what happens when we call reconfigure for an ExoData object we code it out</p>
+<p><strong>ExoData.cpp</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">void</span> <span class="n">ExoData</span><span class="p">::</span><span class="n">reconfigure</span><span class="p">(</span><span class="n">uint8_t</span><span class="o">*</span> <span class="n">config_to_send</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">left_side</span><span class="o">.</span><span class="n">reconfigure</span><span class="p">(</span><span class="n">config_to_send</span><span class="p">);</span>
+    <span class="n">right_side</span><span class="o">.</span><span class="n">reconfigure</span><span class="p">(</span><span class="n">config_to_send</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>So when we call reconfigure for the ExoData objects we call the reconfigure member functions for the left_side and right_side objects the class contains.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>This guide is designed to provide background information on OpenExo’s software. This system is designed to be flexible, where the system can be easily adapted to the user’s needs, changing the motors used, number of joints, etc.</p>
+<section id="code-location">
+<h3>Code Location<a class="headerlink" href="#code-location" title="Link to this heading">¶</a></h3>
+<p>If you are reading this you have found the location, but for completeness it can be found at: <a class="reference external" href="https://github.com/naubiomech/ExoCode/tree/nano_teensy_board">https://github.com/naubiomech/ExoCode/tree/nano_teensy_board</a>.</p>
+</section>
+<section id="style-guide">
+<h3>Style Guide<a class="headerlink" href="#style-guide" title="Link to this heading">¶</a></h3>
+<p>The detailed style guide can be found <a class="reference external" href="StyleGuide.rst">here</a>.</p>
+</section>
+<section id="system-structure">
+<h3>System Structure<a class="headerlink" href="#system-structure" title="Link to this heading">¶</a></h3>
+<figure class="align-center">
+<a class="reference internal image-reference" href="_images/CodeDiagram.png"><img alt="Diagram" src="_images/CodeDiagram.png" style="width: 800px;" />
+</a>
+</figure>
+<p>Details of the components can be found in <a class="reference external" href="/Presentations/">/Presentations/20220914_Pridham_NewCodeBase.pptx</a> Note: At the time of the presentaiton the terminology “Leg/LegData” was used instead of “Side/SideData” and communication between the boards occured via SPI instead of UART. The functionality and structure is the same, but to avoid confusion we wanted to specify.</p>
+</section>
+<section id="how-to-deploy">
+<h3>How to Deploy<a class="headerlink" href="#how-to-deploy" title="Link to this heading">¶</a></h3>
+<div class="line-block">
+<div class="line">First, you will need to connect the physical components. 1. Mount the motors on the system as appropriate.</div>
+<div class="line">2. Connect the power and communication cables to the control board. - The connectors should attach to the side they are on while worn, e.g. the left motor connects to the left side of the board. - The connections top to bottom should be the proximal to distal joints used, e.g. if the hip and ankle are used the hip should be the top most location, the ankle should be next; if just the ankle is used it should be on the top most connector of the appropriate type. 3. Similarly, sensors should be connected on the side used 4. The control board may have multiple microcontrollers on it they should all be flashed with ExoCode.ino through the Arduino IDE. The compiler will select the correct parts of the code to use if you select the correct microcontroller.</div>
+<div class="line">- Update /ExoCode/src/Config.h BOARD_VERSION with the version number found on the control board before compiling. - Update the libraries. Move the files/folders in the <a class="reference external" href="/Libraries">Libraries Folder</a>. To your local Folder C:<a href="#id1"><span class="problematic" id="id2">:raw-latex:`\User`</span></a>\[USER]:raw-latex:<cite>Documents</cite><a href="#id3"><span class="problematic" id="id4">:raw-latex:`\Arduino`</span></a><a href="#id5"><span class="problematic" id="id6">:raw-latex:`\libraries`</span></a> or system equivalent. Details on the libraries that are used are used can be found in <a class="reference external" href="/Libraries/README.md">Libraries Folder</a>. - <a class="reference external" href="https://docs.google.com/document/d/1ToLq6Zqv58Q4YEmf4SzqJDKCTp52LUaKgYg5vNmHdaI/edit?usp=sharing">Arduino Instructions</a> 5. Lastly, is the SD card. - Transfer the content of the SD Card folder to the micro SD card. - Update the config.ini file - Change the board version - Change the Exo name - Go to the section for that name and confirm the settings match your system. - For the joints you are using, go to that folder and update the controllers you plan to use.</div>
+</div>
+<p>Those are the rough points. Detailed explanations can be found in the coming sections.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="high-level-functionality">
+<h2>High Level Functionality<a class="headerlink" href="#high-level-functionality" title="Link to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line">The system is broken into separate components that can be put together based on the system’s needs. Arduino is used to control these components.</div>
+<div class="line">There are two key classes, ExoData and Exo.</div>
+<div class="line">ExoData is used to store the data recorded by the system and the data used to control the system and should mirror the structure of Exo. The hierarchy is: - Exo/ExoData - StatusLed - SyncLed - FSRs - Side/SideData - Joint/JointData - TorqueSensor - Motor/MotorData - Controller/ControllerData</div>
+</div>
+<p>A subset of the firmware can run on a separate microcontroller, intended to handle Bluetooth communication and soft real-time functionality. The main microcontroller communicates with the communication microcontroller via UART. The hierarchy is: - ComsMCU/ExoData - ExoBLE/ExoData - BleParser</p>
+<p>More info can be found below in <a class="reference external" href="#code-structure">Code Structure</a>.</p>
+<p>The high level way the code runs is: 1. Read the configuration from the SD card 2. Create the exo_data object (static in main loop) 3. Create the exo object (static in main loop) 4. Read new messages and update exo_data 5. exo.run() which runs the subcomponents as well</p>
+<section id="code-structure">
+<h3>Code Structure<a class="headerlink" href="#code-structure" title="Link to this heading">¶</a></h3>
+<div class="line-block">
+<div class="line"><a class="reference external" href="Structure/Namespaces.md">Namespaces</a> are used in place of global variables.</div>
+<div class="line">They are used for items that need to be accessible by other parts of the code. They are used as little as possible to minimize the amount of dependencies as that makes the code less modular.</div>
+</div>
+<p><a class="reference external" href="Structure/ExoDataStructure.md">Data Structure</a></p>
+<p><a class="reference external" href="Structure/ExoStructure.md">Exo Structure</a></p>
+</section>
+<section id="guiding-principals">
+<h3>Guiding Principals<a class="headerlink" href="#guiding-principals" title="Link to this heading">¶</a></h3>
+<p>The guiding principals of the code is to make it adaptable and modular. There are still some shortcomings with how we achieved this due to the nature of the dual microcontroller system but overall it should work well. To this end we have utilized <a class="reference external" href="#abstract-classes">abstract classes</a> for things like the motors where we define an interface so if we need to add motors that work in a different way, e.g. CAN vs PWM, we don’t have to change the rest of the code just add the underlying private member functions. Additionally sensors do not need access to the ExoData object, we considered doing this for all IO but decided it didn’t make sense in all cases.</p>
+</section>
+<section id="operation">
+<h3>Operation<a class="headerlink" href="#operation" title="Link to this heading">¶</a></h3>
+<p>We have developed a Python GUI to aid in the operation of the device. More information on the Python GUI, and its operation, can be found [here] (/Python_GUI)</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="sd-card">
+<h2>SD Card<a class="headerlink" href="#sd-card" title="Link to this heading">¶</a></h2>
+<p>The files for the SD card can be found in the <a class="reference external" href="/SDCard/">SDCard</a> folder in the main directory. The contents of this file should be copied to the root of the SD card, e.g. when you open the SD Card you should see config.ini. The file contains the configuration file and the parameter files for the controllers. These parameter files are a temporary measure till the new app is running.</p>
+<section id="sd-configuration">
+<h3>SD Configuration<a class="headerlink" href="#sd-configuration" title="Link to this heading">¶</a></h3>
+<div class="line-block">
+<div class="line"><a class="reference external" href="/SDCard/config.ini">config.ini</a> is used to tell the code how they system is configured. The fields should all be less than 25 characters as that is limited by the size of the array that is parsing it. The file is broken into sections denoted by being in [ ], e.g. [Board], containing information related to the board.</div>
+<div class="line">This separates information that is related into groups. Within the section you have keys, these contain the information, e.g. version = 0.1. The key names shouldn’t be modified, version, as the parser is looking for the specific name but the value can be, 0.1.</div>
+</div>
+<p>We have some premade exoskeleton configurations you can choose from by putting their name in the Exo section. Just check to make sure the settings in that section match your system. If we are using a bilateral hip system we would set <code class="docutils literal notranslate"><span class="pre">[Exo]</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">bilateralHip</span></code>, then go to the section [bilateralHip] and check it matches the system we are using. - sides - are you using the left, right, or both sides. - hip, knee, ankle - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won’t use that joint). - gear ratio - sets the transmission ratio for the joint torque to the motor output torque. If the motor has a built in gearbox that should not appear here but rather be coded into the motor class in Motor.cpp. - default controller - is the controller the system starts with. - use torque sensor - flag to determine if you want to use a torque sensor with your joint (0 = no, 1 = yes) - flip motor dir - is if the direction of the motor values should be flipped. For example if we have two motors pointing in towards the hip and both rotate counter clockwise with a positive current one of them will need to be sent a negative current so they both rotate in the same direction on the body. - flip torque dir - flips the sign of the torque sensor on the selected side. This helps align the torque sensor reading to be in the same direction as the motor command to avoid PID issues. - flip angle dir - flips the sign of the angle sensor on the selected side. This helps align the angle sensor reading to be in the same direction as the motor command to avoid controller issues.</p>
+</section>
+<section id="sd-controller-parameters">
+<h3>SD Controller Parameters<a class="headerlink" href="#sd-controller-parameters" title="Link to this heading">¶</a></h3>
+<p>The parameters for each controller are stored in their corresponding joint folder. This way if both joints are using a zero torque controller but need different gains they can pull from different files. The files are comma separated value files, so there are commas between cells. The first cell in the <em>first</em> row contains the number of lines in the header, how many lines we need to get through to get to the parameters. The first cell in the <em>second</em> row contains the number of parameters to read. The rest of the header just contains useful info for the person, such as the parameter order. The first parameter row will be the default values, set 0. The nth parameter row is n-1 parameter set, e.g. parameter row 2 will be referenced as set 1.</p>
+<p>The order of the parameters should match how they appear in the parameter array which can be found in <a class="reference external" href="/ExoCode/src/ControllerData.h">ControllerData.h</a>. in the controller_defs namespace.</p>
+<p>These will be selected using the update controller field in the app where you set the joint, controller, and parameter set.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="sensors">
+<h2>Sensors<a class="headerlink" href="#sensors" title="Link to this heading">¶</a></h2>
+<p>Sensors do not have a shared interface (abstract class), although you could do this if you want. The sensors are designed to be stand alone so they do not need something like access to an ExoData object. With this they must be written so that they take in the information they need and return the info they need.</p>
+<p>For example for the FSR to calibrate over a period of time they need to take in a command to calibrate but also to return when the calibration is finished.</p>
+<section id="sensor-structure">
+<h3>Sensor Structure<a class="headerlink" href="#sensor-structure" title="Link to this heading">¶</a></h3>
+<p>The main thing the sensors will need is a constructor to setup the interface. For most of the sensors they are just analog sensors so they will need the analog pin that is used. For some sensors though you may need to define a communication protocol like SPI or I2C. With these other interfaces you will need to make sure not to create conflicts with other systems using that interface.</p>
+</section>
+<section id="adding-new-sensors">
+<h3>Adding New Sensors<a class="headerlink" href="#adding-new-sensors" title="Link to this heading">¶</a></h3>
+<p>Details can be found in <a class="reference external" href="AddingNew/AddingNewSensors.md">Adding New Sensors</a></p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="displays">
+<h2>Displays<a class="headerlink" href="#displays" title="Link to this heading">¶</a></h2>
+<p>There are currently two different options for displays, the status LED and the sync LED, used to display information to people or other systems. Currently we only use the Status LED, but we have developed and outlined the Sync LED for future research purposes.</p>
+<section id="status-led">
+<h3>Status LED<a class="headerlink" href="#status-led" title="Link to this heading">¶</a></h3>
+<p>The status LED is simply and RGB LED that displays different light patterns to let you know what is happening with the system. Details on what the different patterns mean can be found in <a class="reference external" href="/ExoCode/src/StatusLed.h">StatusLed.h</a> in the status_led_defs namespace. There is an instance of StatusLed in Exo which should be updated every run of exo using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">Update</span> <span class="n">status</span> <span class="n">LED</span>
+<span class="n">status_led</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">status</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Where the status value is defined in the status_defs::messages namespace in <a class="reference external" href="/ExoCode/src/StatusDefs.h">StatusDefs.h</a>, and is set in other areas of the code depending on what the current state is.</p>
+</section>
+<section id="sync-led">
+<h3>Sync LED<a class="headerlink" href="#sync-led" title="Link to this heading">¶</a></h3>
+<p>The sync LED can be used to synchronize the data recorded by the exoskeleton and other systems, primarily infrared based optical motion capture systems. The state of this LED must be included in the recorded data for this to work.</p>
+<div class="line-block">
+<div class="line">Essentially, the LEDs nominal state is either on or off, selectable using the sync default pin on the PCB.</div>
+<div class="line">When triggered it gives a long pulse, then gives short pulses till triggered again when it gives a long pulse again.</div>
+</div>
+<figure class="align-center">
+<a class="reference internal image-reference" href="_images/SyncPattern.png"><img alt="Sync LED pulse pattern" src="_images/SyncPattern.png" style="width: 600px;" />
+</a>
+</figure>
+<p>By aligning the long pulses in the data from the exo and the external system the time point of the data will match up. This can be done by identifying the long pulses, by finding the time between rising and falling edges, and the long pulses should be the only ones with the larger duration. Once identified the start pulse could be matched up, then the time can be scaled to make the end pulse match up. This way even if the sampling rates are different or the clocks are at different rates you can still match up the data. A tool for aligning can be found <a class="reference external" href="https://drive.google.com/file/d/1vgxFCoCukO2us4WSrcil_TI3fLCNSLNX/view?usp=sharing">here</a>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="actuators">
+<h2>Actuators<a class="headerlink" href="#actuators" title="Link to this heading">¶</a></h2>
+<p>Actuators are setup so that the system can add multiple types of motors and select the correct one for the system at startup. The Joint instance will use a pointer to a motor instance. This motor instance will be set based on what is in the config.ini file on the SD card. To be able to call any type of motor we need to have a common interface which will be described next.</p>
+<section id="actuator-structure">
+<h3>Actuator Structure<a class="headerlink" href="#actuator-structure" title="Link to this heading">¶</a></h3>
+<p>As with most of the system there is a parallel data structure that follows the system structure. MotorData details can be found in <a class="reference external" href="Structure/ExoDataStructure.md">Data Structure</a>, but contains state and configuration information.</p>
+<p>The motors should all inherit their interface from the <a class="reference external" href="#abstract-classes">abstract class</a> _Motor in <a class="reference external" href="/ExoCode/src/Motor.h">Motor.h</a>. This defines how other systems can call motors, that way the rest of the system doesn’t need to know what specific motor you are using as they all have the same calls. Within this you can then define what that call does for the specific motor/type. With the CAN motors they have a separate class that this type of motor inherits since they all work in much the same way but have some parameters that are different. You can see this in the Motor.h file as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">_CANMotor</span> <span class="p">:</span> <span class="n">public</span> <span class="n">_Motor</span>
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">AK60</span> <span class="p">:</span> <span class="n">public</span> <span class="n">_CANMotor</span>
+</pre></div>
+</div>
+<p>Where _CANMotor <a class="reference external" href="#inheritance">inherits</a> from _Motor and then the AK60 motor inherits from the _CANMotor class so it also gets the things that are in _Motor.</p>
+<p>We decided that the motors would always be used in torque control mode so transaction(torque) and send_data(torque), only take torque commands. If you need a position/velocity controller you will need to make this as a separate controller. This was done since most any motor will have access to torque controller, even if it is just driving current, but may not have other more advanced built in controllers.</p>
+</section>
+<section id="adding-new-actuators">
+<h3>Adding New Actuators<a class="headerlink" href="#adding-new-actuators" title="Link to this heading">¶</a></h3>
+<p>Details to adding a new motor type can be found in <a class="reference external" href="AddingNew/AddingNewMotorType.md">Adding New Motor Type</a>. Details on adding a new CAN motor can be found in <a class="reference external" href="AddingNew/AddingNewCanMotor.md">Adding New CAN Motor</a>. This is specifically for the TMotor CAN motors but can be adapted to new types of motors when we have them.</p>
+</section>
+<section id="t-motor-initialization">
+<h3>T-motor Initialization<a class="headerlink" href="#t-motor-initialization" title="Link to this heading">¶</a></h3>
+<p>TMotor initialization information can be found [here] (<a class="reference external" href="https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b_?usp=drive_link">https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b_?usp=drive_link</a>)</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="controllers">
+<h2>Controllers<a class="headerlink" href="#controllers" title="Link to this heading">¶</a></h2>
+<p>Much like the motor the controllers have a parallel ControllerData class to store data for the controller. ControllerData details can be found in <a class="reference external" href="Structure/ExoDataStructure.md">Data Structure</a>, but contains state and configuration information.</p>
+<p>The Joint instance uses a <a class="reference external" href="#pointers">pointer</a> to the controller that is currently being used. The main difference is that the Joint has an instance to all the possible controllers that will be used so we just need to point to the correct one. That is why the constructor to the a joint like the hip looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">HipJoint</span><span class="p">::</span><span class="n">HipJoint</span><span class="p">(</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="nb">id</span><span class="p">,</span> <span class="n">ExoData</span><span class="o">*</span> <span class="n">exo_data</span><span class="p">)</span>
+<span class="p">:</span> <span class="n">_Joint</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>  <span class="o">//</span> <span class="o">&lt;--</span> <span class="n">Initializer</span> <span class="nb">list</span>
+<span class="p">,</span> <span class="n">_zero_torque</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>
+<span class="p">,</span> <span class="n">_franks_collins_hip</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>
+<span class="p">,</span> <span class="n">_constant_torque</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>
+<span class="p">,</span> <span class="n">_chirp</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>
+<span class="p">,</span> <span class="n">_step</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>
+<span class="p">{</span>
+</pre></div>
+</div>
+<p>Where the constructor of each controller is called.</p>
+<p>The controllers also inherit their interface, like the motors, from the <a class="reference external" href="#abstract-classes">abstract class</a> _Controller in <a class="reference external" href="/ExoCode/src/Controller.h">Controller.h</a>. This defines how other systems can call controllers, that way the rest of the system doesn’t need to know what specific controller you are using as they all have the same calls. Within this you can then define what that call does for the specific controller.</p>
+<section id="controller-structure">
+<h3>Controller Structure<a class="headerlink" href="#controller-structure" title="Link to this heading">¶</a></h3>
+<p>The controllers have a primary call of calc_motor_cmd() that will calculate the torque command that will be sent to the motor.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">Calculate</span> <span class="n">the</span> <span class="n">motor</span> <span class="n">command</span>
+<span class="n">_joint_data</span><span class="o">-&gt;</span><span class="n">controller</span><span class="o">.</span><span class="n">setpoint</span> <span class="o">=</span> <span class="n">_controller</span><span class="o">-&gt;</span><span class="n">calc_motor_cmd</span><span class="p">();</span>
+<span class="n">_motor</span><span class="o">-&gt;</span><span class="n">transaction</span><span class="p">(</span><span class="n">_joint_data</span><span class="o">-&gt;</span><span class="n">controller</span><span class="o">.</span><span class="n">setpoint</span> <span class="o">/</span> <span class="n">_joint_data</span><span class="o">-&gt;</span><span class="n">motor</span><span class="o">.</span><span class="n">gearing</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Each controller can also have additionally private member functions that are called internally.</p>
+<p>The controllers will pull the parameters that they use from the ControllerData instance which can be accessed through the pointer in the controller using <code class="docutils literal notranslate"><span class="pre">_controller_data-&gt;parameters</span></code>. This is shared between all controllers so it is important to change to the “zero_torque” controller prior to moving to a new controller. The order of operations are: 1. Change to zero torque controller, commands the motor to 0 current and uses no parameters so it is safe when making big changes to parameters. 2. Change parameters so they are what you want for the new controller. 3. Change the controller pointer to use the new controller. This way you don’t change a parameter for one controller to something like user mass when the current controller is interpreting that parameter as max torque. This should be handled in software so the user doesn’t need to think about it, but is good to be aware of.</p>
+</section>
+<section id="adding-new-controllers">
+<h3>Adding New Controllers<a class="headerlink" href="#adding-new-controllers" title="Link to this heading">¶</a></h3>
+<p>Details can be found in <a class="reference external" href="AddingNew/AddingNewController.md">Adding New Controller</a>.</p>
+</section>
+<section id="controller-parameters">
+<h3>Controller Parameters<a class="headerlink" href="#controller-parameters" title="Link to this heading">¶</a></h3>
+<p>The controller parameters are dependent on what controller is being used but a description of the parameters for each controller can be found below.</p>
+<section id="hip">
+<h4>Hip<a class="headerlink" href="#hip" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="Controllers/ZeroTorque.md">Zero Torque</a></p></li>
+<li><p><a class="reference external" href="Controllers/Hip/FranksCollinsHip.md">Franks Collins Hip</a></p></li>
+<li><p>[Constant Torque] (Controllers/ConstantTorque.md)</p></li>
+<li><p>[Chirp] (Controllers/Chirp.md)</p></li>
+<li><p>[Step] (Controllers/Step.md)</p></li>
+<li><p>[Calibration Manager] (Controllers/CalbrManager.md)</p></li>
+</ul>
+</section>
+<section id="knee">
+<h4>Knee<a class="headerlink" href="#knee" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="Controllers/ZeroTorque.md">Zero Torque</a></p></li>
+<li><p>[Constant Torque] (Controllers/ConstantTorque.md)</p></li>
+<li><p>[Chirp] (Controllers/Chirp.md)</p></li>
+<li><p>[Step] (Controllers/Step.md)</p></li>
+<li><p>[Calibration Manager] (Controllers/CalbrManager.md)</p></li>
+</ul>
+</section>
+<section id="ankle">
+<h4>Ankle<a class="headerlink" href="#ankle" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="Controllers/ZeroTorque.md">Zero Torque</a></p></li>
+<li><p>[Constant Torque] (Controllers/ConstantTorque.md)</p></li>
+<li><p>[Chirp] (Controllers/Chirp.md)</p></li>
+<li><p>[Step] (Controllers/Step.md)</p></li>
+<li><p>[Calibration Manager] (Controllers/CalbrManager.md)</p></li>
+<li><p><a class="reference external" href="Controllers/Ankle/ProportionalJointMoment.md">Proportional Joint Moment</a></p></li>
+<li><p><a class="reference external" href="Controllers/Ankle/ZhangCollins.md">Zhang Collins</a></p></li>
+</ul>
+</section>
+<section id="elbow">
+<h4>Elbow<a class="headerlink" href="#elbow" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="Controllers/ZeroTorque.md">Zero Torque</a></p></li>
+<li><p><a class="reference external" href="Controllers/Elbow/ElbowMinMax.md">Elbow Min Max</a></p></li>
+<li><p>[Constant Torque] (Controllers/ConstantTorque.md)</p></li>
+<li><p>[Chirp] (Controllers/Chirp.md)</p></li>
+<li><p>[Step] (Controllers/Step.md)</p></li>
+<li><p>[Calibration Manager] (Controllers/CalbrManager.md)</p></li>
+</ul>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="bluetooth">
+<h2>Bluetooth<a class="headerlink" href="#bluetooth" title="Link to this heading">¶</a></h2>
+<p>The system uses Bluetooth Low Energy (BLE) to communicate with a graphical user interface (GUI). For an introduction to BLE, <a class="reference external" href="https://learn.adafruit.com/introduction-to-bluetooth-low-energy">see</a>.</p>
+<section id="bluetooth-background">
+<h3>Bluetooth Background<a class="headerlink" href="#bluetooth-background" title="Link to this heading">¶</a></h3>
+<p>The Exosekeleton uses Norduc’s UART Service (NUS) to communicate with the GUI. This service has RX and TX characteristics mimicking UART. In order for the app to connect with the Exoskeleton it’s name must begin with “EXOBLE_” and advertise the NUS. When a trial is started the device will begin transmitting a subset of the ExoData struct.</p>
+</section>
+<section id="bluetooth-structure">
+<h3>Bluetooth Structure<a class="headerlink" href="#bluetooth-structure" title="Link to this heading">¶</a></h3>
+<p>The CommsMCU class is the highest class in the Communications firmware heirarchy. It contains the battery object, and the ExoBLE object. This class manages the bluetooth connection and data. The class can also performs battery sampling, however at this time we have opted not to do this via that app to save space/cost on the PCB. The battery level can be monitored manually during operation. The ExoBLE class handles all bluetooth work. This includes initialization, advertising, connection, and data transfer. The BleParser class is used to serialize and deserialize the BLE data. The application uses Nordic’s UART service to pass all of the data. Therefore, the command-data pairs must be packaged together and unpackaged on the peripheral and central. There are several variables in config.h that control the timing of data transmission.</p>
+</section>
+<section id="sending-a-message">
+<h3>Sending a Message<a class="headerlink" href="#sending-a-message" title="Link to this heading">¶</a></h3>
+<p>If you would like to add a new message, see the “AddingNewBLEMessage” doc. The messages are all created in the ble_commands.h file. ble_commands.h also defines the functions that are called when a command is received. To send a new message you must package a BleMessage object with your desired command and data. The data must be packaged correctly, both in length and index. Currently there is no method to ensure the correct index is used for a specific command, but the length of the commands can be found in the ble namespace. Here is an example message (Sending messages must be done in the ComsMCU):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BleMessage</span> <span class="n">batt_msg</span> <span class="o">=</span> <span class="n">BleMessage</span><span class="p">();</span>
+<span class="n">batt_msg</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="n">ble_names</span><span class="p">::</span><span class="n">send_batt</span><span class="p">;</span>
+<span class="n">batt_msg</span><span class="o">.</span><span class="n">expecting</span> <span class="o">=</span> <span class="n">ble_command_helpers</span><span class="p">::</span><span class="n">get_length_for_command</span><span class="p">(</span><span class="n">batt_msg</span><span class="o">.</span><span class="n">command</span><span class="p">);</span>
+<span class="n">batt_msg</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_data</span><span class="o">-&gt;</span><span class="n">battery_value</span><span class="p">;</span>
+<span class="n">_exo_ble</span><span class="o">-&gt;</span><span class="n">send_message</span><span class="p">(</span><span class="n">batt_msg</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="debug">
+<h2>Debug<a class="headerlink" href="#debug" title="Link to this heading">¶</a></h2>
+<p>In the top of many of the files you will see a define for debugging like <code class="docutils literal notranslate"><span class="pre">#define</span> <span class="pre">EXO_DEBUG</span> <span class="pre">1</span></code>. When this is present debug statements will print if they are in an <code class="docutils literal notranslate"><span class="pre">#ifdef</span></code> like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#ifdef EXO_DEBUG</span>
+    <span class="n">logger</span><span class="p">::</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;Exo :: Constructor : _data set&quot;</span><span class="p">);</span>
+<span class="c1">#endif</span>
+</pre></div>
+</div>
+<p>This is because serial printing is a pretty slow process, so you only want to do it if you are actively using it. So if you are adding a print statement you should wrap it in an <code class="docutils literal notranslate"><span class="pre">#ifdef</span></code> for that file.</p>
+<p>The reason we do it file by file rather than printing everything is because it allows you to focus in on the area you are working on. Even within this you may still want to comment out some of the prints within the file to really focus on the area you are using.</p>
+<p>You will also notice several “logger” print statments throughout the code. If you wish to print these, you need to switch the loglevel in the logging namespace in <a class="reference external" href="/ExoCode/src/Config.h">Config.h</a> from “Release” to “Debug”. When not troubleshooting the device, make sure the logger is set to “Release” in order to most efficiently operate the system.</p>
+</section>
+<hr class="docutils" />
+<section id="adding-new">
+<h2>Adding New<a class="headerlink" href="#adding-new" title="Link to this heading">¶</a></h2>
+<p>This section links to how to add new elements not covered by other sections</p>
+<section id="adding-new-board">
+<h3>Adding New Board<a class="headerlink" href="#adding-new-board" title="Link to this heading">¶</a></h3>
+<p>Details can be found in <a class="reference external" href="AddingNew/AddingNewBoard.md">Adding New Board</a>.</p>
+<p>This would be done if you are creating a new PCB which may have moved what pins are connected where, or uses new sensors or motor types</p>
+</section>
+<section id="adding-new-microcontroller">
+<h3>Adding New Microcontroller<a class="headerlink" href="#adding-new-microcontroller" title="Link to this heading">¶</a></h3>
+<p>Details can be found in <a class="reference external" href="AddingNew/AddingNewMicroontroller.md">Adding New microcontroller</a>.</p>
+<p>This would be done if you are changing the type of microcontroller is being used.</p>
+</section>
+<section id="adding-new-item-to-config">
+<h3>Adding New Item To Config<a class="headerlink" href="#adding-new-item-to-config" title="Link to this heading">¶</a></h3>
+<p>Details can be found in <a class="reference external" href="AddingNew/AddingNewItemToConfig.md">Adding New Controller</a>.</p>
+<p>This would be done if new features need to be configured.</p>
+</section>
+<section id="adding-new-joint">
+<h3>Adding New Joint<a class="headerlink" href="#adding-new-joint" title="Link to this heading">¶</a></h3>
+<p>Details can be found in <a class="reference external" href="#adding-new-joint">Adding New Joint</a> (AddingNew/AddingNewJoint.md)</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading">¶</a></h2>
+<section id="arduino-resources">
+<h3>Arduino Resources<a class="headerlink" href="#arduino-resources" title="Link to this heading">¶</a></h3>
+<p><a class="reference external" href="https://docs.google.com/document/d/1ToLq6Zqv58Q4YEmf4SzqJDKCTp52LUaKgYg5vNmHdaI/edit?usp=sharing">Arduino Instructions</a></p>
+</section>
+<section id="c-resources">
+<h3>C++ Resources<a class="headerlink" href="#c-resources" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.tutorialspoint.com/cplusplus/index.htm">tutorialspoint</a></p></li>
+<li><p><a class="reference external" href="https://www.w3schools.com/cpp/default.asp">w3schools</a></p></li>
+</ul>
+</section>
+<section id="bluetooth-resources">
+<h3>Bluetooth Resources<a class="headerlink" href="#bluetooth-resources" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://learn.adafruit.com/introduction-to-bluetooth-low-energy">Adafruit guide</a></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="known-issues">
+<h2>Known Issues<a class="headerlink" href="#known-issues" title="Link to this heading">¶</a></h2>
+<section id="println">
+<h3>Println()<a class="headerlink" href="#println" title="Link to this heading">¶</a></h3>
+<p>There has been a reoccuring issue within the codebase when using Serial.println(). For some reason this can casue the code to crash at runtime. However, using Serial.print(“<a href="#id7"><span class="problematic" id="id8">:raw-latex:`\n`</span></a>”) works just fine.</p>
+<p>When utilizing an Arduino Nano BLE rev2, you need to download an additional library “Arduino_BMI270_BMM150.h” directly into Arduino for the code to work.</p>
+<p>The FSR regression equation for Ankle Control alters accuracy of percent gait estimate which disrupts timing of franksCollinsHip Control when in bilateral operation. Future work will handle FSRs slightly differently to allow for better control.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+        <div id="show_right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents</span></a></p>
+        </div>
+
+        <div id="right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
+            <div class="page_toc">
+                <ul>
+<li><a class="reference internal" href="#">User Guide</a><ul>
+<li><a class="reference internal" href="#outline">Outline</a></li>
+<li><a class="reference internal" href="#background">Background</a><ul>
+<li><a class="reference internal" href="#bits-and-bytes">Bits and Bytes</a><ul>
+<li><a class="reference internal" href="#bitwise-operators">Bitwise Operators</a></li>
+<li><a class="reference internal" href="#bit-shifting">Bit Shifting</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#addresses">Addresses</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+<li><a class="reference internal" href="#types">Types</a><ul>
+<li><a class="reference internal" href="#bool">Bool</a><ul>
+<li><a class="reference internal" href="#logical-operators">Logical Operators</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#char">Char</a></li>
+<li><a class="reference internal" href="#int">Int</a></li>
+<li><a class="reference internal" href="#float">Float</a></li>
+<li><a class="reference internal" href="#double">Double</a></li>
+<li><a class="reference internal" href="#arrays">Arrays</a></li>
+<li><a class="reference internal" href="#void">Void</a></li>
+<li><a class="reference internal" href="#typecasting">Typecasting</a></li>
+<li><a class="reference internal" href="#modifiers">Modifiers</a><ul>
+<li><a class="reference internal" href="#signed-vs-unsigned">Signed vs Unsigned</a></li>
+<li><a class="reference internal" href="#long-and-short">Long and Short</a></li>
+<li><a class="reference internal" href="#static">Static</a></li>
+<li><a class="reference internal" href="#volatile">Volatile</a></li>
+<li><a class="reference internal" href="#extern">Extern</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conditions">Conditions</a><ul>
+<li><a class="reference internal" href="#if-else-statments">If-Else Statments</a></li>
+<li><a class="reference internal" href="#switch-statements">Switch Statements</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#overloading">Overloading</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
+<li><a class="reference internal" href="#constructor">Constructor</a></li>
+<li><a class="reference internal" href="#inheritance">Inheritance</a></li>
+<li><a class="reference internal" href="#friend-classes">Friend Classes</a></li>
+<li><a class="reference internal" href="#abstract-classes">Abstract Classes</a></li>
+<li><a class="reference internal" href="#initializer-list">Initializer List</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pointers">Pointers</a><ul>
+<li><a class="reference internal" href="#function-pointers">Function Pointers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#h-vs-cpp-files">.h vs .cpp files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#code-location">Code Location</a></li>
+<li><a class="reference internal" href="#style-guide">Style Guide</a></li>
+<li><a class="reference internal" href="#system-structure">System Structure</a></li>
+<li><a class="reference internal" href="#how-to-deploy">How to Deploy</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#high-level-functionality">High Level Functionality</a><ul>
+<li><a class="reference internal" href="#code-structure">Code Structure</a></li>
+<li><a class="reference internal" href="#guiding-principals">Guiding Principals</a></li>
+<li><a class="reference internal" href="#operation">Operation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sd-card">SD Card</a><ul>
+<li><a class="reference internal" href="#sd-configuration">SD Configuration</a></li>
+<li><a class="reference internal" href="#sd-controller-parameters">SD Controller Parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sensors">Sensors</a><ul>
+<li><a class="reference internal" href="#sensor-structure">Sensor Structure</a></li>
+<li><a class="reference internal" href="#adding-new-sensors">Adding New Sensors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#displays">Displays</a><ul>
+<li><a class="reference internal" href="#status-led">Status LED</a></li>
+<li><a class="reference internal" href="#sync-led">Sync LED</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#actuators">Actuators</a><ul>
+<li><a class="reference internal" href="#actuator-structure">Actuator Structure</a></li>
+<li><a class="reference internal" href="#adding-new-actuators">Adding New Actuators</a></li>
+<li><a class="reference internal" href="#t-motor-initialization">T-motor Initialization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#controllers">Controllers</a><ul>
+<li><a class="reference internal" href="#controller-structure">Controller Structure</a></li>
+<li><a class="reference internal" href="#adding-new-controllers">Adding New Controllers</a></li>
+<li><a class="reference internal" href="#controller-parameters">Controller Parameters</a><ul>
+<li><a class="reference internal" href="#hip">Hip</a></li>
+<li><a class="reference internal" href="#knee">Knee</a></li>
+<li><a class="reference internal" href="#ankle">Ankle</a></li>
+<li><a class="reference internal" href="#elbow">Elbow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bluetooth">Bluetooth</a><ul>
+<li><a class="reference internal" href="#bluetooth-background">Bluetooth Background</a></li>
+<li><a class="reference internal" href="#bluetooth-structure">Bluetooth Structure</a></li>
+<li><a class="reference internal" href="#sending-a-message">Sending a Message</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#debug">Debug</a></li>
+<li><a class="reference internal" href="#adding-new">Adding New</a><ul>
+<li><a class="reference internal" href="#adding-new-board">Adding New Board</a></li>
+<li><a class="reference internal" href="#adding-new-microcontroller">Adding New Microcontroller</a></li>
+<li><a class="reference internal" href="#adding-new-item-to-config">Adding New Item To Config</a></li>
+<li><a class="reference internal" href="#adding-new-joint">Adding New Joint</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#resources">Resources</a><ul>
+<li><a class="reference internal" href="#arduino-resources">Arduino Resources</a></li>
+<li><a class="reference internal" href="#c-resources">C++ Resources</a></li>
+<li><a class="reference internal" href="#bluetooth-resources">Bluetooth Resources</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#known-issues">Known Issues</a><ul>
+<li><a class="reference internal" href="#println">Println()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+        </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+                <a href="introduction.html">
+                    <span class="icon">&lt;</span><span>Introduction</span></a>
+                
+            </div>
+
+            <div class="right">
+                
+                    <a href="installation.html"><span>Installation</span><span class="icon">&gt;</span></a>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Landon Coonrod, Jack Williams, and Prof. Zach Lerner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>

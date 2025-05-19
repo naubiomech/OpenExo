@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>OpenPythonAPI &#8212; OpenExo Documentation  documentation</title>
+    <title>OpenExo GUI &#8212; OpenExo Documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=0ac4fbd8" />
@@ -16,6 +16,7 @@
     <script src="_static/js/petite-vue.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Adding New Pages to OpenExo Documentation" href="AddingNewPages.html" />
     <link rel="prev" title="Zero Torque Controller" href="ZeroTorque.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
@@ -30,7 +31,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">OpenExo Documentation  documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">OpenExo</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -124,7 +125,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">OpenPythonAPI</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">OpenExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
 </ul>
 
         </div>
@@ -136,8 +138,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="openpythonapi">
-<h1>OpenPythonAPI<a class="headerlink" href="#openpythonapi" title="Link to this heading">¶</a></h1>
+  <section id="openexo-gui">
+<h1>OpenExo GUI<a class="headerlink" href="#openexo-gui" title="Link to this heading">¶</a></h1>
+<img alt="OpenSourceLeg Banner" class="align-center" src="_images/OpenexoGUI.png" />
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
 <p>This application runs on any system with Python 3.12 installed. Required libraries can be installed via pip.</p>
@@ -267,46 +270,41 @@
 </section>
 <section id="adding-a-new-frame">
 <h2>Adding a New Frame<a class="headerlink" href="#adding-a-new-frame" title="Link to this heading">¶</a></h2>
-<ol class="arabic">
-<li><p><strong>Create the frame class:</strong> Add a new file (e.g., <code class="docutils literal notranslate"><span class="pre">views/newFeature.py</span></code>):</p>
-<p>import tkinter as tk</p>
-<dl>
-<dt>class NewFeature(tk.Frame):</dt><dd><dl>
-<dt>def __init__(self, parent, controller):</dt><dd><p>super().__init__(parent)
-self.controller = controller</p>
-<p>label = tk.Label(self, text=”New Feature Frame”, font=(“Arial”, 24))
-label.pack(pady=20)</p>
-<dl class="simple">
-<dt>button = tk.Button(</dt><dd><p>self,
-text=”Go to Scan Window”,
-command=lambda: controller.show_frame(“ScanWindow”)</p>
-</dd>
-</dl>
-<p>)
-button.pack(pady=10)</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</li>
-<li><p><strong>Update the controller:</strong> In your main app file, import and register the new frame:</p>
-<p>from views.newFeature import NewFeature</p>
-<dl class="simple">
-<dt>for F in (ScanWindow, ActiveTrial, UpdateTorque, BioFeedback, MachineLearning, NewFeature):</dt><dd><p># existing frame setup</p>
-</dd>
-</dl>
-</li>
-<li><p><strong>Add navigation:</strong> Create a button in any frame to show the new feature:</p>
-<dl class="simple">
-<dt>button = tk.Button(</dt><dd><p>self,
-text=”Go to New Feature”,
-command=lambda: controller.show_frame(“NewFeature”)</p>
-</dd>
-</dl>
-<p>)
-button.pack(pady=10)</p>
-</li>
-</ol>
+<p>1. <strong>Create the frame class:</strong> Add a new file (e.g., <code class="docutils literal notranslate"><span class="pre">views/newFeature.py</span></code>)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tk</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">NewFeature</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">controller</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">controller</span>
+
+        <span class="n">label</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;New Feature Frame&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Arial&quot;</span><span class="p">,</span> <span class="mi">24</span><span class="p">))</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">pady</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+        <span class="n">button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Go to Scan Window&quot;</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">controller</span><span class="o">.</span><span class="n">show_frame</span><span class="p">(</span><span class="s2">&quot;ScanWindow&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">pady</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>2. <strong>Update the controller:</strong> In your main app file, import and register the new frame</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">views.newFeature</span><span class="w"> </span><span class="kn">import</span> <span class="n">NewFeature</span>
+
+<span class="k">for</span> <span class="n">F</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ScanWindow</span><span class="p">,</span> <span class="n">ActiveTrial</span><span class="p">,</span> <span class="n">UpdateTorque</span><span class="p">,</span> <span class="n">BioFeedback</span><span class="p">,</span> <span class="n">MachineLearning</span><span class="p">,</span> <span class="n">NewFeature</span><span class="p">):</span>
+    <span class="c1"># existing frame setup</span>
+</pre></div>
+</div>
+<p>3. <strong>Add navigation:</strong> Create a button in any frame to show the new feature</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Go to New Feature&quot;</span><span class="p">,</span>
+    <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">controller</span><span class="o">.</span><span class="n">show_frame</span><span class="p">(</span><span class="s2">&quot;NewFeature&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">pady</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 <section id="biofeedback-frame">
 <h2>Biofeedback Frame<a class="headerlink" href="#biofeedback-frame" title="Link to this heading">¶</a></h2>
@@ -368,7 +366,7 @@ button.pack(pady=10)</p>
             <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
             <div class="page_toc">
                 <ul>
-<li><a class="reference internal" href="#">OpenPythonAPI</a><ul>
+<li><a class="reference internal" href="#">OpenExo GUI</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#minimum-system-requirements">Minimum System Requirements</a></li>
 <li><a class="reference internal" href="#installation-guide">Installation Guide</a></li>
@@ -407,6 +405,8 @@ button.pack(pady=10)</p>
             </div>
 
             <div class="right">
+                
+                    <a href="AddingNewPages.html"><span>Adding New Pages to OpenExo Documentation</span><span class="icon">&gt;</span></a>
                 
             </div>
         </div>

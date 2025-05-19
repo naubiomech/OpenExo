@@ -1,5 +1,9 @@
-OpenPythonAPI
+OpenExo GUI
 =============
+
+.. image:: photos/OpenexoGUI.png
+   :alt: OpenSourceLeg Banner
+   :align: center
 
 Overview
 --------
@@ -137,8 +141,8 @@ Each plot subclass has an ``animate()`` method—modify it to change data sourci
 Adding a New Frame
 ------------------
 
-1. **Create the frame class:** Add a new file (e.g., ``views/newFeature.py``)::
-
+1. **Create the frame class:** Add a new file (e.g., ``views/newFeature.py``)
+::
    import tkinter as tk
 
    class NewFeature(tk.Frame):
@@ -156,14 +160,16 @@ Adding a New Frame
            )
            button.pack(pady=10)
 
-2. **Update the controller:** In your main app file, import and register the new frame::
+2. **Update the controller:** In your main app file, import and register the new frame
+::
 
    from views.newFeature import NewFeature
 
    for F in (ScanWindow, ActiveTrial, UpdateTorque, BioFeedback, MachineLearning, NewFeature):
        # existing frame setup
 
-3. **Add navigation:** Create a button in any frame to show the new feature::
+3. **Add navigation:** Create a button in any frame to show the new feature
+::
 
    button = tk.Button(
        self,

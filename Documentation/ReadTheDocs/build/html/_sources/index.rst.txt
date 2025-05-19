@@ -1,7 +1,7 @@
 Firmware and Software Documentation for OpenExo: An Open-Source Modular Exoskeleton to Augment Human Function
 ===================================================================================================================
 
-.. image:: 1042_exoskeleton_20250205.jpg
+.. image:: photos/1042_exoskeleton_20250205.jpg
    :alt: OpenSourceLeg Banner
    :align: center
 
@@ -73,3 +73,4 @@ For questions, issues, or further assistance, reach out to us at:
    addingelements
    controllers
    gui
+   AddingNewPages

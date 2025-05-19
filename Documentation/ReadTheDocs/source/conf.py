@@ -8,7 +8,7 @@ import piccolo_theme  # This import may help, but isn't strictly required.
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'OpenExo Documentation'
+project = "OpenExo"
 copyright = '2025, Landon Coonrod, Jack Williams, and Prof. Zach Lerner'
 author = 'By Landon Coonrod, Jack Williams, and Prof. Zach Lerner'
 
@@ -26,7 +26,8 @@ exclude_patterns = []
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-
+html_title       = "OpenExo Documentation"
+html_short_title = "OpenExo"
 html_theme = 'piccolo_theme'
 html_static_path = ['_static']
 html_css_files = [
@@ -34,4 +35,5 @@ html_css_files = [
 ]
 
 html_theme_options = {
+    "collapse_navigation": False,
 }

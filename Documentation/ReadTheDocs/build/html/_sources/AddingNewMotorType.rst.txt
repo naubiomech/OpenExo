@@ -46,5 +46,5 @@ Motor.cpp
 
 Connect to Everything Else
 ---------------------------
-1. Follow the steps in :doc:`AddingNewCanMotor <AddingNewCanMotor.rst>` to connect this new motor type to the rest of the codebase.
+1. Follow the steps in :doc:`AddingNewCanMotor <AddingNewCanMotor>` to connect this new motor type to the rest of the codebase.
    - This step is detailed in the referenced document so that you only need to update information in one place.
