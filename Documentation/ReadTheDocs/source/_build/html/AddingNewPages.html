@@ -127,11 +127,7 @@
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding New Pages to OpenExo Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding New Pages to OpenExo Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
 </ul>
@@ -156,33 +152,39 @@
 <li id="new-page"><p>Write your content below the title.</p></li>
 </ul>
 </li>
-<li><ul>
+<li><ul class="simple">
 <li><p>Open <cite>index.rst</cite> located in the same <cite>source/</cite> directory.</p></li>
 <li><p>Locate the <cite>.. toctree::</cite> directive (usually after the main title).</p></li>
-<li><p>Add an entry for your new file (without the <cite>.rst</cite> extension), for example:</p>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="BuildAndFlash.html">Build And Flash</a></li>
+<li><p>Add an entry for your new file (without the <cite>.rst</cite> extension), for example:</p></li>
 </ul>
-</li>
-</ul>
+<p>Add to your <em>index.rst</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">toctree</span><span class="p">::</span>
+   <span class="p">:</span><span class="n">maxdepth</span><span class="p">:</span> <span class="mi">2</span>
+   <span class="p">:</span><span class="n">caption</span><span class="p">:</span> <span class="n">Contents</span><span class="p">:</span>
+
+   <span class="n">introduction</span>
+   <span class="n">installation</span>
+   <span class="n">new_page</span>       <span class="o">&lt;--</span> <span class="n">add</span> <span class="n">this</span> <span class="n">line</span>
+   <span class="n">usage</span>
+</pre></div>
 </div>
-</li>
-</ul>
 </li>
 <li><ul class="simple">
 <li><p>If your new page requires additional Sphinx extensions, install them and add to the <cite>extensions</cite> list.</p></li>
 <li><p>For custom styling, you can adjust theme options or add CSS files under the <cite>_static</cite> folder and reference them via <cite>html_static_path</cite>.</p></li>
 </ul>
 </li>
-<li><p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>bash
-cd C:UserslandoDesktopLabFilesOpenExoDocumentationReadTheDocs
-make html
-# then open buildhtmlindex.html in your browser</p></li>
+<li></li>
 </ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\U</span>sers<span class="se">\u</span>ser<span class="se">\O</span>penExo<span class="se">\D</span>ocumentation<span class="se">\R</span>eadTheDocs
+make<span class="w"> </span>html
+start<span class="w"> </span>build<span class="se">\h</span>tml<span class="se">\i</span>ndex.html<span class="w">   </span><span class="c1"># open the docs in your browser</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>If everything looks correct, <strong>log into Read the Docs and click *Build* (or
+*Trigger Build*) to publish the updated documentation.</strong></p></li>
+</ul>
 </section>
 
 

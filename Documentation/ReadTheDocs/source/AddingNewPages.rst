@@ -21,6 +21,9 @@ This guide explains how to add new content pages to the Read the Docs site for t
    - Locate the `.. toctree::` directive (usually after the main title).
    - Add an entry for your new file (without the `.rst` extension), for example:
 
+   Add to your *index.rst*::
+
+
      .. toctree::
         :maxdepth: 2
         :caption: Contents:
@@ -37,7 +40,11 @@ This guide explains how to add new content pages to the Read the Docs site for t
 
 4. Build and preview locally
    ---------------------------
-   ```bash
-   cd C:\Users\lando\Desktop\LabFiles\OpenExo\Documentation\ReadTheDocs
+.. code-block:: bash
+
+   cd C:\Users\user\OpenExo\Documentation\ReadTheDocs
    make html
-   # then open build\html\index.html in your browser
+   start build\html\index.html   # open the docs in your browser
+
+- If everything looks correct, **log into Read the Docs and click *Build* (or
+  *Trigger Build*) to publish the updated documentation.**
