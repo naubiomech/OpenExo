@@ -455,11 +455,27 @@ namespace UART_command_handlers
 				rx_msg.data[8] = (exo_data->right_side.ankle.motor.maxon_pwm_delivered - 2048)/10;
 				rx_msg.data[9] = 9;
 				
-				rx_msg.data[5] = (exo_data->right_side.ankle.motor.maxon_pwm_delivered - 2048)/10;
+				//rx_msg.data[5] = (exo_data->right_side.ankle.motor.maxon_pwm_delivered - 2048)/10;
 				
-				rx_msg.data[3] = 10*map(exo_data->right_side.ankle.controller.candidate_eval,0,2047,0,300);
+				//rx_msg.data[3] = 10*map(exo_data->right_side.ankle.controller.candidate_eval,0,2047,0,300);
 				rx_msg.data[5] = exo_data->right_side.ankle.controller.candidate;
 				rx_msg.data[3] = exo_data->right_side.ankle.controller.candidate;
+				rx_msg.data[6] = local_scalar * exo_data->right_side.ankle.controller.SPV2_current_pwr * 0.001;
+				
+				rx_msg.data[3] = local_scalar * exo_data->right_side.ankle.controller.SPV2_currentAngle;
+				rx_msg.data[5] = local_scalar * exo_data->right_side.ankle.controller.SPV2_currentAngle;
+				
+				// rx_msg.data[0] = 0;
+				// rx_msg.data[1] = 1;
+				// rx_msg.data[2] = 2;
+				// rx_msg.data[3] = 3;
+				// rx_msg.data[4] = 4;
+				// rx_msg.data[5] = 5;
+				// rx_msg.data[6] = 6;
+				// rx_msg.data[7] = 7;
+				// rx_msg.data[8] = 8;
+				// rx_msg.data[9] = 9;
+
                 break;
 			}
 

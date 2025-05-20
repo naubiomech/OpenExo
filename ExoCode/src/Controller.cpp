@@ -2027,13 +2027,15 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 		_controller_data->SPV2_CF_output = _controller_data->SPV2_RMSE / (_controller_data->parameters[controller_defs::spv2::plantar_scaling] + 1);
 		//the above cost function output is tracking RMSE normalized by the nominal plantarflexion
 		
-		_controller_data->SPV2_CF_output = _controller_data->SPV2_CF_output * _controller_data->SPV2_newCurrent;
+		//_controller_data->SPV2_CF_output = _controller_data->SPV2_CF_output * _controller_data->SPV2_newCurrent;
+		_controller_data->SPV2_CF_output = _controller_data->SPV2_newCurrent;
 		Serial.print("\n----- CF: ");
 		Serial.print(_controller_data->SPV2_CF_output);
 		Serial.print(" -----");
 	}
 	else {
-		_controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + abs(analogRead(A1) - 2047);
+		// _controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + abs(analogRead(A1) - 2047);
+		_controller_data->SPV2_motor_current = _controller_data->SPV2_current_pwr;
 		_controller_data->SPV2_motor_current_count++;//number of frames (not number of steps)
 		
 		//calculation for the updated cost function. The goal for the updated cost function is to evaluate both the motor current and the tracking error.
@@ -2062,7 +2064,7 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 		
 		switch (_controller_data->do_adv_optimizer) {
 			case 2:
-			_SA_point_gen(20, minAngle, maxAngle, 10);
+			_SA_point_gen(30, minAngle, maxAngle, 1000);
 			_controller_data->SPV2_currentAngle = _controller_data->candidate;
 			break;
 			case -1://these numerical switch case values don't make much sense, will update afterward
@@ -2079,7 +2081,7 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 			Serial.print("\n Running golden loop 1");
 			break;			
 			default:
-			_SA_point_gen(20, minAngle, maxAngle, 10);
+			_SA_point_gen(30, minAngle, maxAngle, 1000);
 			_controller_data->SPV2_currentAngle = _controller_data->candidate;
 			_controller_data->do_adv_optimizer = 2;
 			//_controller_data->SPV2_currentAngle = _SA_point_gen(10, true, 60, 120);
@@ -2153,7 +2155,7 @@ void SPV2::optimizer_reset()
 	_controller_data->SPV2_motor_current = 0;
 	_controller_data->SPV2_motor_current_count = 0;
 	_controller_data->SPV2_oldCurrent = 0;
-	_controller_data->SPV2_newCurrent = 10000;
+	_controller_data->SPV2_newCurrent = 0;
 	
 	_controller_data->SPV2_error_sum = 0;
 	_controller_data->SPV2_error_count = 0;
@@ -2171,8 +2173,10 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 	// Serial.print(_controller_data->i_SA);
 	
 	if (_controller_data->i_SA == 1) {
-		randomSeed(analogRead(0));
-		_controller_data->curr = bound_l + random(0, 1) * (bound_u - bound_l);
+		randomSeed((micros())%(analogRead(20)*analogRead(0)));
+		float random_num_2 = random(1001);
+		float random_component_2 = ((random_num_2)/1000);
+		_controller_data->curr = bound_l + random_component_2 * (bound_u - bound_l);
 		_controller_data->candidate = _controller_data->curr;
 		_controller_data->best = _controller_data->curr;
 		//return best;//initial point
@@ -2180,6 +2184,7 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 
 	else {
 		if (_controller_data->i_SA == 2) {
+			//randomSeed((micros())%(analogRead(20)*analogRead(0)));
 			//_controller_data->curr_eval = _controller_data->SPV2_newCurrent;
 			_controller_data->curr_eval = _controller_data->SPV2_CF_output;
 			_controller_data->best_eval = _controller_data->curr_eval;
@@ -2203,11 +2208,14 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 		float diff = _controller_data->candidate_eval - _controller_data->curr_eval;
 		float t = temp / _controller_data->i_SA;
 		float metropolis = exp(-diff / t);
-		if ((diff < 0) || (random(0, 1)) < metropolis) {
+		//if ((diff < 0) || (random(0, 1)) < metropolis) { // Issue noticed: random(0,1) wouldn't work as expected because of its "long" variable type
+		float random_num_1 = random(1001);
+		float random_component_1 = ((random_num_1)/1000);
+		if ((diff < 0) || (random_component_1 < metropolis)) {
 			_controller_data->curr = _controller_data->candidate;
 			_controller_data->curr_eval = _controller_data->candidate_eval;
 		}
-		float random_num = random(1000);
+		float random_num = random(1001);
 		float random_component = ((random_num - 500)/1000)*(step_size);
 		//float random_component = ((static_cast<float>(random_num) - 500)/1000)*(step_size);
 		_controller_data->candidate = _controller_data->curr + random_component;
@@ -2219,7 +2227,7 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 		_controller_data->candidate = constrain(_controller_data->candidate, bound_l, bound_u);
 		
 		//Simulated Annealing debug
-		if (_controller_data->i_SA < 100000) {
+		/* if (_controller_data->i_SA < 100000) {
 			Serial.print("\n----i_SA: ");
 			Serial.print(_controller_data->i_SA);
 			Serial.print("  |  candidate: ");
@@ -2233,7 +2241,7 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 			Serial.print(_controller_data->best_eval);
 			
 			
-		}
+		} */
 	}
 	
 	
@@ -2243,28 +2251,49 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 
 float SPV2::calc_motor_cmd()
 {
-	if (!_controller_data->ps_connected) {
-		if (!ina260.begin()) {
-			Serial.println("Couldn't find INA260 chip");
-			while (1);
-		}
-		else {
-			_controller_data->ps_connected = true;
-		}
-	}
-	Serial.print("\nEpoch time: ");
-	float ps_current_time = micros();
-	Serial.print(ps_current_time-_controller_data->ps_old_time);
-	_controller_data->ps_old_time = ps_current_time;
-	Serial.print("  |  Power: ");
-	Serial.print(ina260.readPower());
-	Serial.println(" mW");
+
+	
 	
 	
 	if (_joint_data->is_left) {
 		return 0;
 	}
 	else {
+		
+		// Serial.print("\n  |  Right TRQ offset: ");
+		// Serial.print(_joint_data->torque_offset_reading);
+		
+		if (!_controller_data->ps_connected) {
+			if (!ina260.begin()) {
+				Serial.println("Couldn't find INA260 chip");
+				while (1);
+				//delay(10);
+			}
+			else {
+				_controller_data->ps_connected = true;
+			}
+		}
+		
+		// Serial.print("\nEpoch time: ");
+		// float ps_current_time = micros();
+		// Serial.print(ps_current_time-_controller_data->ps_old_time);
+		// _controller_data->ps_old_time = ps_current_time;
+		// Serial.print("  |  Power: ");
+		_controller_data->SPV2_current_pwr = ina260.readPower();
+		//Serial.print(ina260.readPower());
+		// Serial.print(_controller_data->SPV2_current_pwr);
+		// Serial.print(" mW");
+		// Serial.print("  |  Bus Voltage: ");
+		// Serial.print(ina260.readBusVoltage());
+		// Serial.println(" mV");
+		// Serial.print("  |  CustomRandom: ");
+		// Serial.print((micros())%(analogRead(20)*analogRead(0)));
+		// Serial.print("  |  Pin20: ");
+		// Serial.print(analogRead(20));
+		// Serial.print("  |  Pin0: ");
+		// Serial.print(analogRead(0));
+		
+		
 	//Calculate Generic Contribution
 	float plantar_setpoint = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
 	float dorsi_setpoint = _controller_data->parameters[controller_defs::spv2::dorsi_scaling];
@@ -2335,6 +2364,7 @@ float SPV2::calc_motor_cmd()
 	float servo_fsr_threshold = 0.01 * _controller_data->parameters[controller_defs::spv2::fsr_servo_threshold];
 	uint8_t servo_home = _controller_data->parameters[controller_defs::spv2::servo_origin];
 	uint8_t servo_target = _controller_data->parameters[controller_defs::spv2::servo_terminal];
+	bool optimizer_switch = _controller_data->parameters[controller_defs::spv2::do_update_stiffness];
 	bool SD_content_imported = (((servo_home == 0)&&(servo_target == 0)&&(servo_fsr_threshold == 0))?false: true);
 	
 	// servo_home = 40;
@@ -2413,14 +2443,14 @@ float SPV2::calc_motor_cmd()
 				}
 				
 				//Run Servo1
-				if (servo_switch) {
+				if (optimizer_switch) {
 					_step_counter(_controller_data->parameters[controller_defs::spv2::motor_current_calc_win], _side_data, _controller_data);
 					_calc_motor_current(_controller_data);
 					_stiffness_adjustment(_controller_data->parameters[controller_defs::spv2::min_angle], _controller_data->parameters[controller_defs::spv2::max_angle], _controller_data);
 					// Serial.print(" -- Another itr.");
 				}
 				else {
-					optimizer_reset();//make it a fresh start every time the servo switch is ON again
+					optimizer_reset();//make it a fresh start every time the optimizer switch is ON again
 				}
 				if (!_side_data->toe_stance) {
 					
@@ -2434,8 +2464,8 @@ float SPV2::calc_motor_cmd()
 						// Serial.print("\n\n----- OG x1 x2 pulled from SD -----\n\n");
 					}
 					
-					//Servo1 debugging
 					_servo1_runner(26, _controller_data->SPV2_currentAngle);
+					//Servo1 debugging
 					// Serial.print("\n----- currentAngle: ");
 					// Serial.print(_controller_data->SPV2_currentAngle);
 					
