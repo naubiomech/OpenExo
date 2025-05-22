@@ -195,7 +195,8 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t swing_assist_duration_idx = 3;            //Duration of Swing Phase Assistance (ms)
         const uint8_t max_torque_idx = 4;                       //Maximum Torque Limit (Nm)
         const uint8_t recalibrate_flag_idx = 5;                 //Flag to Recalibrate Normalized Moment (change value to recalibrate)
-        const uint8_t num_parameter = 6;
+        const uint8_t recalibrate_angle_idx = 6;
+        const uint8_t num_parameter = 7;
     }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
@@ -313,6 +314,13 @@ class ControllerData {
         float max_stance_moment;
         int recal_flag;
         int control_state;
+
+        float normalized_angle;
+        int recal_angle;
+        float maxAngle;
+        float minAngle;
+        int steps;
+        float sum_min;
 };      
 
 #endif

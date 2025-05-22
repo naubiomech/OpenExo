@@ -369,12 +369,12 @@ namespace UART_command_handlers
             rx_msg.data[1] = 0; 
             rx_msg.data[2] = exo_data->right_side.hip.controller.stance_moment;
             rx_msg.data[3] = exo_data->right_side.hip.controller.ff_setpoint;
-            rx_msg.data[4] = exo_data->right_side.hip.controller.max_stance_moment;
+            rx_msg.data[4] = 0; // exo_data->right_side.hip.controller.recal_angle;
             rx_msg.data[5] = 0;
-            rx_msg.data[6] = exo_data->right_side.toe_fsr;
-            rx_msg.data[7] = exo_data->right_side.heel_fsr;
-            rx_msg.data[8] = exo_data->right_side.hip.controller.encoder_angle;
-            rx_msg.data[9] = exo_data->right_side.hip.controller.min_stance_moment;
+            rx_msg.data[6] = exo_data->right_side.hip.controller.encoder_angle;
+            rx_msg.data[7] = exo_data->right_side.hip.imu_position; // controller.normalized_angle;
+            rx_msg.data[8] = exo_data->right_side.toe_fsr;
+            rx_msg.data[9] = exo_data->right_side.heel_fsr;
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_elbow:

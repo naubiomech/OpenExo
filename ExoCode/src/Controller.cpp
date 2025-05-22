@@ -1568,24 +1568,24 @@ float Step::calc_motor_cmd()
     //    _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, 1);
     //}
 
-    _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, (_controller_data->parameters[controller_defs::step::alpha_idx])/100);
+    //_controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, (_controller_data->parameters[controller_defs::step::alpha_idx])/100);
 
     _controller_data->ff_setpoint = cmd_ff;
 
     float cmd = cmd_ff;
 
-    if (_controller_data->parameters[controller_defs::step::pid_flag_idx] > 0)
-    {
-        cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::step::p_gain_idx], _controller_data->parameters[controller_defs::step::i_gain_idx], _controller_data->parameters[controller_defs::step::d_gain_idx]);
-    }
-    else
-    {
-        cmd = cmd_ff;
-    }
+    //if (_controller_data->parameters[controller_defs::step::pid_flag_idx] > 0)
+    //{
+    //    cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::step::p_gain_idx], _controller_data->parameters[controller_defs::step::i_gain_idx], _controller_data->parameters[controller_defs::step::d_gain_idx]);
+    //}
+    //else
+    //{
+    //    cmd = cmd_ff;
+    //}
 
     previous_command = cmd_ff;
 
-    previous_torque_reading = _controller_data->filtered_torque_reading;
+    //previous_torque_reading = _controller_data->filtered_torque_reading;
 
     uint16_t exo_status = _data->get_status();
     
@@ -2200,6 +2200,33 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     prev_toe_fsr = 0.0;
 
     state = 0;
+
+    normalized_angle = 0.0;
+    max_angle = -100.0;
+    min_angle = 100.0;
+    local_angle_max = - 100.0;
+    local_angle_min = 100.0;
+
+    recal_angle_flag = 0;
+    prev_recal_angle_flag = 0;
+    recal_angle_loop = 0;
+    ending_angle = 0;
+
+    prev_step = 0;
+    sum_max_angle = 0.0;
+    sum_min_angle = 0.0;
+    average_max_angle = 1.0;
+    average_min_angle = 1.0;
+
+    count = 0.0;
+
+    moment_count = 0.0;
+
+    sum_max = 0.0;
+    sum_min = 0.0;
+
+    starting_angle = 0;
+    starting_step = 0;
 }
 
 float AngleBased::calc_motor_cmd()
@@ -2211,6 +2238,7 @@ float AngleBased::calc_motor_cmd()
     double swing_assist_duration = _controller_data->parameters[controller_defs::angle_based::swing_assist_duration_idx];
     float max_torque = _controller_data->parameters[controller_defs::angle_based::max_torque_idx];
     int recalibrate_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_flag_idx];
+    int recal_angle_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_angle_idx];
 
     //Pull in FSR values (double check that Toe FSR, located in Side.h, is not drawing from the FSR_Regressed Function)
     float raw_heel_fsr = _side_data->heel_fsr;
@@ -2224,16 +2252,12 @@ float AngleBased::calc_motor_cmd()
     }
 
     //Handle the Angle Data
-    encoder_angle = _joint_data->position - encoder_offset; //Get the encoder angle from the motors and normalize if by the offset
+    encoder_angle = _joint_data->imu_position - encoder_offset; //Get the encoder angle from the motors and normalize if by the offset
     _controller_data->encoder_angle = encoder_angle;        //Store the offset angle for plotting
 
     //Calculate the Combined FSR value (Toe + Heel)
     combined_fsr = (raw_toe_fsr + raw_heel_fsr);            //Calculates value
     _controller_data->combined_fsr = combined_fsr;          //Stores the combined FSR term for plotting
-
-    //Calculate the Approximated Hip Moment 
-    stance_moment = encoder_angle*combined_fsr;             //Define Stance Moment as Encoder Angle * Combined Heel and Toe FSR                          
-    _controller_data->stance_moment = stance_moment;        //Store the Stance Moment Term for plotting
 
     //Increase step count for every time stance is detected
     if (_side_data->prev_toe_stance < _side_data->toe_stance)   //If we just entered stance
@@ -2241,23 +2265,143 @@ float AngleBased::calc_motor_cmd()
         steps++;                                                //Increase the step count by 1
     }
 
-    //Allow FSRs to scale 
+    //Calculate Average Min and Max from Seven Steps
     if (steps < 8)
     {
-        return 0;
+        if ((steps != 0 && steps == prev_step) && (_side_data->heel_stance || _side_data->toe_stance) && (encoder_angle > local_angle_max))
+        {
+            local_angle_max = encoder_angle;
+        }
+
+        if ((steps != 0 && steps == prev_step) && (_side_data->heel_stance || _side_data->toe_stance) && (encoder_angle < local_angle_min))
+        {
+            local_angle_min = encoder_angle;
+        }
+
+        if (steps != 0 && steps != 1 && steps != prev_step)
+        {
+            sum_max_angle += local_angle_max;
+            sum_min_angle += local_angle_min;
+            count = count + 1;
+            local_angle_max = -100.0;
+            local_angle_min = 100.0;
+
+            if (steps == 7)
+            {
+                max_angle = sum_max_angle / count;
+                min_angle = sum_min_angle / count;
+            }
+        }
+    }
+
+    //Calculate the Normalized Angle 
+    if (encoder_angle >= 0)
+    {
+        normalized_angle = encoder_angle / max_angle;
+    }
+    else
+    {
+        normalized_angle = -1 * encoder_angle / min_angle;
     }
     
-    //Find the max and min stance_moment for normalization
+    //_controller_data->maxAngle = max_angle;
+    //_controller_data->minAngle = min_angle;
+    _controller_data->normalized_angle = normalized_angle;
+
+    //Calculate the Approximated Hip Moment 
+    stance_moment = normalized_angle * combined_fsr;             //Define Stance Moment as Encoder Angle * Combined Heel and Toe FSR                          
+    _controller_data->stance_moment = stance_moment;        //Store the Stance Moment Term for plotting
+    
+    //Find the average max and min stance_moment values for normalization
     if (steps >= 8 && steps < 14)
     {
-        normalize_stance_moment();
+        if (steps == prev_step && (_side_data->heel_stance || _side_data->toe_stance) && (stance_moment > local_max))
+        {
+            local_max = stance_moment;
+        }
+
+        if (steps == prev_step && (_side_data->heel_stance || _side_data->toe_stance) && (stance_moment < local_min))
+        {
+            local_min = stance_moment;
+        }
+
+        if (steps != 8 && steps != prev_step)
+        {
+            sum_max += local_max;
+            sum_min += local_min;
+            moment_count = moment_count + 1;
+            local_max = -100.0;
+            local_min = 100.0;
+
+            if (steps == 13)
+            {
+                max_stance_moment = sum_max / moment_count;
+                min_stance_moment = sum_min / moment_count;
+            }
+        }
     }
+
+    _controller_data->recal_angle = recal_angle_flag;
+
+    if (recal_angle_flag != prev_recal_angle_flag)
+    {
+        recal_angle_loop = 1;
+        starting_angle = steps;
+        ending_angle = steps + 7;
+        sum_max_angle = 0.0;
+        sum_min_angle = 0.0;
+        count = 0.0;
+        local_angle_max = -100.0;
+        local_angle_min = 100.0;
+    }
+
+    if (recal_angle_loop == 1)
+    {
+        if (steps <= ending_angle)
+        {
+            if ((steps != starting_angle && steps == prev_step) && (_side_data->heel_stance || _side_data->toe_stance) && (encoder_angle > local_angle_max))
+            {
+                local_angle_max = encoder_angle;
+            }
+
+            if ((steps != starting_angle && steps == prev_step) && (_side_data->heel_stance || _side_data->toe_stance) && (encoder_angle < local_angle_min))
+            {
+                local_angle_min = encoder_angle;
+            }
+
+            if (steps != starting_angle && steps != (starting_angle + 1) && steps != prev_step)
+            {
+                sum_max_angle += local_angle_max;
+                sum_min_angle += local_angle_min;
+                count = count + 1;
+                local_angle_max = -100.0;
+                local_angle_min = 100.0;
+            }
+        }
+        else
+        {
+            max_angle = sum_max_angle / count;
+            min_angle = sum_min_angle / count;
+            local_angle_max = -100.0;
+            local_angle_min = 100.0;
+            recal_angle_loop = 0;
+        }
+    }
+
+    _controller_data->maxAngle = max_angle;
+    _controller_data->minAngle = min_angle;
 
     //If we want to recalibrate the normalized moment start the recalibration loop
     if (recalibrate_flag != prev_recalibrate_value)
     {
         recal_loop_flag = 1;
+        starting_step = steps;
         ending_step = steps + 7;
+        sum_max = 0.0;
+        sum_min = 0.0;
+        moment_count = 0;
+        local_max = -100.0;
+        local_min = 100.0;
     }
 
     //Recalibrate 
@@ -2265,27 +2409,36 @@ float AngleBased::calc_motor_cmd()
     {
         if (steps <= ending_step)
         {
-            if ((_side_data->heel_stance || _side_data->toe_stance) && (stance_moment > local_max))
+            if ((steps != starting_step && steps == prev_step) && (_side_data->heel_stance || _side_data->toe_stance) && (stance_moment > local_max))
             {
                 local_max = stance_moment;
             }
 
-            if ((_side_data->heel_stance || _side_data->toe_stance) && (stance_moment < local_min))
+            if ((steps != starting_step && steps == prev_step) && (_side_data->heel_stance || _side_data->toe_stance) && (stance_moment < local_min))
             {
                 local_min = stance_moment;
+            }
+
+            if ((steps != starting_step && steps != starting_step + 1) && steps != prev_step)
+            {
+                sum_max += local_max;
+                sum_min += local_min;
+                moment_count = moment_count + 1;
+                local_max = -100.0;
+                local_min = 100.0;
             }
         }
         else
         {
-            max_stance_moment = local_max;
-            min_stance_moment = local_min;
+            max_stance_moment = sum_max / moment_count;
+            min_stance_moment = sum_min / moment_count;
             local_max = -100.0;
             local_min = 100.0;
             recal_loop_flag = 0;
         }
     }
 
-    _controller_data->recal_flag = recal_loop_flag;
+    //_controller_data->recal_flag = recal_loop_flag;
 
     _controller_data->max_stance_moment = max_stance_moment;
     _controller_data->min_stance_moment = min_stance_moment;
@@ -2328,10 +2481,10 @@ float AngleBased::calc_motor_cmd()
     {
         cmd_ff = -1.0 * normalized_stance_moment * stance_extension_setpoint;     //Calculate the setpoint by multiplying the normalized_stance_moment (ranging from -1 to 1) by the user defined setpoint
 
-        if (recal_loop_flag == 1)
-        {
-            cmd_ff = cmd_ff * 2;
-        }
+        //if (recal_loop_flag == 1)
+        //{
+        //    cmd_ff = cmd_ff * 2;
+        //}
 
         startFlag = true;                                           //Reset the swing phase start flag when we are in stance 
     }
@@ -2340,10 +2493,10 @@ float AngleBased::calc_motor_cmd()
     {
         cmd_ff = -1.0 * normalized_stance_moment * stance_flexion_setpoint; //Calculate the setpoint by multiplying the normalized_stance_moment (ranging from -1 to 1) by the user defined setpoint
 
-        if (recal_loop_flag == 1)
-        {
-            cmd_ff = cmd_ff * 2;
-        }
+        //if (recal_loop_flag == 1)
+        //{
+        //    cmd_ff = cmd_ff * 2;
+        //}
 
         startFlag = true;                                           //Reset the swing phase start flag when we are in stance
     }
@@ -2380,13 +2533,17 @@ float AngleBased::calc_motor_cmd()
     _controller_data->ff_setpoint = cmd_ff;
     
     //Set the motor command to be equal to the feed-foward setpoint (Note: if doing closed-loop control, this is where you would do PID)
-    float cmd = cmd_ff;
+    float cmd = 0;// cmd_ff;
 
     //Store the current Toe FSR as the previous one for the next iteration. 
     prev_toe_fsr = raw_toe_fsr;
 
     //Store the current recalibrate flag value as the previous one for the next iteration. 
     prev_recalibrate_value = recalibrate_flag;
+
+    prev_recal_angle_flag = recal_angle_flag;
+
+    prev_step = steps;
 
     //Return the desired command to the motor
     return cmd;
@@ -2398,7 +2555,7 @@ void AngleBased::calibrate_encoders()
 
     for (int i = 0; i < 5; i++)
     {
-        sum_encoder_readings += _joint_data->position;
+        sum_encoder_readings += _joint_data->imu_position;
     }
 
     encoder_offset = sum_encoder_readings / 5.0;
@@ -2414,6 +2571,19 @@ void AngleBased::normalize_stance_moment()
     if ((_side_data->heel_stance || _side_data->toe_stance) && (stance_moment < min_stance_moment))
     {
         min_stance_moment = stance_moment;
+    }
+}
+
+void AngleBased::normalize_angle()
+{
+    if ((_side_data->heel_stance || _side_data->toe_stance) && (encoder_angle > max_angle))
+    {
+        max_angle = encoder_angle;
+    }
+
+    if ((_side_data->heel_stance || _side_data->toe_stance) && (encoder_angle < min_angle))
+    {
+        min_angle = encoder_angle;
     }
 }
 

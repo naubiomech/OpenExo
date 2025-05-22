@@ -162,6 +162,18 @@ class HipJoint : public _Joint
         Step _step;                                     /**< Step Controller for Device Characterization */
         ProportionalHipMoment _proportional_hip_moment; /**< Proportional Hip Moment Conroller */
         AngleBased _angle_based;                        /**< Angle Based controller */
+
+        int right_hip_nano = 8;                         //interger address for the hip nano relevant to the side the nano is on
+        int left_hip_nano = 9;
+
+        union {                                         //data type to convert from i2c read data to float representing the hip data (estim angle comes in deg)
+            float estim_angle;
+            byte angle_bytes[4];
+        }data;
+
+        float prevtime = 0.0;
+
+        void read_imu();                                /**< function for reading angle data from the imu */
         
 };
 

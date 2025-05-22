@@ -414,7 +414,6 @@ namespace config_defs
             {"step", (uint8_t)config_defs::hip_controllers::step},
             {"phmc", (uint8_t)config_defs::hip_controllers::phmc},
             {"angleBased", (uint8_t)config_defs::hip_controllers::angle_based},
-
         };
         
         const IniKeyCode knee_controllers 

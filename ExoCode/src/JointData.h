@@ -87,6 +87,9 @@ class JointData {
         const float close_to_zero_tolerance = 0.1;
         float torque_error = 0;
 
+        //IMU
+        float imu_position;
+
 };
 
 

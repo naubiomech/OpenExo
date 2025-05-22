@@ -503,6 +503,9 @@ void HipJoint::run_joint()
     //Make sure the correct controller is running.
     set_controller(_joint_data->controller.controller);
     
+    //Calculate the IMU Angle
+    read_imu();
+
     //Calculate the motor command
     _joint_data->controller.setpoint = _controller->calc_motor_cmd();
 
@@ -586,6 +589,33 @@ void HipJoint::set_controller(uint8_t controller_id)
         logger::println("Hip : set_controller : End");
     #endif
 };
+
+void HipJoint::read_imu()
+{
+    if (millis() - prevtime >= 100)
+    {
+        prevtime = millis();
+
+        if (_is_left)
+        {
+            Wire.requestFrom(left_hip_nano, 4);
+        }
+        else
+        {
+            Wire.requestFrom(right_hip_nano, 4);
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            data.angle_bytes[i] = Wire.read();
+        }
+
+        _joint_data->imu_position = data.estim_angle;
+
+        Serial.print(_joint_data->imu_position);
+
+    }
+}
 
 //================================================================
 

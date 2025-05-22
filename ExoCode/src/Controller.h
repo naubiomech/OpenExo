@@ -519,15 +519,42 @@ public:
     
     int state;
 
+
+    float normalized_angle;
+    float max_angle;
+    float min_angle;
+    float local_angle_max;
+    float local_angle_min;
+
+    int recal_angle_flag;
+    int prev_recal_angle_flag;
+    int recal_angle_loop;
+    int ending_angle;
+
+    int prev_step;
+    float sum_max_angle;
+    float sum_min_angle;
+    float average_max_angle;
+    float average_min_angle;
+
+    int count;
+    int moment_count;
+
+    float sum_max;
+    float sum_min;
+
+    int starting_angle;
+    int starting_step;
+
     //Functions
     float calc_motor_cmd();         /* Function to calcualte the desired motor command. */
     void calibrate_encoders();      /* Function to finds the offset angle when the user is standing still upon initiation of the trial. */
     void normalize_stance_moment(); /* Function to calucalte the max and min stance_moment to normalize to the variable between -1 and 1. */
+    void normalize_angle();
 
 private:
 
 };
-
 
 #endif
 #endif
