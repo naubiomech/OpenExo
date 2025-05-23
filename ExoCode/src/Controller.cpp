@@ -2010,6 +2010,7 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 {
 	
 	if(_controller_data->SPV2_motor_current_ready) {
+		Serial.print("\nMotor current ready.");
 		_controller_data->SPV2_oldCurrent = _controller_data->SPV2_newCurrent;
 		_controller_data->SPV2_newCurrent = _controller_data->SPV2_motor_current / _controller_data->SPV2_motor_current_count ;
 		Serial.print("\nnew Current: ");
@@ -2034,8 +2035,11 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 		Serial.print(" -----");
 	}
 	else {
+		// Serial.print("\nStill accumulating motor current data.");
 		// _controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + abs(analogRead(A1) - 2047);
-		_controller_data->SPV2_motor_current = _controller_data->SPV2_current_pwr;
+		// Serial.print("  |  current power: ");
+		// Serial.print(_controller_data->SPV2_current_pwr);
+		_controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + _controller_data->SPV2_current_pwr;
 		_controller_data->SPV2_motor_current_count++;//number of frames (not number of steps)
 		
 		//calculation for the updated cost function. The goal for the updated cost function is to evaluate both the motor current and the tracking error.
@@ -2144,6 +2148,7 @@ void SPV2::_golden_search_advance()
 
 void SPV2::optimizer_reset()
 {
+	Serial.print("\n  |  optimizer just RESET.");
 	_controller_data->do_adv_optimizer = 0;
 	_controller_data->SPV2_gs_is_ini_itr = true;
 	_controller_data->i_SA = 0;
@@ -2169,8 +2174,8 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 	}
 	_controller_data->i_SA++;
 	//Simulated Annealing debug
-	// Serial.print("\n----i_SA: ");
-	// Serial.print(_controller_data->i_SA);
+	Serial.print("\n----i_SA: ");
+	Serial.print(_controller_data->i_SA);
 	
 	if (_controller_data->i_SA == 1) {
 		randomSeed((micros())%(analogRead(20)*analogRead(0)));
@@ -2292,6 +2297,40 @@ float SPV2::calc_motor_cmd()
 		// Serial.print(analogRead(20));
 		// Serial.print("  |  Pin0: ");
 		// Serial.print(analogRead(0));
+		
+		long millis_time = millis();
+		if (millis_time-_controller_data->SPV2_current_voltage_timer > 10000) {
+			_controller_data->SPV2_current_voltage = ina260.readBusVoltage();
+			_controller_data->SPV2_current_voltage_timer = millis_time;
+		}
+		
+		//Calculate system power usage during 30 seconds
+		uint8_t calc_pwr_30 = _controller_data->parameters[controller_defs::spv2::spring_stiffness_adj_factor];
+		if (calc_pwr_30 == 0) {
+			_controller_data->sys_pwr_30 = 0;
+			_controller_data->sys_pwr_30_count = 0;
+			_controller_data->sys_pwr_30_timer = 0;
+			_controller_data->cal_pwr_30_old_val = 0;
+			_controller_data->sys_pwr_30_2_plot = 0;
+		}
+		else if (calc_pwr_30 == 1) {
+			if (_controller_data->cal_pwr_30_old_val == 0) {
+				_controller_data->sys_pwr_30_timer = millis();
+				_controller_data->do_cal_pwr_30 = true;
+			}
+			_controller_data->cal_pwr_30_old_val = 1;
+			
+			if (_controller_data->do_cal_pwr_30) {
+				if ((millis() - _controller_data->sys_pwr_30_timer) < 30000) {
+					_controller_data->sys_pwr_30 = _controller_data->sys_pwr_30 + _controller_data->SPV2_current_pwr;
+					_controller_data->sys_pwr_30_count++;
+				}
+				else {
+					_controller_data->sys_pwr_30_2_plot = _controller_data->sys_pwr_30/_controller_data->sys_pwr_30_count;
+					_controller_data->do_cal_pwr_30 = false;
+				}
+			}
+		}
 		
 		
 	//Calculate Generic Contribution
@@ -2478,6 +2517,13 @@ float SPV2::calc_motor_cmd()
 				//cmd = percent_grf * 100;
 				//Serial.print("  |  Maxon motor running...");
 			
+			if ((servo_switch) && (_controller_data->servo_did_go_down) && (_controller_data->filtered_torque_reading - cmd_ff) < 0)
+			{
+				cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
+				cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
+			
+			}
+			
 		}
 		else {
 			_servo_runner(27, servo_home);//when the FSR is being calibrated, move the servo out of the way
@@ -2493,12 +2539,7 @@ float SPV2::calc_motor_cmd()
 		//	cmd = constrain(cmd, -200, 200);
 		//}
 		
-		if ((servo_switch) && (_controller_data->servo_did_go_down) && (_controller_data->filtered_torque_reading - cmd_ff) < 0)
-        {
-			cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
-			cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
 		
-		}
 
         // 
 		//Debugging for the motor id stuff

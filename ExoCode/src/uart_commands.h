@@ -452,7 +452,7 @@ namespace UART_command_handlers
 				
 				//rx_msg.data[8] = exo_data->left_leg.ankle.controller.gasp_motor_reset_plot;
 				//rx_msg.data[9] = exo_data->right_leg.ankle.controller.gasp_motor_reset_plot;
-				rx_msg.data[8] = (exo_data->right_side.ankle.motor.maxon_pwm_delivered - 2048)/10;
+				//rx_msg.data[8] = (exo_data->right_side.ankle.motor.maxon_pwm_delivered - 2048)/10;
 				rx_msg.data[9] = 9;
 				
 				//rx_msg.data[5] = (exo_data->right_side.ankle.motor.maxon_pwm_delivered - 2048)/10;
@@ -464,6 +464,16 @@ namespace UART_command_handlers
 				
 				rx_msg.data[3] = local_scalar * exo_data->right_side.ankle.controller.SPV2_currentAngle;
 				rx_msg.data[5] = local_scalar * exo_data->right_side.ankle.controller.SPV2_currentAngle;
+				
+				rx_msg.data[1] = local_scalar * exo_data->right_side.ankle.controller.SPV2_current_pwr * 0.001;
+				
+				rx_msg.data[8] = local_scalar * exo_data->right_side.ankle.controller.SPV2_current_voltage * 0.001;
+				
+				rx_msg.data[6] = local_scalar * exo_data->right_side.ankle.controller.sys_pwr_30_2_plot * 0.001;
+				
+				rx_msg.data[1] = local_scalar * exo_data->right_side.ankle.controller.sys_pwr_30_2_plot * 0.001;
+				
+				rx_msg.data[9] = local_scalar * exo_data->right_side.ankle.controller.parameters[controller_defs::spv2::do_update_stiffness];
 				
 				// rx_msg.data[0] = 0;
 				// rx_msg.data[1] = 1;

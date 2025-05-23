@@ -292,11 +292,11 @@ class ControllerData {
 		bool wasStance_spv2 = false;
 		float oldMaxPrescription = 0;
 		float currentMaxPrescription = 0;
-		unsigned long SPV2_motor_current;
+		unsigned long SPV2_motor_current = 0;
 		unsigned long SPV2_motor_current_count = 0;
 		bool SPV2_motor_current_ready = false;
-		uint32_t SPV2_oldCurrent = 0;
-		uint32_t SPV2_newCurrent = 0;
+		unsigned long SPV2_oldCurrent = 0;
+		unsigned long SPV2_newCurrent = 0;
 		uint8_t SPV2_currentAngle = 90;
 		bool SPV2_do_count_steps = true;
 		uint16_t SPV2_step_count = 0;
@@ -314,6 +314,15 @@ class ControllerData {
 		uint8_t x_l = 90;
 		uint8_t x_u = 90;
 		uint32_t SPV2_current_pwr = 0;//System-wide power in Milliwatts (power draw from the battery
+		uint32_t SPV2_current_voltage = 0;//battery voltage in Millivolts
+		unsigned long SPV2_current_voltage_timer = 0;
+		
+		long sys_pwr_30 = 0;
+		long sys_pwr_30_count = 0;
+		long sys_pwr_30_timer = 0;
+		int8_t cal_pwr_30_old_val = 0;
+		long sys_pwr_30_2_plot = 0;
+		bool do_cal_pwr_30 = false;
 		
 		//SPV2 Simulated Annealing Optimizer
 		float curr = 90;

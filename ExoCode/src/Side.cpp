@@ -167,11 +167,13 @@ void Side::check_calibration()
         if (_side_data->do_calibration_toe_fsr)
         {
             _side_data->do_calibration_toe_fsr = _toe_fsr.calibrate(_side_data->do_calibration_toe_fsr);
+			_side_data->do_calibration_heel_fsr = _heel_fsr.calibrate(_side_data->do_calibration_heel_fsr);
             _data->set_status(status_defs::messages::fsr_calibration);
         }
         else if (_side_data->do_calibration_refinement_toe_fsr) 
         {
             _side_data->do_calibration_refinement_toe_fsr = _toe_fsr.refine_calibration(_side_data->do_calibration_refinement_toe_fsr);
+			_side_data->do_calibration_refinement_heel_fsr = _heel_fsr.refine_calibration(_side_data->do_calibration_refinement_heel_fsr);
             _data->set_status(status_defs::messages::fsr_refinement);
         }
         
