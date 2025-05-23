@@ -2068,7 +2068,8 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 		
 		switch (_controller_data->do_adv_optimizer) {
 			case 2:
-			_SA_point_gen(30, minAngle, maxAngle, 1000);
+			// _SA_point_gen(30, minAngle, maxAngle, 1000);
+			_lab_OP_point_gen(10, minAngle, maxAngle);
 			_controller_data->SPV2_currentAngle = _controller_data->candidate;
 			break;
 			case -1://these numerical switch case values don't make much sense, will update afterward
@@ -2085,7 +2086,8 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 			Serial.print("\n Running golden loop 1");
 			break;			
 			default:
-			_SA_point_gen(30, minAngle, maxAngle, 1000);
+			// _SA_point_gen(30, minAngle, maxAngle, 1000);
+			_lab_OP_point_gen(10, minAngle, maxAngle);
 			_controller_data->SPV2_currentAngle = _controller_data->candidate;
 			_controller_data->do_adv_optimizer = 2;
 			//_controller_data->SPV2_currentAngle = _SA_point_gen(10, true, 60, 120);
@@ -2252,6 +2254,29 @@ void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp
 	
 	//example from https://machinelearningmastery.com/simulated-annealing-from-scratch-in-python/
 	
+}
+
+void SPV2::_lab_OP_point_gen(float step_size, long bound_l, long bound_u)
+{
+	if (_controller_data->SPV2_newCurrent==0) {
+		return;
+	}
+	_controller_data->i_SA++;
+	Serial.print("\n----i_SA: ");
+	Serial.print(_controller_data->i_SA);
+	
+	if (_controller_data->i_SA == 1) {
+		_controller_data->candidate = _controller_data->parameters[controller_defs::spv2::neutral_angle];
+
+		//return best;//initial point
+	}
+
+	else {
+		unsigned long delta_pwr = _controller_data->SPV2_newCurrent - _controller_data->SPV2_oldCurrent;
+		_controller_data->candidate = _controller_data->candidate + step_size * delta_pwr * (1);
+
+	}
+	_controller_data->candidate = constrain(_controller_data->candidate, bound_l, bound_u);
 }
 
 float SPV2::calc_motor_cmd()

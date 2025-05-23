@@ -473,6 +473,10 @@ namespace UART_command_handlers
 				
 				rx_msg.data[1] = local_scalar * exo_data->right_side.ankle.controller.sys_pwr_30_2_plot * 0.001;
 				
+				rx_msg.data[1] = local_scalar * exo_data->right_side.ankle.controller.SPV2_newCurrent * 0.001;
+				
+				rx_msg.data[6] = local_scalar * exo_data->right_side.ankle.controller.SPV2_newCurrent * 0.001;
+				
 				rx_msg.data[9] = local_scalar * exo_data->right_side.ankle.controller.parameters[controller_defs::spv2::do_update_stiffness];
 				
 				// rx_msg.data[0] = 0;
