@@ -2117,7 +2117,7 @@ void SPV2::_step_counter(uint16_t num_steps_threshold, SideData* side_data, Cont
 		if ((!_side_data->prev_toe_stance) && (_side_data->toe_stance)) {
 			_controller_data->SPV2_step_count++;
 		}
-		if (_controller_data->SPV2_step_count > num_steps_threshold) {
+		if (_controller_data->SPV2_step_count == num_steps_threshold) {
 			_controller_data->SPV2_step_count = 0;
 			_controller_data->SPV2_do_count_steps = false;
 			_controller_data->SPV2_motor_current_ready = true;
@@ -2262,18 +2262,28 @@ void SPV2::_lab_OP_point_gen(float step_size, long bound_l, long bound_u)
 		return;
 	}
 	_controller_data->i_SA++;
-	Serial.print("\n----i_SA: ");
+	Serial.print("\n----i_SA (Lab OP): ");
 	Serial.print(_controller_data->i_SA);
 	
 	if (_controller_data->i_SA == 1) {
 		_controller_data->candidate = _controller_data->parameters[controller_defs::spv2::neutral_angle];
+		_controller_data->old_candidate = _controller_data->candidate;
 
-		//return best;//initial point
 	}
 
 	else {
-		unsigned long delta_pwr = _controller_data->SPV2_newCurrent - _controller_data->SPV2_oldCurrent;
-		_controller_data->candidate = _controller_data->candidate + step_size * delta_pwr * (1);
+		signed long delta_pwr = _controller_data->SPV2_newCurrent - _controller_data->SPV2_oldCurrent;
+		int8_t candidate_dir = ((_controller_data->candidate - _controller_data->old_candidate>0)?1:-1);
+		_controller_data->old_candidate = _controller_data->candidate;
+		int8_t pwr_dir = ((delta_pwr>0)?1:-1);
+		int8_t curr_dir = -1 * candidate_dir * pwr_dir;
+		_controller_data->candidate = _controller_data->candidate + step_size * 0.001 * abs(delta_pwr) * (curr_dir);
+		Serial.print("\n----delta_pwr: ");
+		Serial.print(delta_pwr);
+		Serial.print("  ----raw candidate: ");
+		Serial.print(_controller_data->candidate);
+		Serial.print("  ----step_size: ");
+		Serial.print(step_size);
 
 	}
 	_controller_data->candidate = constrain(_controller_data->candidate, bound_l, bound_u);
@@ -2364,6 +2374,8 @@ float SPV2::calc_motor_cmd()
 	float threshold = constrain(_controller_data->parameters[controller_defs::spv2::timing_threshold]/100, 0, 99);
 	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.6);
 	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.6);
+	_controller_data->percent_grf2plot= percent_grf;
+	_controller_data->percent_grf_heel2plot= percent_grf_heel;
 	
 
 	
@@ -2456,15 +2468,16 @@ float SPV2::calc_motor_cmd()
 
 	if (_data->user_paused || !active_trial)
 	{
-		
-
-			if (SD_content_imported)
-            {
-				_servo_runner(27, servo_home);
-			}
+		if (SD_content_imported)
+		{
+			_servo_runner(27, servo_home);
+		}
 	}
 	else
     {
+		Serial.print("  |  |  |  Battery voltage (mV): ");
+		Serial.print(_controller_data->SPV2_current_voltage);
+		
 		if (!servo_switch)
         {
 			_servo_runner(27, servo_home);

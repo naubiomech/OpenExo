@@ -479,6 +479,7 @@ private:
 	void SPV2::_golden_search_advance();
 	void SPV2::optimizer_reset();
 	void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp);
+	void SPV2::_lab_OP_point_gen(float step_size, long bound_l, long bound_u);
 };
 
 #endif

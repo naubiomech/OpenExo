@@ -328,10 +328,14 @@ class ControllerData {
 		float curr = 90;
 		float curr_eval = 0;
 		float candidate = 90;
+		float old_candidate;
 		float candidate_eval = 0;
 		uint16_t i_SA = 0;
 		float best = 90;
 		float best_eval = 10000;
+		float percent_grf2plot = 0;
+		float percent_grf_heel2plot = 0;
+		
 		
 		//SPV2 Cost Function
 		float SPV2_error_sum = 0;
