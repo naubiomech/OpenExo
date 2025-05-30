@@ -4,7 +4,7 @@
 #include "ErrorReporter.h"
 #include "error_codes.h"
 
-//#define JOINT_DEBUG       //Uncomment if you want to print debug statements to serial monitor.
+#define JOINT_DEBUG       //Uncomment if you want to print debug statements to serial monitor.
 
 //Arduino compiles everything in the src folder even if not included so it causes and error for the nano if this is not included.
 #if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41) 
@@ -527,10 +527,13 @@ void HipJoint::run_joint()
         }
     }
 
-    //Enable or disable the motor.
-    _motor->on_off(); 
-    _motor->enable();
+    bool is_AK60v3 = (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::AK60v3);
 
+    //Enable or disable the motor.
+    _motor->on_off();
+    if (!is_AK60v3) {
+        _motor->enable();
+    }
     //Send the new command to the motor.
     _motor->transaction(_joint_data->controller.setpoint / _joint_data->motor.gearing);
 

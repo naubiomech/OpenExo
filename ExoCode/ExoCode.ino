@@ -10,7 +10,7 @@
 //UNCOMMENT TO UTILIZE
 //#define INCLUDE_FLEXCAN_DEBUG   //Flag to print CAN debugging messages for the motors
 //#define MAKE_PLOTS              //Flag to serial plot
-//#define MAIN_DEBUG              //Flag to print Arduino debugging statements
+#define MAIN_DEBUG              //Flag to print Arduino debugging statements
 //#define HEADLESS                //Flag to be used when there is no app access
 
 //Standard Libraries

@@ -206,12 +206,16 @@
               reading_count = 0;
 
               motor.on_off(motor._motor_data->enabled);
-              motor.transaction(torque_cmd);
-          
-
-          
               
+              // The code below helps prevent bus contention in bilateral mode
+              if (config_info::config_to_send[config_defs::exo_side_idx] == (uint8_t)config_defs::exo_side::bilateral) {
+                  // Add slight delay if running bilateral to stagger commands
+                  delayMicroseconds(motor._is_left ? 0 : 500);
+              }
+              
+              motor.transaction(torque_cmd);
           }
+          
           reading_sum += load_cell.read();
           reading_count++;
           if (!sequence_is_running)

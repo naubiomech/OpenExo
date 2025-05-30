@@ -11,7 +11,7 @@
 #include "Logger.h"
 #include "ErrorReporter.h"
 #include "error_codes.h"
-//#define MOTOR_DEBUG           //Uncomment if you want to print debug statments to the serial monitor
+#define MOTOR_DEBUG           //Uncomment if you want to print debug statments to the serial monitor
 
 //Arduino compiles everything in the src folder even if not included so it causes and error for the nano if this is not included.
 #if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41) 
@@ -128,6 +128,7 @@ void _CANMotor::transaction(float torque)
     check_response();
 };
 
+/*
 void _CANMotor::read_data()
 {
     //Read data from motor
@@ -143,17 +144,34 @@ void _CANMotor::read_data()
             int direction_modifier = _motor_data->flip_direction ? -1 : 1;
 
             CAN_message_t msg = can->read();
-            if (msg.buf[0] == uint32_t(_motor_data->id))
+            Serial.print("message ID: ");
+            Serial.print(msg.id);
+            Serial.println();
+            if ((msg.id & 0xFF) == uint8_t(_motor_data->id))// OLD: (msg.buf[0] == uint32_t(_motor_data->id))
             {
                 //Unpack data
-                uint32_t p_int = (msg.buf[1] << 8) | msg.buf[2];
-                uint32_t v_int = (msg.buf[3]) << 4 | (msg.buf[4] >> 4);
-                uint32_t i_int = ((msg.buf[4] & 0xF) << 8) | msg.buf[5];
+
+				//=== OLD ===
+                //uint32_t p_int = (msg.buf[1] << 8) | msg.buf[2];
+                //uint32_t v_int = (msg.buf[3]) << 4 | (msg.buf[4] >> 4);
+                //uint32_t i_int = ((msg.buf[4] & 0xF) << 8) | msg.buf[5];
+
+				//=== NEW ===
+            	//uint32_t p_int = (msg.buf[3] << 8) | msg.buf[4];
+                //uint32_t v_int = (msg.buf[5] << 4) | (msg.buf[6] >> 4);
+                //uint32_t i_int = ((msg.buf[6] & 0xF) << 8) | msg.buf[7];
+
+                uint32_t p_int = (msg.buf[0] << 8) | msg.buf[1];
+                uint32_t v_int = (msg.buf[2] << 8) | msg.buf[3];
+                uint32_t i_int = (msg.buf[4] << 8) | msg.buf[5];
 
                 //Set data in ExoData object
-                _motor_data->p = direction_modifier * _uint_to_float(p_int, -_P_MAX, _P_MAX, 16);
-                _motor_data->v = direction_modifier * _uint_to_float(v_int, -_V_MAX, _V_MAX, 12);
-                _motor_data->i = direction_modifier * _uint_to_float(i_int, -_I_MAX, _I_MAX, 12);
+                _motor_data->p = direction_modifier * _uint_to_float(p_int, -_P_MAX, _P_MAX, 16); //* 0.1f;
+                //_motor_data->p = direction_modifier * _uint_to_float(p_int * 0.1f);
+                _motor_data->v = direction_modifier * _uint_to_float(v_int, -_V_MAX, _V_MAX, 12); //* 10.0f;
+                //_motor_data->v = direction_modifier * _uint_to_float(v_int * 10.0f);
+                _motor_data->i = direction_modifier * _uint_to_float(i_int, -_I_MAX, _I_MAX, 12); //* 0.01f;
+                //_motor_data->i = direction_modifier * _uint_to_float(i_int * 0.01f);
 
                 #ifdef MOTOR_DEBUG
                     logger::print("_CANMotor::read_data():Got data-");
@@ -173,10 +191,80 @@ void _CANMotor::read_data()
         while(searching);
 
         //If we get here, we timed out
-        _handle_read_failure();
+        //_handle_read_failure();
     }
     return;
 };
+*/
+// Copilot's code:
+void _CANMotor::read_data()
+{
+    if (_motor_data->enabled)
+    {
+        Serial.println("Entered read_data");
+        CAN* can = can->getInstance();
+        int direction_modifier = _motor_data->flip_direction ? -1 : 1;
+
+        CAN_message_t msg = can->read();
+
+        // Determine if this is an AK60v3 (extended, new format) or old AK (standard, old format)
+        bool is_ak60v3 = (_motor_data->motor_type == (uint8_t)config_defs::motor::AK60v3);
+
+        // Only process if the frame type matches what we expect for this motor
+        if (is_ak60v3) {
+            if (msg.len == 0 || !msg.flags.extended) {
+                Serial.println("wrong0");
+                return;
+            }
+            // AK60v3: NEW format
+            if ((msg.id & 0xFF) == uint8_t(_motor_data->id))
+            {
+                Serial.println("wrong1");
+                uint32_t p_int = (msg.buf[0] << 8) | msg.buf[1];
+                uint32_t v_int = (msg.buf[2] << 8) | msg.buf[3];
+                uint32_t i_int = (msg.buf[4] << 8) | msg.buf[5];
+                _motor_data->p = direction_modifier * _uint_to_float(p_int, -_P_MAX, _P_MAX, 16);
+                _motor_data->v = direction_modifier * _uint_to_float(v_int, -_V_MAX, _V_MAX, 12);
+                _motor_data->i = direction_modifier * _uint_to_float(i_int, -_I_MAX, _I_MAX, 12);
+                #ifdef MOTOR_DEBUG
+                    logger::print("_CANMotor::read_data():Got data-");
+                    logger::print("ID:" + String(uint32_t(_motor_data->id)) + ",");
+                    logger::print("P:"+String(_motor_data->p) + ",V:" + String(_motor_data->v) + ",I:" + String(_motor_data->i));
+                    logger::print("\n");
+                #endif
+                _motor_data->timeout_count = 0;
+            }
+        } else {
+            if (msg.len == 0 || msg.flags.extended) {
+                Serial.println("wrong2");
+                return;
+            }
+            // Old AK: OLD format
+            if (msg.buf[0] == uint32_t(_motor_data->id))
+            {
+                Serial.println("correct");
+                uint32_t p_int = (msg.buf[1] << 8) | msg.buf[2];
+                uint32_t v_int = (msg.buf[3] << 4) | (msg.buf[4] >> 4);
+                uint32_t i_int = ((msg.buf[4] & 0xF) << 8) | msg.buf[5];
+                _motor_data->p = direction_modifier * _uint_to_float(p_int, -_P_MAX, _P_MAX, 16);
+                _motor_data->v = direction_modifier * _uint_to_float(v_int, -_V_MAX, _V_MAX, 12);
+                _motor_data->i = direction_modifier * _uint_to_float(i_int, -_I_MAX, _I_MAX, 12);
+                #ifdef MOTOR_DEBUG
+                    logger::print("_CANMotor::read_data():Got data-");
+                    logger::print("ID:" + String(uint32_t(_motor_data->id)) + ",");
+                    logger::print("P:"+String(_motor_data->p) + ",V:" + String(_motor_data->v) + ",I:" + String(_motor_data->i));
+                    logger::print("\n");
+                #endif
+                _motor_data->timeout_count = 0;
+            }
+            else {
+                Serial.println("wrong3");
+                Serial.println("Motor ID: " + String(uint32_t(_motor_data->id)) + " does not match received ID: " + String(msg.buf[0]));
+            }
+        }
+    }
+    return;
+}
 
 void _CANMotor::send_data(float torque)
 {
@@ -191,7 +279,6 @@ void _CANMotor::send_data(float torque)
     _motor_data->t_ff = torque;
     const float current = torque / get_Kt();
 
-    //Read data from ExoData object, constraint it, and package it
     float p_sat = constrain(direction_modifier * _motor_data->p_des, -_P_MAX, _P_MAX);
     float v_sat = constrain(direction_modifier * _motor_data->v_des, -_V_MAX, _V_MAX);
     float kp_sat = constrain(_motor_data->kp, _KP_MIN, _KP_MAX);
@@ -203,26 +290,47 @@ void _CANMotor::send_data(float torque)
     uint32_t kp_int = _float_to_uint(kp_sat, _KP_MIN, _KP_MAX, 12);
     uint32_t kd_int = _float_to_uint(kd_sat, _KD_MIN, _KD_MAX, 12);
     uint32_t i_int = _float_to_uint(i_sat, -_I_MAX, _I_MAX, 12);
-    CAN_message_t msg;
-    msg.id = uint32_t(_motor_data->id);
-    msg.buf[0] = p_int >> 8;
-    msg.buf[1] = p_int & 0xFF;
-    msg.buf[2] = v_int >> 4;
-    msg.buf[3] = ((v_int & 0xF) << 4) | (kp_int >> 8);
-    msg.buf[4] = kp_int & 0xFF;
-    msg.buf[5] = kd_int >> 4;
-    msg.buf[6] = ((kd_int & 0xF) << 4) | (i_int >> 8);
-    msg.buf[7] = i_int & 0xFF;
 
-    //logger::print("_CANMotor::send_data::t_sat:: ");
-    //logger::print(t_sat);
-    //logger::print("\n");
-    //logger::print("T:"+String(t_sat)+",");
-    
-    //Only send messages if enabled
+    CAN_message_t msg;
+
+    bool is_ak60v3 = (_motor_data->motor_type == (uint8_t)config_defs::motor::AK60v3);
+
+    if (is_ak60v3) {
+        Serial.println("Using new format");
+        // AK60v3: Extended CAN, NEW format
+        msg.flags.extended = 1;
+        msg.id = ((uint32_t) 8 << 8) | (uint32_t)_motor_data->id;
+        // NEW format
+        msg.buf[0] = kp_int >> 4;
+        msg.buf[1] = ((kp_int&0xF) << 4) | (kd_int >> 8);
+        msg.buf[2] = (kd_int & 0xFF);
+        msg.buf[3] = p_int >> 8;
+        msg.buf[4] = p_int & 0xFF;
+        msg.buf[5] = v_int >> 4;
+        msg.buf[6] = ((v_int & 0xF) << 4) | (i_int >> 8);
+        msg.buf[7] = i_int & 0xFF;
+    } else {
+        // Old AK: Standard CAN, OLD format
+        Serial.println("Using old format");
+        msg.flags.extended = 0;
+        msg.id = (uint32_t)_motor_data->id;
+        // OLD format
+        msg.buf[0] = p_int >> 8;
+        msg.buf[1] = p_int & 0xFF;
+        msg.buf[2] = v_int >> 4;
+        msg.buf[3] = ((v_int & 0xF) << 4) | (kp_int >> 8);
+        msg.buf[4] = kp_int & 0xFF;
+        msg.buf[5] = kd_int >> 4;
+        msg.buf[6] = ((kd_int & 0xF) << 4) | (i_int >> 8);
+        msg.buf[7] = i_int & 0xFF;
+    }
+
+    logger::print("_CANMotor::send_data::t_sat:: ");
+    logger::print(torque);
+    logger::print("\n");
+
     if (_motor_data->enabled)
     {
-        //Set data in motor
         CAN* can = can->getInstance();
         can->send(msg);
     }
@@ -304,19 +412,20 @@ bool _CANMotor::enable()
 bool _CANMotor::enable(bool overide)
 {
     #ifdef MOTOR_DEBUG
-        //  logger::print(_prev_motor_enabled);
-        //  logger::print("\t");
-        //  logger::print(_motor_data->enabled);
-        //  logger::print("\t");
-        //  logger::print(_motor_data->is_on);
-        //  logger::print("\n");
+        logger::print(_prev_motor_enabled);
+        logger::print("\t");
+        logger::print(_motor_data->enabled);
+        logger::print("\t");
+        logger::print(_motor_data->is_on);
+        logger::print("\n");
     #endif
     
     //Only change the state and send messages if the enabled state has changed.
     if ((_prev_motor_enabled != _motor_data->enabled) || overide || !_enable_response)
     {
         CAN_message_t msg;
-        msg.id = uint32_t(_motor_data->id);
+        //msg.flags.extended = 1; // set extended CAN frame
+        msg.id = (uint32_t)_motor_data->id;
         msg.buf[0] = 0xFF;
         msg.buf[1] = 0xFF;
         msg.buf[2] = 0xFF;
@@ -325,7 +434,7 @@ bool _CANMotor::enable(bool overide)
         msg.buf[5] = 0xFF;
         msg.buf[6] = 0xFF;
 
-        if (_motor_data->enabled && !_error && !_data->estop)
+        if (_motor_data->enabled) //&& !_error && !_data->estop)
         {
             msg.buf[7] = 0xFC;
         }
@@ -385,8 +494,8 @@ void _CANMotor::set_Kt(float Kt)
 
 void _CANMotor::_handle_read_failure()
 {
-    logger::println("CAN Motor - Handle Read Failure", LogLevel::Error);
-    _motor_data->timeout_count++;
+    //logger::println("CAN Motor - Handle Read Failure", LogLevel::Error); // (Noah) This is what Jack and I removed previously
+    //_motor_data->timeout_count++; // (Noah) This too.
 };
 
 float _CANMotor::_float_to_uint(float x, float x_min, float x_max, int bits)
@@ -507,14 +616,14 @@ AK60v3::AK60v3(config_defs::joint_id id, ExoData* exo_data, int enable_pin): //C
 _CANMotor(id, exo_data, enable_pin)
 {
     _I_MAX = 10.3f;
-    _V_MAX = 24.0f;
+    _V_MAX = 48.0f;
 
     float kt = 0.135;
     set_Kt(kt);
     exo_data->get_joint_with(static_cast<uint8_t>(id))->motor.kt = kt;
 
 #ifdef MOTOR_DEBUG
-    logger::println("AK60::AK60 : Leaving Constructor");
+    logger::println("AK60v3::AK60v3 : Leaving Constructor");
 #endif
 };
 
