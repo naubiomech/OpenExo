@@ -438,7 +438,8 @@ namespace UART_command_handlers
 				//rx_msg.data[6] = 100 * exo_data->right_leg.heel_fsr;
 				
 				//motor current plot
-				rx_msg.data[6] = local_scalar * map(analogRead(A1),0,4095,-300,300);
+				rx_msg.data[6] = local_scalar * map(analogRead(A1),0,4095,-15,15);
+				float powerVScurrent = (exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001) / abs(map(analogRead(A1),0,4095,-15,15));
 				//motor reset plot hijack
 				//rx_msg.data[6] = exo_data->right_leg.ankle.controller.gasp_motor_reset_plot;
 		//Left FSR
@@ -462,12 +463,12 @@ namespace UART_command_handlers
 				//rx_msg.data[3] = 10*map(exo_data->right_side.ankle.controller.candidate_eval,0,2047,0,300);
 				rx_msg.data[5] = exo_data->right_side.ankle.controller.candidate;
 				rx_msg.data[3] = exo_data->right_side.ankle.controller.candidate;
-				rx_msg.data[6] = local_scalar * exo_data->right_side.ankle.controller.SPV2_current_pwr * 0.001;
+				rx_msg.data[6] = local_scalar * exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001;
 				
 				rx_msg.data[3] = local_scalar * exo_data->right_side.ankle.controller.SPV2_currentAngle;
 				rx_msg.data[5] = local_scalar * exo_data->right_side.ankle.controller.SPV2_currentAngle;
 				
-				rx_msg.data[1] = local_scalar * exo_data->right_side.ankle.controller.SPV2_current_pwr * 0.001;
+				rx_msg.data[1] = local_scalar * exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001;
 				
 				rx_msg.data[8] = local_scalar * exo_data->right_side.ankle.controller.SPV2_current_voltage * 0.001;
 				
@@ -477,9 +478,12 @@ namespace UART_command_handlers
 				
 				//rx_msg.data[1] = local_scalar * exo_data->right_side.ankle.controller.SPV2_newCurrent * 0.001;
 				
-				rx_msg.data[6] = local_scalar * exo_data->right_side.ankle.controller.SPV2_newCurrent * 0.001;
+				//rx_msg.data[6] = local_scalar * exo_data->right_side.ankle.controller.SPV2_newCurrent * 0.001;
 				
 				rx_msg.data[9] = local_scalar * exo_data->right_side.ankle.controller.parameters[controller_defs::spv2::do_update_stiffness];
+				
+				// rx_msg.data[1] = exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001;
+				// rx_msg.data[6] = map(analogRead(A1),0,4095,-15,15);
 				
 				// rx_msg.data[0] = 0;
 				// rx_msg.data[1] = 1;

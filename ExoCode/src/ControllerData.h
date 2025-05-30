@@ -292,7 +292,7 @@ class ControllerData {
 		bool wasStance_spv2 = false;
 		float oldMaxPrescription = 0;
 		float currentMaxPrescription = 0;
-		unsigned long SPV2_motor_current = 0;
+		long SPV2_motor_current = 0;
 		unsigned long SPV2_motor_current_count = 0;
 		bool SPV2_motor_current_ready = false;
 		unsigned long SPV2_oldCurrent = 0;
@@ -313,7 +313,8 @@ class ControllerData {
 		uint16_t x2_current = 0;
 		uint8_t x_l = 90;
 		uint8_t x_u = 90;
-		uint32_t SPV2_current_pwr = 0;//System-wide power in Milliwatts (power draw from the battery
+		long SPV2_current_pwr = 0;//System-wide power in Milliwatts (power draw from the battery
+		long SPV2_filtered_pwr = 0;
 		uint32_t SPV2_current_voltage = 0;//battery voltage in Millivolts
 		unsigned long SPV2_current_voltage_timer = 0;
 		

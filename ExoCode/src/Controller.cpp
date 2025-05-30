@@ -2039,7 +2039,7 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 		// _controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + abs(analogRead(A1) - 2047);
 		// Serial.print("  |  current power: ");
 		// Serial.print(_controller_data->SPV2_current_pwr);
-		_controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + _controller_data->SPV2_current_pwr;
+		_controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + _controller_data->SPV2_filtered_pwr;
 		_controller_data->SPV2_motor_current_count++;//number of frames (not number of steps)
 		
 		//calculation for the updated cost function. The goal for the updated cost function is to evaluate both the motor current and the tracking error.
@@ -2320,6 +2320,7 @@ float SPV2::calc_motor_cmd()
 		// _controller_data->ps_old_time = ps_current_time;
 		// Serial.print("  |  Power: ");
 		_controller_data->SPV2_current_pwr = ina260.readPower();
+		_controller_data->SPV2_filtered_pwr = utils::ewma(_controller_data->SPV2_current_pwr, _controller_data->SPV2_filtered_pwr, 0.05);
 		//Serial.print(ina260.readPower());
 		// Serial.print(_controller_data->SPV2_current_pwr);
 		// Serial.print(" mW");
@@ -2357,7 +2358,7 @@ float SPV2::calc_motor_cmd()
 			
 			if (_controller_data->do_cal_pwr_30) {
 				if ((millis() - _controller_data->sys_pwr_30_timer) < 30000) {
-					_controller_data->sys_pwr_30 = _controller_data->sys_pwr_30 + _controller_data->SPV2_current_pwr;
+					_controller_data->sys_pwr_30 = _controller_data->sys_pwr_30 + _controller_data->SPV2_filtered_pwr;
 					_controller_data->sys_pwr_30_count++;
 				}
 				else {
