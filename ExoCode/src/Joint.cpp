@@ -527,11 +527,14 @@ void HipJoint::run_joint()
         }
     }
 
+    // Boolean to check if the motor is an AK60v3.
     bool is_AK60v3 = (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::AK60v3);
 
     //Enable or disable the motor.
     _motor->on_off();
     if (!is_AK60v3) {
+        // The AK60v3 enables automatically and does not expect an enable command.
+        // The other AK motors do require the enable command to be sent.
         _motor->enable();
     }
     //Send the new command to the motor.

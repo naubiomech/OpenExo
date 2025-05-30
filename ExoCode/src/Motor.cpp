@@ -128,80 +128,10 @@ void _CANMotor::transaction(float torque)
     check_response();
 };
 
-/*
-void _CANMotor::read_data()
-{
-    //Read data from motor
-    bool searching = true;
-    uint32_t start = micros();
-
-    //Only send and receive data if enabled
-    if (_motor_data->enabled)
-    {
-        CAN* can = can->getInstance();
-        do
-        {
-            int direction_modifier = _motor_data->flip_direction ? -1 : 1;
-
-            CAN_message_t msg = can->read();
-            Serial.print("message ID: ");
-            Serial.print(msg.id);
-            Serial.println();
-            if ((msg.id & 0xFF) == uint8_t(_motor_data->id))// OLD: (msg.buf[0] == uint32_t(_motor_data->id))
-            {
-                //Unpack data
-
-				//=== OLD ===
-                //uint32_t p_int = (msg.buf[1] << 8) | msg.buf[2];
-                //uint32_t v_int = (msg.buf[3]) << 4 | (msg.buf[4] >> 4);
-                //uint32_t i_int = ((msg.buf[4] & 0xF) << 8) | msg.buf[5];
-
-				//=== NEW ===
-            	//uint32_t p_int = (msg.buf[3] << 8) | msg.buf[4];
-                //uint32_t v_int = (msg.buf[5] << 4) | (msg.buf[6] >> 4);
-                //uint32_t i_int = ((msg.buf[6] & 0xF) << 8) | msg.buf[7];
-
-                uint32_t p_int = (msg.buf[0] << 8) | msg.buf[1];
-                uint32_t v_int = (msg.buf[2] << 8) | msg.buf[3];
-                uint32_t i_int = (msg.buf[4] << 8) | msg.buf[5];
-
-                //Set data in ExoData object
-                _motor_data->p = direction_modifier * _uint_to_float(p_int, -_P_MAX, _P_MAX, 16); //* 0.1f;
-                //_motor_data->p = direction_modifier * _uint_to_float(p_int * 0.1f);
-                _motor_data->v = direction_modifier * _uint_to_float(v_int, -_V_MAX, _V_MAX, 12); //* 10.0f;
-                //_motor_data->v = direction_modifier * _uint_to_float(v_int * 10.0f);
-                _motor_data->i = direction_modifier * _uint_to_float(i_int, -_I_MAX, _I_MAX, 12); //* 0.01f;
-                //_motor_data->i = direction_modifier * _uint_to_float(i_int * 0.01f);
-
-                #ifdef MOTOR_DEBUG
-                    logger::print("_CANMotor::read_data():Got data-");
-                    logger::print("ID:" + String(uint32_t(_motor_data->id)) + ",");
-                    logger::print("P:"+String(_motor_data->p) + ",V:" + String(_motor_data->v) + ",I:" + String(_motor_data->i));
-                    logger::print("\n");
-                #endif
-
-                //Reset timout_count because we got a valid message
-                _motor_data->timeout_count = 0;
-                return;
-            }
-
-            searching = ((micros() - start) < _timeout);
-
-        }
-        while(searching);
-
-        //If we get here, we timed out
-        //_handle_read_failure();
-    }
-    return;
-};
-*/
-// Copilot's code:
 void _CANMotor::read_data()
 {
     if (_motor_data->enabled)
     {
-        Serial.println("Entered read_data");
         CAN* can = can->getInstance();
         int direction_modifier = _motor_data->flip_direction ? -1 : 1;
 
@@ -213,13 +143,11 @@ void _CANMotor::read_data()
         // Only process if the frame type matches what we expect for this motor
         if (is_ak60v3) {
             if (msg.len == 0 || !msg.flags.extended) {
-                Serial.println("wrong0");
                 return;
             }
             // AK60v3: NEW format
             if ((msg.id & 0xFF) == uint8_t(_motor_data->id))
             {
-                Serial.println("wrong1");
                 uint32_t p_int = (msg.buf[0] << 8) | msg.buf[1];
                 uint32_t v_int = (msg.buf[2] << 8) | msg.buf[3];
                 uint32_t i_int = (msg.buf[4] << 8) | msg.buf[5];
@@ -236,13 +164,11 @@ void _CANMotor::read_data()
             }
         } else {
             if (msg.len == 0 || msg.flags.extended) {
-                Serial.println("wrong2");
                 return;
             }
             // Old AK: OLD format
             if (msg.buf[0] == uint32_t(_motor_data->id))
             {
-                Serial.println("correct");
                 uint32_t p_int = (msg.buf[1] << 8) | msg.buf[2];
                 uint32_t v_int = (msg.buf[3] << 4) | (msg.buf[4] >> 4);
                 uint32_t i_int = ((msg.buf[4] & 0xF) << 8) | msg.buf[5];
@@ -256,10 +182,6 @@ void _CANMotor::read_data()
                     logger::print("\n");
                 #endif
                 _motor_data->timeout_count = 0;
-            }
-            else {
-                Serial.println("wrong3");
-                Serial.println("Motor ID: " + String(uint32_t(_motor_data->id)) + " does not match received ID: " + String(msg.buf[0]));
             }
         }
     }
@@ -293,10 +215,10 @@ void _CANMotor::send_data(float torque)
 
     CAN_message_t msg;
 
+    // Boolean to determine if this is an AK60v3 (extended, new format) or old AK (standard, old format)
     bool is_ak60v3 = (_motor_data->motor_type == (uint8_t)config_defs::motor::AK60v3);
 
     if (is_ak60v3) {
-        Serial.println("Using new format");
         // AK60v3: Extended CAN, NEW format
         msg.flags.extended = 1;
         msg.id = ((uint32_t) 8 << 8) | (uint32_t)_motor_data->id;
@@ -311,7 +233,6 @@ void _CANMotor::send_data(float torque)
         msg.buf[7] = i_int & 0xFF;
     } else {
         // Old AK: Standard CAN, OLD format
-        Serial.println("Using old format");
         msg.flags.extended = 0;
         msg.id = (uint32_t)_motor_data->id;
         // OLD format
@@ -424,7 +345,6 @@ bool _CANMotor::enable(bool overide)
     if ((_prev_motor_enabled != _motor_data->enabled) || overide || !_enable_response)
     {
         CAN_message_t msg;
-        //msg.flags.extended = 1; // set extended CAN frame
         msg.id = (uint32_t)_motor_data->id;
         msg.buf[0] = 0xFF;
         msg.buf[1] = 0xFF;
