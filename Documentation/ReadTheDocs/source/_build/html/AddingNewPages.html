@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Adding New Pages to OpenExo Documentation &#8212; OpenExo Documentation</title>
+    <title>Add Documentation &#8212; OpenExo Documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=0ac4fbd8" />
@@ -122,14 +122,15 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding New Pages to OpenExo Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Add Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
 </ul>
 
         </div>
@@ -141,18 +142,24 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="adding-new-pages-to-openexo-documentation">
-<h1>Adding New Pages to OpenExo Documentation<a class="headerlink" href="#adding-new-pages-to-openexo-documentation" title="Link to this heading">¶</a></h1>
+  <section id="add-documentation">
+<h1>Add Documentation<a class="headerlink" href="#add-documentation" title="Link to this heading">¶</a></h1>
 <p>This guide explains how to add new content pages to the Read the Docs site for the OpenExo project.</p>
-<ol class="arabic">
-<li><ul class="simple">
+<section id="create-a-new-restructuredtext-file">
+<h2>1. Create a new reStructuredText file<a class="headerlink" href="#create-a-new-restructuredtext-file" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
 <li><p>In your source folder (next to <cite>conf.py</cite>), create a file named, for example, <cite>new_page.rst</cite>.</p></li>
 <li><p>At the top of <cite>new_page.rst</cite>, add a title and reference label:</p>
 </li>
 <li id="new-page"><p>Write your content below the title.</p></li>
 </ul>
-</li>
-<li><ul class="simple">
+</div></blockquote>
+</section>
+<section id="include-the-new-page-in-the-table-of-contents">
+<h2>2. Include the new page in the table of contents<a class="headerlink" href="#include-the-new-page-in-the-table-of-contents" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
 <li><p>Open <cite>index.rst</cite> located in the same <cite>source/</cite> directory.</p></li>
 <li><p>Locate the <cite>.. toctree::</cite> directive (usually after the main title).</p></li>
 <li><p>Add an entry for your new file (without the <cite>.rst</cite> extension), for example:</p></li>
@@ -168,14 +175,19 @@
    <span class="n">usage</span>
 </pre></div>
 </div>
-</li>
-<li><ul class="simple">
+</div></blockquote>
+</section>
+<section id="update-conf-py-if-needed">
+<h2>3. Update <cite>conf.py</cite> if needed<a class="headerlink" href="#update-conf-py-if-needed" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
 <li><p>If your new page requires additional Sphinx extensions, install them and add to the <cite>extensions</cite> list.</p></li>
 <li><p>For custom styling, you can adjust theme options or add CSS files under the <cite>_static</cite> folder and reference them via <cite>html_static_path</cite>.</p></li>
 </ul>
-</li>
-<li></li>
-</ol>
+</div></blockquote>
+</section>
+<section id="build-and-preview-locally">
+<h2>4. Build and preview locally<a class="headerlink" href="#build-and-preview-locally" title="Link to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>C:<span class="se">\U</span>sers<span class="se">\u</span>ser<span class="se">\O</span>penExo<span class="se">\D</span>ocumentation<span class="se">\R</span>eadTheDocs
 make<span class="w"> </span>html
 start<span class="w"> </span>build<span class="se">\h</span>tml<span class="se">\i</span>ndex.html<span class="w">   </span><span class="c1"># open the docs in your browser</span>
@@ -186,12 +198,33 @@ start<span class="w"> </span>build<span class="se">\h</span>tml<span class="se">
 *Trigger Build*) to publish the updated documentation.</strong></p></li>
 </ul>
 </section>
+</section>
 
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
+    
+        <div id="show_right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents</span></a></p>
+        </div>
+
+        <div id="right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
+            <div class="page_toc">
+                <ul>
+<li><a class="reference internal" href="#">Add Documentation</a><ul>
+<li><a class="reference internal" href="#create-a-new-restructuredtext-file">1. Create a new reStructuredText file</a></li>
+<li><a class="reference internal" href="#include-the-new-page-in-the-table-of-contents">2. Include the new page in the table of contents</a></li>
+<li><a class="reference internal" href="#update-conf-py-if-needed">3. Update <cite>conf.py</cite> if needed</a></li>
+<li><a class="reference internal" href="#build-and-preview-locally">4. Build and preview locally</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+        </div>
     
 
       <div class="clearer"></div>

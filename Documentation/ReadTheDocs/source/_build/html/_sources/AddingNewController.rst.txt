@@ -11,6 +11,7 @@ parseIni.h
 ControllerData.h (Controller Definition)
 ------------------------------------------
 1. In the ``controller_defs`` namespace, add a namespace for your controller following the template from the existing controllers:
+ 
    - Create **idx** values that will be used to access the different parameters (remember, indexing starts at 0).
    - Add a **num_parameter** value that stores the number of parameters the controller needs.
    - If this number is larger than the current ``max_parameters`` in ``controller_defs``, update ``max_parameters`` accordingly.
@@ -18,6 +19,7 @@ ControllerData.h (Controller Definition)
 Controller.h
 ------------
 1. In ``Controller.h``, create a new controller that inherits from the ``_Controller`` class.
+   
    - This new controller must include:
 
      - A **constructor** that takes in the joint ID and an ``exo_data`` pointer.

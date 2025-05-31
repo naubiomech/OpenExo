@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Calibration Manager Controller &#8212; OpenExo Documentation</title>
+    <title>Franks Collins Hip Controller &#8212; OpenExo Documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=0ac4fbd8" />
@@ -16,8 +16,8 @@
     <script src="_static/js/petite-vue.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Chirp Controller" href="Chirp.html" />
-    <link rel="prev" title="Franks Collins Hip Controller" href="FranksCollinsHip.html" /> 
+    <link rel="next" title="Calibration Manager Controller" href="CalbrManager.html" />
+    <link rel="prev" title="Hip" href="hip.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
 <div id="top_nav">
@@ -129,8 +129,8 @@
 <li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="hip.html">Hip</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="FranksCollinsHip.html">Franks Collins Hip Controller</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Calibration Manager Controller</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Franks Collins Hip Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Chirp.html">Chirp Controller</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Step.html">Step Controller</a></li>
@@ -154,52 +154,32 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="calibration-manager-controller">
-<h1>Calibration Manager Controller<a class="headerlink" href="#calibration-manager-controller" title="Link to this heading">¶</a></h1>
+  <section id="franks-collins-hip-controller">
+<h1>Franks Collins Hip Controller<a class="headerlink" href="#franks-collins-hip-controller" title="Link to this heading">¶</a></h1>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
-<p>This controller applies a small, constant torque while printing statements of relevance (command value/sign, torque sensor value/sign, angle sensor value/sign) to the Arduino Serial Monitor.</p>
+<p>Provides Hip assistance based on a series of splines that have an extension and flexion portion. Uses percent gait, requiring heel FSR. Based on:</p>
+<p>Franks, P. W., Bryan, G. M., Martin, R. M., Reyes, R., Lakmazaheri, A. C., &amp; Collins, S. H. (2021). <a class="reference external" href="https://www.cambridge.org/core/journals/wearable-technologies/article/comparing-optimized-exoskeleton-assistance-of-the-hip-knee-and-ankle-in-single-and-multijoint-configurations/9FBC1580F11614B388BE621D716800AD">Comparing optimized exoskeleton assistance of the hip, knee, and ankle in single and multi-joint configurations</a>. Wearable Technologies, 2.</p>
 </section>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
-<p>There are no user-defined parameters associated with this controller.</p>
-</section>
-<section id="purposes">
-<h2>Purposes<a class="headerlink" href="#purposes" title="Link to this heading">¶</a></h2>
-<p>After you have built an exo, one of the first things to check is the motor directions and the signs (positive/negative) of any external sensors (such as torque or angle sensors). Having correct motor directions is important because it allows the exo controller designers to concentrate solely on control logic—knowing that if the system is calibrated properly before use, the exo assistance will always operate in the intended directions. The same principle applies to the sensors involved in control; since PID control is implemented in many of our controllers, it is crucial that sensor readings match the motor command signs.</p>
-<p>This document explains how to perform the calibration using the Calibration Manager Controller. Note that on each exo, this calibration process needs to be done <strong>once</strong>; its results must then be <strong>manually</strong> saved to the SD card and will be loaded <strong>automatically</strong> each time the exo starts up.</p>
-</section>
-<section id="motor-directions">
-<h2>Motor Directions<a class="headerlink" href="#motor-directions" title="Link to this heading">¶</a></h2>
-<p>When designing a controller, the values returned by the <code class="docutils literal notranslate"><span class="pre">calc_motor_cmd()</span></code> function determine the motor torque command (feedforward). To simplify the controller design process, we propose that designers adhere to the following directional conventions for torque commands:</p>
+<p>Parameter index order can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>.</p>
 <ul class="simple">
-<li><p><strong>Ankle joints:</strong>
-Positive for Dorsiflexion, negative for Plantarflexion.</p></li>
-<li><p><strong>Knee joints:</strong>
-Positive for Extension, negative for Flexion.</p></li>
-<li><p><strong>Hip joints:</strong>
-Positive for Flexion, negative for Extension.</p></li>
-<li><p><strong>Shoulder joints:</strong>
-Positive for Flexion, negative for Extension.</p></li>
-<li><p><strong>Elbow joints:</strong>
-Positive for Flexion, negative for Extension.</p></li>
+<li><p>mass - User mass in kg used for denormalizing torque.</p></li>
+<li><p>trough_normalized_torque_Nm_kg - Largest extension torque normalized to user mass (Nm/kg).</p></li>
+<li><p>peak_normalized_torque_Nm_kg - Largest flexion torque normalized to user mass (Nm/kg).</p></li>
+<li><p>start_percent_gait - Percent gait to start the torque pattern so it doesn’t have a discontinuity at heel strike.</p></li>
+<li><p>trough_onset_percent_gait - Percent gait to start applying extension torque.</p></li>
+<li><p>trough_percent_gait - Percent gait to apply the largest extension torque.</p></li>
+<li><p>mid_time - Transition point between extension and flexion to apply 0 torque.</p></li>
+<li><p>mid_duration - The duration of the transition pause as a percent of the gait cycle.</p></li>
+<li><p>peak_percent_gait - Percent gait to apply the largest flexion torque.</p></li>
+<li><p>peak_offset_percent_gait - Percent gait to stop applying flexion torque.</p></li>
+<li><p>use_pid - This flag turns PID on(1) or off(0)</p></li>
+<li><p>p_gain - Proportional gain for closed loop controls</p></li>
+<li><p>i_gain - Integral gain for closed loop controls</p></li>
+<li><p>d_gain - Derivative gain for closed loop controls</p></li>
 </ul>
-<p>In summary, this approach follows the <strong>right-hand rule</strong>.</p>
-</section>
-<section id="torque-sensor-signs-positive-negative">
-<h2>Torque Sensor Signs (Positive/Negative)<a class="headerlink" href="#torque-sensor-signs-positive-negative" title="Link to this heading">¶</a></h2>
-<p>Based on the motor direction definitions above, verify that when the motor supplies a positive torque command, the torque sensors (when properly zeroed) also return a positive value when the motor shaft is not spinning.</p>
-</section>
-<section id="how-to-calibrate">
-<h2>How to Calibrate<a class="headerlink" href="#how-to-calibrate" title="Link to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p><strong>Set Up the Controller:</strong>
-Set the Direction Calibration Manager as the default controller for the current exo. Connect the Teensy to a computer via USB and open the Arduino Serial Monitor. Also, connect the exo (Arduino Nano) with the Python application. Power on the exo and start a new session. The Calibration Manager will send a positive torque command (3.5 Nm by default) to each motor.</p></li>
-<li><p><strong>Check Motor Direction:</strong>
-Feel each torque—e.g., by using the foot plates on an ankle exo. If the torque applied (for example, to the left foot plate) does not cause it to rotate in the expected positive direction (refer to the directional definitions above), flip the motor direction for that side. Flipping the motor direction is achieved by modifying the <code class="docutils literal notranslate"><span class="pre">config.ini</span></code> file on the SD card.</p></li>
-<li><p><strong>Check Sensor Readings:</strong>
-After making any necessary changes to motor directions, restart the calibration process. This time, focus on the sensor readings (e.g., torque, angle) displayed on the Arduino Serial Monitor. For example, feel the motor torque on an ankle exo’s foot plate, then manually move the foot plate back to its neutral position (e.g., 0°). If the corresponding sensor does not return a positive value, flip the sensor direction by modifying the <code class="docutils literal notranslate"><span class="pre">config.ini</span></code> on the microSD card. Repeat this process for all torque sensors as needed.</p></li>
-</ol>
 </section>
 </section>
 
@@ -217,13 +197,9 @@ After making any necessary changes to motor directions, restart the calibration 
             <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
             <div class="page_toc">
                 <ul>
-<li><a class="reference internal" href="#">Calibration Manager Controller</a><ul>
+<li><a class="reference internal" href="#">Franks Collins Hip Controller</a><ul>
 <li><a class="reference internal" href="#description">Description</a></li>
 <li><a class="reference internal" href="#parameters">Parameters</a></li>
-<li><a class="reference internal" href="#purposes">Purposes</a></li>
-<li><a class="reference internal" href="#motor-directions">Motor Directions</a></li>
-<li><a class="reference internal" href="#torque-sensor-signs-positive-negative">Torque Sensor Signs (Positive/Negative)</a></li>
-<li><a class="reference internal" href="#how-to-calibrate">How to Calibrate</a></li>
 </ul>
 </li>
 </ul>
@@ -238,14 +214,14 @@ After making any necessary changes to motor directions, restart the calibration 
         <div class="button_nav">
             <div class="left">
                 
-                <a href="FranksCollinsHip.html">
-                    <span class="icon">&lt;</span><span>Franks Collins Hip Controller</span></a>
+                <a href="hip.html">
+                    <span class="icon">&lt;</span><span>Hip</span></a>
                 
             </div>
 
             <div class="right">
                 
-                    <a href="Chirp.html"><span>Chirp Controller</span><span class="icon">&gt;</span></a>
+                    <a href="CalbrManager.html"><span>Calibration Manager Controller</span><span class="icon">&gt;</span></a>
                 
             </div>
         </div>

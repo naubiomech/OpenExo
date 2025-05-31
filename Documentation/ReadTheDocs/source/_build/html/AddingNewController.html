@@ -122,7 +122,7 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a></li>
@@ -136,13 +136,14 @@
 <li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
 </ul>
 
         </div>
@@ -167,25 +168,27 @@
 <section id="controllerdata-h-controller-definition">
 <h2>ControllerData.h (Controller Definition)<a class="headerlink" href="#controllerdata-h-controller-definition" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>In the <code class="docutils literal notranslate"><span class="pre">controller_defs</span></code> namespace, add a namespace for your controller following the template from the existing controllers:
-- Create <strong>idx</strong> values that will be used to access the different parameters (remember, indexing starts at 0).
-- Add a <strong>num_parameter</strong> value that stores the number of parameters the controller needs.
-- If this number is larger than the current <code class="docutils literal notranslate"><span class="pre">max_parameters</span></code> in <code class="docutils literal notranslate"><span class="pre">controller_defs</span></code>, update <code class="docutils literal notranslate"><span class="pre">max_parameters</span></code> accordingly.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">controller_defs</span></code> namespace, add a namespace for your controller following the template from the existing controllers:</p>
+<ul class="simple">
+<li><p>Create <strong>idx</strong> values that will be used to access the different parameters (remember, indexing starts at 0).</p></li>
+<li><p>Add a <strong>num_parameter</strong> value that stores the number of parameters the controller needs.</p></li>
+<li><p>If this number is larger than the current <code class="docutils literal notranslate"><span class="pre">max_parameters</span></code> in <code class="docutils literal notranslate"><span class="pre">controller_defs</span></code>, update <code class="docutils literal notranslate"><span class="pre">max_parameters</span></code> accordingly.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="controller-h">
 <h2>Controller.h<a class="headerlink" href="#controller-h" title="Link to this heading">¶</a></h2>
-<ol class="arabic">
-<li><p>In <code class="docutils literal notranslate"><span class="pre">Controller.h</span></code>, create a new controller that inherits from the <code class="docutils literal notranslate"><span class="pre">_Controller</span></code> class.
-- This new controller must include:</p>
-<blockquote>
-<div><ul class="simple">
+<ol class="arabic simple">
+<li><p>In <code class="docutils literal notranslate"><span class="pre">Controller.h</span></code>, create a new controller that inherits from the <code class="docutils literal notranslate"><span class="pre">_Controller</span></code> class.</p>
+<ul class="simple">
+<li><p>This new controller must include:</p>
+<ul>
 <li><p>A <strong>constructor</strong> that takes in the joint ID and an <code class="docutils literal notranslate"><span class="pre">exo_data</span></code> pointer.</p></li>
 <li><p>A <strong>destructor</strong>.</p></li>
 <li><p>A <code class="docutils literal notranslate"><span class="pre">calc_motor_cmd()</span></code> function that returns the torque command in mNm.</p></li>
 </ul>
-</div></blockquote>
-<ul class="simple">
+</li>
 <li><p>Additional private functions or variables can be added as needed, but note that external calls will only invoke these three required functions.</p></li>
 </ul>
 </li>

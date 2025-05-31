@@ -121,14 +121,15 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
 </ul>
 
         </div>
@@ -182,14 +183,18 @@ poetry<span class="w"> </span>shell
 </section>
 <section id="license">
 <h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
-<p>The <strong>OpenExo</strong> library is licensed under the GPL-3.0 license. This license grants you the following freedoms:</p>
-<ul class="simple">
-<li><p><strong>Use</strong>: You are free to use the library for any purpose.</p></li>
-<li><p><strong>Modify</strong>: You may modify the library to suit your needs.</p></li>
-<li><p><strong>Study</strong>: You can study and change how the library works.</p></li>
-<li><p><strong>Distribute</strong>: You are allowed to distribute modified versions of the library.</p></li>
-</ul>
-<p>The GPL license ensures that these freedoms are upheld, requiring contributors to share their modifications publicly if they distribute the library.</p>
+<section id="hardware-license">
+<h3>Hardware License<a class="headerlink" href="#hardware-license" title="Link to this heading">¶</a></h3>
+<p>OpenExo’s <strong>hardware</strong> is released under the <strong>CERN-OHL-P v2.0</strong> license.
+You may study, modify, manufacture, and distribute the hardware provided you share modifications under the same license.
+Full text: <a class="reference external" href="https://ohwr.org/project/cernohl/-/wikis/uploads/98ff9662c7ce4252ec91104118c2af8e/cern_ohl_p_v2.pdf">https://ohwr.org/project/cernohl/-/wikis/uploads/98ff9662c7ce4252ec91104118c2af8e/cern_ohl_p_v2.pdf</a></p>
+</section>
+<section id="software-license">
+<h3>Software License<a class="headerlink" href="#software-license" title="Link to this heading">¶</a></h3>
+<p>OpenExo’s <strong>software</strong> is released under the <strong>GNU Lesser General Public License v3.0 (LGPL-3.0)</strong>.
+You may use, study, share, and modify the software so long as derivative works also comply with the LGPL.
+Details: <a class="reference external" href="https://www.gnu.org/licenses/lgpl-3.0.html">https://www.gnu.org/licenses/lgpl-3.0.html</a></p>
+</section>
 </section>
 <section id="contact-resources">
 <h2>Contact &amp; Resources<a class="headerlink" href="#contact-resources" title="Link to this heading">¶</a></h2>
@@ -204,19 +209,17 @@ poetry<span class="w"> </span>shell
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#outline">Outline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#background">Background</a></li>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#high-level-functionality">High Level Functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#high-level-functionality">High-Level Functionality</a></li>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#sd-card">SD Card</a></li>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#sensors">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#displays">Displays</a></li>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#actuators">Actuators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#controllers">Controllers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#bluetooth">Bluetooth</a></li>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#debug">Debug</a></li>
-<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#adding-new">Adding New</a></li>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#resources">Resources</a></li>
 <li class="toctree-l2"><a class="reference internal" href="User_Guide.html#known-issues">Known Issues</a></li>
 </ul>
@@ -237,6 +240,7 @@ poetry<span class="w"> </span>shell
 <li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a><ul>
@@ -262,7 +266,13 @@ poetry<span class="w"> </span>shell
 <li class="toctree-l2"><a class="reference internal" href="gui.html#biofeedback-frame">Biofeedback Frame</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#create-a-new-restructuredtext-file">1. Create a new reStructuredText file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#include-the-new-page-in-the-table-of-contents">2. Include the new page in the table of contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#update-conf-py-if-needed">3. Update <cite>conf.py</cite> if needed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#build-and-preview-locally">4. Build and preview locally</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="vscode_setup.html#download-and-install-vs-code">Download and Install VS Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vscode_setup.html#first-launch-checklist">First-Launch Checklist</a></li>
@@ -281,6 +291,12 @@ poetry<span class="w"> </span>shell
 <li class="toctree-l2"><a class="reference internal" href="gamification_template.html#api-endpoints">API Endpoints</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gamification_template.html#extending-the-gui">Extending the GUI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gamification_template.html#future-work">Future Work</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="StyleGuide.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="StyleGuide.html#commenting">Commenting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="StyleGuide.html#naming">Naming</a></li>
 </ul>
 </li>
 </ul>
@@ -307,7 +323,11 @@ poetry<span class="w"> </span>shell
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#getting-started">Getting Started</a></li>
 <li><a class="reference internal" href="#developing">Developing</a></li>
-<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#license">License</a><ul>
+<li><a class="reference internal" href="#hardware-license">Hardware License</a></li>
+<li><a class="reference internal" href="#software-license">Software License</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#contact-resources">Contact &amp; Resources</a></li>
 </ul>
 </li>

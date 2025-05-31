@@ -49,14 +49,17 @@ If you wish to modify, develop, or contribute to the **OpenExo** library, it is 
 
 License
 -------
-The **OpenExo** library is licensed under the GPL-3.0 license. This license grants you the following freedoms:
+Hardware License
+~~~~~~~~~~~~~~~~
+OpenExo’s **hardware** is released under the **CERN-OHL-P v2.0** license.  
+You may study, modify, manufacture, and distribute the hardware provided you share modifications under the same license.  
+Full text: https://ohwr.org/project/cernohl/-/wikis/uploads/98ff9662c7ce4252ec91104118c2af8e/cern_ohl_p_v2.pdf
 
-- **Use**: You are free to use the library for any purpose.
-- **Modify**: You may modify the library to suit your needs.
-- **Study**: You can study and change how the library works.
-- **Distribute**: You are allowed to distribute modified versions of the library.
-
-The GPL license ensures that these freedoms are upheld, requiring contributors to share their modifications publicly if they distribute the library.
+Software License
+~~~~~~~~~~~~~~~~
+OpenExo’s **software** is released under the **GNU Lesser General Public License v3.0 (LGPL-3.0)**.  
+You may use, study, share, and modify the software so long as derivative works also comply with the LGPL.  
+Details: https://www.gnu.org/licenses/lgpl-3.0.html
 
 Contact & Resources
 -------------------
@@ -82,3 +85,4 @@ For questions, issues, or further assistance, reach out to us at:
    AddingNewPages
    vscode_setup
    gamification_template
+   StyleGuide

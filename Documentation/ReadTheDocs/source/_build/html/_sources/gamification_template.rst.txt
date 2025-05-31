@@ -21,10 +21,6 @@ motivational rationale.
 Architecture Diagram
 --------------------
 
-.. image:: ../_static/gamification_arch.png
-   :alt: Gamification Architecture Diagram
-   :width: 500
-
 *TODO* – Describe data flow between the exoskeleton, game engine, and GUI.
 
 API Endpoints

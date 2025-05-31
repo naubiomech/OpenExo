@@ -1,4 +1,4 @@
-User Guide
+Background Info
 ==========
 
 Outline
@@ -37,7 +37,7 @@ Outline
 
     1. `Actuator Structure <#actuator-structure>`__
     2. `Adding New Actuators <#adding-new-actuators>`__
-    3. `T-motor Initialization <#t-motor-initialization>`__ (Get info from Chance)
+    3. `T-motor Initialization <#t-motor-initialization>`__
 
 8.  `Controllers <#controllers>`__
 
@@ -45,7 +45,7 @@ Outline
     2. `Adding New Controllers <#adding-new-controllers>`__
     3. `Controller Parameters <#controller-parameters>`__
 
-9.  `Bluetooth Communication <#bluetooth>`__ (Get info from Chance)
+9.  `Bluetooth Communication <#bluetooth>`__
 
     1. `Bluetooth Background <#bluetooth-background>`__
     2. `Bluetooth Structure <#bluetooth-structure>`__
@@ -100,7 +100,7 @@ Bit Shifting
 
 Bit Shifting, as its name implies, moves the binary value of the bit of interest some determined number of places to the left or right. This is traditionally used for data storage purposes. For example, if you have a boolien (see section below) that will either have a 0 or a 1 it would be inefficient to store only that in a single byte. Thus, we can use bit shifting to store multiple booliens (e.g., 8) into a single byte, which is much more efficient.
 
-**ex.** `Utilities.cpp </ExoCode/src/Utilities.cpp>`__
+**ex.** `Utilities.cpp <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Utilities.cpp>`__
 
 ::
 
@@ -129,7 +129,7 @@ Variables are used as a means to store data/information. Variables have a name t
 
 **Syntax:** type variable_name = value;
 
-**ex.** `BleMessage.h </ExoCode/src/BleMessage.h>`__
+**ex.** `BleMessage.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/BleMessage.h>`__
 
 ::
 
@@ -146,7 +146,7 @@ Bool
 
 The Bool (Boolean) type can store true (1) or false (0) values.
 
-**ex.** `ExoCode.ino </ExoCode/ExoCode.ino>`__
+**ex.** `ExoCode.ino <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/ExoCode.ino>`__
 
 ::
 
@@ -183,7 +183,7 @@ Char
 
 The Char type can store one character. The character should be surrounded by single quotes (e.g., ‘P’,‘u’,‘p’,‘p’,‘y’).
 
-**ex.** `BleMessage.h </ExoCode/src/BleMessage.h>`__
+**ex.** `BleMessage.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/BleMessage.h>`__
 
 ::
 
@@ -195,7 +195,7 @@ Int
 
 The int type is used when storing numbers without a decimal.
 
-**ex.** `BleMessage.h </ExoCode/src/BleMessage.h>`__
+**ex.** `BleMessage.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/BleMessage.h>`__
 
 ::
 
@@ -207,7 +207,7 @@ Float
 
 The float type is used when storing numbers that have a decimal. It is capable of occupying 32 bits which is approximately 7 decimal places.
 
-**ex.** `TorqueSensor.h </ExoCode/src/TorqueSensor.h>`__
+**ex.** `TorqueSensor.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/TorqueSensor.h>`__
 
 ::
 
@@ -236,7 +236,7 @@ Arrays are used to store several values witin one variable. Similar to other var
    cout << numbers[0]; //Would output 10
    cout << numbers[1]; //Would output 20
 
-**ex.** `ExoCode.ino </ExoCode/ExoCode.ino>`__
+**ex.** `ExoCode.ino <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/ExoCode.ino>`__
 
 ::
 
@@ -247,7 +247,7 @@ Void
 
 Void means that there is no type, thus variables cannot be defined with “void”. The primary utilization of void is for functions that return no values (more on those later).
 
-**ex.** `SyncLed.cpp </ExoCode/src/SyncLed.cpp>`__
+**ex.** `SyncLed.cpp <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/SyncLed.cpp>`__
 
 ::
 
@@ -290,7 +290,7 @@ Explicit typecasting occurs when the programmer manually changes a variable from
 
    cout << value; //Prints out the value, which is 12
 
-**ex.** `Utilities.h </ExoCode/src/Utilities.h>`__
+**ex.** `Utilities.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Utilities.h>`__
 
 ::
 
@@ -312,7 +312,7 @@ Unsigned variables are only capable of storing postive values and zero. These ca
 
 Signed variables use one extra bit to account for the sign of the value (compared to unsigned), hence unsigned can be used to save extra space.
 
-**ex.** `BleParser.cpp </ExoCode/src/BleParser.cpp>`__
+**ex.** `BleParser.cpp <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/BleParser.cpp>`__
 
 ::
 
@@ -329,7 +329,7 @@ The short modifier modifies the minimum value that a data type can hold. Short c
 
 The primary value of using these modifiers is for memory usage purposes. A short int will use less bytes than an int whereas a long int will use more bytes than an int.
 
-**ex.** `Utilities.h </ExoCode/src/Utilities.h>`__
+**ex.** `Utilities.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Utilities.h>`__
 
 ::
 
@@ -346,7 +346,7 @@ Local Scope: variables can only be accessed within the block of code that they a
 
 Global Scope: variables can be access from the time of declaration within the code until the end of the code.
 
-**ex.** `ExoCode.ino </ExoCode/ExoCode.ino>`__
+**ex.** `ExoCode.ino <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/ExoCode.ino>`__
 
 ::
 
@@ -357,7 +357,7 @@ Volatile
 
 A volatile variable means that the value may change between accesses to the variable, even if said variable appears unmodified. The use of volatile guarantees that the varilabe will be read again before any usage. This may be useful in a situation when a controller may try to use a previous copy of the variable value (that it assumes are unchanged) rather than reading and writing using the current value. This is common in situations when the variable value can change due to something outside of the code (e.g., hardware that changes the value).
 
-**ex.** `SyncLed.h </ExoCode/src/SyncLed.h>`__
+**ex.** `SyncLed.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/StatusLed.h>`__
 
 ::
 
@@ -382,8 +382,6 @@ FileTwo.cpp
 
    extern int variable;
    cout << variable; //This would output 20
-
-**ex.** `SPIHandler.h </ExoCode/src/SPIHandler.h>`__
 
 ::
 
@@ -450,7 +448,7 @@ There is an alternative way to formulate if-else statments within the code that 
    string result = (x < y) ? "The dog is really really good." : "The dog is really good."
    cout << result;
 
-**ex.** `Controller.cpp </ExoCode/src/Controller.cpp>`__
+**ex.** `Controller.cpp <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.cpp>`__
 
 ::
 
@@ -542,7 +540,7 @@ If the expression matches the case value (x, y, z in the above syntax), then the
            cout << "This is not a month.";
    }
 
-**ex.** `Controller.cpp </ExoCode/src/Controller.cpp>`__
+**ex.** `Controller.cpp <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.cpp>`__
 
 ::
 
@@ -649,7 +647,7 @@ If the function has a return, the return will be the last line of code within th
        cout << result;             //Will output 4
    }
 
-**ex.** `Utilities.cpp </ExoCode/src/Utilities.cpp>`__
+**ex.** `Utilities.cpp <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Utilities.cpp>`__
 
 ::
 
@@ -689,7 +687,7 @@ Function overloading is when there are multiple functions of the same name but w
        cout << multiply(2,3,4) << "\n";    //Outputs a value of 24
    }
 
-**ex.** `Utilities.cpp </ExoCode/src/Utilities.cpp>`__
+**ex.** `Utilities.cpp <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Utilities.cpp>`__
 
 ::
 
@@ -808,7 +806,7 @@ While some functions are definied within the class itself, such as above, there 
        dog1.dog_information();     //Utilizes the class's method to output "Mr. Pebbles is a 4 year old Golden Retriever"
    }   
 
-**ex.** `Controller.h </ExoCode/src/Controller.h>`__
+**ex.** `Controller.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.h>`__
 
 ::
 
@@ -829,7 +827,7 @@ Constructors are a method within a class that is automatically called upon creat
 
 Note: Constructors must have the same name as the class and all members within a constructor are public.
 
-**ex.** `Controller.h </ExoCode/src/Controller.h>`__
+**ex.** `Controller.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.h>`__
 
 ::
 
@@ -879,7 +877,7 @@ Inheritance is when a class (called a child, derived, or sub class) takes (inher
        int interceptions;
    };
 
-**ex.** `Controller.h </ExoCode/src/Controller.h>`__
+**ex.** `Controller.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.h>`__
 
 ::
 
@@ -911,7 +909,7 @@ Abstract Classes
 
 Abstact classess (also called interfaces) provide a base class from which other classes can inherit. These classes can not be used to create objects, they only serve as an interface. A class is made abstract when at least one of its functions is made to be a pure virtual function (syntax: virtual type function_name(parameters) = 0;).
 
-**ex.** `Controller.h </ExoCode/src/Controller.h>`__
+**ex.** `Controller.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.h>`__
 
 ::
 
@@ -1007,7 +1005,7 @@ Initializer lists are used to initializing members of classes with data.
    };
            
 
-**ex.** `Controller.cpp </ExoCode/src/Controller.cpp>`__
+**ex.** `Controller.cpp <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.cpp>`__
 
 ::
 
@@ -1028,7 +1026,7 @@ Pointers are variables that contain the memory address as a value. These variabl
 
 **Synatx:** type\* variable_name or type \*variable_name
 
-**ex.** `Joint.h </ExoCode/src/Joint.h>`__
+**ex.** `Joint.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Joint.h>`__
 
 ::
 
@@ -1065,7 +1063,7 @@ You can also do the opposite and get the value of a variable from it’s memory 
 
 Within the code you may run into “->”. This is used with pointers and is equivalent to using “object.attribute” within classes.
 
-**ex.** `Controller.cpp </ExoCode/src/Controller.cpp>`__
+**ex.** `Controller.cpp <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.cpp>`__
 
 ::
 
@@ -1105,7 +1103,7 @@ These can also be initialized via the following synatx: type (\*function_pointer
        cout << result;                             //Outputs the result
    }
 
-**ex.** `ExoData.h </ExoCode/src/ExoData.h>`__
+**ex.** `ExoData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ExoData.h>`__
 
 ::
 
@@ -1175,7 +1173,7 @@ If you are reading this you have found the location, but for completeness it can
 Style Guide
 ~~~~~~~~~~~
 
-The detailed style guide can be found `here <StyleGuide.rst>`__.
+The detailed style guide can be found :doc:`here <StyleGuide>`.
 
 System Structure
 ~~~~~~~~~~~~~~~~
@@ -1184,41 +1182,89 @@ System Structure
    :alt: Diagram
    :align: center
    :width: 800px
-Details of the components can be found in `/Presentations/20220914_Pridham_NewCodeBase.pptx </Presentations/>`__ Note: At the time of the presentaiton the terminology “Leg/LegData” was used instead of “Side/SideData” and communication between the boards occured via SPI instead of UART. The functionality and structure is the same, but to avoid confusion we wanted to specify.
+
+Details of the components can be found in `presentations <https://github.com/naubiomech/OpenExo/tree/main/Presentations>`__ Note: At the time of the presentaiton the terminology “Leg/LegData” was used instead of “Side/SideData” and communication between the boards occured via SPI instead of UART. The functionality and structure is the same, but to avoid confusion we wanted to specify.
 
 How to Deploy
 ~~~~~~~~~~~~~
 
-| First, you will need to connect the physical components. 1. Mount the motors on the system as appropriate.
-| 2. Connect the power and communication cables to the control board. - The connectors should attach to the side they are on while worn, e.g. the left motor connects to the left side of the board. - The connections top to bottom should be the proximal to distal joints used, e.g. if the hip and ankle are used the hip should be the top most location, the ankle should be next; if just the ankle is used it should be on the top most connector of the appropriate type. 3. Similarly, sensors should be connected on the side used 4. The control board may have multiple microcontrollers on it they should all be flashed with ExoCode.ino through the Arduino IDE. The compiler will select the correct parts of the code to use if you select the correct microcontroller.
-| - Update /ExoCode/src/Config.h BOARD_VERSION with the version number found on the control board before compiling. - Update the libraries. Move the files/folders in the `Libraries Folder </Libraries>`__. To your local Folder C::raw-latex:`\User`\\[USER]:raw-latex:`\Documents`:raw-latex:`\Arduino`:raw-latex:`\libraries` or system equivalent. Details on the libraries that are used are used can be found in `Libraries Folder </Libraries/README.md>`__. - `Arduino Instructions <https://docs.google.com/document/d/1ToLq6Zqv58Q4YEmf4SzqJDKCTp52LUaKgYg5vNmHdaI/edit?usp=sharing>`__ 5. Lastly, is the SD card. - Transfer the content of the SD Card folder to the micro SD card. - Update the config.ini file - Change the board version - Change the Exo name - Go to the section for that name and confirm the settings match your system. - For the joints you are using, go to that folder and update the controllers you plan to use.
+First, you will need to connect the physical components.
+
+#. Mount the motors on the system as appropriate.
+
+#. Connect the power and communication cables to the control board.
+
+   * The connectors should attach to the side they are on while worn, e.g. the left motor connects to the left side of the board.
+   * The connections top to bottom should be the proximal to distal joints used, e.g. if the hip and ankle are used the hip should be the top most location, the ankle should be next; if just the ankle is used it should be on the top most connector of the appropriate type.
+
+#. Similarly, sensors should be connected on the side used
+
+#. The control board may have multiple microcontrollers on it they should all be flashed with ExoCode.ino through the Arduino IDE. The compiler will select the correct parts of the code to use if you select the correct microcontroller.
+
+   * Update /ExoCode/src/Config.h BOARD_VERSION with the version number found on the control board before compiling.
+   * Update the libraries. Move the files/folders in the `Libraries Folder <https://github.com/naubiomech/OpenExo/tree/main/Libraries>`__. To your local Folder C:\User\[USER]\Documents\Arduino\libraries\ or system equivalent. Details on the libraries that are used are used can be found in `Libraries Folder <https://github.com/naubiomech/OpenExo/blob/main/Libraries/README.md>`__.
+   * `Arduino Instructions <https://docs.google.com/document/d/1ToLq6Zqv58Q4YEmf4SzqJDKCTp52LUaKgYg5vNmHdaI/edit?usp=sharing>`__
+
+#. Lastly, is the SD card.
+
+    * Transfer the content of the SD Card folder to the micro SD card.
+    * Update the config.ini file
+        * Change the board version
+        * Change the Exo name
+        * Go to the section for that name and confirm the settings match your system.
+    * For the joints you are using, go to that folder and update the controllers you plan to use.
 
 Those are the rough points. Detailed explanations can be found in the coming sections.
 
---------------
-
-High Level Functionality
+High-Level Functionality
 ------------------------
 
-| The system is broken into separate components that can be put together based on the system’s needs. Arduino is used to control these components.
-| There are two key classes, ExoData and Exo.
-| ExoData is used to store the data recorded by the system and the data used to control the system and should mirror the structure of Exo. The hierarchy is: - Exo/ExoData - StatusLed - SyncLed - FSRs - Side/SideData - Joint/JointData - TorqueSensor - Motor/MotorData - Controller/ControllerData
+The system is broken into modular components that can be assembled as needed; an
+Arduino-class MCU coordinates them.
 
-A subset of the firmware can run on a separate microcontroller, intended to handle Bluetooth communication and soft real-time functionality. The main microcontroller communicates with the communication microcontroller via UART. The hierarchy is: - ComsMCU/ExoData - ExoBLE/ExoData - BleParser
+There are two key classes, **ExoData** and **Exo**:
 
-More info can be found below in `Code Structure <#code-structure>`__.
+* **ExoData** stores both telemetry and control parameters and mirrors the
+  internal structure of **Exo**.  
+  Its hierarchy is::
 
-The high level way the code runs is: 1. Read the configuration from the SD card 2. Create the exo_data object (static in main loop) 3. Create the exo object (static in main loop) 4. Read new messages and update exo_data 5. exo.run() which runs the subcomponents as well
+      Exo / ExoData
+      ├── StatusLed
+      ├── SyncLed
+      ├── FSRs
+      └── Side / SideData
+          └── Joint / JointData
+              ├── TorqueSensor
+              ├── Motor / MotorData
+              └── Controller / ControllerData
+
+A subset of the firmware can run on a secondary microcontroller that handles
+Bluetooth communication and soft real-time tasks.  
+The primary MCU talks to the communications MCU over UART:
+
+* **ComsMCU / ExoData**
+    * **ExoBLE / ExoData**
+        * **BleParser**
+
+For more detail see `Code Structure <#code-structure>`__.
+
+The high level way the code runs is:
+
+#. Read the configuration from the SD card.
+#. Create the ``exo_data`` object (static in the main loop).
+#. Create the ``exo`` object (static in the main loop).
+#. Read new messages and update ``exo_data``.
+#. Call ``exo.run()`` to execute all sub-components.
 
 Code Structure
 ~~~~~~~~~~~~~~
 
-| `Namespaces <Structure/Namespaces.md>`__ are used in place of global variables.
+| `Namespaces <https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/Namespaces.md>`__ are used in place of global variables.
 | They are used for items that need to be accessible by other parts of the code. They are used as little as possible to minimize the amount of dependencies as that makes the code less modular.
 
-`Data Structure <Structure/ExoDataStructure.md>`__
+`Data Structure <https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/ExoDataStructure.md>`__
 
-`Exo Structure <Structure/ExoStructure.md>`__
+`Exo Structure <https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/ExoStructure.md>`__
 
 Guiding Principals
 ~~~~~~~~~~~~~~~~~~
@@ -1228,29 +1274,41 @@ The guiding principals of the code is to make it adaptable and modular. There ar
 Operation
 ~~~~~~~~~
 
-We have developed a Python GUI to aid in the operation of the device. More information on the Python GUI, and its operation, can be found [here] (/Python_GUI)
+We have developed a Python GUI to aid in the operation of the device.
+More information on the Python GUI, and its operation, can be found
+:doc:`here <gui>`.
 
 --------------
 
 SD Card
 -------
 
-The files for the SD card can be found in the `SDCard </SDCard/>`__ folder in the main directory. The contents of this file should be copied to the root of the SD card, e.g. when you open the SD Card you should see config.ini. The file contains the configuration file and the parameter files for the controllers. These parameter files are a temporary measure till the new app is running.
+The files for the SD card can be found in the `SDCard <https://github.com/naubiomech/OpenExo/tree/main/SDCard>`__ folder in the main directory. The contents of this file should be copied to the root of the SD card, e.g. when you open the SD Card you should see config.ini. The file contains the configuration file and the parameter files for the controllers. These parameter files are a temporary measure till the new app is running.
 
 SD Configuration
 ~~~~~~~~~~~~~~~~
 
-| `config.ini </SDCard/config.ini>`__ is used to tell the code how they system is configured. The fields should all be less than 25 characters as that is limited by the size of the array that is parsing it. The file is broken into sections denoted by being in [ ], e.g. [Board], containing information related to the board.
-| This separates information that is related into groups. Within the section you have keys, these contain the information, e.g. version = 0.1. The key names shouldn’t be modified, version, as the parser is looking for the specific name but the value can be, 0.1.
+`config.ini <https://github.com/naubiomech/OpenExo/blob/main/SDCard/config.ini>`__ is used to tell the code how they system is configured. The fields should all be less than 25 characters as that is limited by the size of the array that is parsing it. The file is broken into sections denoted by being in [ ], e.g. [Board], containing information related to the board.
 
-We have some premade exoskeleton configurations you can choose from by putting their name in the Exo section. Just check to make sure the settings in that section match your system. If we are using a bilateral hip system we would set ``[Exo] name = bilateralHip``, then go to the section [bilateralHip] and check it matches the system we are using. - sides - are you using the left, right, or both sides. - hip, knee, ankle - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won’t use that joint). - gear ratio - sets the transmission ratio for the joint torque to the motor output torque. If the motor has a built in gearbox that should not appear here but rather be coded into the motor class in Motor.cpp. - default controller - is the controller the system starts with. - use torque sensor - flag to determine if you want to use a torque sensor with your joint (0 = no, 1 = yes) - flip motor dir - is if the direction of the motor values should be flipped. For example if we have two motors pointing in towards the hip and both rotate counter clockwise with a positive current one of them will need to be sent a negative current so they both rotate in the same direction on the body. - flip torque dir - flips the sign of the torque sensor on the selected side. This helps align the torque sensor reading to be in the same direction as the motor command to avoid PID issues. - flip angle dir - flips the sign of the angle sensor on the selected side. This helps align the angle sensor reading to be in the same direction as the motor command to avoid controller issues.
+This separates information that is related into groups. Within the section you have keys, these contain the information, e.g. version = 0.1. The key names shouldn’t be modified, version, as the parser is looking for the specific name but the value can be, 0.1.
+
+We have some premade exoskeleton configurations you can choose from by putting their name in the Exo section. Just check to make sure the settings in that section match your system. If we are using a bilateral hip system we would set ``[Exo] name = bilateralHip``, then go to the section [bilateralHip] and check it matches the system we are using.
+
+* sides - are you using the left, right, or both sides.
+* hip, knee, ankle - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won’t use that joint).
+* gear ratio - sets the transmission ratio for the joint torque to the motor output torque. If the motor has a built in gearbox that should not appear here but rather be coded into the motor class in Motor.cpp.
+* default controller - is the controller the system starts with.
+* use torque sensor - flag to determine if you want to use a torque sensor with your joint (0 = no, 1 = yes)
+* flip motor dir - is if the direction of the motor values should be flipped. For example if we have two motors pointing in towards the hip and both rotate counter clockwise with a positive current one of them will need to be sent a negative current so they both rotate in the same direction on the body.
+* flip torque dir - flips the sign of the torque sensor on the selected side. This helps align the torque sensor reading to be in the same direction as the motor command to avoid PID issues.
+* flip angle dir - flips the sign of the angle sensor on the selected side. This helps align the angle sensor reading to be in the same direction as the motor command to avoid controller issues.
 
 SD Controller Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 The parameters for each controller are stored in their corresponding joint folder. This way if both joints are using a zero torque controller but need different gains they can pull from different files. The files are comma separated value files, so there are commas between cells. The first cell in the *first* row contains the number of lines in the header, how many lines we need to get through to get to the parameters. The first cell in the *second* row contains the number of parameters to read. The rest of the header just contains useful info for the person, such as the parameter order. The first parameter row will be the default values, set 0. The nth parameter row is n-1 parameter set, e.g. parameter row 2 will be referenced as set 1.
 
-The order of the parameters should match how they appear in the parameter array which can be found in `ControllerData.h </ExoCode/src/ControllerData.h>`__. in the controller_defs namespace.
+The order of the parameters should match how they appear in the parameter array which can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`__. in the controller_defs namespace.
 
 These will be selected using the update controller field in the app where you set the joint, controller, and parameter set.
 
@@ -1271,7 +1329,7 @@ The main thing the sensors will need is a constructor to setup the interface. Fo
 Adding New Sensors
 ~~~~~~~~~~~~~~~~~~
 
-Details can be found in `Adding New Sensors <AddingNew/AddingNewSensors.md>`__
+Details can be found in :doc:`Adding New Sensors <AddingNewSensors>`.
 
 --------------
 
@@ -1283,14 +1341,14 @@ There are currently two different options for displays, the status LED and the s
 Status LED
 ~~~~~~~~~~
 
-The status LED is simply and RGB LED that displays different light patterns to let you know what is happening with the system. Details on what the different patterns mean can be found in `StatusLed.h </ExoCode/src/StatusLed.h>`__ in the status_led_defs namespace. There is an instance of StatusLed in Exo which should be updated every run of exo using:
+The status LED is simply and RGB LED that displays different light patterns to let you know what is happening with the system. Details on what the different patterns mean can be found in `StatusLed.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/StatusLed.h>`__ in the status_led_defs namespace. There is an instance of StatusLed in Exo which should be updated every run of exo using:
 
 ::
 
    //Update status LED
    status_led.update(data->status);
 
-Where the status value is defined in the status_defs::messages namespace in `StatusDefs.h </ExoCode/src/StatusDefs.h>`__, and is set in other areas of the code depending on what the current state is.
+Where the status value is defined in the status_defs::messages namespace in `StatusDefs.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/StatusDefs.h>`__, and is set in other areas of the code depending on what the current state is.
 
 Sync LED
 ~~~~~~~~
@@ -1318,9 +1376,9 @@ Actuators are setup so that the system can add multiple types of motors and sele
 Actuator Structure
 ~~~~~~~~~~~~~~~~~~
 
-As with most of the system there is a parallel data structure that follows the system structure. MotorData details can be found in `Data Structure <Structure/ExoDataStructure.md>`__, but contains state and configuration information.
+As with most of the system there is a parallel data structure that follows the system structure. MotorData details can be found in `Data Structure <https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/ExoDataStructure.md>`__, but contains state and configuration information.
 
-The motors should all inherit their interface from the `abstract class <#abstract-classes>`__ \_Motor in `Motor.h </ExoCode/src/Motor.h>`__. This defines how other systems can call motors, that way the rest of the system doesn’t need to know what specific motor you are using as they all have the same calls. Within this you can then define what that call does for the specific motor/type. With the CAN motors they have a separate class that this type of motor inherits since they all work in much the same way but have some parameters that are different. You can see this in the Motor.h file as
+The motors should all inherit their interface from the `abstract class <#abstract-classes>`__ \_Motor in `Motor.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Motor.h>`__. This defines how other systems can call motors, that way the rest of the system doesn’t need to know what specific motor you are using as they all have the same calls. Within this you can then define what that call does for the specific motor/type. With the CAN motors they have a separate class that this type of motor inherits since they all work in much the same way but have some parameters that are different. You can see this in the Motor.h file as
 
 ::
 
@@ -1339,19 +1397,19 @@ We decided that the motors would always be used in torque control mode so transa
 Adding New Actuators
 ~~~~~~~~~~~~~~~~~~~~
 
-Details to adding a new motor type can be found in `Adding New Motor Type <AddingNew/AddingNewMotorType.md>`__. Details on adding a new CAN motor can be found in `Adding New CAN Motor <AddingNew/AddingNewCanMotor.md>`__. This is specifically for the TMotor CAN motors but can be adapted to new types of motors when we have them.
+Details to adding a new motor type can be found in :doc:`Adding New Motor Type <AddingNewMotorType>`. Details on adding a new CAN motor can be found in :doc:`Adding New CAN Motor <AddingNewCanMotor>`. This is specifically for the TMotor CAN motors but can be adapted to new types of motors when we have them.
 
 T-motor Initialization
 ~~~~~~~~~~~~~~~~~~~~~~
 
-TMotor initialization information can be found [here] (https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b\_?usp=drive_link)
+TMotor initialization information can be found `here <https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b\_?usp=drive_link>`__
 
 --------------
 
 Controllers
 -----------
 
-Much like the motor the controllers have a parallel ControllerData class to store data for the controller. ControllerData details can be found in `Data Structure <Structure/ExoDataStructure.md>`__, but contains state and configuration information.
+Much like the motor the controllers have a parallel ControllerData class to store data for the controller. ControllerData details can be found in `Data Structure <https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/ExoDataStructure.md>`__, but contains state and configuration information.
 
 The Joint instance uses a `pointer <#pointers>`__ to the controller that is currently being used. The main difference is that the Joint has an instance to all the possible controllers that will be used so we just need to point to the correct one. That is why the constructor to the a joint like the hip looks like:
 
@@ -1368,7 +1426,7 @@ The Joint instance uses a `pointer <#pointers>`__ to the controller that is curr
 
 Where the constructor of each controller is called.
 
-The controllers also inherit their interface, like the motors, from the `abstract class <#abstract-classes>`__ \_Controller in `Controller.h </ExoCode/src/Controller.h>`__. This defines how other systems can call controllers, that way the rest of the system doesn’t need to know what specific controller you are using as they all have the same calls. Within this you can then define what that call does for the specific controller.
+The controllers also inherit their interface, like the motors, from the `abstract class <#abstract-classes>`__ \_Controller in `Controller.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.h>`__. This defines how other systems can call controllers, that way the rest of the system doesn’t need to know what specific controller you are using as they all have the same calls. Within this you can then define what that call does for the specific controller.
 
 Controller Structure
 ~~~~~~~~~~~~~~~~~~~~
@@ -1383,12 +1441,16 @@ The controllers have a primary call of calc_motor_cmd() that will calculate the 
 
 Each controller can also have additionally private member functions that are called internally.
 
-The controllers will pull the parameters that they use from the ControllerData instance which can be accessed through the pointer in the controller using ``_controller_data->parameters``. This is shared between all controllers so it is important to change to the “zero_torque” controller prior to moving to a new controller. The order of operations are: 1. Change to zero torque controller, commands the motor to 0 current and uses no parameters so it is safe when making big changes to parameters. 2. Change parameters so they are what you want for the new controller. 3. Change the controller pointer to use the new controller. This way you don’t change a parameter for one controller to something like user mass when the current controller is interpreting that parameter as max torque. This should be handled in software so the user doesn’t need to think about it, but is good to be aware of.
+The controllers will pull the parameters that they use from the ControllerData instance which can be accessed through the pointer in the controller using ``_controller_data->parameters``. This is shared between all controllers so it is important to change to the “zero_torque” controller prior to moving to a new controller. The order of operations are:
+
+#. Change to zero torque controller, commands the motor to 0 current and uses no parameters so it is safe when making big changes to parameters.
+#. Change parameters so they are what you want for the new controller.
+#. Change the controller pointer to use the new controller.This way you don’t change a parameter for one controller to something like user mass when the current controller is interpreting that parameter as max torque. This should be handled in software so the user doesn’t need to think about it, but is good to be aware of.
 
 Adding New Controllers
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Details can be found in `Adding New Controller <AddingNew/AddingNewController.md>`__.
+Details can be found in :doc:`Adding New Controller <AddingNewController>`.
 
 Controller Parameters
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1398,45 +1460,44 @@ The controller parameters are dependent on what controller is being used but a d
 Hip
 ^^^
 
-- `Zero Torque <Controllers/ZeroTorque.md>`__
-- `Franks Collins Hip <Controllers/Hip/FranksCollinsHip.md>`__
-- [Constant Torque] (Controllers/ConstantTorque.md)
-- [Chirp] (Controllers/Chirp.md)
-- [Step] (Controllers/Step.md)
-- [Calibration Manager] (Controllers/CalbrManager.md)
+- :doc:`Zero Torque <ZeroTorque>`
+- :doc:`Franks Collins Hip <FranksCollinsHip>`
+- :doc:`Constant Torque <ConstantTorque>`
+- :doc:`Chirp <Chirp>`
+- :doc:`Step <Step>`
+- :doc:`Calibration Manager <CalbrManager>`
 
 Knee
 ^^^^
 
-- `Zero Torque <Controllers/ZeroTorque.md>`__
-- [Constant Torque] (Controllers/ConstantTorque.md)
-- [Chirp] (Controllers/Chirp.md)
-- [Step] (Controllers/Step.md)
-- [Calibration Manager] (Controllers/CalbrManager.md)
+- :doc:`Zero Torque <ZeroTorque>`
+- :doc:`Constant Torque <ConstantTorque>`
+- :doc:`Chirp <Chirp>`
+- :doc:`Step <Step>`
+- :doc:`Calibration Manager <CalbrManager>`
 
 Ankle
 ^^^^^
 
-- `Zero Torque <Controllers/ZeroTorque.md>`__
-- [Constant Torque] (Controllers/ConstantTorque.md)
-- [Chirp] (Controllers/Chirp.md)
-- [Step] (Controllers/Step.md)
-- [Calibration Manager] (Controllers/CalbrManager.md)
-- `Proportional Joint Moment <Controllers/Ankle/ProportionalJointMoment.md>`__
-- `Zhang Collins <Controllers/Ankle/ZhangCollins.md>`__
+- :doc:`Zero Torque <ZeroTorque>`
+- :doc:`Constant Torque <ConstantTorque>`
+- :doc:`Chirp <Chirp>`
+- :doc:`Step <Step>`
+- :doc:`Calibration Manager <CalbrManager>`
+- :doc:`Proportional Joint Moment <ProportionalJointMoment>`
+- :doc:`Zhang Collins <ZhangCollins>`
 
 Elbow
 ^^^^^
 
-- `Zero Torque <Controllers/ZeroTorque.md>`__
-- `Elbow Min Max <Controllers/Elbow/ElbowMinMax.md>`__
-- [Constant Torque] (Controllers/ConstantTorque.md)
-- [Chirp] (Controllers/Chirp.md)
-- [Step] (Controllers/Step.md)
-- [Calibration Manager] (Controllers/CalbrManager.md)
+- :doc:`Zero Torque <ZeroTorque>`
+- :doc:`Elbow Min Max <elbow>`
+- :doc:`Constant Torque <ConstantTorque>`
+- :doc:`Chirp <Chirp>`
+- :doc:`Step <Step>`
+- :doc:`Calibration Manager <CalbrManager>`
 
 --------------
-
 Bluetooth
 ---------
 
@@ -1485,7 +1546,6 @@ The reason we do it file by file rather than printing everything is because it a
 You will also notice several “logger” print statments throughout the code. If you wish to print these, you need to switch the loglevel in the logging namespace in `Config.h </ExoCode/src/Config.h>`__ from “Release” to “Debug”. When not troubleshooting the device, make sure the logger is set to “Release” in order to most efficiently operate the system.
 
 --------------
-
 Adding New
 ----------
 
@@ -1494,28 +1554,28 @@ This section links to how to add new elements not covered by other sections
 Adding New Board
 ~~~~~~~~~~~~~~~~
 
-Details can be found in `Adding New Board <AddingNew/AddingNewBoard.md>`__.
+Details can be found in :doc:`Adding New Board <AddingNewBoard>`.
 
 This would be done if you are creating a new PCB which may have moved what pins are connected where, or uses new sensors or motor types
 
 Adding New Microcontroller
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Details can be found in `Adding New microcontroller <AddingNew/AddingNewMicroontroller.md>`__.
+Details can be found in :doc:`Adding New microcontroller <AddingNewMicrocontroller>`.
 
 This would be done if you are changing the type of microcontroller is being used.
 
 Adding New Item To Config
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Details can be found in `Adding New Controller <AddingNew/AddingNewItemToConfig.md>`__.
+Details can be found in :doc:`Adding New Controller <AddingNewItemToConfig>`.
 
 This would be done if new features need to be configured.
 
 Adding New Joint
 ~~~~~~~~~~~~~~~~
 
-Details can be found in `Adding New Joint <#adding-new-joint>`__ (AddingNew/AddingNewJoint.md)
+Details can be found in :doc:`Adding New Joint <AddingNewJoint>`.
 
 --------------
 
@@ -1546,7 +1606,7 @@ Known Issues
 Println()
 ~~~~~~~~~
 
-There has been a reoccuring issue within the codebase when using Serial.println(). For some reason this can casue the code to crash at runtime. However, using Serial.print(“:raw-latex:`\n`”) works just fine.
+There has been a reoccuring issue within the codebase when using Serial.println(). For some reason this can casue the code to crash at runtime. However, using Serial.print(“\n”) works just fine.
 
 When utilizing an Arduino Nano BLE rev2, you need to download an additional library “Arduino_BMI270_BMM150.h” directly into Arduino for the code to work.
 

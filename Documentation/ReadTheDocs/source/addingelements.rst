@@ -18,3 +18,4 @@ This section provides instructions on how to use the platform and add new functi
    AddingNewMotorType
    AddingNewSensors
    AddingNewUARTMessage
+   AddingNewPages

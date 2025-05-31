@@ -7,10 +7,15 @@ Our project focuses on enhancing mobility and function for individuals with neur
 
 Key topics covered in this documentation include:
 
-- **Project Overview:** An introduction to our mission and the challenges we address.
+- **User Guide:** A concise overview of the coding standards and engineering principles our lab follows.
 - **Installation:** Step-by-step guidance to set up the software and hardware components.
-- **Usage:** Detailed instructions and examples on how to use our platform effectively.
-- **Contribution Guidelines:** How to get involved and contribute to the project.
+- **Adding Elements:** Practical examples that show how to extend the platform with new sensors, actuators, and algorithms.
+- **Controllers:** Reference material and tutorials for implementing ankle and elbow controllers.
+- **OpenExo GUI:**  A walkthrough of our Python-based graphical application for configuring and controlling the exoskeleton.
+- **Documentation:** Instructions for adding pages, diagrams, and API references to the Read the Docs site
+- **VS Code + GitHub Quick-Start:** A fast-track guide to creating a fully featured development environment connected to GitHub.
+- **Gamification Template** Guidelines and assets for the capstone team’s biofeedback gamification layer.
+
 
 Whether you're a researcher, engineer, or practitioner, we hope this resource helps you explore and contribute to advancing wearable robotics and rehabilitation technologies.
 

@@ -7,6 +7,7 @@ Overview of the hip process.
    :maxdepth: 2
    :caption: Installation Subcategories:
 
+   FranksCollinsHip
    CalbrManager
    Chirp
    ConstantTorque

@@ -35,5 +35,4 @@ html_css_files = [
 ]
 
 html_theme_options = {
-    "collapse_navigation": False,
 }

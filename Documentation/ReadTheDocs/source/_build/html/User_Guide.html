@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>User Guide &#8212; OpenExo Documentation</title>
+    <title>Background Info &#8212; OpenExo Documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=0ac4fbd8" />
@@ -122,14 +122,14 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
 </ul>
 
         </div>
@@ -141,8 +141,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="user-guide">
-<h1>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h1>
+  <section id="background-info">
+<h1>Background Info<a class="headerlink" href="#background-info" title="Link to this heading">¶</a></h1>
 <section id="outline">
 <h2>Outline<a class="headerlink" href="#outline" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
@@ -184,7 +184,7 @@
 <ol class="arabic simple">
 <li><p><a class="reference external" href="#actuator-structure">Actuator Structure</a></p></li>
 <li><p><a class="reference external" href="#adding-new-actuators">Adding New Actuators</a></p></li>
-<li><p><a class="reference external" href="#t-motor-initialization">T-motor Initialization</a> (Get info from Chance)</p></li>
+<li><p><a class="reference external" href="#t-motor-initialization">T-motor Initialization</a></p></li>
 </ol>
 </li>
 <li><p><a class="reference external" href="#controllers">Controllers</a></p>
@@ -194,7 +194,7 @@
 <li><p><a class="reference external" href="#controller-parameters">Controller Parameters</a></p></li>
 </ol>
 </li>
-<li><p><a class="reference external" href="#bluetooth">Bluetooth Communication</a> (Get info from Chance)</p>
+<li><p><a class="reference external" href="#bluetooth">Bluetooth Communication</a></p>
 <ol class="arabic simple">
 <li><p><a class="reference external" href="#bluetooth-background">Bluetooth Background</a></p></li>
 <li><p><a class="reference external" href="#bluetooth-structure">Bluetooth Structure</a></p></li>
@@ -244,7 +244,7 @@
 <section id="bit-shifting">
 <h4>Bit Shifting<a class="headerlink" href="#bit-shifting" title="Link to this heading">¶</a></h4>
 <p>Bit Shifting, as its name implies, moves the binary value of the bit of interest some determined number of places to the left or right. This is traditionally used for data storage purposes. For example, if you have a boolien (see section below) that will either have a 0 or a 1 it would be inefficient to store only that in a single byte. Thus, we can use bit shifting to store multiple booliens (e.g., 8) into a single byte, which is much more efficient.</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Utilities.cpp">Utilities.cpp</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Utilities.cpp">Utilities.cpp</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uint8_t</span> <span class="n">update_bit</span><span class="p">(</span><span class="n">uint8_t</span> <span class="n">original</span><span class="p">,</span> <span class="nb">bool</span> <span class="n">val</span><span class="p">,</span> <span class="n">uint8_t</span> <span class="n">loc</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">uint8_t</span> <span class="n">keep_bit</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">loc</span><span class="p">);</span>  <span class="o">//</span><span class="nb">set</span> <span class="n">a</span> <span class="n">mask</span> <span class="k">for</span> <span class="n">the</span> <span class="n">bits</span> <span class="n">we</span> <span class="n">aren</span><span class="s1">&#39;t setting</span>
@@ -270,7 +270,7 @@
 <h3>Variables<a class="headerlink" href="#variables" title="Link to this heading">¶</a></h3>
 <p>Variables are used as a means to store data/information. Variables have a name that pertains to its identity and helps distinguish it from other pieces of data/information. When creating a variable you must declare (specify) its type. Information on types can be found in the section below.</p>
 <p><strong>Syntax:</strong> type variable_name = value;</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/BleMessage.h">BleMessage.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/BleMessage.h">BleMessage.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">parameters</span> <span class="n">to</span> <span class="n">expect</span> <span class="k">with</span> <span class="n">the</span> <span class="n">command</span>
 <span class="nb">int</span> <span class="n">expecting</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 </pre></div>
@@ -282,7 +282,7 @@
 <section id="bool">
 <h4>Bool<a class="headerlink" href="#bool" title="Link to this heading">¶</a></h4>
 <p>The Bool (Boolean) type can store true (1) or false (0) values.</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/ExoCode.ino">ExoCode.ino</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/ExoCode.ino">ExoCode.ino</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="nb">bool</span> <span class="n">first_run</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -310,7 +310,7 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <section id="char">
 <h4>Char<a class="headerlink" href="#char" title="Link to this heading">¶</a></h4>
 <p>The Char type can store one character. The character should be surrounded by single quotes (e.g., ‘P’,‘u’,‘p’,‘p’,‘y’).</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/BleMessage.h">BleMessage.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/BleMessage.h">BleMessage.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">GUI</span> <span class="n">command</span>
 <span class="n">char</span> <span class="n">command</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 </pre></div>
@@ -319,7 +319,7 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <section id="int">
 <h4>Int<a class="headerlink" href="#int" title="Link to this heading">¶</a></h4>
 <p>The int type is used when storing numbers without a decimal.</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/BleMessage.h">BleMessage.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/BleMessage.h">BleMessage.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">parameters</span> <span class="n">to</span> <span class="n">expect</span> <span class="k">with</span> <span class="n">the</span> <span class="n">command</span>
 <span class="nb">int</span> <span class="n">expecting</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 </pre></div>
@@ -328,7 +328,7 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <section id="float">
 <h4>Float<a class="headerlink" href="#float" title="Link to this heading">¶</a></h4>
 <p>The float type is used when storing numbers that have a decimal. It is capable of occupying 32 bits which is approximately 7 decimal places.</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/TorqueSensor.h">TorqueSensor.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/TorqueSensor.h">TorqueSensor.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">float</span> <span class="n">_calibrated_reading</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -349,7 +349,7 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">numbers</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span> <span class="o">//</span><span class="n">Would</span> <span class="n">output</span> <span class="mi">20</span>
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/ExoCode.ino">ExoCode.ino</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/ExoCode.ino">ExoCode.ino</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uint8_t</span> <span class="p">(</span><span class="n">config_to_send</span><span class="p">)[</span><span class="n">ini_config</span><span class="p">::</span><span class="n">number_of_keys</span><span class="p">];</span>
 </pre></div>
 </div>
@@ -357,7 +357,7 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <section id="void">
 <h4>Void<a class="headerlink" href="#void" title="Link to this heading">¶</a></h4>
 <p>Void means that there is no type, thus variables cannot be defined with “void”. The primary utilization of void is for functions that return no values (more on those later).</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/SyncLed.cpp">SyncLed.cpp</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/SyncLed.cpp">SyncLed.cpp</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span>
 <span class="o">*</span> <span class="n">Sets</span> <span class="n">the</span> <span class="n">flags</span> <span class="n">to</span> <span class="n">start</span> <span class="ow">or</span> <span class="n">stop</span> <span class="n">the</span> <span class="n">blink</span> <span class="n">sequence</span>
 <span class="o">*/</span>
@@ -391,7 +391,7 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">;</span> <span class="o">//</span><span class="n">Prints</span> <span class="n">out</span> <span class="n">the</span> <span class="n">value</span><span class="p">,</span> <span class="n">which</span> <span class="ow">is</span> <span class="mi">12</span>
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Utilities.h">Utilities.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Utilities.h">Utilities.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">val</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">short</span> <span class="nb">int</span><span class="p">)</span> <span class="p">(</span><span class="n">num_to_convert</span> <span class="o">*</span> <span class="n">factor</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -405,7 +405,7 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <p>Signed variables are capable of storing postitive and negative values as well as zero. The type int by defult is signed. (Signed Int Value Range: -2,147,483,648 to 2,147,483,647)</p>
 <p>Unsigned variables are only capable of storing postive values and zero. These can never be negative. (Unsigned Int Value Range: 0 to 4,294,967,295)</p>
 <p>Signed variables use one extra bit to account for the sign of the value (compared to unsigned), hence unsigned can be used to save extra space.</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/BleParser.cpp">BleParser.cpp</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/BleParser.cpp">BleParser.cpp</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">Get</span> <span class="n">the</span> <span class="n">amount</span> <span class="n">of</span> <span class="n">characters</span> <span class="n">to</span> <span class="n">wait</span> <span class="k">for</span>
 <span class="k">for</span><span class="p">(</span><span class="n">unsigned</span> <span class="nb">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">ble</span><span class="p">::</span><span class="n">commands</span><span class="p">)</span><span class="o">/</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ble</span><span class="p">::</span><span class="n">commands</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <span class="p">{</span>
@@ -417,7 +417,7 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <p>The long modifier modifies the maximum value that a data type can hold. Long can be used for int and double data types. Long modifiers can be used twice (int only) to create larger numbers (e.g., long long int).</p>
 <p>The short modifier modifies the minimum value that a data type can hold. Short can be used for int.</p>
 <p>The primary value of using these modifiers is for memory usage purposes. A short int will use less bytes than an int whereas a long int will use more bytes than an int.</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Utilities.h">Utilities.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Utilities.h">Utilities.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">val</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">short</span> <span class="nb">int</span><span class="p">)</span> <span class="p">(</span><span class="n">num_to_convert</span> <span class="o">*</span> <span class="n">factor</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -428,7 +428,7 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <p>Scope helps determine where the variable can be accessed within the code. There are generally two types: Local and Global.</p>
 <p>Local Scope: variables can only be accessed within the block of code that they are declared.</p>
 <p>Global Scope: variables can be access from the time of declaration within the code until the end of the code.</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/ExoCode.ino">ExoCode.ino</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/ExoCode.ino">ExoCode.ino</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="nb">bool</span> <span class="n">first_run</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -436,7 +436,7 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <section id="volatile">
 <h5>Volatile<a class="headerlink" href="#volatile" title="Link to this heading">¶</a></h5>
 <p>A volatile variable means that the value may change between accesses to the variable, even if said variable appears unmodified. The use of volatile guarantees that the varilabe will be read again before any usage. This may be useful in a situation when a controller may try to use a previous copy of the variable value (that it assumes are unchanged) rather than reading and writing using the current value. This is common in situations when the variable value can change due to something outside of the code (e.g., hardware that changes the value).</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/SyncLed.h">SyncLed.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/StatusLed.h">SyncLed.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">volatile</span> <span class="nb">int</span> <span class="n">_current_sync_period</span><span class="p">;</span> <span class="o">//</span> <span class="n">The</span> <span class="n">current</span> <span class="n">period</span> <span class="n">to</span> <span class="n">use</span><span class="o">.</span>  <span class="n">Whenever</span> <span class="n">syncLedHandler</span> <span class="ow">is</span> <span class="n">called</span> <span class="n">the</span> <span class="n">interupt</span> <span class="n">should</span> <span class="n">have</span> <span class="n">another</span> <span class="n">begin</span> <span class="n">call</span> <span class="n">to</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">the</span> <span class="n">period</span> <span class="ow">is</span> <span class="n">correct</span><span class="o">.</span>
 </pre></div>
 </div>
@@ -454,7 +454,6 @@ cout &lt;&lt; !(dogs_are_cute &amp;&amp; cats_are_nice);  //Would output true
 <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">variable</span><span class="p">;</span> <span class="o">//</span><span class="n">This</span> <span class="n">would</span> <span class="n">output</span> <span class="mi">20</span>
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/SPIHandler.h">SPIHandler.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">extern</span> <span class="n">uint8_t</span> <span class="n">is_ff</span><span class="p">[</span><span class="n">num_bytes</span><span class="p">];</span>
 </pre></div>
 </div>
@@ -510,7 +509,7 @@ string result = (x &lt; y) ? &quot;The dog is really really good.&quot; : &quot;
 cout &lt;&lt; result;
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>float ZeroTorque::calc_motor_cmd()
 {
     float cmd_ff = 0;
@@ -593,7 +592,7 @@ cout &lt;&lt; result;
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">switch</span> <span class="p">(</span><span class="n">utils</span><span class="p">::</span><span class="n">get_joint_type</span><span class="p">(</span><span class="n">_id</span><span class="p">))</span>
    <span class="p">{</span>
        <span class="k">case</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">hip</span><span class="p">:</span>
@@ -690,7 +689,7 @@ cout &lt;&lt; result;
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Utilities.cpp">Utilities.cpp</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Utilities.cpp">Utilities.cpp</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">bool</span> <span class="n">get_is_left</span><span class="p">(</span><span class="n">uint8_t</span> <span class="nb">id</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="p">(</span><span class="nb">id</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">left</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">uint8_t</span><span class="p">)</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span><span class="p">::</span><span class="n">left</span><span class="p">;</span>
@@ -724,7 +723,7 @@ cout &lt;&lt; result;
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Utilities.cpp">Utilities.cpp</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Utilities.cpp">Utilities.cpp</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span>
  <span class="o">*</span> <span class="n">From</span> <span class="n">the</span> <span class="n">joint_id</span> <span class="n">returns</span> <span class="n">the</span> <span class="n">bit</span> <span class="k">for</span> <span class="n">is_left</span><span class="o">.</span>
  <span class="o">*/</span>
@@ -824,7 +823,7 @@ type function_name(parameters)
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.h">Controller.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.h">Controller.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ProportionalJointMoment</span> <span class="p">:</span> <span class="n">public</span> <span class="n">_Controller</span>
 <span class="p">{</span>
     <span class="n">public</span><span class="p">:</span>
@@ -840,7 +839,7 @@ type function_name(parameters)
 <h4>Constructor<a class="headerlink" href="#constructor" title="Link to this heading">¶</a></h4>
 <p>Constructors are a method within a class that is automatically called upon creation of an object. The primary purpose of a constructor is to initialize members of the object with data. It makes sure that an object is created with specific attributes. Constructors construct the values of the objects (hence it’s name). These methods have no return value (thus they do not have a return type).</p>
 <p>Note: Constructors must have the same name as the class and all members within a constructor are public.</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.h">Controller.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.h">Controller.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ProportionalJointMoment</span> <span class="p">:</span> <span class="n">public</span> <span class="n">_Controller</span>
 <span class="p">{</span>
     <span class="n">public</span><span class="p">:</span>
@@ -883,7 +882,7 @@ type function_name(parameters)
 <span class="p">};</span>
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.h">Controller.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.h">Controller.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ProportionalJointMoment</span> <span class="p">:</span> <span class="n">public</span> <span class="n">_Controller</span>
 <span class="p">{</span>
     <span class="n">public</span><span class="p">:</span>
@@ -907,7 +906,7 @@ type function_name(parameters)
 <section id="abstract-classes">
 <h4>Abstract Classes<a class="headerlink" href="#abstract-classes" title="Link to this heading">¶</a></h4>
 <p>Abstact classess (also called interfaces) provide a base class from which other classes can inherit. These classes can not be used to create objects, they only serve as an interface. A class is made abstract when at least one of its functions is made to be a pure virtual function (syntax: virtual type function_name(parameters) = 0;).</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.h">Controller.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.h">Controller.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">_Controller</span>
 <span class="p">{</span>
     <span class="n">public</span><span class="p">:</span>
@@ -996,7 +995,7 @@ type function_name(parameters)
 <span class="p">};</span>
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ZeroTorque</span><span class="p">::</span><span class="n">ZeroTorque</span><span class="p">(</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="nb">id</span><span class="p">,</span> <span class="n">ExoData</span><span class="o">*</span> <span class="n">exo_data</span><span class="p">)</span>
 <span class="p">:</span> <span class="n">_Controller</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>
 <span class="p">{</span>
@@ -1014,7 +1013,7 @@ type function_name(parameters)
 <h3>Pointers<a class="headerlink" href="#pointers" title="Link to this heading">¶</a></h3>
 <p>Pointers are variables that contain the memory address as a value. These variables point to a data type of the same type.</p>
 <p><strong>Synatx:</strong> type* variable_name or type *variable_name</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Joint.h">Joint.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Joint.h">Joint.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_Motor</span><span class="o">*</span> <span class="n">_motor</span><span class="p">;</span> <span class="o">//</span> <span class="n">using</span> <span class="n">pointer</span> <span class="n">to</span> <span class="n">the</span> <span class="n">base</span> <span class="k">class</span><span class="w"> </span><span class="nc">so</span> <span class="n">we</span> <span class="n">can</span> <span class="n">use</span> <span class="nb">any</span> <span class="n">motor</span> <span class="nb">type</span><span class="o">.</span>
 <span class="n">JointData</span><span class="o">*</span> <span class="n">_joint_data</span><span class="p">;</span>
 </pre></div>
@@ -1041,7 +1040,7 @@ type function_name(parameters)
 </pre></div>
 </div>
 <p>Within the code you may run into “-&gt;”. This is used with pointers and is equivalent to using “object.attribute” within classes.</p>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.cpp">Controller.cpp</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">is_left</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">_side_data</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">left_side</span><span class="p">);</span>
@@ -1073,7 +1072,7 @@ type function_name(parameters)
 <span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>ex.</strong> <a class="reference external" href="/ExoCode/src/ExoData.h">ExoData.h</a></p>
+<p><strong>ex.</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ExoData.h">ExoData.h</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Type</span> <span class="n">used</span> <span class="k">for</span> <span class="n">the</span> <span class="k">for</span> <span class="n">each</span> <span class="n">joint</span> <span class="n">method</span><span class="p">,</span> <span class="n">the</span> <span class="n">function</span> <span class="n">should</span> <span class="n">take</span> <span class="n">JointData</span> <span class="k">as</span> <span class="nb">input</span> <span class="ow">and</span> <span class="k">return</span> <span class="n">void</span>
 <span class="n">typedef</span> <span class="n">void</span> <span class="p">(</span><span class="o">*</span><span class="n">for_each_joint_function_t</span><span class="p">)</span> <span class="p">(</span><span class="n">JointData</span><span class="o">*</span><span class="p">);</span>
 </pre></div>
@@ -1128,7 +1127,7 @@ type function_name(parameters)
 </section>
 <section id="style-guide">
 <h3>Style Guide<a class="headerlink" href="#style-guide" title="Link to this heading">¶</a></h3>
-<p>The detailed style guide can be found <a class="reference external" href="StyleGuide.rst">here</a>.</p>
+<p>The detailed style guide can be found <a class="reference internal" href="StyleGuide.html"><span class="doc">here</span></a>.</p>
 </section>
 <section id="system-structure">
 <h3>System Structure<a class="headerlink" href="#system-structure" title="Link to this heading">¶</a></h3>
@@ -1136,37 +1135,105 @@ type function_name(parameters)
 <a class="reference internal image-reference" href="_images/CodeDiagram.png"><img alt="Diagram" src="_images/CodeDiagram.png" style="width: 800px;" />
 </a>
 </figure>
-<p>Details of the components can be found in <a class="reference external" href="/Presentations/">/Presentations/20220914_Pridham_NewCodeBase.pptx</a> Note: At the time of the presentaiton the terminology “Leg/LegData” was used instead of “Side/SideData” and communication between the boards occured via SPI instead of UART. The functionality and structure is the same, but to avoid confusion we wanted to specify.</p>
+<p>Details of the components can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/tree/main/Presentations">presentations</a> Note: At the time of the presentaiton the terminology “Leg/LegData” was used instead of “Side/SideData” and communication between the boards occured via SPI instead of UART. The functionality and structure is the same, but to avoid confusion we wanted to specify.</p>
 </section>
 <section id="how-to-deploy">
 <h3>How to Deploy<a class="headerlink" href="#how-to-deploy" title="Link to this heading">¶</a></h3>
-<div class="line-block">
-<div class="line">First, you will need to connect the physical components. 1. Mount the motors on the system as appropriate.</div>
-<div class="line">2. Connect the power and communication cables to the control board. - The connectors should attach to the side they are on while worn, e.g. the left motor connects to the left side of the board. - The connections top to bottom should be the proximal to distal joints used, e.g. if the hip and ankle are used the hip should be the top most location, the ankle should be next; if just the ankle is used it should be on the top most connector of the appropriate type. 3. Similarly, sensors should be connected on the side used 4. The control board may have multiple microcontrollers on it they should all be flashed with ExoCode.ino through the Arduino IDE. The compiler will select the correct parts of the code to use if you select the correct microcontroller.</div>
-<div class="line">- Update /ExoCode/src/Config.h BOARD_VERSION with the version number found on the control board before compiling. - Update the libraries. Move the files/folders in the <a class="reference external" href="/Libraries">Libraries Folder</a>. To your local Folder C:<a href="#id1"><span class="problematic" id="id2">:raw-latex:`\User`</span></a>\[USER]:raw-latex:<cite>Documents</cite><a href="#id3"><span class="problematic" id="id4">:raw-latex:`\Arduino`</span></a><a href="#id5"><span class="problematic" id="id6">:raw-latex:`\libraries`</span></a> or system equivalent. Details on the libraries that are used are used can be found in <a class="reference external" href="/Libraries/README.md">Libraries Folder</a>. - <a class="reference external" href="https://docs.google.com/document/d/1ToLq6Zqv58Q4YEmf4SzqJDKCTp52LUaKgYg5vNmHdaI/edit?usp=sharing">Arduino Instructions</a> 5. Lastly, is the SD card. - Transfer the content of the SD Card folder to the micro SD card. - Update the config.ini file - Change the board version - Change the Exo name - Go to the section for that name and confirm the settings match your system. - For the joints you are using, go to that folder and update the controllers you plan to use.</div>
-</div>
+<p>First, you will need to connect the physical components.</p>
+<ol class="arabic">
+<li><p>Mount the motors on the system as appropriate.</p></li>
+<li><p>Connect the power and communication cables to the control board.</p>
+<ul class="simple">
+<li><p>The connectors should attach to the side they are on while worn, e.g. the left motor connects to the left side of the board.</p></li>
+<li><p>The connections top to bottom should be the proximal to distal joints used, e.g. if the hip and ankle are used the hip should be the top most location, the ankle should be next; if just the ankle is used it should be on the top most connector of the appropriate type.</p></li>
+</ul>
+</li>
+<li><p>Similarly, sensors should be connected on the side used</p></li>
+<li><p>The control board may have multiple microcontrollers on it they should all be flashed with ExoCode.ino through the Arduino IDE. The compiler will select the correct parts of the code to use if you select the correct microcontroller.</p>
+<ul class="simple">
+<li><p>Update /ExoCode/src/Config.h BOARD_VERSION with the version number found on the control board before compiling.</p></li>
+<li><p>Update the libraries. Move the files/folders in the <a class="reference external" href="https://github.com/naubiomech/OpenExo/tree/main/Libraries">Libraries Folder</a>. To your local Folder C:User[USER]DocumentsArduinolibrariesor system equivalent. Details on the libraries that are used are used can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/Libraries/README.md">Libraries Folder</a>.</p></li>
+<li><p><a class="reference external" href="https://docs.google.com/document/d/1ToLq6Zqv58Q4YEmf4SzqJDKCTp52LUaKgYg5vNmHdaI/edit?usp=sharing">Arduino Instructions</a></p></li>
+</ul>
+</li>
+<li><p>Lastly, is the SD card.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Transfer the content of the SD Card folder to the micro SD card.</p></li>
+<li><dl class="simple">
+<dt>Update the config.ini file</dt><dd><ul>
+<li><p>Change the board version</p></li>
+<li><p>Change the Exo name</p></li>
+<li><p>Go to the section for that name and confirm the settings match your system.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>For the joints you are using, go to that folder and update the controllers you plan to use.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
 <p>Those are the rough points. Detailed explanations can be found in the coming sections.</p>
 </section>
 </section>
-<hr class="docutils" />
 <section id="high-level-functionality">
-<h2>High Level Functionality<a class="headerlink" href="#high-level-functionality" title="Link to this heading">¶</a></h2>
-<div class="line-block">
-<div class="line">The system is broken into separate components that can be put together based on the system’s needs. Arduino is used to control these components.</div>
-<div class="line">There are two key classes, ExoData and Exo.</div>
-<div class="line">ExoData is used to store the data recorded by the system and the data used to control the system and should mirror the structure of Exo. The hierarchy is: - Exo/ExoData - StatusLed - SyncLed - FSRs - Side/SideData - Joint/JointData - TorqueSensor - Motor/MotorData - Controller/ControllerData</div>
+<h2>High-Level Functionality<a class="headerlink" href="#high-level-functionality" title="Link to this heading">¶</a></h2>
+<p>The system is broken into modular components that can be assembled as needed; an
+Arduino-class MCU coordinates them.</p>
+<p>There are two key classes, <strong>ExoData</strong> and <strong>Exo</strong>:</p>
+<ul>
+<li><p><strong>ExoData</strong> stores both telemetry and control parameters and mirrors the
+internal structure of <strong>Exo</strong>.
+Its hierarchy is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Exo / ExoData
+├── StatusLed
+├── SyncLed
+├── FSRs
+└── Side / SideData
+    └── Joint / JointData
+        ├── TorqueSensor
+        ├── Motor / MotorData
+        └── Controller / ControllerData
+</pre></div>
 </div>
-<p>A subset of the firmware can run on a separate microcontroller, intended to handle Bluetooth communication and soft real-time functionality. The main microcontroller communicates with the communication microcontroller via UART. The hierarchy is: - ComsMCU/ExoData - ExoBLE/ExoData - BleParser</p>
-<p>More info can be found below in <a class="reference external" href="#code-structure">Code Structure</a>.</p>
-<p>The high level way the code runs is: 1. Read the configuration from the SD card 2. Create the exo_data object (static in main loop) 3. Create the exo object (static in main loop) 4. Read new messages and update exo_data 5. exo.run() which runs the subcomponents as well</p>
+</li>
+</ul>
+<p>A subset of the firmware can run on a secondary microcontroller that handles
+Bluetooth communication and soft real-time tasks.
+The primary MCU talks to the communications MCU over UART:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>ComsMCU / ExoData</strong></dt><dd><ul>
+<li><dl class="simple">
+<dt><strong>ExoBLE / ExoData</strong></dt><dd><ul>
+<li><p><strong>BleParser</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>For more detail see <a class="reference external" href="#code-structure">Code Structure</a>.</p>
+<p>The high level way the code runs is:</p>
+<ol class="arabic simple">
+<li><p>Read the configuration from the SD card.</p></li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">exo_data</span></code> object (static in the main loop).</p></li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">exo</span></code> object (static in the main loop).</p></li>
+<li><p>Read new messages and update <code class="docutils literal notranslate"><span class="pre">exo_data</span></code>.</p></li>
+<li><p>Call <code class="docutils literal notranslate"><span class="pre">exo.run()</span></code> to execute all sub-components.</p></li>
+</ol>
 <section id="code-structure">
 <h3>Code Structure<a class="headerlink" href="#code-structure" title="Link to this heading">¶</a></h3>
 <div class="line-block">
-<div class="line"><a class="reference external" href="Structure/Namespaces.md">Namespaces</a> are used in place of global variables.</div>
+<div class="line"><a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/Namespaces.md">Namespaces</a> are used in place of global variables.</div>
 <div class="line">They are used for items that need to be accessible by other parts of the code. They are used as little as possible to minimize the amount of dependencies as that makes the code less modular.</div>
 </div>
-<p><a class="reference external" href="Structure/ExoDataStructure.md">Data Structure</a></p>
-<p><a class="reference external" href="Structure/ExoStructure.md">Exo Structure</a></p>
+<p><a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/ExoDataStructure.md">Data Structure</a></p>
+<p><a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/ExoStructure.md">Exo Structure</a></p>
 </section>
 <section id="guiding-principals">
 <h3>Guiding Principals<a class="headerlink" href="#guiding-principals" title="Link to this heading">¶</a></h3>
@@ -1174,25 +1241,35 @@ type function_name(parameters)
 </section>
 <section id="operation">
 <h3>Operation<a class="headerlink" href="#operation" title="Link to this heading">¶</a></h3>
-<p>We have developed a Python GUI to aid in the operation of the device. More information on the Python GUI, and its operation, can be found [here] (/Python_GUI)</p>
+<p>We have developed a Python GUI to aid in the operation of the device.
+More information on the Python GUI, and its operation, can be found
+<a class="reference internal" href="gui.html"><span class="doc">here</span></a>.</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="sd-card">
 <h2>SD Card<a class="headerlink" href="#sd-card" title="Link to this heading">¶</a></h2>
-<p>The files for the SD card can be found in the <a class="reference external" href="/SDCard/">SDCard</a> folder in the main directory. The contents of this file should be copied to the root of the SD card, e.g. when you open the SD Card you should see config.ini. The file contains the configuration file and the parameter files for the controllers. These parameter files are a temporary measure till the new app is running.</p>
+<p>The files for the SD card can be found in the <a class="reference external" href="https://github.com/naubiomech/OpenExo/tree/main/SDCard">SDCard</a> folder in the main directory. The contents of this file should be copied to the root of the SD card, e.g. when you open the SD Card you should see config.ini. The file contains the configuration file and the parameter files for the controllers. These parameter files are a temporary measure till the new app is running.</p>
 <section id="sd-configuration">
 <h3>SD Configuration<a class="headerlink" href="#sd-configuration" title="Link to this heading">¶</a></h3>
-<div class="line-block">
-<div class="line"><a class="reference external" href="/SDCard/config.ini">config.ini</a> is used to tell the code how they system is configured. The fields should all be less than 25 characters as that is limited by the size of the array that is parsing it. The file is broken into sections denoted by being in [ ], e.g. [Board], containing information related to the board.</div>
-<div class="line">This separates information that is related into groups. Within the section you have keys, these contain the information, e.g. version = 0.1. The key names shouldn’t be modified, version, as the parser is looking for the specific name but the value can be, 0.1.</div>
-</div>
-<p>We have some premade exoskeleton configurations you can choose from by putting their name in the Exo section. Just check to make sure the settings in that section match your system. If we are using a bilateral hip system we would set <code class="docutils literal notranslate"><span class="pre">[Exo]</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">bilateralHip</span></code>, then go to the section [bilateralHip] and check it matches the system we are using. - sides - are you using the left, right, or both sides. - hip, knee, ankle - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won’t use that joint). - gear ratio - sets the transmission ratio for the joint torque to the motor output torque. If the motor has a built in gearbox that should not appear here but rather be coded into the motor class in Motor.cpp. - default controller - is the controller the system starts with. - use torque sensor - flag to determine if you want to use a torque sensor with your joint (0 = no, 1 = yes) - flip motor dir - is if the direction of the motor values should be flipped. For example if we have two motors pointing in towards the hip and both rotate counter clockwise with a positive current one of them will need to be sent a negative current so they both rotate in the same direction on the body. - flip torque dir - flips the sign of the torque sensor on the selected side. This helps align the torque sensor reading to be in the same direction as the motor command to avoid PID issues. - flip angle dir - flips the sign of the angle sensor on the selected side. This helps align the angle sensor reading to be in the same direction as the motor command to avoid controller issues.</p>
+<p><a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/SDCard/config.ini">config.ini</a> is used to tell the code how they system is configured. The fields should all be less than 25 characters as that is limited by the size of the array that is parsing it. The file is broken into sections denoted by being in [ ], e.g. [Board], containing information related to the board.</p>
+<p>This separates information that is related into groups. Within the section you have keys, these contain the information, e.g. version = 0.1. The key names shouldn’t be modified, version, as the parser is looking for the specific name but the value can be, 0.1.</p>
+<p>We have some premade exoskeleton configurations you can choose from by putting their name in the Exo section. Just check to make sure the settings in that section match your system. If we are using a bilateral hip system we would set <code class="docutils literal notranslate"><span class="pre">[Exo]</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">bilateralHip</span></code>, then go to the section [bilateralHip] and check it matches the system we are using.</p>
+<ul class="simple">
+<li><p>sides - are you using the left, right, or both sides.</p></li>
+<li><p>hip, knee, ankle - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won’t use that joint).</p></li>
+<li><p>gear ratio - sets the transmission ratio for the joint torque to the motor output torque. If the motor has a built in gearbox that should not appear here but rather be coded into the motor class in Motor.cpp.</p></li>
+<li><p>default controller - is the controller the system starts with.</p></li>
+<li><p>use torque sensor - flag to determine if you want to use a torque sensor with your joint (0 = no, 1 = yes)</p></li>
+<li><p>flip motor dir - is if the direction of the motor values should be flipped. For example if we have two motors pointing in towards the hip and both rotate counter clockwise with a positive current one of them will need to be sent a negative current so they both rotate in the same direction on the body.</p></li>
+<li><p>flip torque dir - flips the sign of the torque sensor on the selected side. This helps align the torque sensor reading to be in the same direction as the motor command to avoid PID issues.</p></li>
+<li><p>flip angle dir - flips the sign of the angle sensor on the selected side. This helps align the angle sensor reading to be in the same direction as the motor command to avoid controller issues.</p></li>
+</ul>
 </section>
 <section id="sd-controller-parameters">
 <h3>SD Controller Parameters<a class="headerlink" href="#sd-controller-parameters" title="Link to this heading">¶</a></h3>
 <p>The parameters for each controller are stored in their corresponding joint folder. This way if both joints are using a zero torque controller but need different gains they can pull from different files. The files are comma separated value files, so there are commas between cells. The first cell in the <em>first</em> row contains the number of lines in the header, how many lines we need to get through to get to the parameters. The first cell in the <em>second</em> row contains the number of parameters to read. The rest of the header just contains useful info for the person, such as the parameter order. The first parameter row will be the default values, set 0. The nth parameter row is n-1 parameter set, e.g. parameter row 2 will be referenced as set 1.</p>
-<p>The order of the parameters should match how they appear in the parameter array which can be found in <a class="reference external" href="/ExoCode/src/ControllerData.h">ControllerData.h</a>. in the controller_defs namespace.</p>
+<p>The order of the parameters should match how they appear in the parameter array which can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>. in the controller_defs namespace.</p>
 <p>These will be selected using the update controller field in the app where you set the joint, controller, and parameter set.</p>
 </section>
 </section>
@@ -1207,7 +1284,7 @@ type function_name(parameters)
 </section>
 <section id="adding-new-sensors">
 <h3>Adding New Sensors<a class="headerlink" href="#adding-new-sensors" title="Link to this heading">¶</a></h3>
-<p>Details can be found in <a class="reference external" href="AddingNew/AddingNewSensors.md">Adding New Sensors</a></p>
+<p>Details can be found in <a class="reference internal" href="AddingNewSensors.html"><span class="doc">Adding New Sensors</span></a>.</p>
 </section>
 </section>
 <hr class="docutils" />
@@ -1216,12 +1293,12 @@ type function_name(parameters)
 <p>There are currently two different options for displays, the status LED and the sync LED, used to display information to people or other systems. Currently we only use the Status LED, but we have developed and outlined the Sync LED for future research purposes.</p>
 <section id="status-led">
 <h3>Status LED<a class="headerlink" href="#status-led" title="Link to this heading">¶</a></h3>
-<p>The status LED is simply and RGB LED that displays different light patterns to let you know what is happening with the system. Details on what the different patterns mean can be found in <a class="reference external" href="/ExoCode/src/StatusLed.h">StatusLed.h</a> in the status_led_defs namespace. There is an instance of StatusLed in Exo which should be updated every run of exo using:</p>
+<p>The status LED is simply and RGB LED that displays different light patterns to let you know what is happening with the system. Details on what the different patterns mean can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/StatusLed.h">StatusLed.h</a> in the status_led_defs namespace. There is an instance of StatusLed in Exo which should be updated every run of exo using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">Update</span> <span class="n">status</span> <span class="n">LED</span>
 <span class="n">status_led</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="o">-&gt;</span><span class="n">status</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Where the status value is defined in the status_defs::messages namespace in <a class="reference external" href="/ExoCode/src/StatusDefs.h">StatusDefs.h</a>, and is set in other areas of the code depending on what the current state is.</p>
+<p>Where the status value is defined in the status_defs::messages namespace in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/StatusDefs.h">StatusDefs.h</a>, and is set in other areas of the code depending on what the current state is.</p>
 </section>
 <section id="sync-led">
 <h3>Sync LED<a class="headerlink" href="#sync-led" title="Link to this heading">¶</a></h3>
@@ -1243,8 +1320,8 @@ type function_name(parameters)
 <p>Actuators are setup so that the system can add multiple types of motors and select the correct one for the system at startup. The Joint instance will use a pointer to a motor instance. This motor instance will be set based on what is in the config.ini file on the SD card. To be able to call any type of motor we need to have a common interface which will be described next.</p>
 <section id="actuator-structure">
 <h3>Actuator Structure<a class="headerlink" href="#actuator-structure" title="Link to this heading">¶</a></h3>
-<p>As with most of the system there is a parallel data structure that follows the system structure. MotorData details can be found in <a class="reference external" href="Structure/ExoDataStructure.md">Data Structure</a>, but contains state and configuration information.</p>
-<p>The motors should all inherit their interface from the <a class="reference external" href="#abstract-classes">abstract class</a> _Motor in <a class="reference external" href="/ExoCode/src/Motor.h">Motor.h</a>. This defines how other systems can call motors, that way the rest of the system doesn’t need to know what specific motor you are using as they all have the same calls. Within this you can then define what that call does for the specific motor/type. With the CAN motors they have a separate class that this type of motor inherits since they all work in much the same way but have some parameters that are different. You can see this in the Motor.h file as</p>
+<p>As with most of the system there is a parallel data structure that follows the system structure. MotorData details can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/ExoDataStructure.md">Data Structure</a>, but contains state and configuration information.</p>
+<p>The motors should all inherit their interface from the <a class="reference external" href="#abstract-classes">abstract class</a> _Motor in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Motor.h">Motor.h</a>. This defines how other systems can call motors, that way the rest of the system doesn’t need to know what specific motor you are using as they all have the same calls. Within this you can then define what that call does for the specific motor/type. With the CAN motors they have a separate class that this type of motor inherits since they all work in much the same way but have some parameters that are different. You can see this in the Motor.h file as</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">_CANMotor</span> <span class="p">:</span> <span class="n">public</span> <span class="n">_Motor</span>
 </pre></div>
 </div>
@@ -1257,17 +1334,17 @@ type function_name(parameters)
 </section>
 <section id="adding-new-actuators">
 <h3>Adding New Actuators<a class="headerlink" href="#adding-new-actuators" title="Link to this heading">¶</a></h3>
-<p>Details to adding a new motor type can be found in <a class="reference external" href="AddingNew/AddingNewMotorType.md">Adding New Motor Type</a>. Details on adding a new CAN motor can be found in <a class="reference external" href="AddingNew/AddingNewCanMotor.md">Adding New CAN Motor</a>. This is specifically for the TMotor CAN motors but can be adapted to new types of motors when we have them.</p>
+<p>Details to adding a new motor type can be found in <a class="reference internal" href="AddingNewMotorType.html"><span class="doc">Adding New Motor Type</span></a>. Details on adding a new CAN motor can be found in <a class="reference internal" href="AddingNewCanMotor.html"><span class="doc">Adding New CAN Motor</span></a>. This is specifically for the TMotor CAN motors but can be adapted to new types of motors when we have them.</p>
 </section>
 <section id="t-motor-initialization">
 <h3>T-motor Initialization<a class="headerlink" href="#t-motor-initialization" title="Link to this heading">¶</a></h3>
-<p>TMotor initialization information can be found [here] (<a class="reference external" href="https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b_?usp=drive_link">https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b_?usp=drive_link</a>)</p>
+<p>TMotor initialization information can be found <a class="reference external" href="https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b_?usp=drive_link">here</a></p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="controllers">
 <h2>Controllers<a class="headerlink" href="#controllers" title="Link to this heading">¶</a></h2>
-<p>Much like the motor the controllers have a parallel ControllerData class to store data for the controller. ControllerData details can be found in <a class="reference external" href="Structure/ExoDataStructure.md">Data Structure</a>, but contains state and configuration information.</p>
+<p>Much like the motor the controllers have a parallel ControllerData class to store data for the controller. ControllerData details can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/ExoDataStructure.md">Data Structure</a>, but contains state and configuration information.</p>
 <p>The Joint instance uses a <a class="reference external" href="#pointers">pointer</a> to the controller that is currently being used. The main difference is that the Joint has an instance to all the possible controllers that will be used so we just need to point to the correct one. That is why the constructor to the a joint like the hip looks like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">HipJoint</span><span class="p">::</span><span class="n">HipJoint</span><span class="p">(</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="nb">id</span><span class="p">,</span> <span class="n">ExoData</span><span class="o">*</span> <span class="n">exo_data</span><span class="p">)</span>
 <span class="p">:</span> <span class="n">_Joint</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>  <span class="o">//</span> <span class="o">&lt;--</span> <span class="n">Initializer</span> <span class="nb">list</span>
@@ -1280,7 +1357,7 @@ type function_name(parameters)
 </pre></div>
 </div>
 <p>Where the constructor of each controller is called.</p>
-<p>The controllers also inherit their interface, like the motors, from the <a class="reference external" href="#abstract-classes">abstract class</a> _Controller in <a class="reference external" href="/ExoCode/src/Controller.h">Controller.h</a>. This defines how other systems can call controllers, that way the rest of the system doesn’t need to know what specific controller you are using as they all have the same calls. Within this you can then define what that call does for the specific controller.</p>
+<p>The controllers also inherit their interface, like the motors, from the <a class="reference external" href="#abstract-classes">abstract class</a> _Controller in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/Controller.h">Controller.h</a>. This defines how other systems can call controllers, that way the rest of the system doesn’t need to know what specific controller you are using as they all have the same calls. Within this you can then define what that call does for the specific controller.</p>
 <section id="controller-structure">
 <h3>Controller Structure<a class="headerlink" href="#controller-structure" title="Link to this heading">¶</a></h3>
 <p>The controllers have a primary call of calc_motor_cmd() that will calculate the torque command that will be sent to the motor.</p>
@@ -1290,11 +1367,16 @@ type function_name(parameters)
 </pre></div>
 </div>
 <p>Each controller can also have additionally private member functions that are called internally.</p>
-<p>The controllers will pull the parameters that they use from the ControllerData instance which can be accessed through the pointer in the controller using <code class="docutils literal notranslate"><span class="pre">_controller_data-&gt;parameters</span></code>. This is shared between all controllers so it is important to change to the “zero_torque” controller prior to moving to a new controller. The order of operations are: 1. Change to zero torque controller, commands the motor to 0 current and uses no parameters so it is safe when making big changes to parameters. 2. Change parameters so they are what you want for the new controller. 3. Change the controller pointer to use the new controller. This way you don’t change a parameter for one controller to something like user mass when the current controller is interpreting that parameter as max torque. This should be handled in software so the user doesn’t need to think about it, but is good to be aware of.</p>
+<p>The controllers will pull the parameters that they use from the ControllerData instance which can be accessed through the pointer in the controller using <code class="docutils literal notranslate"><span class="pre">_controller_data-&gt;parameters</span></code>. This is shared between all controllers so it is important to change to the “zero_torque” controller prior to moving to a new controller. The order of operations are:</p>
+<ol class="arabic simple">
+<li><p>Change to zero torque controller, commands the motor to 0 current and uses no parameters so it is safe when making big changes to parameters.</p></li>
+<li><p>Change parameters so they are what you want for the new controller.</p></li>
+<li><p>Change the controller pointer to use the new controller.This way you don’t change a parameter for one controller to something like user mass when the current controller is interpreting that parameter as max torque. This should be handled in software so the user doesn’t need to think about it, but is good to be aware of.</p></li>
+</ol>
 </section>
 <section id="adding-new-controllers">
 <h3>Adding New Controllers<a class="headerlink" href="#adding-new-controllers" title="Link to this heading">¶</a></h3>
-<p>Details can be found in <a class="reference external" href="AddingNew/AddingNewController.md">Adding New Controller</a>.</p>
+<p>Details can be found in <a class="reference internal" href="AddingNewController.html"><span class="doc">Adding New Controller</span></a>.</p>
 </section>
 <section id="controller-parameters">
 <h3>Controller Parameters<a class="headerlink" href="#controller-parameters" title="Link to this heading">¶</a></h3>
@@ -1302,53 +1384,49 @@ type function_name(parameters)
 <section id="hip">
 <h4>Hip<a class="headerlink" href="#hip" title="Link to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><a class="reference external" href="Controllers/ZeroTorque.md">Zero Torque</a></p></li>
-<li><p><a class="reference external" href="Controllers/Hip/FranksCollinsHip.md">Franks Collins Hip</a></p></li>
-<li><p>[Constant Torque] (Controllers/ConstantTorque.md)</p></li>
-<li><p>[Chirp] (Controllers/Chirp.md)</p></li>
-<li><p>[Step] (Controllers/Step.md)</p></li>
-<li><p>[Calibration Manager] (Controllers/CalbrManager.md)</p></li>
+<li><p><a class="reference internal" href="ZeroTorque.html"><span class="doc">Zero Torque</span></a></p></li>
+<li><p><a class="reference internal" href="FranksCollinsHip.html"><span class="doc">Franks Collins Hip</span></a></p></li>
+<li><p><a class="reference internal" href="ConstantTorque.html"><span class="doc">Constant Torque</span></a></p></li>
+<li><p><a class="reference internal" href="Chirp.html"><span class="doc">Chirp</span></a></p></li>
+<li><p><a class="reference internal" href="Step.html"><span class="doc">Step</span></a></p></li>
+<li><p><a class="reference internal" href="CalbrManager.html"><span class="doc">Calibration Manager</span></a></p></li>
 </ul>
 </section>
 <section id="knee">
 <h4>Knee<a class="headerlink" href="#knee" title="Link to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><a class="reference external" href="Controllers/ZeroTorque.md">Zero Torque</a></p></li>
-<li><p>[Constant Torque] (Controllers/ConstantTorque.md)</p></li>
-<li><p>[Chirp] (Controllers/Chirp.md)</p></li>
-<li><p>[Step] (Controllers/Step.md)</p></li>
-<li><p>[Calibration Manager] (Controllers/CalbrManager.md)</p></li>
+<li><p><a class="reference internal" href="ZeroTorque.html"><span class="doc">Zero Torque</span></a></p></li>
+<li><p><a class="reference internal" href="ConstantTorque.html"><span class="doc">Constant Torque</span></a></p></li>
+<li><p><a class="reference internal" href="Chirp.html"><span class="doc">Chirp</span></a></p></li>
+<li><p><a class="reference internal" href="Step.html"><span class="doc">Step</span></a></p></li>
+<li><p><a class="reference internal" href="CalbrManager.html"><span class="doc">Calibration Manager</span></a></p></li>
 </ul>
 </section>
 <section id="ankle">
 <h4>Ankle<a class="headerlink" href="#ankle" title="Link to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><a class="reference external" href="Controllers/ZeroTorque.md">Zero Torque</a></p></li>
-<li><p>[Constant Torque] (Controllers/ConstantTorque.md)</p></li>
-<li><p>[Chirp] (Controllers/Chirp.md)</p></li>
-<li><p>[Step] (Controllers/Step.md)</p></li>
-<li><p>[Calibration Manager] (Controllers/CalbrManager.md)</p></li>
-<li><p><a class="reference external" href="Controllers/Ankle/ProportionalJointMoment.md">Proportional Joint Moment</a></p></li>
-<li><p><a class="reference external" href="Controllers/Ankle/ZhangCollins.md">Zhang Collins</a></p></li>
+<li><p><a class="reference internal" href="ZeroTorque.html"><span class="doc">Zero Torque</span></a></p></li>
+<li><p><a class="reference internal" href="ConstantTorque.html"><span class="doc">Constant Torque</span></a></p></li>
+<li><p><a class="reference internal" href="Chirp.html"><span class="doc">Chirp</span></a></p></li>
+<li><p><a class="reference internal" href="Step.html"><span class="doc">Step</span></a></p></li>
+<li><p><a class="reference internal" href="CalbrManager.html"><span class="doc">Calibration Manager</span></a></p></li>
+<li><p><a class="reference internal" href="ProportionalJointMoment.html"><span class="doc">Proportional Joint Moment</span></a></p></li>
+<li><p><a class="reference internal" href="ZhangCollins.html"><span class="doc">Zhang Collins</span></a></p></li>
 </ul>
 </section>
 <section id="elbow">
 <h4>Elbow<a class="headerlink" href="#elbow" title="Link to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><a class="reference external" href="Controllers/ZeroTorque.md">Zero Torque</a></p></li>
-<li><p><a class="reference external" href="Controllers/Elbow/ElbowMinMax.md">Elbow Min Max</a></p></li>
-<li><p>[Constant Torque] (Controllers/ConstantTorque.md)</p></li>
-<li><p>[Chirp] (Controllers/Chirp.md)</p></li>
-<li><p>[Step] (Controllers/Step.md)</p></li>
-<li><p>[Calibration Manager] (Controllers/CalbrManager.md)</p></li>
+<li><p><a class="reference internal" href="ZeroTorque.html"><span class="doc">Zero Torque</span></a></p></li>
+<li><p><a class="reference internal" href="elbow.html"><span class="doc">Elbow Min Max</span></a></p></li>
+<li><p><a class="reference internal" href="ConstantTorque.html"><span class="doc">Constant Torque</span></a></p></li>
+<li><p><a class="reference internal" href="Chirp.html"><span class="doc">Chirp</span></a></p></li>
+<li><p><a class="reference internal" href="Step.html"><span class="doc">Step</span></a></p></li>
+<li><p><a class="reference internal" href="CalbrManager.html"><span class="doc">Calibration Manager</span></a></p></li>
 </ul>
-</section>
-</section>
-</section>
-<hr class="docutils" />
-<section id="bluetooth">
-<h2>Bluetooth<a class="headerlink" href="#bluetooth" title="Link to this heading">¶</a></h2>
 <p>The system uses Bluetooth Low Energy (BLE) to communicate with a graphical user interface (GUI). For an introduction to BLE, <a class="reference external" href="https://learn.adafruit.com/introduction-to-bluetooth-low-energy">see</a>.</p>
+</section>
+</section>
 <section id="bluetooth-background">
 <h3>Bluetooth Background<a class="headerlink" href="#bluetooth-background" title="Link to this heading">¶</a></h3>
 <p>The Exosekeleton uses Norduc’s UART Service (NUS) to communicate with the GUI. This service has RX and TX characteristics mimicking UART. In order for the app to connect with the Exoskeleton it’s name must begin with “EXOBLE_” and advertise the NUS. When a trial is started the device will begin transmitting a subset of the ExoData struct.</p>
@@ -1381,29 +1459,25 @@ type function_name(parameters)
 <p>This is because serial printing is a pretty slow process, so you only want to do it if you are actively using it. So if you are adding a print statement you should wrap it in an <code class="docutils literal notranslate"><span class="pre">#ifdef</span></code> for that file.</p>
 <p>The reason we do it file by file rather than printing everything is because it allows you to focus in on the area you are working on. Even within this you may still want to comment out some of the prints within the file to really focus on the area you are using.</p>
 <p>You will also notice several “logger” print statments throughout the code. If you wish to print these, you need to switch the loglevel in the logging namespace in <a class="reference external" href="/ExoCode/src/Config.h">Config.h</a> from “Release” to “Debug”. When not troubleshooting the device, make sure the logger is set to “Release” in order to most efficiently operate the system.</p>
-</section>
-<hr class="docutils" />
-<section id="adding-new">
-<h2>Adding New<a class="headerlink" href="#adding-new" title="Link to this heading">¶</a></h2>
 <p>This section links to how to add new elements not covered by other sections</p>
 <section id="adding-new-board">
 <h3>Adding New Board<a class="headerlink" href="#adding-new-board" title="Link to this heading">¶</a></h3>
-<p>Details can be found in <a class="reference external" href="AddingNew/AddingNewBoard.md">Adding New Board</a>.</p>
+<p>Details can be found in <a class="reference internal" href="AddingNewBoard.html"><span class="doc">Adding New Board</span></a>.</p>
 <p>This would be done if you are creating a new PCB which may have moved what pins are connected where, or uses new sensors or motor types</p>
 </section>
 <section id="adding-new-microcontroller">
 <h3>Adding New Microcontroller<a class="headerlink" href="#adding-new-microcontroller" title="Link to this heading">¶</a></h3>
-<p>Details can be found in <a class="reference external" href="AddingNew/AddingNewMicroontroller.md">Adding New microcontroller</a>.</p>
+<p>Details can be found in <a class="reference internal" href="AddingNewMicrocontroller.html"><span class="doc">Adding New microcontroller</span></a>.</p>
 <p>This would be done if you are changing the type of microcontroller is being used.</p>
 </section>
 <section id="adding-new-item-to-config">
 <h3>Adding New Item To Config<a class="headerlink" href="#adding-new-item-to-config" title="Link to this heading">¶</a></h3>
-<p>Details can be found in <a class="reference external" href="AddingNew/AddingNewItemToConfig.md">Adding New Controller</a>.</p>
+<p>Details can be found in <a class="reference internal" href="AddingNewItemToConfig.html"><span class="doc">Adding New Controller</span></a>.</p>
 <p>This would be done if new features need to be configured.</p>
 </section>
 <section id="adding-new-joint">
 <h3>Adding New Joint<a class="headerlink" href="#adding-new-joint" title="Link to this heading">¶</a></h3>
-<p>Details can be found in <a class="reference external" href="#adding-new-joint">Adding New Joint</a> (AddingNew/AddingNewJoint.md)</p>
+<p>Details can be found in <a class="reference internal" href="AddingNewJoint.html"><span class="doc">Adding New Joint</span></a>.</p>
 </section>
 </section>
 <hr class="docutils" />
@@ -1432,7 +1506,7 @@ type function_name(parameters)
 <h2>Known Issues<a class="headerlink" href="#known-issues" title="Link to this heading">¶</a></h2>
 <section id="println">
 <h3>Println()<a class="headerlink" href="#println" title="Link to this heading">¶</a></h3>
-<p>There has been a reoccuring issue within the codebase when using Serial.println(). For some reason this can casue the code to crash at runtime. However, using Serial.print(“<a href="#id7"><span class="problematic" id="id8">:raw-latex:`\n`</span></a>”) works just fine.</p>
+<p>There has been a reoccuring issue within the codebase when using Serial.println(). For some reason this can casue the code to crash at runtime. However, using Serial.print(“n”) works just fine.</p>
 <p>When utilizing an Arduino Nano BLE rev2, you need to download an additional library “Arduino_BMI270_BMM150.h” directly into Arduino for the code to work.</p>
 <p>The FSR regression equation for Ankle Control alters accuracy of percent gait estimate which disrupts timing of franksCollinsHip Control when in bilateral operation. Future work will handle FSRs slightly differently to allow for better control.</p>
 </section>
@@ -1453,7 +1527,7 @@ type function_name(parameters)
             <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
             <div class="page_toc">
                 <ul>
-<li><a class="reference internal" href="#">User Guide</a><ul>
+<li><a class="reference internal" href="#">Background Info</a><ul>
 <li><a class="reference internal" href="#outline">Outline</a></li>
 <li><a class="reference internal" href="#background">Background</a><ul>
 <li><a class="reference internal" href="#bits-and-bytes">Bits and Bytes</a><ul>
@@ -1516,7 +1590,7 @@ type function_name(parameters)
 <li><a class="reference internal" href="#how-to-deploy">How to Deploy</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#high-level-functionality">High Level Functionality</a><ul>
+<li><a class="reference internal" href="#high-level-functionality">High-Level Functionality</a><ul>
 <li><a class="reference internal" href="#code-structure">Code Structure</a></li>
 <li><a class="reference internal" href="#guiding-principals">Guiding Principals</a></li>
 <li><a class="reference internal" href="#operation">Operation</a></li>
@@ -1553,16 +1627,12 @@ type function_name(parameters)
 <li><a class="reference internal" href="#elbow">Elbow</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a class="reference internal" href="#bluetooth">Bluetooth</a><ul>
 <li><a class="reference internal" href="#bluetooth-background">Bluetooth Background</a></li>
 <li><a class="reference internal" href="#bluetooth-structure">Bluetooth Structure</a></li>
 <li><a class="reference internal" href="#sending-a-message">Sending a Message</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#debug">Debug</a></li>
-<li><a class="reference internal" href="#adding-new">Adding New</a><ul>
+<li><a class="reference internal" href="#debug">Debug</a><ul>
 <li><a class="reference internal" href="#adding-new-board">Adding New Board</a></li>
 <li><a class="reference internal" href="#adding-new-microcontroller">Adding New Microcontroller</a></li>
 <li><a class="reference internal" href="#adding-new-item-to-config">Adding New Item To Config</a></li>
