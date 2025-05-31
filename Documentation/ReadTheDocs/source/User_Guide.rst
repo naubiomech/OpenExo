@@ -1,5 +1,5 @@
 Background Info
-==========
+===============
 
 Outline
 -------
@@ -1168,7 +1168,7 @@ This guide is designed to provide background information on OpenExo’s software
 Code Location
 ~~~~~~~~~~~~~
 
-If you are reading this you have found the location, but for completeness it can be found at: https://github.com/naubiomech/ExoCode/tree/nano_teensy_board.
+If you are reading this you have found the location, but for completeness it can be found `here <https://github.com/naubiomech/ExoCode/tree/nano_teensy_board>`__
 
 Style Guide
 ~~~~~~~~~~~
