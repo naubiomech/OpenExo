@@ -140,12 +140,12 @@ void _CANMotor::read_data()
         // Determine if this is an AK60v3 (extended, new format) or old AK (standard, old format)
         bool is_ak60v3 = (_motor_data->motor_type == (uint8_t)config_defs::motor::AK60v3);
 
-        // Only process if the frame type matches what we expect for this motor
+        // Only process if the message type matches what we expect for this motor
         if (is_ak60v3) {
             if (msg.len == 0 || !msg.flags.extended) {
                 return;
             }
-            // AK60v3: NEW format
+            // AK60v3: NEW message format
             if ((msg.id & 0xFF) == uint8_t(_motor_data->id))
             {
                 uint32_t p_int = (msg.buf[0] << 8) | msg.buf[1];
@@ -166,7 +166,7 @@ void _CANMotor::read_data()
             if (msg.len == 0 || msg.flags.extended) {
                 return;
             }
-            // Old AK: OLD format
+            // Old AK: OLD message format
             if (msg.buf[0] == uint32_t(_motor_data->id))
             {
                 uint32_t p_int = (msg.buf[1] << 8) | msg.buf[2];
@@ -215,7 +215,7 @@ void _CANMotor::send_data(float torque)
 
     CAN_message_t msg;
 
-    // Boolean to determine if this is an AK60v3 (extended, new format) or old AK (standard, old format)
+    // Determine if this is an AK60v3 (extended, new format) or old AK (standard, old format)
     bool is_ak60v3 = (_motor_data->motor_type == (uint8_t)config_defs::motor::AK60v3);
 
     if (is_ak60v3) {
@@ -354,7 +354,7 @@ bool _CANMotor::enable(bool overide)
         msg.buf[5] = 0xFF;
         msg.buf[6] = 0xFF;
 
-        if (_motor_data->enabled) //&& !_error && !_data->estop)
+        if (_motor_data->enabled && !_error && !_data->estop)
         {
             msg.buf[7] = 0xFC;
         }
