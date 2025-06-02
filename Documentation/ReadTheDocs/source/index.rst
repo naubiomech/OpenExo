@@ -34,7 +34,7 @@ The easiest and quickest way to install the **OpenExo** library is to clone the 
 
 Getting Started
 ---------------
-For new users, visit the **User Guide** page for an overview of the project.
+For new users, visit the **Background** page for an overview of the project.
 
 Developing
 ----------
