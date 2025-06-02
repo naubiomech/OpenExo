@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Ankle" href="ankle.html" />
-    <link rel="prev" title="Adding New UART Messages" href="AddingNewUARTMessage.html" /> 
+    <link rel="prev" title="Add Documentation" href="AddingNewPages.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
 <div id="top_nav">
@@ -122,7 +122,7 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Controllers</a><ul>
@@ -132,9 +132,10 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
 </ul>
 
         </div>
@@ -193,10 +194,12 @@ When designing a controller, the output of the <cite>calc_motor_cmd()</cite> fun
 <p>This overall approach follows the <strong>right-hand rule</strong>.</p>
 <p><strong>Torque Sensor Signs (Positive/Negative)</strong>
 Ensure that when the motor outputs a positive torque command, the torque sensors—when zeroed properly—also return a positive value when the motor shaft is stationary.</p>
-<p><strong>How to Calibrate</strong>
-1. Set the Direction Calibration Manager as the default controller for the current exo. Connect the Teensy via USB, open the Arduino Serial Monitor, connect the exo (Arduino Nano) with the Python app, power on the exo, and start a new session. The Calibration Manager will send a positive torque command (3.5 Nm by default) to each motor.
-2. Verify the torque by feeling the force (e.g., via the foot plates on an ankle exo). If a motor (e.g., on the left side) does not produce the expected positive rotation, modify the <cite>config.ini</cite> on the SD card to flip the motor direction for that side.
-3. Restart the process and, this time, focus on sensor readings displayed on the Serial Monitor. Manually return the foot plate (or another joint element) to its neutral position (for example, 0°). If the sensor does not report a positive value, adjust the sensor direction in the <cite>config.ini</cite>. Repeat this calibration for all relevant sensors.</p>
+<p><strong>How to Calibrate</strong></p>
+<ol class="arabic simple">
+<li><p>Set the Direction Calibration Manager as the default controller for the current exo. Connect the Teensy via USB, open the Arduino Serial Monitor, connect the exo (Arduino Nano) with the Python app, power on the exo, and start a new session. The Calibration Manager will send a positive torque command (3.5 Nm by default) to each motor.</p></li>
+<li><p>Verify the torque by feeling the force (e.g., via the foot plates on an ankle exo). If a motor (e.g., on the left side) does not produce the expected positive rotation, modify the <cite>config.ini</cite> on the SD card to flip the motor direction for that side.</p></li>
+<li><p>Restart the process and, this time, focus on sensor readings displayed on the Serial Monitor. Manually return the foot plate (or another joint element) to its neutral position (for example, 0°). If the sensor does not report a positive value, adjust the sensor direction in the <cite>config.ini</cite>. Repeat this calibration for all relevant sensors.</p></li>
+</ol>
 </section>
 <section id="chirp-controller">
 <h2>Chirp Controller<a class="headerlink" href="#chirp-controller" title="Link to this heading">¶</a></h2>
@@ -300,8 +303,8 @@ Parameter index order can be found in <a class="reference external" href="https:
         <div class="button_nav">
             <div class="left">
                 
-                <a href="AddingNewUARTMessage.html">
-                    <span class="icon">&lt;</span><span>Adding New UART Messages</span></a>
+                <a href="AddingNewPages.html">
+                    <span class="icon">&lt;</span><span>Add Documentation</span></a>
                 
             </div>
 

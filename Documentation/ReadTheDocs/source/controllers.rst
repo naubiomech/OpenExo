@@ -38,8 +38,11 @@ This overall approach follows the **right-hand rule**.
 Ensure that when the motor outputs a positive torque command, the torque sensors—when zeroed properly—also return a positive value when the motor shaft is stationary.
 
 **How to Calibrate**  
+
 1. Set the Direction Calibration Manager as the default controller for the current exo. Connect the Teensy via USB, open the Arduino Serial Monitor, connect the exo (Arduino Nano) with the Python app, power on the exo, and start a new session. The Calibration Manager will send a positive torque command (3.5 Nm by default) to each motor.
+
 2. Verify the torque by feeling the force (e.g., via the foot plates on an ankle exo). If a motor (e.g., on the left side) does not produce the expected positive rotation, modify the `config.ini` on the SD card to flip the motor direction for that side.
+
 3. Restart the process and, this time, focus on sensor readings displayed on the Serial Monitor. Manually return the foot plate (or another joint element) to its neutral position (for example, 0°). If the sensor does not report a positive value, adjust the sensor direction in the `config.ini`. Repeat this calibration for all relevant sensors.
 
 Chirp Controller
