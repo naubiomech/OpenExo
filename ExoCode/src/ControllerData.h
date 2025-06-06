@@ -317,6 +317,8 @@ class ControllerData {
 		long SPV2_filtered_pwr = 0;
 		uint32_t SPV2_current_voltage = 0;//battery voltage in Millivolts
 		unsigned long SPV2_current_voltage_timer = 0;
+		unsigned long motor_curr_stpWtch = 0;
+		unsigned long sys_pwr_30_timer_shrt = 0;
 		
 		long sys_pwr_30 = 0;
 		long sys_pwr_30_count = 0;

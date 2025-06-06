@@ -2035,6 +2035,11 @@ void SPV2::_calc_motor_current(ControllerData* controller_data)
 		Serial.print(" -----");
 	}
 	else {
+		unsigned long curr_time = millis();
+		if ((curr_time - _controller_data->motor_curr_stpWtch) < 100) {
+			return;
+		}
+		_controller_data->motor_curr_stpWtch = curr_time;
 		// Serial.print("\nStill accumulating motor current data.");
 		// _controller_data->SPV2_motor_current = _controller_data->SPV2_motor_current + abs(analogRead(A1) - 2047);
 		// Serial.print("  |  current power: ");
@@ -2358,8 +2363,11 @@ float SPV2::calc_motor_cmd()
 			
 			if (_controller_data->do_cal_pwr_30) {
 				if ((millis() - _controller_data->sys_pwr_30_timer) < 30000) {
-					_controller_data->sys_pwr_30 = _controller_data->sys_pwr_30 + _controller_data->SPV2_filtered_pwr;
-					_controller_data->sys_pwr_30_count++;
+					if ((millis() - _controller_data->sys_pwr_30_timer_shrt) > 100) {
+						_controller_data->sys_pwr_30 = _controller_data->sys_pwr_30 + _controller_data->SPV2_filtered_pwr;
+						_controller_data->sys_pwr_30_count++;
+						_controller_data->sys_pwr_30_timer_shrt = millis();
+					}
 				}
 				else {
 					_controller_data->sys_pwr_30_2_plot = _controller_data->sys_pwr_30/_controller_data->sys_pwr_30_count;
