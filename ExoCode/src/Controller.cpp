@@ -2294,6 +2294,88 @@ void SPV2::_lab_OP_point_gen(float step_size, long bound_l, long bound_u)
 	_controller_data->candidate = constrain(_controller_data->candidate, bound_l, bound_u);
 }
 
+void SPV2::_update_reference_angles(SideData* side_data, ControllerData* controller_data, float percent_grf, float percent_grf_heel)
+{
+    //When the percent_grf passes the threshold, update the reference angle
+    // const float threshold = controller_data->parameters[controller_defs::trec::timing_threshold]/100;
+	const float threshold = 35/100;
+    const bool should_update = (percent_grf > controller_data->toeFsrThreshold) && !controller_data->reference_angle_updated;
+    const bool should_capture_level_entrance = side_data->do_calibration_refinement_toe_fsr && !side_data->do_calibration_toe_fsr;
+    const bool should_reset_level_entrance_angle = controller_data->prev_calibrate_level_entrance < should_capture_level_entrance;
+
+    if (should_reset_level_entrance_angle)
+    {
+        controller_data->level_entrance_angle = 0.5;
+    }
+
+    if (should_update)
+    {
+        if (should_capture_level_entrance)
+        {
+            controller_data->level_entrance_angle = utils::ewma(side_data->ankle.joint_position, controller_data->level_entrance_angle, controller_data->cal_level_entrance_angle_alpha);
+        }
+
+        controller_data->reference_angle_updated = true;
+        controller_data->reference_angle = side_data->ankle.joint_position;
+        
+        //controller_data->reference_angle_offset = side_data->ankle.joint_global_angle;
+    }
+
+    //When the percent_grf drops below the threshold, reset the reference angle updated flag and expire the reference angle
+    const bool should_reset = (percent_grf < controller_data->toeFsrThreshold) && controller_data->reference_angle_updated;
+    
+    if (should_reset)
+    {
+        controller_data->reference_angle_updated = false;
+        controller_data->reference_angle = 0;
+        controller_data->reference_angle_offset = 0;
+    }
+
+    controller_data->prev_calibrate_level_entrance = should_capture_level_entrance;
+}
+
+void SPV2::_capture_neutral_angle(SideData* side_data, ControllerData* controller_data)
+{
+    //On the start of torque calibration reset the neutral angle
+    if (controller_data->prev_calibrate_trq_sensor < side_data->ankle.calibrate_torque_sensor)
+    {
+        controller_data->neutral_angle = side_data->ankle.joint_position;
+    }
+
+    if (side_data->ankle.calibrate_torque_sensor) 
+    {
+        //Update the neutral angle with an ema filter
+        controller_data->neutral_angle = utils::ewma(side_data->ankle.joint_position, controller_data->neutral_angle, controller_data->cal_neutral_angle_alpha);
+    }
+
+    controller_data->prev_calibrate_trq_sensor = side_data->ankle.calibrate_torque_sensor;
+}
+
+void SPV2::_grf_threshold_dynamic_tuner(SideData* side_data, ControllerData* controller_data, float threshold, float percent_grf_heel)
+{
+	//If it's swing phase, set wait4HiHeelFSR to True, and increase the toeFSR threshold; when wait4HiHeelFSR is true and heelFSR > a pre-defined threshold, reduce the toeFSR threshold; when it's stance phase, set wait4HiHeelFSR to False
+	if (!side_data->toe_stance)
+    {
+		controller_data->wait4HiHeelFSR = true;
+	}
+	else
+    {
+		controller_data->wait4HiHeelFSR = false;
+		controller_data->toeFsrThreshold = threshold*0.01;
+	}
+	if (controller_data->wait4HiHeelFSR) 
+    {
+		if (percent_grf_heel > threshold) 
+        {
+			controller_data->toeFsrThreshold = threshold*0.1;
+		}
+		else 
+        {
+			controller_data->toeFsrThreshold = threshold;
+		}
+	}
+}
+
 float SPV2::calc_motor_cmd()
 {
 
@@ -2304,7 +2386,6 @@ float SPV2::calc_motor_cmd()
 		return 0;
 	}
 	else {
-		
 		// Serial.print("\n  |  Right TRQ offset: ");
 		// Serial.print(_joint_data->torque_offset_reading);
 		
@@ -2381,8 +2462,8 @@ float SPV2::calc_motor_cmd()
 	float plantar_setpoint = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
 	float dorsi_setpoint = _controller_data->parameters[controller_defs::spv2::dorsi_scaling];
 	float threshold = constrain(_controller_data->parameters[controller_defs::spv2::timing_threshold]/100, 0, 99);
-	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.6);
-	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.6);
+	float percent_grf = constrain(_side_data->toe_fsr, 0, 2.5);
+	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 2.5);
 	_controller_data->percent_grf2plot= percent_grf;
 	_controller_data->percent_grf_heel2plot= percent_grf_heel;
 	
@@ -2400,6 +2481,84 @@ float SPV2::calc_motor_cmd()
 
 	
 	float cmd_ff = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
+	
+	
+	//TREC section begins
+					static const float sigmoid_exp_scalar{50.0f};
+
+					//Calculate Generic Contribution
+				/* 	float plantar_setpoint = 0;
+
+					if (_controller_data->parameters[controller_defs::trec::turn_on_peak_limiter]) 
+					{
+						plantar_setpoint = _controller_data->setpoint2use;
+					}
+					else 
+					{
+						plantar_setpoint = _controller_data->parameters[controller_defs::trec::plantar_scaling];
+						_controller_data->setpoint2use = plantar_setpoint;
+					}
+
+					const float dorsi_setpoint = -_controller_data->parameters[controller_defs::trec::dorsi_scaling];
+					const float threshold = _controller_data->parameters[controller_defs::trec::timing_threshold]/100;
+					const float percent_grf = min(_side_data->toe_fsr, 1);
+					const float percent_grf_heel = min(_side_data->heel_fsr, 1);
+					const float slope = (plantar_setpoint - dorsi_setpoint)/(1 - threshold);
+					const float generic = max(((slope*(percent_grf - threshold)) + dorsi_setpoint), dorsi_setpoint);                    //Stateless "PJMC" stateless
+					_controller_data->stateless_pjmc_term = generic; */
+
+					//Assistive Contribution (a.k.a: Suspension; this term consists of a "Spring term" and a "Damper term" as the suspension)
+					_capture_neutral_angle(_side_data, _controller_data);
+					_grf_threshold_dynamic_tuner(_side_data, _controller_data, threshold, percent_grf_heel);
+					_update_reference_angles(_side_data, _controller_data, percent_grf, percent_grf_heel);   //When current toe FSR > set threshold, use the current ankle angle as the "reference angle"
+					// const float k = 0.01 * _controller_data->parameters[controller_defs::trec::spring_stiffness];
+					// const float b = 0.01 * _controller_data->parameters[controller_defs::trec::damping];
+					const float k = 1;
+					const float b = 0;
+					//const float equilibrium_angle_offset = _controller_data->parameters[controller_defs::trec::neutral_angle]/100;
+					const float equilibrium_angle_offset = 20/100;
+					const float deviation_from_level = (_controller_data->reference_angle - _controller_data->level_entrance_angle);
+					const float delta = _controller_data->reference_angle + deviation_from_level - _side_data->ankle.joint_position + equilibrium_angle_offset;//describes the amount of dorsi flexion since toe FSR > set threshold (negative at more plantarflexed angles)
+					const float assistive = max(k*delta - b*_side_data->ankle.joint_velocity, 0);//Dorsi velocity: Negative
+
+					//Use a tuned sigmoid to squelch the spring output during the 'swing' phase
+					const float squelch_offset = -(1.5*_controller_data->toeFsrThreshold);                                                                                  //1.5 ensures that the spring activates after the new angle is captured
+					const float grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+squelch_offset))+1);
+					const float squelched_supportive_term = assistive*grf_squelch_multiplier;                                                                               //Finalized suspension term
+					
+					//Low pass the squelched supportive term
+					_controller_data->filtered_squelched_supportive_term = utils::ewma(squelched_supportive_term, _controller_data->filtered_squelched_supportive_term, 0.075);
+
+					//Propulsive Contribution
+					// const float kProp = 0.01 * _controller_data->parameters[controller_defs::trec::propulsive_gain];
+					const float kProp = 1;
+					const float saturated_velocity = _side_data->ankle.joint_velocity > 0 ? _side_data->ankle.joint_velocity:0;
+					const float propulsive = kProp*saturated_velocity;
+
+					//Use a symmetric sigmoid to squelch the propulsive term
+					const float propulsive_squelch_offset = -1.1 + threshold;
+					const float propulsive_grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))+1);
+					const float squelched_propulsive_term = propulsive*propulsive_grf_squelch_multiplier;
+	
+	
+	
+	
+	_controller_data->cmd_ff_kb = -_controller_data->filtered_squelched_supportive_term;
+	_controller_data->cmd_ff_pushOff = -squelched_propulsive_term;
+	_controller_data->cmd_ff_generic = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
+	
+	Serial.print("\ncmd_ff_kb: ");
+	Serial.print(_controller_data->cmd_ff_kb);
+	Serial.print("  |  push off: ");
+	Serial.print(_controller_data->cmd_ff_pushOff);
+	Serial.print("  |  generic: ");
+	Serial.print(_controller_data->cmd_ff_generic);
+	//TREC section ends
+	
+	
+	
+	
+	
 	
     //Low pass filter torque_reading
     const float torque = _joint_data->torque_reading;

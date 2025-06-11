@@ -350,6 +350,11 @@ class ControllerData {
 		float ps_old_time = 0;
 		bool ps_connected = false;
 		
+		//SPV2 TREC troubleshooting
+		float cmd_ff_kb = 0;
+		float cmd_ff_pushOff = 0;
+		float cmd_ff_generic = 0;
+		
 		//magnet troubleshooting
 		unsigned long magnet_watch = 0;;
 		

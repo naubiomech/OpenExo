@@ -480,6 +480,12 @@ private:
 	void SPV2::optimizer_reset();
 	void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp);
 	void SPV2::_lab_OP_point_gen(float step_size, long bound_l, long bound_u);
+	
+	//from TREC
+	void _update_reference_angles(SideData* side_data, ControllerData* controller_data, float percent_grf, float percent_grf_heel);
+    void _capture_neutral_angle(SideData* side_data, ControllerData* controller_data);
+    void _grf_threshold_dynamic_tuner(SideData* side_data, ControllerData* controller_data, float threshold, float percent_grf_heel);
+    //void _plantar_setpoint_adjuster(SideData* side_data, ControllerData* controller_data, float pjmcSpringDamper);
 };
 
 #endif
