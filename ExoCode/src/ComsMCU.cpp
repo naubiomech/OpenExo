@@ -168,14 +168,30 @@ void ComsMCU::update_gui()
         rt_data_msg.command = ble_names::send_real_time_data;
         rt_data_msg.expecting = rt_data::len;
 
-        for (int i = 0; i < rt_data::len; i++)
-        {   
-            #if REAL_TIME_I2C
-                rt_data_msg.data[i] = rt_floats[i];
-            #else
-                rt_data_msg.data[i] = rt_data::float_values[i];
-            #endif
+/* ---------- ADD SYNTHETIC NOISE HERE ---------------- */
+constexpr float NOISE_FRAC = 0.05f;          // ±5 % of the magnitude
+constexpr float NOISE_MIN  = 0.005f;         // 0.5 % absolute floor
+
+    for (int i = 0; i < rt_data::len; ++i)
+    {
+    #if REAL_TIME_I2C
+        float clean = rt_floats[i];
+    #else
+        float clean = rt_data::float_values[i];
+    #endif
+
+        /* keep MARK index exact – no noise on that one */
+        if (i == _mark_index)
+        {
+            rt_data_msg.data[i] = clean;
+            continue;
         }
+
+        float span  = fabsf(clean) * NOISE_FRAC + NOISE_MIN;
+        float eps   = ((float)random(-1000, 1001) / 1000.0f) * span;  // uniform noise
+        rt_data_msg.data[i] = clean + eps;
+    }
+/* ---------------------------------------------------- */
 
         if (my_mark < _data->mark)
         {

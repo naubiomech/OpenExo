@@ -8,10 +8,10 @@
 #if defined(ARDUINO_TEENSY36) | defined(ARDUINO_TEENSY41)
 
 //UNCOMMENT TO UTILIZE
-//#define INCLUDE_FLEXCAN_DEBUG   //Flag to print CAN debugging messages for the motors
-//#define MAKE_PLOTS              //Flag to serial plot
-//#define MAIN_DEBUG              //Flag to print Arduino debugging statements
-//#define HEADLESS                //Flag to be used when there is no app access
+// #define INCLUDE_FLEXCAN_DEBUG   //Flag to print CAN debugging messages for the motors
+#define MAKE_PLOTS              //Flag to serial plot
+#define MAIN_DEBUG              //Flag to print Arduino debugging statements
+// #define HEADLESS                //Flag to be used when there is no app access
 
 //Standard Libraries
 #include <stdint.h>
@@ -670,7 +670,7 @@ void loop()
 #include "src/WaistBarometer.h"
 #include "src/InclineDetector.h"
 
-#define MAIN_DEBUG 0
+#define MAIN_DEBUG 1
 
 //Create an array to store config
 namespace config_info
@@ -713,7 +713,9 @@ namespace config_info
 void setup()
 {
     Serial.begin(115200);
+
     delay(100);
+    randomSeed(analogRead(A0));   // floating pin gives nicely unpredictable seed
 
     #if MAIN_DEBUG
       while (!Serial);
@@ -805,7 +807,7 @@ void loop()
 
 #else //Code that operates when the microcontroller is not recognized
 
-#include "Utilities.h"
+#include "src/Utilities.h"
 
 void setup()
 {

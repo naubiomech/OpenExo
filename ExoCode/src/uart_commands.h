@@ -234,7 +234,7 @@ namespace UART_command_handlers
         tx_msg.data[config_defs::elbow_flip_angle_dir_idx] = exo_data->config[config_defs::elbow_flip_angle_dir_idx];
 
         handler->UART_msg(tx_msg);
-        // logger::println("UART_command_handlers::get_config->sent updated config");
+        logger::println("UART_command_handlers::get_config->sent updated config");
     }
     inline static void update_config(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
     {
