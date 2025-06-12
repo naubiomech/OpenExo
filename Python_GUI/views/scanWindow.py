@@ -66,7 +66,7 @@ class ScanWindow(tk.Frame):
         style.configure('TListbox', font=(self.fontstyle, 14))
 
         # Title label on top of the image
-        titleLabel = ttk.Label(self, text="OpenExo GUI V1.03", font=(self.fontstyle, 30))
+        titleLabel = ttk.Label(self, text="OpenExo GUI V1.04", font=(self.fontstyle, 30))
         titleLabel.grid(row=1, column=0, columnspan=2, pady=0, sticky="n")  # Center instructions
         
         # Initial device name display
@@ -102,17 +102,23 @@ class ScanWindow(tk.Frame):
                                             state=DISABLED)
         self.startTrialButton.grid(row=0, column=0, padx=5)
 
+        # Button to start the debug (initially disabled)
+        self.debugButton = ttk.Button(action_button_frame, text="Debug",
+                                            command=async_handler(self.on_start_trial_debug_button_clicked),
+                                            state=DISABLED)
+        self.debugButton.grid(row=0, column=1, padx=5)
+
         # Calibrate Torque button
         self.calTorqueButton = ttk.Button(action_button_frame, text="Calibrate Torque",
                                            command=async_handler(self.on_calibrate_torque_button_clicked),
                                            state=DISABLED)
-        self.calTorqueButton.grid(row=0, column=1, padx=5)
+        self.calTorqueButton.grid(row=0, column=2, padx=5)
 
         # Connect button
         self.connectButton = ttk.Button(action_button_frame, text="Connect",
                                         command=async_handler(self.on_connect_button_clicked),
                                         state=DISABLED)  # Initially disabled
-        self.connectButton.grid(row=0, column=2, padx=5)
+        self.connectButton.grid(row=0, column=3, padx=5)
 
         # Button to save the selected device
         self.saveDeviceButton = ttk.Button(action_button_frame, text="Save & Connect",
@@ -155,6 +161,7 @@ class ScanWindow(tk.Frame):
         
         if success:
             self.startTrialButton.config(state="normal")  # Enable Start Trial button
+            self.debugButton.config(state="normal")  # Enable Start Trial button
             self.calTorqueButton.config(state="normal")   # Enable Calibrate Torque button
             self.connectButton.config(state=DISABLED)
             self.saveDeviceButton.config(state=DISABLED)
@@ -182,6 +189,7 @@ class ScanWindow(tk.Frame):
         self.loadDeviceButton.config(state=DISABLED)
         self.startScanButton.config(state=DISABLED)
         self.startTrialButton.config(state=DISABLED)
+        self.debugButton.config(state=DISABLED)
         self.calTorqueButton.config(state=DISABLED)
         await self.controller.deviceManager.disconnect()  # Disconnects from any devices
         self.deviceListbox.delete(0, tk.END)
@@ -191,6 +199,7 @@ class ScanWindow(tk.Frame):
         if success:
             self.deviceNameText.set(f"Connected: {self.selected_device_name} {self.saved_address}")
             self.startTrialButton.config(state="normal")
+            self.debugButton.config(state="normal")
             self.calTorqueButton.config(state="normal")
             self.loadDeviceButton.config(state=DISABLED)
             self.saveDeviceButton.config(state=DISABLED)
@@ -219,6 +228,7 @@ class ScanWindow(tk.Frame):
         
         if success:
             self.startTrialButton.config(state="normal")  # Enable Start Trial button
+            self.debugButton.config(state = "normal")
             self.calTorqueButton.config(state="normal")   # Enable Calibrate Torque button
             self.deviceNameText.set(f"Connected: {self.selected_device_name} {self.selected_device_address}")
         else:
@@ -234,6 +244,10 @@ class ScanWindow(tk.Frame):
         """Handles the Start Trial button click."""
         await self.startTrialButtonClicked()  # Initiate the trial process
 
+    async def on_start_trial_debug_button_clicked(self):
+        """Handles the Start Trial button click."""
+        await self.startTrialDebugButtonClicked()
+        
     async def on_start_scan_button_clicked(self):
         """Starts scanning for devices when the button is clicked."""
         self.reset_elements()
@@ -346,6 +360,33 @@ class ScanWindow(tk.Frame):
         active_trial_frame.newSelection(self)
         active_trial_frame.startClock()
 
+    async def startTrialDebugButtonClicked(self):
+        # self.changeName()
+        # """Switches frame to ActiveTrial and begins the trial."""
+        # active_trial_frame = self.controller.frames["ActiveTrial"]
+        # active_trial_frame.disable_interactions()  # Disable buttons in ActiveTrial frame
+        # active_trial_frame.clear_both_plot()
+
+        # # Show ActiveTrial frame
+        # self.controller.show_frame("ActiveTrial")
+        # await self.controller.trial.calibrate(self.controller.deviceManager)  # Calibrate devices
+        # await self.controller.trial.beginTrial(self.controller.deviceManager)  # Begin the trial
+
+        # # Starts new selection once Active trial has started
+        # active_trial_frame.newSelection(self)
+        # active_trial_frame.startClock()
+            self.changeName()
+
+            active_trial_frame = self.controller.frames["ActiveTrial"]
+            active_trial_frame.disable_interactions()
+            active_trial_frame.clear_both_plot()
+
+            self.controller.show_frame("ActiveTrial")
+            active_trial_frame.newSelection(self)
+
+            # Show modal popup for manual motor start
+            active_trial_frame.show_motor_start_popup()
+
     def loadDeviceAvailible(self):
         if self.saved_address is not None:
             self.loadDeviceButton.config(state="normal")
@@ -360,6 +401,7 @@ class ScanWindow(tk.Frame):
         self.selected_device_address = None
         self.startScanButton.config(state="normal")
         self.startTrialButton.config(state=DISABLED)
+        self.debugButton.config(state=DISABLED)
         self.calTorqueButton.config(state=DISABLED)
         self.connectButton.config(state=DISABLED)
         self.saveDeviceButton.config(state=DISABLED)
@@ -373,6 +415,7 @@ class ScanWindow(tk.Frame):
         self.selected_device_address = None
         self.startScanButton.config(state=DISABLED)
         self.startTrialButton.config(state=DISABLED)
+        self.debugButton.config(state=DISABLED)
         self.calTorqueButton.config(state=DISABLED)
         self.connectButton.config(state=DISABLED)
         self.saveDeviceButton.config(state=DISABLED)

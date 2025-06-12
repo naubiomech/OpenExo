@@ -439,3 +439,30 @@ class ActiveTrial(tk.Frame):
         self.controller.deviceManager._realTimeProcessor._exo_data.MarkLabel.set(
             "Mark: " + str(self.controller.
                 deviceManager._realTimeProcessor._exo_data.MarkVal))
+    
+    async def start_motors_and_close_popup(self, popup):
+        await self.controller.trial.calibrate(self.controller.deviceManager)  # Calibrate devices
+        await self.controller.trial.beginTrial(self.controller.deviceManager)  # Begin the trial
+
+        popup.destroy()
+        self.startClock()
+        
+    def show_motor_start_popup(self):
+        popup = tk.Toplevel(self)
+        popup.title("Manual Motor Start")
+        popup.geometry("400x200")
+        popup.grab_set()  # Make it modal
+
+        # Disable window close button
+        popup.protocol("WM_DELETE_WINDOW", lambda: None)
+
+        label = tk.Label(popup, text="Click below to start motors and calibrate.", font=(self.fontstyle, 14))
+        label.pack(pady=30)
+
+        start_button = ttk.Button(
+            popup,
+            text="Start Motors and Calibrate",
+            command=async_handler(lambda: self.start_motors_and_close_popup(popup))
+        )
+        start_button.pack(pady=10)
+
