@@ -175,8 +175,8 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 		const uint8_t min_angle = 5;
         const uint8_t max_angle = 6;
         const uint8_t kp = 7;
-		const uint8_t turn_on_peak_limiter = 9;                 
-        const uint8_t kd = 8;
+		const uint8_t kd = 8;
+		const uint8_t turn_on_peak_limiter = 9;
 		const uint8_t do_update_stiffness = 10;
 		const uint8_t ki = 11;
 		const uint8_t do_use_servo = 12;
@@ -184,7 +184,10 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 		const uint8_t servo_origin = 14;
 		const uint8_t servo_terminal = 15;
 		const uint8_t motor_current_calc_win = 16;
-        const uint8_t num_parameter = 17;
+		const uint8_t spring_stiffness = 17;
+		const uint8_t damping = 18;
+		const uint8_t propulsive_gain = 19;
+        const uint8_t num_parameter = 20;
     }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters

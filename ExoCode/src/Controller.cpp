@@ -2511,34 +2511,39 @@ float SPV2::calc_motor_cmd()
 					_capture_neutral_angle(_side_data, _controller_data);
 					_grf_threshold_dynamic_tuner(_side_data, _controller_data, threshold, percent_grf_heel);
 					_update_reference_angles(_side_data, _controller_data, percent_grf, percent_grf_heel);   //When current toe FSR > set threshold, use the current ankle angle as the "reference angle"
-					// const float k = 0.01 * _controller_data->parameters[controller_defs::trec::spring_stiffness];
-					// const float b = 0.01 * _controller_data->parameters[controller_defs::trec::damping];
-					const float k = 1;
-					const float b = 0;
+					float k = 0.01 * _controller_data->parameters[controller_defs::spv2::spring_stiffness];
+					float b = 0.01 * _controller_data->parameters[controller_defs::spv2::damping];
+					// const float k = 1;
+					// const float b = 0;
 					//const float equilibrium_angle_offset = _controller_data->parameters[controller_defs::trec::neutral_angle]/100;
-					const float equilibrium_angle_offset = 20/100;
-					const float deviation_from_level = (_controller_data->reference_angle - _controller_data->level_entrance_angle);
-					const float delta = _controller_data->reference_angle + deviation_from_level - _side_data->ankle.joint_position + equilibrium_angle_offset;//describes the amount of dorsi flexion since toe FSR > set threshold (negative at more plantarflexed angles)
-					const float assistive = max(k*delta - b*_side_data->ankle.joint_velocity, 0);//Dorsi velocity: Negative
-
+					float equilibrium_angle_offset = 20/100;
+					float deviation_from_level = (_controller_data->reference_angle - _controller_data->level_entrance_angle);
+					float delta = _controller_data->reference_angle + deviation_from_level - _side_data->ankle.joint_position + equilibrium_angle_offset;//describes the amount of dorsi flexion since toe FSR > set threshold (negative at more plantarflexed angles)
+					float assistive = max(k*delta - b*_side_data->ankle.joint_velocity, 0);//Dorsi velocity: Negative
+					Serial.print("\nk: ");
+					Serial.print(k);
+					Serial.print("  |  delta: ");
+					Serial.print(delta);
 					//Use a tuned sigmoid to squelch the spring output during the 'swing' phase
-					const float squelch_offset = -(1.5*_controller_data->toeFsrThreshold);                                                                                  //1.5 ensures that the spring activates after the new angle is captured
-					const float grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+squelch_offset))+1);
-					const float squelched_supportive_term = assistive*grf_squelch_multiplier;                                                                               //Finalized suspension term
+					float squelch_offset = -(1.5*_controller_data->toeFsrThreshold);                                                                                  //1.5 ensures that the spring activates after the new angle is captured
+					float grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+squelch_offset))+1);
+					Serial.print("\ngrf_squelch_multiplier: ");
+					Serial.print(grf_squelch_multiplier);
+					float squelched_supportive_term = assistive*grf_squelch_multiplier;                                                                              //Finalized suspension term
 					
 					//Low pass the squelched supportive term
 					_controller_data->filtered_squelched_supportive_term = utils::ewma(squelched_supportive_term, _controller_data->filtered_squelched_supportive_term, 0.075);
 
 					//Propulsive Contribution
-					// const float kProp = 0.01 * _controller_data->parameters[controller_defs::trec::propulsive_gain];
-					const float kProp = 1;
-					const float saturated_velocity = _side_data->ankle.joint_velocity > 0 ? _side_data->ankle.joint_velocity:0;
-					const float propulsive = kProp*saturated_velocity;
+					float kProp = 0.01 * _controller_data->parameters[controller_defs::spv2::propulsive_gain];
+					// const float kProp = 1;
+					float saturated_velocity = _side_data->ankle.joint_velocity > 0 ? _side_data->ankle.joint_velocity:0;
+					float propulsive = kProp*saturated_velocity;
 
 					//Use a symmetric sigmoid to squelch the propulsive term
-					const float propulsive_squelch_offset = -1.1 + threshold;
-					const float propulsive_grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))+1);
-					const float squelched_propulsive_term = propulsive*propulsive_grf_squelch_multiplier;
+					float propulsive_squelch_offset = -1.1 + threshold;
+					float propulsive_grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))+1);
+					float squelched_propulsive_term = propulsive*propulsive_grf_squelch_multiplier;
 	
 	
 	
@@ -2546,6 +2551,9 @@ float SPV2::calc_motor_cmd()
 	_controller_data->cmd_ff_kb = -_controller_data->filtered_squelched_supportive_term;
 	_controller_data->cmd_ff_pushOff = -squelched_propulsive_term;
 	_controller_data->cmd_ff_generic = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
+	
+	// _controller_data->cmd_ff_kb = min(_controller_data->cmd_ff_kb, 0);
+	// _controller_data->cmd_ff_pushOff = min(_controller_data->cmd_ff_pushOff, 0);
 	
 	Serial.print("\ncmd_ff_kb: ");
 	Serial.print(_controller_data->cmd_ff_kb);
@@ -2555,7 +2563,7 @@ float SPV2::calc_motor_cmd()
 	Serial.print(_controller_data->cmd_ff_generic);
 	//TREC section ends
 	
-	
+	cmd_ff = cmd_ff + _controller_data->cmd_ff_kb + _controller_data->cmd_ff_pushOff;
 	
 	
 	

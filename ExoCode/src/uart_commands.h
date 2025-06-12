@@ -486,16 +486,16 @@ namespace UART_command_handlers
 				 rx_msg.data[5] = abs(map(analogRead(A1),0,4095,-300,300));
 				 rx_msg.data[3] = abs(map(analogRead(A1),0,4095,-300,300));
 				 float pwr2plot = exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001;
-				 rx_msg.data[2] = map(pwr2plot,-2,100,0,300);
-				 rx_msg.data[0] = map(pwr2plot,-2,100,0,300);
+				 //rx_msg.data[2] = map(pwr2plot,-2,100,0,300);
+				 //rx_msg.data[0] = map(pwr2plot,-2,100,0,300);
 				 
 				 // rx_msg.data[5] = map(analogRead(A8),0,4095,0,90);
 				 // rx_msg.data[3] = map(analogRead(A8),0,4095,0,90);
 				 rx_msg.data[5] = exo_data->right_side.ankle.joint_position;
 				 rx_msg.data[3] = exo_data->right_side.ankle.joint_position;
 				 
-				 rx_msg.data[2] = exo_data->right_side.ankle.controller.cmd_ff_kb;
-				 rx_msg.data[0] = exo_data->right_side.ankle.controller.cmd_ff_pushOff;
+				 rx_msg.data[5] = exo_data->right_side.ankle.controller.cmd_ff_kb;
+				 rx_msg.data[3] = exo_data->right_side.ankle.controller.cmd_ff_pushOff;
 				
 				// rx_msg.data[0] = 0;
 				// rx_msg.data[1] = 1;
