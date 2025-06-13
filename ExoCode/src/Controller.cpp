@@ -2299,79 +2299,83 @@ void SPV2::_update_reference_angles(SideData* side_data, ControllerData* control
     //When the percent_grf passes the threshold, update the reference angle
     // const float threshold = controller_data->parameters[controller_defs::trec::timing_threshold]/100;
 	const float threshold = 35/100;
-    const bool should_update = (percent_grf > controller_data->toeFsrThreshold) && !controller_data->reference_angle_updated;
+    const bool should_update = (percent_grf >  _controller_data->toeFsrThreshold) && !_controller_data->reference_angle_updated;
     const bool should_capture_level_entrance = side_data->do_calibration_refinement_toe_fsr && !side_data->do_calibration_toe_fsr;
-    const bool should_reset_level_entrance_angle = controller_data->prev_calibrate_level_entrance < should_capture_level_entrance;
+	Serial.print("\nshould_capture_level_entrance: ");
+	Serial.print(should_capture_level_entrance);
+    const bool should_reset_level_entrance_angle =  _controller_data->prev_calibrate_level_entrance < should_capture_level_entrance;
 
     if (should_reset_level_entrance_angle)
     {
-        controller_data->level_entrance_angle = 0.5;
+         _controller_data->level_entrance_angle = 0.5;
     }
 
     if (should_update)
     {
         if (should_capture_level_entrance)
         {
-            controller_data->level_entrance_angle = utils::ewma(side_data->ankle.joint_position, controller_data->level_entrance_angle, controller_data->cal_level_entrance_angle_alpha);
+             _controller_data->level_entrance_angle = utils::ewma(side_data->ankle.joint_position,  _controller_data->level_entrance_angle,  _controller_data->cal_level_entrance_angle_alpha);
         }
 
-        controller_data->reference_angle_updated = true;
-        controller_data->reference_angle = side_data->ankle.joint_position;
+         _controller_data->reference_angle_updated = true;
+         _controller_data->reference_angle = side_data->ankle.joint_position;
         
-        //controller_data->reference_angle_offset = side_data->ankle.joint_global_angle;
+        // _controller_data->reference_angle_offset = side_data->ankle.joint_global_angle;
     }
 
     //When the percent_grf drops below the threshold, reset the reference angle updated flag and expire the reference angle
-    const bool should_reset = (percent_grf < controller_data->toeFsrThreshold) && controller_data->reference_angle_updated;
+    const bool should_reset = (percent_grf <  _controller_data->toeFsrThreshold) &&  _controller_data->reference_angle_updated;
     
     if (should_reset)
     {
-        controller_data->reference_angle_updated = false;
-        controller_data->reference_angle = 0;
-        controller_data->reference_angle_offset = 0;
+         _controller_data->reference_angle_updated = false;
+         _controller_data->reference_angle = 0;
+         _controller_data->reference_angle_offset = 0;
     }
 
-    controller_data->prev_calibrate_level_entrance = should_capture_level_entrance;
+     _controller_data->prev_calibrate_level_entrance = should_capture_level_entrance;
 }
 
-void SPV2::_capture_neutral_angle(SideData* side_data, ControllerData* controller_data)
+void SPV2::_capture_neutral_angle(SideData* _side_data, ControllerData* controller_data)
 {
     //On the start of torque calibration reset the neutral angle
-    if (controller_data->prev_calibrate_trq_sensor < side_data->ankle.calibrate_torque_sensor)
+    if ( _controller_data->prev_calibrate_trq_sensor < _side_data->ankle.calibrate_torque_sensor)
     {
-        controller_data->neutral_angle = side_data->ankle.joint_position;
+         _controller_data->neutral_angle = _side_data->ankle.joint_position;
     }
 
-    if (side_data->ankle.calibrate_torque_sensor) 
+    if (_side_data->ankle.calibrate_torque_sensor) 
     {
         //Update the neutral angle with an ema filter
-        controller_data->neutral_angle = utils::ewma(side_data->ankle.joint_position, controller_data->neutral_angle, controller_data->cal_neutral_angle_alpha);
+         _controller_data->neutral_angle = utils::ewma(_side_data->ankle.joint_position,  _controller_data->neutral_angle,  _controller_data->cal_neutral_angle_alpha);
     }
 
-    controller_data->prev_calibrate_trq_sensor = side_data->ankle.calibrate_torque_sensor;
+     _controller_data->prev_calibrate_trq_sensor = _side_data->ankle.calibrate_torque_sensor;
 }
 
-void SPV2::_grf_threshold_dynamic_tuner(SideData* side_data, ControllerData* controller_data, float threshold, float percent_grf_heel)
+void SPV2::_grf_threshold_dynamic_tuner(SideData* _side_data, ControllerData* controller_data, float threshold, float percent_grf_heel)
 {
+	 _controller_data->toeFsrThreshold = threshold;
+	return;
 	//If it's swing phase, set wait4HiHeelFSR to True, and increase the toeFSR threshold; when wait4HiHeelFSR is true and heelFSR > a pre-defined threshold, reduce the toeFSR threshold; when it's stance phase, set wait4HiHeelFSR to False
-	if (!side_data->toe_stance)
+	if (!_side_data->toe_stance)
     {
-		controller_data->wait4HiHeelFSR = true;
+		 _controller_data->wait4HiHeelFSR = true;
 	}
 	else
     {
-		controller_data->wait4HiHeelFSR = false;
-		controller_data->toeFsrThreshold = threshold*0.01;
+		 _controller_data->wait4HiHeelFSR = false;
+		 _controller_data->toeFsrThreshold = threshold*0.01;
 	}
-	if (controller_data->wait4HiHeelFSR) 
+	if ( _controller_data->wait4HiHeelFSR) 
     {
 		if (percent_grf_heel > threshold) 
         {
-			controller_data->toeFsrThreshold = threshold*0.1;
+			 _controller_data->toeFsrThreshold = threshold*0.1;
 		}
 		else 
         {
-			controller_data->toeFsrThreshold = threshold;
+			 _controller_data->toeFsrThreshold = threshold;
 		}
 	}
 }
@@ -2518,12 +2522,27 @@ float SPV2::calc_motor_cmd()
 					//const float equilibrium_angle_offset = _controller_data->parameters[controller_defs::trec::neutral_angle]/100;
 					float equilibrium_angle_offset = 20/100;
 					float deviation_from_level = (_controller_data->reference_angle - _controller_data->level_entrance_angle);
-					float delta = _controller_data->reference_angle + deviation_from_level - _side_data->ankle.joint_position + equilibrium_angle_offset;//describes the amount of dorsi flexion since toe FSR > set threshold (negative at more plantarflexed angles)
+					//float delta = _controller_data->reference_angle + deviation_from_level - _side_data->ankle.joint_position + equilibrium_angle_offset;//describes the amount of dorsi flexion since toe FSR > set threshold (negative at more plantarflexed angles)
+					float delta = 0;
+					if (_controller_data->SPV2_virtual_spring_ON) {
+						delta = _side_data->ankle.joint_position - _controller_data->SPV2_virtual_spring_entry_angle;
+					}
+					delta = min(delta, 0);
 					float assistive = max(k*delta - b*_side_data->ankle.joint_velocity, 0);//Dorsi velocity: Negative
 					Serial.print("\nk: ");
 					Serial.print(k);
 					Serial.print("  |  delta: ");
 					Serial.print(delta);
+					Serial.print("  |  reference: ");
+					Serial.print(_controller_data->reference_angle);
+					Serial.print("  |  deviation: ");
+					Serial.print(deviation_from_level);
+					Serial.print("  |  joint_position: ");
+					Serial.print(_side_data->ankle.joint_position);
+					Serial.print("  |  offset: ");
+					Serial.print(equilibrium_angle_offset);
+					Serial.print("  |  entrance: ");
+					Serial.print(_controller_data->level_entrance_angle);
 					//Use a tuned sigmoid to squelch the spring output during the 'swing' phase
 					float squelch_offset = -(1.5*_controller_data->toeFsrThreshold);                                                                                  //1.5 ensures that the spring activates after the new angle is captured
 					float grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+squelch_offset))+1);
@@ -2539,9 +2558,10 @@ float SPV2::calc_motor_cmd()
 					// const float kProp = 1;
 					float saturated_velocity = _side_data->ankle.joint_velocity > 0 ? _side_data->ankle.joint_velocity:0;
 					float propulsive = kProp*saturated_velocity;
-
+					Serial.print("\njoint_velocity: ");
+					Serial.print(_side_data->ankle.joint_velocity);
 					//Use a symmetric sigmoid to squelch the propulsive term
-					float propulsive_squelch_offset = -1.1 + threshold;
+					float propulsive_squelch_offset = -1.2 + threshold;
 					float propulsive_grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))+1);
 					float squelched_propulsive_term = propulsive*propulsive_grf_squelch_multiplier;
 	
@@ -2561,9 +2581,13 @@ float SPV2::calc_motor_cmd()
 	Serial.print(_controller_data->cmd_ff_pushOff);
 	Serial.print("  |  generic: ");
 	Serial.print(_controller_data->cmd_ff_generic);
+	Serial.print("  |  assistive: ");
+	Serial.print(assistive);
 	//TREC section ends
-	
-	cmd_ff = cmd_ff + _controller_data->cmd_ff_kb + _controller_data->cmd_ff_pushOff;
+	if (!(k==0)){
+		cmd_ff = cmd_ff + delta + _controller_data->cmd_ff_pushOff;
+	}
+	//cmd_ff = cmd_ff + _controller_data->cmd_ff_kb + _controller_data->cmd_ff_pushOff;
 	
 	
 	
@@ -2661,6 +2685,19 @@ float SPV2::calc_motor_cmd()
 		
 		if (exo_status == status_defs::messages::fsr_refinement)
         {
+			
+			//TREC's virtual spring section begins
+			if ((percent_grf_heel + percent_grf > servo_fsr_threshold) && (!_controller_data->SPV2_virtual_spring_ON))
+			{
+				_controller_data->SPV2_virtual_spring_entry_angle = _side_data->ankle.joint_position;
+				_controller_data->SPV2_virtual_spring_ON = true;
+			}
+			if ((percent_grf < servo_fsr_threshold * 0.3) && (_controller_data->SPV2_virtual_spring_ON))
+			{
+				_controller_data->SPV2_virtual_spring_ON = false;
+			}
+			
+			//TREC's virtual spring section ends
                 //Servo movement
                 //When does the arm go DOWN?//
 				//Reset only after toe FSR drops below a threshold
@@ -2768,8 +2805,15 @@ float SPV2::calc_motor_cmd()
 			cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
 			cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
 		}
-		return cmd;
+		Serial.print("\ncmd: ");
+		Serial.print(cmd);
+		if (!(cmd == cmd)) {
+			return 0;
+		}
+		else {
+			return cmd;
 		//return 0;
+		}
 
 	}
 }

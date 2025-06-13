@@ -247,7 +247,8 @@ class ControllerData {
         const float cal_neutral_angle_alpha = 0.01f;            /**< Alpha for the low pass on the neutral angle calibration */
         float level_entrance_angle = 0.0f;                      /**< Level entrance angle for the spring term */
         bool prev_calibrate_level_entrance = false;             /**< Previous value of the calibrate level entrance flag */
-        const float cal_level_entrance_angle_alpha = 0.01f;     /**< Alpha for the low pass on the level entrance calibration */
+        //const float cal_level_entrance_angle_alpha = 0.01f;     /**< Alpha for the low pass on the level entrance calibration */
+		const float cal_level_entrance_angle_alpha = 0.2f;     /**< Alpha for the low pass on the level entrance calibration */
 		float stateless_pjmc_term = 0;
 		float toeFsrThreshold = 0.2f;
 		bool wait4HiHeelFSR = false;
@@ -357,6 +358,8 @@ class ControllerData {
 		float cmd_ff_kb = 0;
 		float cmd_ff_pushOff = 0;
 		float cmd_ff_generic = 0;
+		bool SPV2_virtual_spring_ON = false;
+		float SPV2_virtual_spring_entry_angle = 50;
 		
 		//magnet troubleshooting
 		unsigned long magnet_watch = 0;;
