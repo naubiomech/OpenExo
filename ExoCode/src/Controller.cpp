@@ -2484,7 +2484,7 @@ float SPV2::calc_motor_cmd()
 	}
 
 	
-	float cmd_ff = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
+	float cmd_pjmc = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
 	
 	
 	//TREC section begins
@@ -2528,7 +2528,8 @@ float SPV2::calc_motor_cmd()
 						delta = _side_data->ankle.joint_position - _controller_data->SPV2_virtual_spring_entry_angle;
 					}
 					delta = min(delta, 0);
-					float assistive = max(k*delta - b*_side_data->ankle.joint_velocity, 0);//Dorsi velocity: Negative
+					float assistive = min(k*delta,0);
+					//float assistive = max(k*delta - b*_side_data->ankle.joint_velocity, 0);//Dorsi velocity: Negative
 					Serial.print("\nk: ");
 					Serial.print(k);
 					Serial.print("  |  delta: ");
@@ -2584,9 +2585,10 @@ float SPV2::calc_motor_cmd()
 	Serial.print("  |  assistive: ");
 	Serial.print(assistive);
 	//TREC section ends
-	if (!(k==0)){
-		cmd_ff = cmd_ff + delta + _controller_data->cmd_ff_pushOff;
-	}
+	
+	float cmd_ff = cmd_pjmc + assistive + _controller_data->cmd_ff_pushOff;
+	cmd_ff = constrain(cmd_ff, -45, 5);
+	
 	//cmd_ff = cmd_ff + _controller_data->cmd_ff_kb + _controller_data->cmd_ff_pushOff;
 	
 	
@@ -2599,14 +2601,15 @@ float SPV2::calc_motor_cmd()
 	
 	if (_controller_data->parameters[controller_defs::spv2::turn_on_peak_limiter]) 
     {
-		_plantar_setpoint_adjuster(_side_data, _controller_data, -_controller_data->filtered_torque_reading);
+		// _plantar_setpoint_adjuster(_side_data, _controller_data, -_controller_data->filtered_torque_reading);
+		_plantar_setpoint_adjuster(_side_data, _controller_data, -cmd_pjmc);
 		
 	}
 	
 	float cmd;
 
 
-		if (cmd_ff < -6)
+		if (cmd_ff < -5)
         {
 			//cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
@@ -2614,7 +2617,7 @@ float SPV2::calc_motor_cmd()
 		else
         {
 			//cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]); // less jittery during zero-torque mode
-			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
+			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 		}
 	
     //Establish Setpoints
