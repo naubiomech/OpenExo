@@ -559,13 +559,8 @@ bool MaxonMotor::enable(bool overide)
 		
         //Disable motor, the message after this shouldn't matter as the power is cut, and the send() doesn't send a message if not enabled.
 		digitalWrite(_enable_pin,LOW);
-		analogWriteResolution(12);
-		analogWriteFrequency(A9, 5000);
-		analogWrite(A9,2048);
-		analogWriteFrequency(A8, 5000);
-		analogWrite(A8,2048);
-		pinMode(A1,INPUT);
-		pinMode(A0,INPUT);
+		analogWrite(_ctrl_right_pin,_pwm_neutral_val);
+		analogWrite(_ctrl_left_pin,_pwm_neutral_val);
     }
 
 	_prev_motor_enabled = _motor_data->enabled;
@@ -600,25 +595,23 @@ void MaxonMotor::send_data(float torque) //Always send motor command regardless 
         (exo_status == status_defs::messages::fsr_calibration) ||
         (exo_status == status_defs::messages::fsr_refinement);
    
-	if (_data->user_paused || !active_trial)        //Ignores the exo error handler and the emergency stop for the moment
+	if (_data->user_paused || !active_trial || _data->estop)        //Ignores the exo error handler for the moment
     {
-        analogWrite(A9,2048);   //Send 50% PWM (0 current)
-		analogWrite(A8,2048);
+        analogWrite(_ctrl_left_pin,_pwm_neutral_val);   //Send 50% PWM (0 current)
+		analogWrite(_ctrl_right_pin,_pwm_neutral_val);
     }
     else
     {
-	    if (!_motor_data->is_left)  //Only operational on the right side at the moment
-        {
-		    uint16_t post_fuse_torque = max(655,2048+(direction_modifier*1*torque));    //Set the lowest allowed PWM command (455)
-		    post_fuse_torque = min(3690,post_fuse_torque);                              //Set the highest allowed PWM command (3890)
-		    analogWrite(A9,post_fuse_torque);
-	    }
-		else
-		{
-		    uint16_t post_fuse_torque = max(655,2048+(direction_modifier*1*torque));    //Set the lowest allowed PWM command (455)
-		    post_fuse_torque = min(3690,post_fuse_torque);                              //Set the highest allowed PWM command (3890)
-		    analogWrite(A8,post_fuse_torque);
-	    }
+		// Serial.print("\nCtrl right pin: ");
+		// Serial.print(_ctrl_right_pin);
+		// Serial.print("  |  Left: ");
+		// Serial.print(_ctrl_left_pin);
+
+		uint16_t post_fuse_torque = max(_pwm_l_bound,_pwm_neutral_val+(direction_modifier*torque));    //Set the lowest allowed PWM command (455)
+		post_fuse_torque = min(_pwm_u_bound,post_fuse_torque);                              //Set the highest allowed PWM command (3890)
+		analogWrite((_motor_data->is_left? _ctrl_left_pin : _ctrl_right_pin),post_fuse_torque);
+
+
     }
 };
 
@@ -632,6 +625,14 @@ void MaxonMotor::master_switch()
 
 	if (_data->user_paused || !active_trial || _data->estop)
     {
+		pinMode(_err_left_pin, INPUT_PULLUP);
+		pinMode(_err_right_pin, INPUT_PULLUP);
+		pinMode(_current_left_pin,INPUT);
+		pinMode(_current_right_pin,INPUT);
+		analogWriteResolution(12);
+		analogWriteFrequency(_ctrl_left_pin, 5000);
+		analogWriteFrequency(_ctrl_right_pin, 5000);
+		
 		_motor_data->enabled = false;
         enable(false);
     }
@@ -646,9 +647,6 @@ void MaxonMotor::master_switch()
 //To address this issue, we have developed a solution contained in maxon_manager() below. 
 void MaxonMotor::maxon_manager(bool manager_active)
 {
-    pinMode(37, INPUT_PULLUP);
-	pinMode(36, INPUT_PULLUP);
-
     //Initialize variables when switch is set to false, run the error detection and rest code when switch is set to true. 
     if (!manager_active)
     {
@@ -657,8 +655,12 @@ void MaxonMotor::maxon_manager(bool manager_active)
     }
     else
     {
+		// Serial.print("\nlogic_micro_pins::MaxonErrorRight: ");
+		// Serial.print(logic_micro_pins::maxon_err_right_pin);
+		// Serial.print("  |  Left: ");
+		// Serial.print(logic_micro_pins::maxon_err_left_pin);
         //Scan for Motor Error
-        if ((do_scan4maxon_err) && ((_motor_data->is_left? !digitalRead(36) : !digitalRead(37))))
+        if ((do_scan4maxon_err) && ((_motor_data->is_left? !digitalRead(_err_left_pin) : !digitalRead(_err_right_pin))))
         {
             do_scan4maxon_err = false;          
             maxon_counter_active = true;

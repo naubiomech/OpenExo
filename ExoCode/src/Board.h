@@ -395,9 +395,15 @@
 		{
 			 #if defined(ARDUINO_TEENSY41)
 				//Maxon motor Pins
-				const unsigned int maxon_err_pin = 37;          //Pin definition not utilized at the moment
+				const unsigned int maxon_err_right_pin = 37;          //Pin definition not utilized at the moment
+				const unsigned int maxon_err_left_pin = 36;
 				const unsigned int maxon_ctrl_left_pin = A8;
 				const unsigned int maxon_ctrl_right_pin = A9;   //Pin definition not utilized at the moment
+				const unsigned int maxon_current_left_pin = A0;
+				const unsigned int maxon_current_right_pin = A1;
+				const unsigned int maxon_pwm_neutral_val = 2048;
+				const unsigned int maxon_pwm_u_bound = 3690;
+				const unsigned int maxon_pwm_l_bound = 655;
 				
 				//SPV2 Additional Pins
 				const unsigned int SPV2_servo_pin = 27;         //Pin definition not utilized at the moment

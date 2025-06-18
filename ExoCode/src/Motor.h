@@ -155,6 +155,15 @@ class MaxonMotor : public _Motor
 	bool do_scan4maxon_err = true;              /**< Part of the Maxon motor driver error reporting utilities: A switch to enable or disable error detection */
 	bool maxon_counter_active = false;          /**< Part of the Maxon motor driver error reporting utilities: A switch for the error detection counter */
 	unsigned long zen_millis;                   /**< Part of the Maxon motor driver error reporting utilities: A timer for the motor reset function */
+	const int _ctrl_left_pin = logic_micro_pins::maxon_ctrl_left_pin;
+	const int _ctrl_right_pin = logic_micro_pins::maxon_ctrl_right_pin;
+	const int _err_left_pin = logic_micro_pins::maxon_err_left_pin;
+	const int _err_right_pin = logic_micro_pins::maxon_err_right_pin;
+	const int _current_left_pin = logic_micro_pins::maxon_current_left_pin;
+	const int _current_right_pin = logic_micro_pins::maxon_current_right_pin;
+	const int _pwm_neutral_val = logic_micro_pins::maxon_pwm_neutral_val;
+	const int _pwm_u_bound = logic_micro_pins::maxon_pwm_u_bound;
+	const int _pwm_l_bound = logic_micro_pins::maxon_pwm_l_bound;
 };
 
 
