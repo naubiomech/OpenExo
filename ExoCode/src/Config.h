@@ -19,7 +19,7 @@
     #define AK_Board_V0_5_1 4
 	#define AK_Board_V0_6_Maxon 5
 
-    #define BOARD_VERSION AK_Board_V0_5_1             
+    #define BOARD_VERSION AK_Board_V0_6_Maxon             
     #define REAL_TIME_I2C 1
     #define LOOP_FREQ_HZ 500
     #define LOOP_TIME_TOLERANCE 0.1 

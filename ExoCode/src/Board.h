@@ -396,7 +396,7 @@
 			 #if defined(ARDUINO_TEENSY41)
 				//Maxon motor Pins
 				const unsigned int maxon_err_pin = 37;          //Pin definition not utilized at the moment
-				const unsigned int maxon_ctrl_left_pin;
+				const unsigned int maxon_ctrl_left_pin = A8;
 				const unsigned int maxon_ctrl_right_pin = A9;   //Pin definition not utilized at the moment
 				
 				//SPV2 Additional Pins
@@ -465,8 +465,8 @@
 				const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
 				
 				//Motor enable Pins (To Do: Fix this)
-				const unsigned int enable_left_pin[] = {28, 29};
-				const unsigned int enable_right_pin[] = {33, 33};
+				const unsigned int enable_left_pin[] = {33};
+				const unsigned int enable_right_pin[] = {33};
 				
 				const unsigned int speed_check_pin;
 				

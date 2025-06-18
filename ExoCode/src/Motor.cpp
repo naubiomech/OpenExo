@@ -521,21 +521,17 @@ void MaxonMotor::transaction(float torque)
     //Only enable the motor when it is an active trial 
     master_switch();
 
-    //Currently only implemented for right side 
-	if (!_motor_data->is_left) 
-    {
-		if (_motor_data->enabled)
-        {
-			maxon_manager(true); //Monitors for and corrects motor resetting error if the system is operational.
-		}
-		else
-        {
-			maxon_manager(false);   //Reset the motor error detection function, in case user pauses device in middle of error event
-		}
-
-		// Serial.print("\nRight leg MaxonMotor::transaction(float torque)  |  torque = ");
-		// Serial.print(torque);
+	if (_motor_data->enabled)
+	{
+		maxon_manager(true); //Monitors for and corrects motor resetting error if the system is operational.
 	}
+	else
+	{
+		maxon_manager(false);   //Reset the motor error detection function, in case user pauses device in middle of error event
+	}
+
+	// Serial.print("\nRight leg MaxonMotor::transaction(float torque)  |  torque = ");
+	// Serial.print(torque);
 };
 
 bool MaxonMotor::enable()
@@ -566,7 +562,10 @@ bool MaxonMotor::enable(bool overide)
 		analogWriteResolution(12);
 		analogWriteFrequency(A9, 5000);
 		analogWrite(A9,2048);
+		analogWriteFrequency(A8, 5000);
+		analogWrite(A8,2048);
 		pinMode(A1,INPUT);
+		pinMode(A0,INPUT);
     }
 
 	_prev_motor_enabled = _motor_data->enabled;
@@ -604,6 +603,7 @@ void MaxonMotor::send_data(float torque) //Always send motor command regardless 
 	if (_data->user_paused || !active_trial)        //Ignores the exo error handler and the emergency stop for the moment
     {
         analogWrite(A9,2048);   //Send 50% PWM (0 current)
+		analogWrite(A8,2048);
     }
     else
     {
@@ -612,6 +612,12 @@ void MaxonMotor::send_data(float torque) //Always send motor command regardless 
 		    uint16_t post_fuse_torque = max(655,2048+(direction_modifier*1*torque));    //Set the lowest allowed PWM command (455)
 		    post_fuse_torque = min(3690,post_fuse_torque);                              //Set the highest allowed PWM command (3890)
 		    analogWrite(A9,post_fuse_torque);
+	    }
+		else
+		{
+		    uint16_t post_fuse_torque = max(655,2048+(direction_modifier*1*torque));    //Set the lowest allowed PWM command (455)
+		    post_fuse_torque = min(3690,post_fuse_torque);                              //Set the highest allowed PWM command (3890)
+		    analogWrite(A8,post_fuse_torque);
 	    }
     }
 };
@@ -641,6 +647,7 @@ void MaxonMotor::master_switch()
 void MaxonMotor::maxon_manager(bool manager_active)
 {
     pinMode(37, INPUT_PULLUP);
+	pinMode(36, INPUT_PULLUP);
 
     //Initialize variables when switch is set to false, run the error detection and rest code when switch is set to true. 
     if (!manager_active)
@@ -651,7 +658,7 @@ void MaxonMotor::maxon_manager(bool manager_active)
     else
     {
         //Scan for Motor Error
-        if ((do_scan4maxon_err) && (!digitalRead(37)))
+        if ((do_scan4maxon_err) && ((_motor_data->is_left? !digitalRead(36) : !digitalRead(37))))
         {
             do_scan4maxon_err = false;          
             maxon_counter_active = true;
@@ -675,7 +682,7 @@ void MaxonMotor::maxon_manager(bool manager_active)
             //Thirty iterations after maxon_counter_actie = true, start scanning for error again
             if (millis() - zen_millis >= 30)
             {
-                do_scan4maxon_err = true;                                                       
+                do_scan4maxon_err = true;
                 maxon_counter_active = false;                                   
                 _motor_data->maxon_plotting_scalar = -1 * _motor_data->maxon_plotting_scalar;
             }
