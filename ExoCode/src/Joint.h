@@ -235,6 +235,7 @@ class AnkleJoint : public _Joint
         Chirp _chirp;                                           /**< Chirp Controller for Device Characterization */
         Step _step;                                             /**< Step Controller for Device Characterization */
         SPV2 _spv2;												/**< SPV2 */
+		PJMC_PLUS _pjmc_plus;									/**< The new proportional joint moment controller */
 };
 
 /**

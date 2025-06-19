@@ -168,6 +168,7 @@ namespace config_defs
         chirp = 8,
         step = 9,
 		spv2 = 10,
+		pjmc_plus = 11,
     };
 
     enum class elbow_controllers : uint8_t  //Elbow Controller IDs
@@ -436,6 +437,7 @@ namespace config_defs
             {"chirp", (uint8_t)config_defs::ankle_controllers::chirp},
             {"step", (uint8_t)config_defs::ankle_controllers::step},
 			{"SPV2", (uint8_t)config_defs::ankle_controllers::spv2},
+			{"PJMC_PLUS", (uint8_t)config_defs::ankle_controllers::pjmc_plus},
         };  
 
         const IniKeyCode elbow_controllers

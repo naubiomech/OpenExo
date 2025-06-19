@@ -186,6 +186,28 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 		const uint8_t maxon_outOfOffice_itr = 16;               //Not currently used
         const uint8_t num_parameter = 17;
     }
+	
+	namespace pjmc_plus 
+    {
+        const uint8_t plantar_scaling = 0;
+        const uint8_t dorsi_scaling = 1;
+        const uint8_t timing_threshold = 2;                     //Toe FSR threshold (unit: %)
+        const uint8_t spring_stiffness = 3;                     //Not currently used
+        const uint8_t damping = 5;                              //Not currently used
+        const uint8_t neutral_angle = 4;                        //Not currently used
+        const uint8_t propulsive_gain = 6;                      //Not currently used
+        const uint8_t kp = 7;
+		const uint8_t turn_on_peak_limiter = 9;                 //Not currently used
+        const uint8_t kd = 8;
+		const uint8_t step_response_mode = 10;                  //Not currently used
+		const uint8_t ki = 11;
+		const uint8_t do_use_servo = 12;
+		const uint8_t fsr_servo_threshold = 13;
+		const uint8_t servo_origin = 14;
+		const uint8_t servo_terminal = 15;
+		const uint8_t maxon_outOfOffice_itr = 16;               //Not currently used
+        const uint8_t num_parameter = 17;
+    }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
 }
