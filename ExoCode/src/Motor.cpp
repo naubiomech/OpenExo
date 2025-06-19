@@ -597,21 +597,15 @@ void MaxonMotor::send_data(float torque) //Always send motor command regardless 
    
 	if (_data->user_paused || !active_trial || _data->estop)        //Ignores the exo error handler for the moment
     {
-        analogWrite(_ctrl_left_pin,_pwm_neutral_val);   //Send 50% PWM (0 current)
-		analogWrite(_ctrl_right_pin,_pwm_neutral_val);
+        analogWrite(_ctrl_left_pin,_pwm_neutral_val);   //Set 50% PWM (0 current)
+		analogWrite(_ctrl_right_pin,_pwm_neutral_val);	//Set 50% PWM (0 current)
     }
     else
     {
-		// Serial.print("\nCtrl right pin: ");
-		// Serial.print(_ctrl_right_pin);
-		// Serial.print("  |  Left: ");
-		// Serial.print(_ctrl_left_pin);
-
-		uint16_t post_fuse_torque = max(_pwm_l_bound,_pwm_neutral_val+(direction_modifier*torque));    //Set the lowest allowed PWM command (455)
-		post_fuse_torque = min(_pwm_u_bound,post_fuse_torque);                              //Set the highest allowed PWM command (3890)
-		analogWrite((_motor_data->is_left? _ctrl_left_pin : _ctrl_right_pin),post_fuse_torque);
-
-
+		//Constrain the motor pwm command
+		uint16_t post_fuse_torque = max(_pwm_l_bound,_pwm_neutral_val+(direction_modifier*torque));    //Set the lowest allowed PWM command
+		post_fuse_torque = min(_pwm_u_bound,post_fuse_torque);                              //Set the highest allowed PWM command
+		analogWrite((_motor_data->is_left? _ctrl_left_pin : _ctrl_right_pin),post_fuse_torque);	//Send the motor command to the motor driver
     }
 };
 
@@ -650,45 +644,79 @@ void MaxonMotor::maxon_manager(bool manager_active)
     //Initialize variables when switch is set to false, run the error detection and rest code when switch is set to true. 
     if (!manager_active)
     {
-        do_scan4maxon_err = true;       
-        maxon_counter_active = false;
+		//Reset Maxon motor reset utilities
+        do_scan4maxon_err_left = true;       
+        maxon_counter_active_left = false;
+		do_scan4maxon_err_right = true;       
+        maxon_counter_active_right = false;
     }
     else
     {
-		// Serial.print("\nlogic_micro_pins::MaxonErrorRight: ");
-		// Serial.print(logic_micro_pins::maxon_err_right_pin);
-		// Serial.print("  |  Left: ");
-		// Serial.print(logic_micro_pins::maxon_err_left_pin);
-        //Scan for Motor Error
-        if ((do_scan4maxon_err) && ((_motor_data->is_left? !digitalRead(_err_left_pin) : !digitalRead(_err_right_pin))))
-        {
-            do_scan4maxon_err = false;          
-            maxon_counter_active = true;
-            zen_millis = millis();
-        }
+		unsigned long maxon_reset_current_t = millis();
+        
+		//Scan for left motor error
+		if ((do_scan4maxon_err_left) && (!digitalRead(_err_left_pin)))
+		{
+			do_scan4maxon_err_left = false;          
+			maxon_counter_active_left = true;
+			zen_millis_left = maxon_reset_current_t;
+		}
 
-        if (maxon_counter_active) 
-        {
-            //Two iterations after maxon_counter_actie = true, de-enable motor
-            if (millis() - zen_millis >= 2)
-            {
-                enable(false);
-            }
+		//Left motor reset
+		if (maxon_counter_active_left) 
+		{
+			//Two iterations after maxon_counter_actie = true, de-enable motor
+			if (maxon_reset_current_t - zen_millis_left >= 2)
+			{
+				enable(false);
+			}
 
-            //Ten iterations after maxon_counter_actie = true, re-enable motor
-            if (millis() - zen_millis >= 10)
-            {
-                enable(true);
-            }
-            
-            //Thirty iterations after maxon_counter_actie = true, start scanning for error again
-            if (millis() - zen_millis >= 30)
-            {
-                do_scan4maxon_err = true;
-                maxon_counter_active = false;                                   
-                _motor_data->maxon_plotting_scalar = -1 * _motor_data->maxon_plotting_scalar;
-            }
-        }
+			//Ten iterations after maxon_counter_actie = true, re-enable motor
+			if (maxon_reset_current_t - zen_millis_left >= 10)
+			{
+				enable(true);
+			}
+			
+			//Thirty iterations after maxon_counter_actie = true, start scanning for error again
+			if (maxon_reset_current_t - zen_millis_left >= 30)
+			{
+				do_scan4maxon_err_left = true;
+				maxon_counter_active_left = false;                                   
+				_motor_data->maxon_plotting_scalar = -1 * _motor_data->maxon_plotting_scalar;
+			}
+		}
+
+		//Scan for right motor error
+		if ((do_scan4maxon_err_right) && (!digitalRead(_err_right_pin)))
+		{
+			do_scan4maxon_err_right = false;          
+			maxon_counter_active_right = true;
+			zen_millis_right = maxon_reset_current_t;
+		}
+		
+		//Right motor reset
+		if (maxon_counter_active_right) 
+		{
+			//Two iterations after maxon_counter_actie = true, de-enable motor
+			if (maxon_reset_current_t - zen_millis_right >= 2)
+			{
+				enable(false);
+			}
+
+			//Ten iterations after maxon_counter_actie = true, re-enable motor
+			if (maxon_reset_current_t - zen_millis_right >= 10)
+			{
+				enable(true);
+			}
+			
+			//Thirty iterations after maxon_counter_actie = true, start scanning for error again
+			if (maxon_reset_current_t - zen_millis_right >= 30)
+			{
+				do_scan4maxon_err_right = true;
+				maxon_counter_active_right = false;                                   
+				_motor_data->maxon_plotting_scalar = -1 * _motor_data->maxon_plotting_scalar;
+			}
+		}
     }
 };
 
