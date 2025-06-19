@@ -2180,8 +2180,8 @@ float PJMC_PLUS::calc_motor_cmd()
 	float plantar_setpoint = _controller_data->parameters[controller_defs::pjmc_plus::plantar_scaling];
 	float dorsi_setpoint = _controller_data->parameters[controller_defs::pjmc_plus::dorsi_scaling];
 	float threshold = constrain(_controller_data->parameters[controller_defs::pjmc_plus::timing_threshold]/100, 0, 99);
-	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.2);
-	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.2);
+	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.5);
+	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.5);
 	float cmd_ff = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
 	// if (!_joint_data->is_left){
 		// Serial.print("\nRunning pjmcPlus...");
@@ -2189,7 +2189,6 @@ float PJMC_PLUS::calc_motor_cmd()
 	// }
         // low pass filter on torque_reading
     const float torque = _joint_data->torque_reading;
-	// const float torque = _joint_data->torque_reading_microSD;
     const float alpha = 0.5;
     _controller_data->filtered_torque_reading = utils::ewma(torque, 
             _controller_data->filtered_torque_reading, alpha);
@@ -2204,6 +2203,11 @@ float PJMC_PLUS::calc_motor_cmd()
     #ifdef CONTROLLER_DEBUG
     logger::println("pjmcPlus::calc_motor_cmd : stop");
     #endif
+	
+	//Establish Setpoints
+	_controller_data->ff_setpoint = cmd_ff; 
+	_controller_data->setpoint = cmd;
+    _controller_data->filtered_setpoint = cmd;
 	
 	return cmd;
 }
