@@ -13,17 +13,17 @@ class CsvWritter:
         timestamps = ["EpochTimestamp"]  # New field for epoch time
         tStep = ["TStep"]
         rTorque = ["Data 0"]
-        rSetP = ["Data 1"]
-        rState = ["Data 2"]
+        rSetP = ["Data 2"]
+        rState = ["Data 1"]
         lTorque = ["Data 3"]
-        lSetP = ["Data 4"]
-        LState = ["Data 5"]
-        lFsr = ["Data 6"]
-        rFsr = ["Data 7"]
+        lSetP = ["Data 5"]
+        LState = ["Data 4"]
+        lFsr = ["Data 7"]
+        rFsr = ["Data 6"]
 
         #record our model features
-        # minSV = ["minSV"]
-        # maxSV = ["maxSV"]
+        minSV = ["Data 9"]
+        maxSV = ["Data 8"]
         # minSA = ["minSA"]
         # maxSA = ["maxSA"]
         # maxFSR = ["maxFSR"]
@@ -53,10 +53,10 @@ class CsvWritter:
             rFsr.append(rF)
         for lF in exoData.lFsr:
             lFsr.append(lF)
-        # for min in exoData.MinShankVel:
-        #     minSV.append(min)
-        # for max in exoData.MaxShankVel:
-        #     maxSV.append(max)
+        for min in exoData.MinShankVel:
+            minSV.append(min)
+        for max in exoData.MaxShankVel:
+            maxSV.append(max)
         # for inSA in exoData.MinShankAng:
         #     minSA.append(inSA)
         # for axSA in exoData.MaxShankAng:
@@ -88,8 +88,8 @@ class CsvWritter:
         fileData.append(LState)
         fileData.append(lFsr)
         fileData.append(rFsr)
-        # fileData.append(minSV)
-        # fileData.append(maxSV)
+        fileData.append(minSV)
+        fileData.append(maxSV)
         # fileData.append(minSA)
         # fileData.append(maxSA)
         # fileData.append(maxFSR)
