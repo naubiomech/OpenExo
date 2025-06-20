@@ -12,26 +12,26 @@ class CsvWritter:
         # establish field arrays for output file
         timestamps = ["EpochTimestamp"]  # New field for epoch time
         tStep = ["TStep"]
-        rTorque = ["RTorque"]
-        rSetP = ["RSetP"]
-        rState = ["RState"]
-        lTorque = ["LTorque"]
-        lSetP = ["LSetP"]
-        LState = ["LState"]
-        lFsr = ["LFsr"]
-        rFsr = ["RFsr"]
+        rTorque = ["Data 0"]
+        rSetP = ["Data 1"]
+        rState = ["Data 2"]
+        lTorque = ["Data 3"]
+        lSetP = ["Data 4"]
+        LState = ["Data 5"]
+        lFsr = ["Data 6"]
+        rFsr = ["Data 7"]
 
         #record our model features
-        minSV = ["minSV"]
-        maxSV = ["maxSV"]
-        minSA = ["minSA"]
-        maxSA = ["maxSA"]
-        maxFSR = ["maxFSR"]
-        stancetime = ["StanceTime"]
-        swingtime = ["SwingTime"]
+        # minSV = ["minSV"]
+        # maxSV = ["maxSV"]
+        # minSA = ["minSA"]
+        # maxSA = ["maxSA"]
+        # maxFSR = ["maxFSR"]
+        # stancetime = ["StanceTime"]
+        # swingtime = ["SwingTime"]
 
         #and predicted task/state
-        Task = ["Task"]
+        # Task = ["Task"]
         mark = ["Mark"]
 
 
@@ -53,24 +53,24 @@ class CsvWritter:
             rFsr.append(rF)
         for lF in exoData.lFsr:
             lFsr.append(lF)
-        for min in exoData.MinShankVel:
-            minSV.append(min)
-        for max in exoData.MaxShankVel:
-            maxSV.append(max)
-        for inSA in exoData.MinShankAng:
-            minSA.append(inSA)
-        for axSA in exoData.MaxShankAng:
-            maxSA.append(axSA)
-        for fsr in exoData.MaxFSR:
-            maxFSR.append(fsr)
-        for task in exoData.Task:
-            Task.append(task)
+        # for min in exoData.MinShankVel:
+        #     minSV.append(min)
+        # for max in exoData.MaxShankVel:
+        #     maxSV.append(max)
+        # for inSA in exoData.MinShankAng:
+        #     minSA.append(inSA)
+        # for axSA in exoData.MaxShankAng:
+        #     maxSA.append(axSA)
+        # for fsr in exoData.MaxFSR:
+        #     maxFSR.append(fsr)
+        # for task in exoData.Task:
+        #     Task.append(task)
         for trig in exoData.Mark:
             mark.append(trig)
-        for moment in exoData.StanceTime:
-            stancetime.append(moment)
-        for moment in exoData.SwingTime:
-            swingtime.append(moment)
+        # for moment in exoData.StanceTime:
+        #     stancetime.append(moment)
+        # for moment in exoData.SwingTime:
+        #     swingtime.append(moment)
         for tS in exoData.tStep:
             tStep.append(tS)
         # Add the epoch timestamps (current time in seconds) to the timestamps list
@@ -88,14 +88,14 @@ class CsvWritter:
         fileData.append(LState)
         fileData.append(lFsr)
         fileData.append(rFsr)
-        fileData.append(minSV)
-        fileData.append(maxSV)
-        fileData.append(minSA)
-        fileData.append(maxSA)
-        fileData.append(maxFSR)
-        fileData.append(stancetime)
-        fileData.append(swingtime)
-        fileData.append(Task)
+        # fileData.append(minSV)
+        # fileData.append(maxSV)
+        # fileData.append(minSA)
+        # fileData.append(maxSA)
+        # fileData.append(maxFSR)
+        # fileData.append(stancetime)
+        # fileData.append(swingtime)
+        # fileData.append(Task)
         fileData.append(mark)
 
         
@@ -139,10 +139,10 @@ class CsvWritter:
             "tStep", "rTorque", "rSetP", "rState",
             "lTorque", "lSetP", "lState",
             "lFsr", "rFsr",
-            "MinShankVel", "MaxShankVel",
-            "MinShankAng", "MaxShankAng",
-            "MaxFSR", "StanceTime", "SwingTime",
-            "Task", "Mark", "epochTime"
+            # "MinShankVel", "MaxShankVel",
+            # "MinShankAng", "MaxShankAng",
+            # "MaxFSR", "StanceTime", "SwingTime","Task", 
+            "Mark", "epochTime"
         ]
         for name in attrs:
             getattr(exoData, name).clear()
