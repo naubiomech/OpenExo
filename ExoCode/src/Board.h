@@ -395,10 +395,10 @@
 		{
 			 #if defined(ARDUINO_TEENSY41)
 				//Maxon motor Pins
-				const unsigned int maxon_err_right_pin = 37;          //Pin definition not utilized at the moment
+				const unsigned int maxon_err_right_pin = 37;
 				const unsigned int maxon_err_left_pin = 36;
 				const unsigned int maxon_ctrl_left_pin = A8;
-				const unsigned int maxon_ctrl_right_pin = A9;   //Pin definition not utilized at the moment
+				const unsigned int maxon_ctrl_right_pin = A9;
 				const unsigned int maxon_current_left_pin = A0;
 				const unsigned int maxon_current_right_pin = A1;
 				const unsigned int maxon_pwm_neutral_val = 2048;
@@ -470,7 +470,7 @@
 				//Pin to use when we need a value but don't actually want to use it.
 				const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
 				
-				//Motor enable Pins (To Do: Fix this)
+				//Motor enable Pins
 				const unsigned int enable_left_pin[] = {33};
 				const unsigned int enable_right_pin[] = {33};
 				
