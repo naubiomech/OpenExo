@@ -544,7 +544,7 @@ bool MaxonMotor::enable(bool overide)
 	//Only change the state and send messages if the enabled state (used as a master switch for this motor) has changed.
     if ((_prev_motor_enabled != _motor_data->enabled) || overide)
     {
-		if (_motor_data->enabled)   //_motor_data->enabled is controlled by active_trial and user_paused, refer to master_switch().
+		if (_motor_data->enabled)   //_motor_data->enabled is controlled by the GUI
 		{
             //Enable motor
 			digitalWrite(_enable_pin,HIGH);         //Relocate in the future
@@ -562,6 +562,12 @@ bool MaxonMotor::enable(bool overide)
 		analogWrite(_ctrl_right_pin,_pwm_neutral_val);
 		analogWrite(_ctrl_left_pin,_pwm_neutral_val);
     }
+	
+	if (!_motor_data->enabled)   //_motor_data->enabled is controlled by the GUI
+		{
+            //Disable motor
+			digitalWrite(_enable_pin,LOW);         //Relocate in the future
+		}
 
 	_prev_motor_enabled = _motor_data->enabled;
 
@@ -627,12 +633,12 @@ void MaxonMotor::master_switch()
 		analogWriteFrequency(_ctrl_left_pin, 5000);
 		analogWriteFrequency(_ctrl_right_pin, 5000);
 		
-		_motor_data->enabled = false;
+		//_motor_data->enabled = false;
         enable(false);
     }
 	else
     {
-		_motor_data->enabled = true;
+		//_motor_data->enabled = true;
         enable(true);
 	}
 };

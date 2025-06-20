@@ -41,6 +41,17 @@
                 //Sync LED Pins
                 const unsigned int sync_led_pin = 29;
                 const unsigned int sync_default_pin = 25;
+				
+				//For Maxon PCB only
+				const unsigned int maxon_err_right_pin;
+				const unsigned int maxon_err_left_pin;
+				const unsigned int maxon_ctrl_left_pin;
+				const unsigned int maxon_ctrl_right_pin;
+				const unsigned int maxon_current_left_pin;
+				const unsigned int maxon_current_right_pin;
+				const unsigned int maxon_pwm_neutral_val;
+				const unsigned int maxon_pwm_u_bound;
+				const unsigned int maxon_pwm_l_bound;
             #endif
 
             const unsigned int sync_led_on_state = LOW;
@@ -124,6 +135,17 @@
                 //Sync LED Pins
                 const unsigned int sync_led_pin = 15;
                 const unsigned int sync_default_pin = 5;
+				
+				//For Maxon PCB only
+				const unsigned int maxon_err_right_pin;
+				const unsigned int maxon_err_left_pin;
+				const unsigned int maxon_ctrl_left_pin;
+				const unsigned int maxon_ctrl_right_pin;
+				const unsigned int maxon_current_left_pin;
+				const unsigned int maxon_current_right_pin;
+				const unsigned int maxon_pwm_neutral_val;
+				const unsigned int maxon_pwm_u_bound;
+				const unsigned int maxon_pwm_l_bound;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -222,6 +244,17 @@
                 //Sync LED Pins
                 const unsigned int sync_led_pin = 15;
                 const unsigned int sync_default_pin = 5;
+				
+				//For Maxon PCB only
+				const unsigned int maxon_err_right_pin;
+				const unsigned int maxon_err_left_pin;
+				const unsigned int maxon_ctrl_left_pin;
+				const unsigned int maxon_ctrl_right_pin;
+				const unsigned int maxon_current_left_pin;
+				const unsigned int maxon_current_right_pin;
+				const unsigned int maxon_pwm_neutral_val;
+				const unsigned int maxon_pwm_u_bound;
+				const unsigned int maxon_pwm_l_bound;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -322,6 +355,17 @@
                 //Sync LED Pins
                 const unsigned int sync_led_pin = 15;
                 const unsigned int sync_default_pin = 5;
+				
+				//For Maxon PCB only
+				const unsigned int maxon_err_right_pin;
+				const unsigned int maxon_err_left_pin;
+				const unsigned int maxon_ctrl_left_pin;
+				const unsigned int maxon_ctrl_right_pin;
+				const unsigned int maxon_current_left_pin;
+				const unsigned int maxon_current_right_pin;
+				const unsigned int maxon_pwm_neutral_val;
+				const unsigned int maxon_pwm_u_bound;
+				const unsigned int maxon_pwm_l_bound;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
