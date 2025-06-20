@@ -361,31 +361,21 @@ class ScanWindow(tk.Frame):
         active_trial_frame.startClock()
 
     async def startTrialDebugButtonClicked(self):
-        # self.changeName()
-        # """Switches frame to ActiveTrial and begins the trial."""
-        # active_trial_frame = self.controller.frames["ActiveTrial"]
-        # active_trial_frame.disable_interactions()  # Disable buttons in ActiveTrial frame
-        # active_trial_frame.clear_both_plot()
 
-        # # Show ActiveTrial frame
-        # self.controller.show_frame("ActiveTrial")
-        # await self.controller.trial.calibrate(self.controller.deviceManager)  # Calibrate devices
-        # await self.controller.trial.beginTrial(self.controller.deviceManager)  # Begin the trial
+        """Switches frame to ActiveTrial and begins the trial."""
+        active_trial_frame = self.controller.frames["ActiveTrial"]
+        active_trial_frame.disable_interactions()  # Disable buttons in ActiveTrial frame
+        active_trial_frame.clear_both_plot()
 
-        # # Starts new selection once Active trial has started
-        # active_trial_frame.newSelection(self)
-        # active_trial_frame.startClock()
-            self.changeName()
+        # Show ActiveTrial frame
+        self.controller.show_frame("ActiveTrial")
+        await self.controller.trial.calibrate(self.controller.deviceManager)  # Calibrate devices
+        await self.controller.trial.beginTrialDebug(self.controller.deviceManager)  # Begin the trial
 
-            active_trial_frame = self.controller.frames["ActiveTrial"]
-            active_trial_frame.disable_interactions()
-            active_trial_frame.clear_both_plot()
-
-            self.controller.show_frame("ActiveTrial")
-            active_trial_frame.newSelection(self)
-
-            # Show modal popup for manual motor start
-            active_trial_frame.show_motor_start_popup()
+        # Starts new selection once Active trial has started
+        active_trial_frame.newSelection(self)
+        active_trial_frame.pauseMotorButton()
+        active_trial_frame.startClock()
 
     def loadDeviceAvailible(self):
         if self.saved_address is not None:

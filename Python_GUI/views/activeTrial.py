@@ -138,6 +138,13 @@ class ActiveTrial(tk.Frame):
         #endTrialButton.pack(side=LEFT)  # Pack the button next to the title
         endTrialButton.grid(row=0, column=0, pady=10)
 
+        saveAndStartNewButton = ttk.Button(
+            self,
+            text="Save & Start New CSV",
+            command=async_handler(self.save_and_start_new_csv)
+        )
+        saveAndStartNewButton.grid(row=0, column=1, pady=10)
+
         # Pause/Play Icon as a Label (no button border)
         self.pauseIconLabel = tk.Label(self, image=self.pause_icon, borderwidth=0, cursor="hand2")
         self.pauseIconLabel.grid(row=1, column=0, sticky = N)
@@ -424,6 +431,10 @@ class ActiveTrial(tk.Frame):
         await self.ShutdownExo()
         self.controller.frames["ScanWindow"].show()  # Call show method to reset elements
 
+        # Reset pause button to default state
+        self.paused_flag = False
+        self.pauseIconLabel.config(image=self.pause_icon)
+        
     async def ShutdownExo(self):
         # End trial
         await self.controller.deviceManager.motorOff()  # Turn off motors
@@ -466,3 +477,11 @@ class ActiveTrial(tk.Frame):
         )
         start_button.pack(pady=10)
 
+    def pauseMotorButton(self):
+        self.paused_flag = True
+        self.pauseIconLabel.config(image=self.play_icon)  
+
+    async def save_and_start_new_csv(self):
+            self.controller.trial.loadDataToCSV(
+                self.controller.deviceManager
+            )  # Load data from Exo into CSV

@@ -97,6 +97,19 @@ class ExoTrial:
 
     # -----------------------------------------------------------------------------
 
+    # Start trial and send initial torque commands
+    async def beginTrialDebug(self, deviceManager):
+        print("Starting trial...")
+        await asyncio.sleep(1)
+        # Let user start motor
+
+        await deviceManager.calibrateFSRs()  # Begins Exo calibration
+        print("calibrate fsr\n")
+        # Send FSR value to Exo FSR
+        await deviceManager.sendPresetFsrValues()
+
+    # -----------------------------------------------------------------------------
+
     async def systemUpdate(self, deviceManager):  # Handles Next Steps After Baseline
 
         # Ensure to enter loop at least once
