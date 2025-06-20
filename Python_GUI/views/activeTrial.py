@@ -57,7 +57,7 @@ class ActiveTrial(tk.Frame):
 
         # Active Trial title label
         calibrationMenuLabel = ttk.Label(self, text="Active Trial", font=(self.fontstyle, 40))
-        calibrationMenuLabel.grid(row=0, column=0, columnspan=8, pady=20)
+        calibrationMenuLabel.grid(row=0, column=0, columnspan=8, pady=20,padx=(100, 0))
 
         # Load and place the smaller image behind the timer and battery
         small_image = Image.open("./Resources/Images/OpenExo.png").convert("RGBA")
@@ -140,10 +140,10 @@ class ActiveTrial(tk.Frame):
 
         saveAndStartNewButton = ttk.Button(
             self,
-            text="Save & Start New CSV",
+            text="Save CSV",
             command=async_handler(self.save_and_start_new_csv)
         )
-        saveAndStartNewButton.grid(row=0, column=1, pady=10)
+        saveAndStartNewButton.grid(row=0, column=1)
 
         # Pause/Play Icon as a Label (no button border)
         self.pauseIconLabel = tk.Label(self, image=self.pause_icon, borderwidth=0, cursor="hand2")
@@ -450,32 +450,6 @@ class ActiveTrial(tk.Frame):
         self.controller.deviceManager._realTimeProcessor._exo_data.MarkLabel.set(
             "Mark: " + str(self.controller.
                 deviceManager._realTimeProcessor._exo_data.MarkVal))
-    
-    async def start_motors_and_close_popup(self, popup):
-        await self.controller.trial.calibrate(self.controller.deviceManager)  # Calibrate devices
-        await self.controller.trial.beginTrial(self.controller.deviceManager)  # Begin the trial
-
-        popup.destroy()
-        self.startClock()
-        
-    def show_motor_start_popup(self):
-        popup = tk.Toplevel(self)
-        popup.title("Manual Motor Start")
-        popup.geometry("400x200")
-        popup.grab_set()  # Make it modal
-
-        # Disable window close button
-        popup.protocol("WM_DELETE_WINDOW", lambda: None)
-
-        label = tk.Label(popup, text="Click below to start motors and calibrate.", font=(self.fontstyle, 14))
-        label.pack(pady=30)
-
-        start_button = ttk.Button(
-            popup,
-            text="Start Motors and Calibrate",
-            command=async_handler(lambda: self.start_motors_and_close_popup(popup))
-        )
-        start_button.pack(pady=10)
 
     def pauseMotorButton(self):
         self.paused_flag = True

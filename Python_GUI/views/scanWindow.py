@@ -66,7 +66,7 @@ class ScanWindow(tk.Frame):
         style.configure('TListbox', font=(self.fontstyle, 14))
 
         # Title label on top of the image
-        titleLabel = ttk.Label(self, text="OpenExo GUI V1.04", font=(self.fontstyle, 30))
+        titleLabel = ttk.Label(self, text="OpenExo GUI V1.05", font=(self.fontstyle, 30))
         titleLabel.grid(row=1, column=0, columnspan=2, pady=0, sticky="n")  # Center instructions
         
         # Initial device name display
@@ -362,7 +362,7 @@ class ScanWindow(tk.Frame):
 
     async def startTrialDebugButtonClicked(self):
 
-        """Switches frame to ActiveTrial and begins the trial."""
+        """Switches frame to ActiveTrial and begins the trial in debug mode."""
         active_trial_frame = self.controller.frames["ActiveTrial"]
         active_trial_frame.disable_interactions()  # Disable buttons in ActiveTrial frame
         active_trial_frame.clear_both_plot()
