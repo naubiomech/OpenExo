@@ -523,7 +523,7 @@ void HipJoint::run_joint()
 
     //Enable or disable the motor.
     _motor->on_off(); 
-    _motor->enable();
+    _motor->enable();               //Do not enable the motors until the GUI tells you to, defaults to not enabled to prevent running until desired. 
 
     //Send the new command to the motor.
     _motor->transaction(_joint_data->controller.setpoint / _joint_data->motor.gearing);

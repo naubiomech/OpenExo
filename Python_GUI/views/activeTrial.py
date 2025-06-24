@@ -419,7 +419,7 @@ class ActiveTrial(tk.Frame):
             self.pauseIconLabel.config(image=self.play_icon)
         else:
             # Resume the system
-            await self.controller.deviceManager.startExoMotors()  # Enable motors
+            await self.controller.deviceManager.motorOn()  # Enable motors
             self.paused_flag = False
             # Update the label to show the "pause" icon (for pausing again)
             self.pauseIconLabel.config(image=self.pause_icon)

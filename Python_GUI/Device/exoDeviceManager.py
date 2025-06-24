@@ -163,6 +163,13 @@ class ExoDeviceManager:
 
         await self.client.write_gatt_char(char, command, True)
 
+    # Turn on motors
+    async def motorOn(self):
+        command = bytearray(b"x")
+        char = self.get_char_handle(self.UART_TX_UUID)
+
+        await self.client.write_gatt_char(char, command, True)
+
     # Update torque values based on the parameters
     async def updateTorqueValues(self, parameter_list):
         totalLoops = 1

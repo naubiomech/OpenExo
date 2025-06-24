@@ -236,6 +236,7 @@ void _CANMotor::check_response()
     bool active_trial = (exo_status == status_defs::messages::trial_on) ||
         (exo_status == status_defs::messages::fsr_calibration) ||
         (exo_status == status_defs::messages::fsr_refinement);
+
     if (_data->user_paused || !active_trial || _data->estop || _error)
     {
         return;
