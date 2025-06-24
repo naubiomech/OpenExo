@@ -23,7 +23,7 @@ class MachineLearning(tk.Frame):
         # Variables to manage states and UI elements
         self.var = IntVar()
         self.chartVar = StringVar()
-        self.chartVar.set("Controller")
+        self.chartVar.set("Data 0-3")
         self.graphVar = StringVar()
         self.graphVar.set("Both Graphs")  # Default to "Both Graphs"
 
@@ -79,7 +79,7 @@ class MachineLearning(tk.Frame):
             self,
             textvariable=self.chartVar,
             state="readonly",
-            values=["Controller", "Sensor"],
+            values=["Data 0-3", "Data 4-7"],
         )
         self.chartDropdown.grid(row=4,columnspan=5, sticky="NSEW", pady=5, padx=5)
 

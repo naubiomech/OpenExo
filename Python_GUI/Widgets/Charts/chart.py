@@ -83,22 +83,22 @@ class TopPlot(BasePlot):
         title = " "
         bottomLimit = -1
         topLimit = 1
-        if chartSelection == "Controller":
+        if chartSelection == "Data 0-3":
             topController = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.leftTorque
             )
             topMeasure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
             )
-            title = "Left Controller"
-        elif chartSelection == "Sensor":
+            title = "Data 0 and 1"
+        elif chartSelection == "Data 4-7":
             topController = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.leftState
             )
             topMeasure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
             )
-            title = "Left Sensor"
+            title = "Data 4 and 5"
             bottomLimit = 0
             topLimit = 1.1
 
@@ -122,15 +122,15 @@ class BottomPlot(BasePlot):
         topController = None
         bottomLimit = -1
         topLimit = 1
-        if chartSelection == "Controller":
+        if chartSelection == "Data 0-3":
             topController = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.rightTorque
             )
             topMeasure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.rightSet
             )
-            title = "Right Controller"
-        elif chartSelection == "Sensor":
+            title = "Data 2 and 3"
+        elif chartSelection == "Data 4-7":
             topController = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.rightState
             )
@@ -139,7 +139,7 @@ class BottomPlot(BasePlot):
             )
             bottomLimit = 0
             topLimit = 1.1
-            title = "Right Sensor"
+            title = "Data 6 and 7"
 
         if topController is None or topMeasure is None:
             topController = 0

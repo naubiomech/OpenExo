@@ -43,7 +43,7 @@ class ActiveTrial(tk.Frame):
 
         self.var = IntVar()
         self.chartVar = StringVar()
-        self.chartVar.set("Controller")
+        self.chartVar.set("Data 0-3")
         self.graphVar = StringVar()
         self.graphVar.set("Both Graphs")  # Default to "Both Graphs"
 
@@ -90,7 +90,7 @@ class ActiveTrial(tk.Frame):
         # Chart selection button
         self.chartButton = ttk.Button(
             self,
-            text="Controller",
+            text="Data 0-3",
             command=self.toggle_chart,
             style="Custom.TButton",
         )
@@ -207,12 +207,12 @@ class ActiveTrial(tk.Frame):
     def toggle_chart(self):
         """Toggle between 'Controller' and 'Sensor' for the chart."""
         current = self.chartVar.get()
-        if current == "Controller":
-            self.chartVar.set("Sensor")
-            self.chartButton.config(text="Sensor")
+        if current == "Data 0-3":
+            self.chartVar.set("Data 4-7")
+            self.chartButton.config(text="Data 4-7")
         else:
-            self.chartVar.set("Controller")
-            self.chartButton.config(text="Controller")
+            self.chartVar.set("Data 0-3")
+            self.chartButton.config(text="Data 0-3")
         self.newSelection()
 
     def set_graph(self, selection):

@@ -13,17 +13,17 @@ class CsvWritter:
         timestamps = ["EpochTimestamp"]  # New field for epoch time
         tStep = ["TStep"]
         rTorque = ["Data 0"]
-        rSetP = ["Data 2"]
         rState = ["Data 1"]
+        rSetP = ["Data 2"]
         lTorque = ["Data 3"]
-        lSetP = ["Data 5"]
         LState = ["Data 4"]
-        lFsr = ["Data 7"]
+        lSetP = ["Data 5"]
         rFsr = ["Data 6"]
+        lFsr = ["Data 7"]
 
         #record our model features
-        minSV = ["Data 9"]
         maxSV = ["Data 8"]
+        minSV = ["Data 9"]
         # minSA = ["minSA"]
         # maxSA = ["maxSA"]
         # maxFSR = ["maxFSR"]
@@ -34,29 +34,30 @@ class CsvWritter:
         # Task = ["Task"]
         mark = ["Mark"]
 
-
+        for _ in exoData.epochTime:
+            timestamps.append(_)
         for xt in exoData.tStep:
             tStep.append(xt)
         for rT in exoData.rTorque:
             rTorque.append(rT)
-        for rSP in exoData.rSetP:
-            rSetP.append(rSP)
         for rS in exoData.rState:
             rState.append(rS)
+        for rSP in exoData.rSetP:
+            rSetP.append(rSP)
         for lT in exoData.lTorque:
             lTorque.append(lT)
-        for lSP in exoData.lSetP:
-            lSetP.append(lSP)
         for lS in exoData.lState:
             LState.append(lS)
+        for lSP in exoData.lSetP:
+            lSetP.append(lSP)
         for rF in exoData.rFsr:
             rFsr.append(rF)
         for lF in exoData.lFsr:
             lFsr.append(lF)
-        for min in exoData.MinShankVel:
-            minSV.append(min)
         for max in exoData.MaxShankVel:
             maxSV.append(max)
+        for min in exoData.MinShankVel:
+            minSV.append(min)
         # for inSA in exoData.MinShankAng:
         #     minSA.append(inSA)
         # for axSA in exoData.MaxShankAng:
@@ -71,25 +72,23 @@ class CsvWritter:
         #     stancetime.append(moment)
         # for moment in exoData.SwingTime:
         #     swingtime.append(moment)
-        for tS in exoData.tStep:
-            tStep.append(tS)
-        # Add the epoch timestamps (current time in seconds) to the timestamps list
-        for _ in exoData.epochTime:
-            timestamps.append(_)
+        # for tS in exoData.tStep:
+        #     tStep.append(tS)
 
         # add field array with data to output file
         fileData.append(timestamps)
         fileData.append(tStep)
         fileData.append(rTorque)
-        fileData.append(rSetP)
         fileData.append(rState)
+        fileData.append(rSetP)
         fileData.append(lTorque)
-        fileData.append(lSetP)
         fileData.append(LState)
-        fileData.append(lFsr)
+        fileData.append(lSetP)
         fileData.append(rFsr)
-        fileData.append(minSV)
+        fileData.append(lFsr)
         fileData.append(maxSV)
+        fileData.append(minSV)
+
         # fileData.append(minSA)
         # fileData.append(maxSA)
         # fileData.append(maxFSR)
@@ -139,7 +138,7 @@ class CsvWritter:
             "tStep", "rTorque", "rSetP", "rState",
             "lTorque", "lSetP", "lState",
             "lFsr", "rFsr",
-            # "MinShankVel", "MaxShankVel",
+             "MinShankVel", "MaxShankVel",
             # "MinShankAng", "MaxShankAng",
             # "MaxFSR", "StanceTime", "SwingTime","Task", 
             "Mark", "epochTime"
