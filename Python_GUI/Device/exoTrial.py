@@ -101,12 +101,15 @@ class ExoTrial:
     async def beginTrialDebug(self, deviceManager):
         print("Starting trial...")
         await asyncio.sleep(1)
-        # Let user start motor
+        await deviceManager.startExoMotors()  # Sets Exo motors to receive commands
+        print("start motors\n")
 
         await deviceManager.calibrateFSRs()  # Begins Exo calibration
         print("calibrate fsr\n")
         # Send FSR value to Exo FSR
         await deviceManager.sendPresetFsrValues()
+
+        await deviceManager.motorOff()
 
     # -----------------------------------------------------------------------------
 
