@@ -4,9 +4,9 @@
 This controller applies a torque to the ankle proportional to the normalized FSR reading of the toe.
 More details on this controller can be found in:
 
-G\. M\. Gasparri, J. Luque and Z. F. Lerner, 
-"[Proportional Joint-Moment Control for Instantaneously Adaptive Ankle Exoskeleton Assistance](https://ieeexplore.ieee.org/abstract/document/8669971)," 
-in IEEE Transactions on Neural Systems and Rehabilitation Engineering, vol. 27, no. 4, pp. 751-759, April 2019, doi: 10.1109/TNSRE.2019.2905979.
+G\. M\. Gasparri, J. Luque and Z. F. Lerner (2019). 
+[Proportional Joint-Moment Control for Instantaneously Adaptive Ankle Exoskeleton Assistance](https://ieeexplore.ieee.org/abstract/document/8669971).
+in IEEE Transactions on Neural Systems and Rehabilitation Engineering, vol. 27, no. 4, pp. 751-759, doi: 10.1109/TNSRE.2019.2905979.
 
 ## Parameters
 Parameter index order can be found in [ControllerData.h](/ExoCode/src/ControllerData.h).

@@ -2,10 +2,11 @@
 
 ## Description
 This controller applies a spline defined as a percent of gait.  This requires a heel FSR.
+
 The profile is based on: 
-Zhang, J., Fiers, P., Witte, K. A., Jackson, R. W., Poggensee, K. L., Atkeson, C. G., & Collins, S. H. (2017). 
+J. Zhang, P. Fiers, K.A. Witte, R.W. Jackson, K.L. Poggensee, C.G. Atkeson, & S.H. Collins (2017). 
 [Human-in-the-loop optimization of exoskeleton assistance during walking. ](https://www.science.org/doi/full/10.1126/science.aal5054)
-Science, 356(6344), 1280-1284.
+in Science, vol. 356, no. 6344, pp. 1280-1284, doi: 10.1126/science.aal5054.
 
 ## Parameters
 Parameter index order can be found in [ControllerData.h](/ExoCode/src/ControllerData.h).

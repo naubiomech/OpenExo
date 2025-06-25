@@ -40,7 +40,7 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t p_gain_idx = 4;                       //Value of P Gain for PID control
         const uint8_t i_gain_idx = 5;                       //Value of I Gain for PID control
         const uint8_t d_gain_idx = 6;                       //Value of D Gain for PID control 
-        const uint8_t torque_alpha_idx = 7;
+        const uint8_t torque_alpha_idx = 7;                 //Filtering term
         const uint8_t num_parameter = 8;
     }
 
