@@ -171,16 +171,16 @@ class FSRPlot(BasePlot):
         title = " "
         bottomLimit = 0
         topLimit = 1.1
-        if chartSelection == "Left Leg":
+        if chartSelection == "Right Leg":
+            topMeasure = (
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
+            )
+            title = "Right Leg"
+        elif chartSelection == "Left Leg":
             topMeasure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
             )
             title = "Left Leg"
-        elif chartSelection == "Right Leg":
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightFsr
-            )
-            title = "Right Leg"
 
         if topMeasure is None:
             topMeasure = 0
