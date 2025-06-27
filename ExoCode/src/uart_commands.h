@@ -499,6 +499,8 @@ namespace UART_command_handlers
 				 
 				 rx_msg.data[9] = exo_data->right_side.ankle.joint_position;
 				
+				 rx_msg.data[5] = exo_data->right_side.ankle.joint_position;
+				 rx_msg.data[3] = exo_data->right_side.ankle.joint_position;
 				// rx_msg.data[0] = 0;
 				// rx_msg.data[1] = 1;
 				// rx_msg.data[2] = 2;

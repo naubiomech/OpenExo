@@ -361,6 +361,17 @@ class ControllerData {
 		bool SPV2_virtual_spring_ON = false;
 		float SPV2_virtual_spring_entry_angle = 50;
 		
+		//SPV2 leaf spring stiffness measurement
+		bool SPV2_do_measure_stiffness1 = false;
+		bool SPV2_do_measure_stiffness2 = false;
+		float SPV2_stiffness_angle1 = 0;
+		float SPV2_stiffness_angle2 = 0;
+		float SPV2_stiffness_torque1 = 0;
+		float SPV2_stiffness_torque2 = 0;
+		float SPV2_ls_val = 0;
+		
+		
+		
 		//magnet troubleshooting
 		unsigned long magnet_watch = 0;;
 		

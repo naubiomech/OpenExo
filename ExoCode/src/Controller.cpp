@@ -2728,6 +2728,8 @@ float SPV2::calc_motor_cmd()
 					else
                     {	
 						_controller_data->servo_get_ready = false;
+						_controller_data->SPV2_do_measure_stiffness1 = true;
+						_controller_data->SPV2_do_measure_stiffness2 = true;
 					}
 				}
 				else
@@ -2784,7 +2786,7 @@ float SPV2::calc_motor_cmd()
 		}
 	}
 
-    //Turn of the motor//
+    //Turn off the motor//
 	//When do we turn the motor OFF?
 
 		//Limit post-PID motor command for dorsiflexion torque
@@ -2810,6 +2812,32 @@ float SPV2::calc_motor_cmd()
 		}
 		Serial.print("\ncmd: ");
 		Serial.print(cmd);
+		
+		//Leaf spring stiffness measurement starts
+		if (_controller_data->SPV2_do_measure_stiffness1) {
+			if (_controller_data->filtered_torque_reading < -5) {
+				_controller_data->SPV2_stiffness_angle1 = _side_data->ankle.joint_position;
+				_controller_data->SPV2_stiffness_torque1 = _controller_data->filtered_torque_reading;
+				_controller_data->SPV2_do_measure_stiffness1 = false;
+			}
+		}
+		
+		if (_controller_data->SPV2_do_measure_stiffness2) {
+			if (_controller_data->filtered_torque_reading < -15) {
+				_controller_data->SPV2_stiffness_angle2 = _side_data->ankle.joint_position;
+				_controller_data->SPV2_stiffness_torque2 = _controller_data->filtered_torque_reading;
+				_controller_data->SPV2_do_measure_stiffness2 = false;
+				
+				_controller_data->SPV2_ls_val = abs((_controller_data->SPV2_stiffness_torque1 - _controller_data->SPV2_stiffness_torque2)/(_controller_data->SPV2_stiffness_angle1 - _controller_data->SPV2_stiffness_angle2));
+				_controller_data->SPV2_ls_val = (180/M_PI) * _controller_data->SPV2_ls_val;
+				Serial.print("\nLeaf spring stiffness: ");
+				Serial.print(_controller_data->SPV2_ls_val);
+				Serial.print(" Nm/rad");
+			}
+		}
+		
+		//Leaf spring stiffness measurement ends
+		
 		if (!(cmd == cmd)) {
 			return 0;
 		}
