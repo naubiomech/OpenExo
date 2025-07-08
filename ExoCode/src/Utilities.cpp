@@ -47,8 +47,28 @@ namespace utils
         int time = millis();
         int step = (time - *last_time) * rate_per_ms;
         *last_time = time;
+
+        Serial.println("in int rate limit");
         
         return min(setpoint, last_value + step); 
+     };
+
+     float float_rate_limit(float setpoint, float last_value, int* last_time, float rate_per_ms)
+     {
+        int time = millis();
+        float step = (time - *last_time) * rate_per_ms;
+        *last_time = time;
+
+        float plus_step = last_value + step;
+        float minus_step = last_value - step;
+        if(abs(setpoint - plus_step) > abs(setpoint - minus_step))
+        {
+            return max(setpoint, last_value - step);
+        }
+        else
+        {
+            return min(setpoint, last_value + step);
+        }
      };
      
     uint8_t update_bit(uint8_t original, bool val, uint8_t loc)

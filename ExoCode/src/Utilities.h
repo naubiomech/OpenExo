@@ -91,6 +91,8 @@ namespace utils
      * @return the next value to the system can be at based on the rate limit.
      */
     int rate_limit(int setpoint, int last_value, int* last_time, int rate_per_ms);
+
+    float float_rate_limit(float setpoint, float last_value, int* last_time, float rate_per_ms);
     
     /**
      * @brief sets/clears the specified bit in a unit8_t.

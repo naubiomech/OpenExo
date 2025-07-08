@@ -75,6 +75,8 @@ void _Joint::read_data()
     
     _joint_data->position = _joint_data->motor.p / _joint_data->motor.gearing;
     _joint_data->velocity = _joint_data->motor.v / _joint_data->motor.gearing;
+    //Serial.print("encoder pos: ");
+    //Serial.println(_joint_data->position);
 	
 	//Read the true torque sensor offset
 	_joint_data->torque_offset_reading = _torque_sensor.readOffset();
@@ -592,28 +594,30 @@ void HipJoint::set_controller(uint8_t controller_id)
 
 void HipJoint::read_imu()
 {
-    if (millis() - prevtime >= 100)
+    if (millis() - prevtime >= 25)
     {
-        prevtime = millis();
 
         if (_is_left)
         {
             Wire.requestFrom(left_hip_nano, 4);
+
+            for (int i = 0; i < 4; i++)
+            {
+                data.angle_bytes[i] = Wire.read();
+            }
         }
         else
         {
             Wire.requestFrom(right_hip_nano, 4);
-        }
 
-        for (int i = 0; i < 4; i++)
-        {
-            data.angle_bytes[i] = Wire.read();
+            for (int i = 0; i < 4; i++)
+            {
+                data.angle_bytes[i] = Wire.read();
+            }
         }
 
         _joint_data->imu_position = data.estim_angle;
-
-        Serial.print(_joint_data->imu_position);
-
+        prevtime = millis();
     }
 }
 

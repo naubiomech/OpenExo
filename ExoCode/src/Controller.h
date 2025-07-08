@@ -401,7 +401,6 @@ public:
     float change_time;
 
     float calc_motor_cmd();         /* Function that calculates the motor command. */
-
 };
 
 /**
@@ -488,11 +487,18 @@ class AngleBased : public _Controller
 public:
     AngleBased(config_defs::joint_id id, ExoData* exo_data);
     ~AngleBased() {};    
-    
+
     float encoder_angle;            /* Stores current encoder angle, after being normalized to the calibrated offset. */
     float combined_fsr;             /* Stores the combined(toeand heel) fsr value. */
+    float correction_factor[3];        /* Correction factor for the encoders when torque is being applied by the motor*/
+    float limit_rate;               /* The max rate (in rads) at which the encode angle is allowed to change per ms*/
+    int last_update_time;           /* Stores the last time the enocders were updated*/
+    float ewma_alpha;               /* The alpha value used in the exponential weighted moving average equation */
+    float diff_cmd;                 /* Stores the difference in command values use to update the encoder offset */
 
     float encoder_offset;           /* Store the encoder offset from the calibarition phase at the initation of the trial. */
+    float intended_encoder_offset;  /* Stores the goal encoder offset while the rate limit begins to chage the actual encoder offset */
+    float encoder_offset_0;         /* Stores original encoder offset*/
 
     bool first_loop;                /* Flag to initiate encoder calibration at the initiation of the trial.*/
     
@@ -502,7 +508,8 @@ public:
     float min_stance_moment;        /* Minimum stance_moment from calibration period. */
 
     bool startFlag;                 /* Flag to mark the time at which the lastest instance of swing phase began. */
-    double swingStartTime;          /* Stores the time at which the latest instance of swing phase began. */
+    unsigned long swingStartTime;   /* Stores the time at which the latest instance of swing phase began. */
+    float swingStartPhase;          /* Stores the percent gait phase at which the latest instance of swing began. */
 
     int steps;                      /* Number of steps that have occured. */
 
@@ -546,11 +553,18 @@ public:
     int starting_angle;
     int starting_step;
 
+    long prev_time;
+
+    float prev_cmd;
+
+    bool calibrating;
+
     //Functions
     float calc_motor_cmd();         /* Function to calcualte the desired motor command. */
     void calibrate_encoders();      /* Function to finds the offset angle when the user is standing still upon initiation of the trial. */
     void normalize_stance_moment(); /* Function to calucalte the max and min stance_moment to normalize to the variable between -1 and 1. */
     void normalize_angle();
+    //float getAngle();               /* Function to get the average angle over the past *5* readings. */
 
 private:
 

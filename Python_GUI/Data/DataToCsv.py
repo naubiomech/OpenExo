@@ -113,16 +113,36 @@ class CsvWritter:
             fileName = f"{base_file_name}.csv"
 
 
-        with open(fileName, "w") as csvFile:  # Open file with file name
-            csvwriter = csv.writer(csvFile)  # Prep file for csv data
-            print("creating and opening file")
+        try:
+            with open(fileName, "w") as csvFile:  # Open file with file name
+                csvwriter = csv.writer(csvFile)  # Prep file for csv data
+                print("creating and opening file")
 
-            # Write flipped 2D array to file
-            csvwriter.writerows(fileDataTransposed)
+                # Write flipped 2D array to file
+                csvwriter.writerows(fileDataTransposed)
 
-            csvFile.close  # Close file
+                csvFile.close  # Close file
+
+        finally:
+            # ⇢  CLEAR THE BUFFER  ⇠
+            self._clear_exo_data(exoData)
+            print("ExoData lists emptied")
 
     def rotateArray(self, arrayToFlip):
         return [
             list(row) for row in zip(*arrayToFlip)
         ]  # Roate array so labels on left are on top
+
+    def _clear_exo_data(self, exoData):
+        """Empty all list‑type attributes in exoData."""
+        attrs = [
+            "tStep", "rTorque", "rSetP", "rState",
+            "lTorque", "lSetP", "lState",
+            "lFsr", "rFsr",
+            "MinShankVel", "MaxShankVel",
+            "MinShankAng", "MaxShankAng",
+            "MaxFSR", "StanceTime", "SwingTime",
+            "Task", "Mark", "epochTime"
+        ]
+        for name in attrs:
+            getattr(exoData, name).clear()

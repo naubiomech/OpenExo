@@ -307,6 +307,8 @@ class ControllerData {
         
         //Variables for angle based controller
         float encoder_angle;
+        float encoder_offset;
+        float intended_encoder_offset;
         float combined_fsr;
         float stance_moment;
         float normalized_stance_moment;
