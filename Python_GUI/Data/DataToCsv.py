@@ -22,8 +22,8 @@ class CsvWritter:
         lFsr = ["Data 7"]
 
         #record our model features
-        maxSV = ["Data 8"]
-        minSV = ["Data 9"]
+        minSV = ["Data 8"]
+        maxSV = ["Data 9"]
         # minSA = ["minSA"]
         # maxSA = ["maxSA"]
         # maxFSR = ["maxFSR"]
@@ -86,8 +86,8 @@ class CsvWritter:
         fileData.append(lSetP)
         fileData.append(rFsr)
         fileData.append(lFsr)
-        fileData.append(maxSV)
         fileData.append(minSV)
+        fileData.append(maxSV)
 
         # fileData.append(minSA)
         # fileData.append(maxSA)

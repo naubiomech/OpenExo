@@ -85,10 +85,10 @@ class TopPlot(BasePlot):
         topLimit = 1
         if chartSelection == "Data 0-3":
             topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftTorque
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightTorque
             )
             topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightState
             )
             title = "Data 0 and 1"
         elif chartSelection == "Data 4-7":
@@ -96,7 +96,7 @@ class TopPlot(BasePlot):
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.leftState
             )
             topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
             )
             title = "Data 4 and 5"
             bottomLimit = 0
@@ -124,18 +124,18 @@ class BottomPlot(BasePlot):
         topLimit = 1
         if chartSelection == "Data 0-3":
             topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightTorque
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightSet
             )
             topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightSet
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftTorque
             )
             title = "Data 2 and 3"
         elif chartSelection == "Data 4-7":
             topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightState
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightFsr
             )
             topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightFsr
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
             )
             bottomLimit = 0
             topLimit = 1.1
@@ -171,16 +171,16 @@ class FSRPlot(BasePlot):
         title = " "
         bottomLimit = 0
         topLimit = 1.1
-        if chartSelection == "Left Leg":
+        if chartSelection == "Right Leg":
+            topMeasure = (
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
+            )
+            title = "Right Leg"
+        elif chartSelection == "Left Leg":
             topMeasure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
             )
             title = "Left Leg"
-        elif chartSelection == "Right Leg":
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightFsr
-            )
-            title = "Right Leg"
 
         if topMeasure is None:
             topMeasure = 0

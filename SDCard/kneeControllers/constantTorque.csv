@@ -1,6 +1,6 @@
-5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows"
-2,"parameter number, the number of parameters to read per line"
-,Parameter list for the  Sine controller
-,Parameter order:
-Amplitdue,Direction
-0,0
+5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,
+7,"parameter number, the number of parameters to read per line",,,,,
+,Parameter list for the  Sine controller,,,,,
+,Parameter order:,,,,,
+Amplitdue,Direction,Alpha,PID Flag,P Gain,I Gain,D Gain
+0,0,100,0,0,0,0

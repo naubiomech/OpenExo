@@ -1947,7 +1947,7 @@ float ProportionalHipMoment::calc_motor_cmd()
 //****************************************************
 
 SPV2::SPV2(config_defs::joint_id id, ExoData* exo_data)
-: _Controller(id, exo_data)
+    : _Controller(id, exo_data)
 {
     #ifdef CONTROLLER_DEBUG
         logger::println("SPV2::Constructor");
@@ -2180,22 +2180,21 @@ float PJMC_PLUS::calc_motor_cmd()
 	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.5);
 	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.5);
 	float cmd_ff = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
+
 	// if (!_joint_data->is_left){
 		// Serial.print("\nRunning pjmcPlus...");
 		// Serial.print(cmd_ff);
 	// }
-        // low pass filter on torque_reading
+    
+    //Low-pass filter on torque_reading
     const float torque = _joint_data->torque_reading;
     const float alpha = 0.5;
-    _controller_data->filtered_torque_reading = utils::ewma(torque, 
-            _controller_data->filtered_torque_reading, alpha);
+    _controller_data->filtered_torque_reading = utils::ewma(torque, _controller_data->filtered_torque_reading, alpha);
 	
-		float cmd;
-		cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading,
-					20 * _controller_data->parameters[controller_defs::pjmc_plus::kp],
-					80 * _controller_data->parameters[controller_defs::pjmc_plus::ki], 
-					20 * _controller_data->parameters[controller_defs::pjmc_plus::kd]);
-
+	float cmd;
+	
+    //PID on Motor Command
+    cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::pjmc_plus::kp], 80 * _controller_data->parameters[controller_defs::pjmc_plus::ki], 20 * _controller_data->parameters[controller_defs::pjmc_plus::kd]);
 
     #ifdef CONTROLLER_DEBUG
     logger::println("pjmcPlus::calc_motor_cmd : stop");

@@ -9,7 +9,7 @@ Parameter index order can be found in [ControllerData.h](/ExoCode/src/Controller
 - duration - Duration of the applied torque
 - repetitions - Number of times the torque is applied
 - spacing - Time between each application of torque 
-- use_pid - This flag turns PID on(1) or off(0)
+- pid_flag - This flag turns PID on(1) or off(0)
 - p_gain - Proportional gain for closed loop controls
 - i_gain - Integral gain for closed loop controls
 - d_gain - Derivative gain for closed loop controls

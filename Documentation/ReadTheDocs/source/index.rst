@@ -77,6 +77,7 @@ For questions, issues, or further assistance, reach out to us at:
    :caption: Tutorials:
 
    introduction
+   FirstTimeStartUp
    User_Guide
    installation
    addingelements
