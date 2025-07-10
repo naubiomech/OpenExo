@@ -48,3 +48,7 @@ This guide explains how to add new content pages to the Read the Docs site for t
 
 - If everything looks correct, **log into Read the Docs and click *Build* (or
   *Trigger Build*) to publish the updated documentation.**
+
+5. Watch the Tutorial Video
+-----------------------------
+`▶️ Watch the video on YouTube <https://www.youtube.com/watch?v=YOUR_VIDEO_ID>`_
