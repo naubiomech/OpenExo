@@ -7,3 +7,4 @@ micromlgen
 matplotlib
 pygame
 pillow
+bleak==0.21.1
