@@ -51,4 +51,4 @@ This guide explains how to add new content pages to the Read the Docs site for t
 
 5. Watch the Tutorial Video
 -----------------------------
-`▶️ Watch the video on YouTube <https://www.youtube.com/watch?v=YOUR_VIDEO_IDs>`_
+`▶️ Watch the video on YouTube <https://youtu.be/a9WaMBEafLQ>`_
