@@ -261,7 +261,7 @@ class ExoDeviceManager:
                         print(self.client)
 
                         # Get list of services from Exo
-                        self.set_services(await self.client.get_services())
+                        self.set_services(self.client.services) #Get_Services Not Supported in v1.0 and beyond of bleak library, previously was [await self.client.get_services()] instead of [self.client.services].
                         
                         # Start incoming data stream
                         await self.client.start_notify(self.UART_RX_UUID, self.DataIn)
