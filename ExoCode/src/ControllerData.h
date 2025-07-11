@@ -187,7 +187,9 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 		const uint8_t spring_stiffness = 17;
 		const uint8_t damping = 18;
 		const uint8_t propulsive_gain = 19;
-        const uint8_t num_parameter = 20;
+		const uint8_t servo_angle_scanner = 20;
+		const uint8_t do_use_stiffness_ctrl = 21;
+        const uint8_t num_parameter = 22;
     }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters

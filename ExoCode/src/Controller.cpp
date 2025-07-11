@@ -2155,7 +2155,7 @@ void SPV2::_golden_search_advance()
 
 void SPV2::optimizer_reset()
 {
-	Serial.print("\n  |  optimizer just RESET.");
+	// Serial.print("\n  |  optimizer just RESET.");
 	_controller_data->do_adv_optimizer = 0;
 	_controller_data->SPV2_gs_is_ini_itr = true;
 	_controller_data->i_SA = 0;
@@ -2301,8 +2301,8 @@ void SPV2::_update_reference_angles(SideData* side_data, ControllerData* control
 	const float threshold = 35/100;
     const bool should_update = (percent_grf >  _controller_data->toeFsrThreshold) && !_controller_data->reference_angle_updated;
     const bool should_capture_level_entrance = side_data->do_calibration_refinement_toe_fsr && !side_data->do_calibration_toe_fsr;
-	Serial.print("\nshould_capture_level_entrance: ");
-	Serial.print(should_capture_level_entrance);
+	// Serial.print("\nshould_capture_level_entrance: ");
+	// Serial.print(should_capture_level_entrance);
     const bool should_reset_level_entrance_angle =  _controller_data->prev_calibrate_level_entrance < should_capture_level_entrance;
 
     if (should_reset_level_entrance_angle)
@@ -2390,6 +2390,11 @@ float SPV2::calc_motor_cmd()
 		return 0;
 	}
 	else {
+		
+		uint16_t exo_status = _data->get_status();
+		bool active_trial = (exo_status == status_defs::messages::trial_on) || (exo_status == status_defs::messages::fsr_calibration) || (exo_status == status_defs::messages::fsr_refinement);
+		
+		
 		// Serial.print("\n  |  Right TRQ offset: ");
 		// Serial.print(_joint_data->torque_offset_reading);
 		
@@ -2485,6 +2490,7 @@ float SPV2::calc_motor_cmd()
 
 	
 	float cmd_pjmc = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
+	cmd_pjmc = min(dorsi_setpoint, cmd_pjmc);//cap the dorsiflexion setpoint
 	
 	
 	//TREC section begins
@@ -2517,6 +2523,10 @@ float SPV2::calc_motor_cmd()
 					_update_reference_angles(_side_data, _controller_data, percent_grf, percent_grf_heel);   //When current toe FSR > set threshold, use the current ankle angle as the "reference angle"
 					float k = 0.01 * _controller_data->parameters[controller_defs::spv2::spring_stiffness];
 					float b = 0.01 * _controller_data->parameters[controller_defs::spv2::damping];
+					if (!_controller_data->parameters[controller_defs::spv2::plantar_scaling]) {
+						k = 0;
+						b = 0;
+					}
 					// const float k = 1;
 					// const float b = 0;
 					//const float equilibrium_angle_offset = _controller_data->parameters[controller_defs::trec::neutral_angle]/100;
@@ -2530,26 +2540,35 @@ float SPV2::calc_motor_cmd()
 					delta = min(delta, 0);
 					float assistive = min(k*delta,0);
 					//float assistive = max(k*delta - b*_side_data->ankle.joint_velocity, 0);//Dorsi velocity: Negative
-					Serial.print("\nk: ");
-					Serial.print(k);
-					Serial.print("  |  delta: ");
-					Serial.print(delta);
-					Serial.print("  |  reference: ");
-					Serial.print(_controller_data->reference_angle);
-					Serial.print("  |  deviation: ");
-					Serial.print(deviation_from_level);
-					Serial.print("  |  joint_position: ");
-					Serial.print(_side_data->ankle.joint_position);
-					Serial.print("  |  offset: ");
-					Serial.print(equilibrium_angle_offset);
-					Serial.print("  |  entrance: ");
-					Serial.print(_controller_data->level_entrance_angle);
+					// Serial.print("\nk: ");
+					// Serial.print(k);
+					// Serial.print("  |  delta: ");
+					// Serial.print(delta);
+					// Serial.print("  |  reference: ");
+					// Serial.print(_controller_data->reference_angle);
+					// Serial.print("  |  deviation: ");
+					// Serial.print(deviation_from_level);
+					// Serial.print("  |  joint_position: ");
+					// Serial.print(_side_data->ankle.joint_position);
+					// Serial.print("  |  offset: ");
+					// Serial.print(equilibrium_angle_offset);
+					// Serial.print("  |  entrance: ");
+					// Serial.print(_controller_data->level_entrance_angle);
 					//Use a tuned sigmoid to squelch the spring output during the 'swing' phase
 					float squelch_offset = -(1.5*_controller_data->toeFsrThreshold);                                                                                  //1.5 ensures that the spring activates after the new angle is captured
 					float grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+squelch_offset))+1);
 					Serial.print("\ngrf_squelch_multiplier: ");
 					Serial.print(grf_squelch_multiplier);
+					Serial.print("  |  Assistive: ");
+					Serial.print(assistive);
+					Serial.print("  |  k: ");
+					Serial.print(k);
+					Serial.print("  |  delta: ");
+					Serial.print(delta);
+					
 					float squelched_supportive_term = assistive*grf_squelch_multiplier;                                                                              //Finalized suspension term
+					Serial.print("  |  Output: ");
+					Serial.print(squelched_supportive_term);
 					
 					//Low pass the squelched supportive term
 					_controller_data->filtered_squelched_supportive_term = utils::ewma(squelched_supportive_term, _controller_data->filtered_squelched_supportive_term, 0.075);
@@ -2559,8 +2578,8 @@ float SPV2::calc_motor_cmd()
 					// const float kProp = 1;
 					float saturated_velocity = _side_data->ankle.joint_velocity > 0 ? _side_data->ankle.joint_velocity:0;
 					float propulsive = kProp*saturated_velocity;
-					Serial.print("\njoint_velocity: ");
-					Serial.print(_side_data->ankle.joint_velocity);
+					// Serial.print("\njoint_velocity: ");
+					// Serial.print(_side_data->ankle.joint_velocity);
 					//Use a symmetric sigmoid to squelch the propulsive term
 					float propulsive_squelch_offset = -1.2 + threshold;
 					float propulsive_grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))+1);
@@ -2569,7 +2588,8 @@ float SPV2::calc_motor_cmd()
 	
 	
 	
-	_controller_data->cmd_ff_kb = -_controller_data->filtered_squelched_supportive_term;
+	// _controller_data->cmd_ff_kb = -_controller_data->filtered_squelched_supportive_term;
+	_controller_data->cmd_ff_kb = assistive;
 	_controller_data->cmd_ff_pushOff = -squelched_propulsive_term;
 	_controller_data->cmd_ff_generic = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
 	
@@ -2590,7 +2610,8 @@ float SPV2::calc_motor_cmd()
 	cmd_ff = constrain(cmd_ff, -45, 5);
 	
 	//cmd_ff = cmd_ff + _controller_data->cmd_ff_kb + _controller_data->cmd_ff_pushOff;
-	
+	Serial.print("  |  cmd_ff: ");
+	Serial.print(cmd_ff);
 	
 	
 	
@@ -2601,8 +2622,16 @@ float SPV2::calc_motor_cmd()
 	
 	if (_controller_data->parameters[controller_defs::spv2::turn_on_peak_limiter]) 
     {
-		// _plantar_setpoint_adjuster(_side_data, _controller_data, -_controller_data->filtered_torque_reading);
-		_plantar_setpoint_adjuster(_side_data, _controller_data, -cmd_pjmc);
+		
+		if (_data->user_paused || !active_trial) {
+			plantar_setpoint = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
+			_controller_data->setpoint2use_spv2 = plantar_setpoint;
+		}
+		else {
+			
+			_plantar_setpoint_adjuster(_side_data, _controller_data, -_controller_data->filtered_torque_reading);
+		// _plantar_setpoint_adjuster(_side_data, _controller_data, -cmd_pjmc);
+		}
 		
 	}
 	
@@ -2611,13 +2640,13 @@ float SPV2::calc_motor_cmd()
 
 		if (cmd_ff < -5)
         {
-			//cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
-			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
+			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
+			// cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 		}
 		else
         {
-			//cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]); // less jittery during zero-torque mode
-			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
+			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]); // less jittery during zero-torque mode
+			// cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 		}
 	
     //Establish Setpoints
@@ -2635,11 +2664,16 @@ float SPV2::calc_motor_cmd()
 	//Symptoms: When the wearer relys on the exo to initiate movement, especialy the push-off motion, the ratchet would sometimes fail to disengage.
 	//Proposed solutions: Lowering the servo arm towards the end of the swing phase.
 	
-	uint16_t exo_status = _data->get_status();
-    bool active_trial = (exo_status == status_defs::messages::trial_on) || (exo_status == status_defs::messages::fsr_calibration) || (exo_status == status_defs::messages::fsr_refinement);
+	
 
 	int servoOutput;	
 	bool servo_switch = _controller_data->parameters[controller_defs::spv2::do_use_servo];
+	if (_controller_data->parameters[controller_defs::spv2::plantar_scaling]) {
+		servo_switch = true;
+	}
+	else {
+		servo_switch = false;
+	}
 	float servo_fsr_threshold = 0.01 * _controller_data->parameters[controller_defs::spv2::fsr_servo_threshold];
 	uint8_t servo_home = _controller_data->parameters[controller_defs::spv2::servo_origin];
 	uint8_t servo_target = _controller_data->parameters[controller_defs::spv2::servo_terminal];
@@ -2678,8 +2712,8 @@ float SPV2::calc_motor_cmd()
 	}
 	else
     {
-		Serial.print("  |  |  |  Battery voltage (mV): ");
-		Serial.print(_controller_data->SPV2_current_voltage);
+		// Serial.print("  |  |  |  Battery voltage (mV): ");
+		// Serial.print(_controller_data->SPV2_current_voltage);
 		
 		if (!servo_switch)
         {
@@ -2749,14 +2783,18 @@ float SPV2::calc_motor_cmd()
 				}
 				if (!_side_data->toe_stance) {
 					
-					//Pull the initial stiffness angle from the SD card
-					// if ((_controller_data->SPV2_oldCurrent == 0) && (_controller_data->SPV2_newCurrent == 0)) {
-					if (_controller_data->SPV2_oldCurrent == 0)  {
-						_controller_data->SPV2_currentAngle = _controller_data->parameters[controller_defs::spv2::neutral_angle];
-						
-						_controller_data->x1 = _controller_data->parameters[controller_defs::spv2::min_angle];
-						_controller_data->x2 = _controller_data->parameters[controller_defs::spv2::max_angle];
-						// Serial.print("\n\n----- OG x1 x2 pulled from SD -----\n\n");
+					if (!_controller_data->parameters[controller_defs::spv2::servo_angle_scanner]) {
+					
+						//Pull the initial stiffness angle from the SD card
+						// if ((_controller_data->SPV2_oldCurrent == 0) && (_controller_data->SPV2_newCurrent == 0)) {
+						if (_controller_data->SPV2_oldCurrent == 0)  {
+							_controller_data->SPV2_currentAngle = _controller_data->parameters[controller_defs::spv2::neutral_angle];
+							
+							_controller_data->x1 = _controller_data->parameters[controller_defs::spv2::min_angle];
+							_controller_data->x2 = _controller_data->parameters[controller_defs::spv2::max_angle];
+							// Serial.print("\n\n----- OG x1 x2 pulled from SD -----\n\n");
+						}
+					
 					}
 					
 					_servo1_runner(26, _controller_data->SPV2_currentAngle);
@@ -2810,29 +2848,44 @@ float SPV2::calc_motor_cmd()
 			cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
 			cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
 		}
-		Serial.print("\ncmd: ");
-		Serial.print(cmd);
+		// Serial.print("\ncmd: ");
+		// Serial.print(cmd);
 		
 		//Leaf spring stiffness measurement starts
 		if (_controller_data->SPV2_do_measure_stiffness1) {
-			if (_controller_data->filtered_torque_reading < -5) {
+			if (_controller_data->filtered_torque_reading < -10) {
 				_controller_data->SPV2_stiffness_angle1 = _side_data->ankle.joint_position;
 				_controller_data->SPV2_stiffness_torque1 = _controller_data->filtered_torque_reading;
 				_controller_data->SPV2_do_measure_stiffness1 = false;
+				// Serial.print("\nStart torque: ");
+				// Serial.print(_controller_data->SPV2_stiffness_torque1);
+				// Serial.print("  |  Start angle: ");
+				// Serial.print(_controller_data->SPV2_stiffness_angle1);
 			}
 		}
 		
 		if (_controller_data->SPV2_do_measure_stiffness2) {
-			if (_controller_data->filtered_torque_reading < -15) {
+			if (_controller_data->filtered_torque_reading < -20) {
 				_controller_data->SPV2_stiffness_angle2 = _side_data->ankle.joint_position;
 				_controller_data->SPV2_stiffness_torque2 = _controller_data->filtered_torque_reading;
 				_controller_data->SPV2_do_measure_stiffness2 = false;
 				
-				_controller_data->SPV2_ls_val = abs((_controller_data->SPV2_stiffness_torque1 - _controller_data->SPV2_stiffness_torque2)/(_controller_data->SPV2_stiffness_angle1 - _controller_data->SPV2_stiffness_angle2));
+				_controller_data->SPV2_ls_val = fabs((_controller_data->SPV2_stiffness_torque1 - _controller_data->SPV2_stiffness_torque2)/(_controller_data->SPV2_stiffness_angle1 - _controller_data->SPV2_stiffness_angle2));//abs() seems to only return integers here. What's the cause? fabs() works fine
 				_controller_data->SPV2_ls_val = (180/M_PI) * _controller_data->SPV2_ls_val;
-				Serial.print("\nLeaf spring stiffness: ");
+				// Serial.print("  |  End torque: ");
+				// Serial.print(_controller_data->SPV2_stiffness_torque2);
+				// Serial.print("  |  End angle: ");
+				// Serial.print(_controller_data->SPV2_stiffness_angle2);
+				Serial.print("\nServo angle: ");
+				Serial.print(_controller_data->SPV2_currentAngle);
+				Serial.print("  |  Leaf spring stiffness: ");
 				Serial.print(_controller_data->SPV2_ls_val);
 				Serial.print(" Nm/rad");
+				
+				if (_controller_data->parameters[controller_defs::spv2::servo_angle_scanner]) {
+					_controller_data->SPV2_currentAngle = _controller_data->SPV2_currentAngle + 2;
+					_controller_data->SPV2_currentAngle = constrain(_controller_data->SPV2_currentAngle, _controller_data->parameters[controller_defs::spv2::min_angle], _controller_data->parameters[controller_defs::spv2::max_angle]);
+				}
 			}
 		}
 		

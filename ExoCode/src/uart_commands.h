@@ -438,8 +438,8 @@ namespace UART_command_handlers
 				//rx_msg.data[6] = 100 * exo_data->right_leg.heel_fsr;
 				
 				//motor current plot
-				rx_msg.data[6] = local_scalar * map(analogRead(A1),0,4095,-15,15);
-				float powerVScurrent = (exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001) / abs(map(analogRead(A1),0,4095,-15,15));
+				// rx_msg.data[6] = local_scalar * map(analogRead(A1),0,4095,-15,15);
+				// float powerVScurrent = (exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001) / abs(map(analogRead(A1),0,4095,-15,15));
 				//motor reset plot hijack
 				//rx_msg.data[6] = exo_data->right_leg.ankle.controller.gasp_motor_reset_plot;
 		//Left FSR
@@ -480,27 +480,31 @@ namespace UART_command_handlers
 				
 				// rx_msg.data[6] = local_scalar * exo_data->right_side.ankle.controller.SPV2_newCurrent * 0.001;
 				
-				rx_msg.data[9] = local_scalar * exo_data->right_side.ankle.controller.parameters[controller_defs::spv2::do_update_stiffness];
+				// rx_msg.data[9] = local_scalar * exo_data->right_side.ankle.controller.parameters[controller_defs::spv2::do_update_stiffness];
 				
 				// rx_msg.data[1] = exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001;
-				 rx_msg.data[5] = abs(map(analogRead(A1),0,4095,-300,300));
-				 rx_msg.data[3] = abs(map(analogRead(A1),0,4095,-300,300));
+				 // rx_msg.data[5] = abs(map(analogRead(A1),0,4095,-300,300));
+				 // rx_msg.data[3] = abs(map(analogRead(A1),0,4095,-300,300));
 				 float pwr2plot = exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001;
 				 rx_msg.data[6] = pwr2plot;
 				 rx_msg.data[1] = pwr2plot;
 				 
 				 // rx_msg.data[5] = map(analogRead(A8),0,4095,0,90);
 				 // rx_msg.data[3] = map(analogRead(A8),0,4095,0,90);
-				 rx_msg.data[5] = exo_data->right_side.ankle.joint_position;
-				 rx_msg.data[3] = exo_data->right_side.ankle.joint_position;
+				 // rx_msg.data[5] = exo_data->right_side.ankle.joint_position;
+				 // rx_msg.data[3] = exo_data->right_side.ankle.joint_position;
 				 
 				 rx_msg.data[5] = exo_data->right_side.ankle.controller.cmd_ff_kb;
 				 rx_msg.data[3] = exo_data->right_side.ankle.controller.cmd_ff_pushOff;
 				 
-				 rx_msg.data[9] = exo_data->right_side.ankle.joint_position;
+				 rx_msg.data[9] = exo_data->right_side.ankle.controller.SPV2_currentAngle;
+				 rx_msg.data[9] = exo_data->right_side.ankle.controller.cmd_ff_kb;
 				
 				 rx_msg.data[5] = exo_data->right_side.ankle.joint_position;
 				 rx_msg.data[3] = exo_data->right_side.ankle.joint_position;
+				 
+				 rx_msg.data[6] = local_scalar * exo_data->right_side.ankle.controller.SPV2_current_voltage * 0.001;
+				 rx_msg.data[1] = local_scalar * exo_data->right_side.ankle.controller.SPV2_current_voltage * 0.001;
 				// rx_msg.data[0] = 0;
 				// rx_msg.data[1] = 1;
 				// rx_msg.data[2] = 2;
