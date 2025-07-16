@@ -3,19 +3,20 @@ Build And Flash
 
 Downloads
 ---------
-1. **Download Arduino IDE 1.8.19:**  
+1. **Download Arduino IDE:**
+
    - Available on the Arduino website: `Arduino Software <https://www.arduino.cc/en/software>`_  
-   - Or download via Google Drive: `Arduino IDE on Google Drive <https://drive.google.com/drive/folders/1IRxJFNm2gxUtCeU8Dcavg_Mv2ubANOHK?usp=drive_link>`_.
 
-2. **Install Teensyduino:**  
+2. **Install Teensyduino:**
+
    - Download it on the PJRC website: `Teensyduino <https://www.pjrc.com/teensy/td_download.html>`_  
-   - Or download via Google Drive: `Teensyduino on Google Drive <https://drive.google.com/drive/folders/1IRxJFNm2gxUtCeU8Dcavg_Mv2ubANOHK?usp=drive_link>`_.  
-   - **Note:** Install **version 1.57** for your system.
 
-3. **Install the Arduino Nano 33 BLE:**  
+3. **Install the Arduino Nano 33 BLE:**
+
    - This can be done through the Arduino Boards Manager.
 
-4. **Install the Arduino libraries:**  
+4. **Install the Arduino libraries:**
+
    - Follow the instructions provided in the :ref:`libraries` section below.
 
 Flashing
@@ -32,6 +33,10 @@ Once you have all the tools installed, follow these steps to flash your device:
 7. Change the Arduino port as described in step 3.
 8. Press the **Upload** button.  
    *Note: The Nano will take significantly longer to build than the Teensy.*
+
+If this is your first time, we recommend our `First Time Startup Guide <https://theopenexo.readthedocs.io/en/latest/FirstTimeStartUp.html`__,
+which, in detail, walks you through downloading the relevant software, setting up the system, and running the system for the first time.
+It also outlines potential error handling approaches to aid in troubleshooting should the system not work.
 
 .. _libraries:
 

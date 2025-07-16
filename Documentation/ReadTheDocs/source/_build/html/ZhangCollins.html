@@ -16,7 +16,7 @@
     <script src="_static/js/petite-vue.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Elbow Min Max Controller" href="elbow.html" />
+    <link rel="next" title="SPV2" href="SPV2.html" />
     <link rel="prev" title="Terrain Responsive Exoskeleton Controller (TREC)" href="TREC.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
@@ -122,7 +122,8 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="controllers.html">Controllers</a><ul class="current">
@@ -130,16 +131,19 @@
 <li class="toctree-l3"><a class="reference internal" href="ProportionalJointMoment.html">Proportional Joint Moment Controller</a></li>
 <li class="toctree-l3"><a class="reference internal" href="TREC.html">Terrain Responsive Exoskeleton Controller (TREC)</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Zhang Collins Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SPV2.html">SPV2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PJMC_Plus.html">PJMC_Plus</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
 </ul>
 
         </div>
@@ -155,33 +159,25 @@
 <h1>Zhang Collins Controller<a class="headerlink" href="#zhang-collins-controller" title="Link to this heading">¶</a></h1>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
-<p>This controller applies a spline defined as a percent of gait. It requires a heel FSR for proper operation. The torque profile implemented by this controller is based on the following publication:</p>
-<p>Zhang, J., Fiers, P., Witte, K. A., Jackson, R. W., Poggensee, K. L., Atkeson, C. G., &amp; Collins, S. H. (2017).
-[Human-in-the-loop optimization of exoskeleton assistance during walking.](<a class="reference external" href="https://www.science.org/doi/full/10.1126/science.aal5054">https://www.science.org/doi/full/10.1126/science.aal5054</a>)
-<em>Science, 356(6344), 1280-1284.</em></p>
+<p>This controller applies a spline defined as a percent of gait.  This requires a heel FSR.</p>
+<p>The profile is based on:
+J. Zhang, P. Fiers, K.A. Witte, R.W. Jackson, K.L. Poggensee, C.G. Atkeson, &amp; S.H. Collins (2017).
+<a class="reference external" href="https://www.science.org/doi/full/10.1126/science.aal5054">Human-in-the-loop optimization of exoskeleton assistance during walking</a>.
+in Science, vol. 356, no. 6344, pp. 1280-1284, doi: 10.1126/science.aal5054.</p>
 </section>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
 <p>Parameter index order can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>.</p>
 <ul class="simple">
-<li><p><strong>torque</strong>
-Magnitude of the peak torque in Nm.</p></li>
-<li><p><strong>peak_time</strong>
-Time when the peak torque occurs (expressed as a percentage of the gait cycle).</p></li>
-<li><p><strong>rise_time</strong>
-Duration from zero torque to peak torque (expressed as a percentage of the gait cycle).</p></li>
-<li><p><strong>fall_time</strong>
-Duration from peak torque back to zero torque (expressed as a percentage of the gait cycle).</p></li>
-<li><p><strong>direction</strong>
-Flag to flip the torque from plantarflexion (PF) to dorsiflexion (DF); essentially an assistance/resistance flag.</p></li>
-<li><p><strong>use_pid</strong>
-Flag to enable PID control (1 = on, 0 = off).</p></li>
-<li><p><strong>p_gain</strong>
-Proportional gain for closed-loop control.</p></li>
-<li><p><strong>i_gain</strong>
-Integral gain for closed-loop control.</p></li>
-<li><p><strong>d_gain</strong>
-Derivative gain for closed-loop control.</p></li>
+<li><p><strong>torque</strong>: Magnitude of the peak torque in Nm</p></li>
+<li><p><strong>peak_time</strong>: Time when the peak torque occurs (as a % of gait cycle)</p></li>
+<li><p><strong>rise_time</strong>: Time from zero torque until peak torque (expressed as a % of gait cycle)</p></li>
+<li><p><strong>fall_time</strong>: Time from peak torque until zero torque (expressed as a % of gait cycle)</p></li>
+<li><p><strong>direction</strong>: Flag that flips torque from PF to DF (essentailly an assistance/resistance flag)</p></li>
+<li><p><strong>use_pid</strong>: This flag turns PID on(1) or off(0)</p></li>
+<li><p><strong>p_gain</strong>: Proportional gain for closed-loop control.</p></li>
+<li><p><strong>i_gain</strong>: Integral gain for closed-loop control.</p></li>
+<li><p><strong>d_gain</strong>: Derivative gain for closed-loop control.</p></li>
 </ul>
 </section>
 </section>
@@ -224,7 +220,7 @@ Derivative gain for closed-loop control.</p></li>
 
             <div class="right">
                 
-                    <a href="elbow.html"><span>Elbow Min Max Controller</span><span class="icon">&gt;</span></a>
+                    <a href="SPV2.html"><span>SPV2</span><span class="icon">&gt;</span></a>
                 
             </div>
         </div>

@@ -11,6 +11,6 @@ Parameter index order can be found in [ControllerData.h](/ExoCode/src/Controller
 - duration - The duration that you want the chirp to be applied
 - yshift - Shifts the center of the chirp if you want it to be something other than zero
 - pid_flag - This flag turns PID on(1) or off(0)
-- p_gain - Proportional gain for closed loop controls
-- i_gain - Integral gain for closed loop controls
-- d_gain - Derivative gain for closed loop controls
+- p_gain - Proportional gain for closed loop control
+- i_gain - Integral gain for closed loop control
+- d_gain - Derivative gain for closed loop control

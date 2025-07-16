@@ -1,39 +1,36 @@
-==========================
-OpenExo First Time Startup
+First Time Startup
 ==========================
 
 .. contents:: Table of Contents
     :depth: 2
     :local:
 
-Intro
------
-The video version of this guide can be found here:
+Introduction
+------------
+The video version of this guide can be found on our `YouTube page <https://www.youtube.com/watch?v=cLuNKUZSZRY>`__.
 
-*link*
+This guide will walk you through the first-time starting up OpenExo. We'll be using 
+the bilateral hip configuration of OpenExo, which is the baseline configuration for the system. 
+If you're using a different configuration (but still using the Cubemars AK-motors),
+you'll follow the same steps apart from setting a different configuration in the SD card. 
 
-This guide will walk you through a first-time startup of OpenExo. We'll be using 
-the bilateral hip configuration of OpenExo, which is the most basic configuration 
-and is what you will end up with if you follow the build guide exactly. If
-you're using a different configuration (but still using the cubemars AK motors),
-you'll follow the same steps apart from setting a different configuration and/or
-setting different motors in the SD card. 
+We'll start by downloading: 
+- VSCode
+- Git
+- Python
+- Arduino IDE & Libraries
+- Teensyduino
+- OpenExo Firmware
 
-We'll start by downloading the software we'll need, such as VSCode, the Arduino
-IDE, certain Arduino Libraries, Teensyduino, etc. Once we've done that, we'll
-orient ourselves in the portions of the codebase relevant to what we're doing. 
-After that, we'll upload the ExoCode to the exoskeleton and conduct our first 
-trial using the step controller, which applies torque in a simple on-off pattern.
-We'll be starting with this controller to ensure that everything works properly.
+Once we've done that, we'll orient ourselves to relevant portions of the firmware. 
 
-It's assumed that you have the OpenExo platform already built. **The build guide 
-is located** `here 
-<https://youneedawiki.com/app/page/12IDTJPYXY6L5_p-KUMQvKGewktoxTsTX?p=14AIGjap02Wv8jPJxyezvfYJYFVIJIoO1>`_.
-In this guide, the AK60v1.1 motors are used. If you're using different motors,
-nothing will change other than what motor you set in the SD card's config.ini 
-file (more info on that later). Before beginning, you'll also want to make sure 
-that you have a micro SD card available. The storage size doesn't matter as we
-aren't putting much data onto it.
+Then we'll upload the ExoCode to the exoskeleton and conduct our first 
+trial using the step controller, which applies torque in a simple on-off pattern, to ensure that everything works properly.
+
+It's assumed that you have the OpenExo hardware already built. 
+**The build guide is located** on our `hardware wiki <https://youneedawiki.com/app/page/12IDTJPYXY6L5_p-KUMQvKGewktoxTsTX?p=14AIGjap02Wv8jPJxyezvfYJYFVIJIoO1>`_.
+
+Before beginning, you'll also want to make sure that you have a micro SD card available. The storage size doesn't really matter as we aren't putting much data onto it.
 
 Walkthrough of Components
 -------------------------
@@ -42,37 +39,35 @@ Walkthrough of Components
 .. image:: photos/StartupGuide/TeensyOnPCB.png
     :align: center
 
-The Teensy 4.1 is wehre most of the computation/running of commands is done. It 
+The Teensy 4.1 is where most of the computation/running of commands is done. It 
 is a development board that can run Arduino code (with the help of the 
-Teensyduino board manager). The teensy has a port for an SD card which you can 
+Teensyduino board manager). The Teensy 4.1 has a port for an SD card which you can 
 use to store parameters and other data. For our purpose, we'll be using the SD 
 card to store parameters for controllers and to specify which controller and
-exoskeleton configuration you're using.
+exoskeleton configuration we're using.
 
 **Nano**
 
 .. image:: photos/StartupGuide/NanoOnPCB.png
     :align: center
 
-The Arduino Nano is used mostly for Bluetooth communcication with the graphical 
+The Arduino Nano is used for Bluetooth communcication with the graphical 
 user interface (GUI). It's connected to the Teensy via the PCB and takes 
-relevant information from the teensy and sends it to the GUI so that you can
-visualize torque commands, percent gait estimates, change torque magnitudes in 
-real time, etc.
+relevant information from the Teensy and sends it to the GUI so that you can
+monitor, visualize, and store data in real-time
 
-Any time you want to change the exoskeleton's code (to add a new controller or 
-change what gets plotted for example), you'll be uploading that code to the 
-Teensy and to the Nano.
+Any time you want to change the exoskeleton's code (e.g., to add a new controller, 
+change what gets plotted), you'll be uploading that code to **both the 
+Teensy and the Nano**.
 
 **PCB**
 
 .. image:: photos/StartupGUide/PCB.png
     :align: center
 
-The PCB allows the Teensy and Nano to communicate with eachother. Again, the 
-Teensy handles most of the computation while the Nano transmits the data to the 
-GUI and recieves commands/altered parameters from the GUI and feeds those back 
-to the Teensy.
+The PCB, among other things, allows the Teensy and Nano to communicate with each other. Again, the 
+Teensy handles most of the computation while the Nano transmits/recieves data to/from the 
+GUI.
 
 The PCB also has a number of ports for sensor communication and power, as shown
 below:
@@ -83,22 +78,25 @@ below:
 **Motors**
 
 You are able to use a variety of motors with the OpenExo platform. This guide
-will focus on the CubeMars AK-series motors but note that support for Maxon 
-motors was recently introduced. The CubeMars motors include the AK60, AK60v1.1,
-AK70, AK80, and work is currently being done to integrate the AK60v3.
-
-A breif, helpful, tip for the AK-series motors (excluding the AK60v3s, which
-have a different enabling protocol) is that they have a green LED near the ports 
-which illuminates when the motors are powered on and enabled. If you run into 
-issues with the motors not providing torque, check to see whether the LED is on.
-If it isn't, the issue is most probably a faulty CAN wire. If the LED is on, the 
-issue lies within the code; likely a motor command being overwritten to a value 
-of zero somewhere along the pipeline. You may also have the wrong controller,
-motor, or joint set in the SD card, which would give the same effect.
+will focus on the CubeMars AK-series motors but note that it also has support for Maxon 
+motors. Currently supported CubeMars motors include the AK60, AK60v1.1,
+AK70, and AK80. Work is underway to integrate the v3 versions of these motors (e.g., AK60v3).
 
 It's also assumed that you have already configured the motors according to the 
 steps in the `OpenExo Build Guide 
 <https://youneedawiki.com/app/page/1w9vU0D8s4FzuBDPr1S0EoYw0GNY82Ze1_4S_gxbFk8Q?p=14AIGjap02Wv8jPJxyezvfYJYFVIJIoO1>`_.
+
+*Troubleshooting Motor Issues*
+
+A brief, helpful, tip for the AK-series motors (excluding the AK60v3s, which
+have a different enabling protocol) is that they have a green LED near the ports 
+which illuminates when the motors are powered on **and enabled**. If you run into 
+issues with the motors not providing torque, the first thing you should do is check to see whether the green LED is on.
+If it isn't (but the red one is), then the motors are powering but not enabeling. We first recommend checking the CAN wire, as we have had issues with these in the past. 
+If the green LED is on, check the SD card to ensure the proper configuration details (joints, motors, controllers) are set.
+If all else fails the issue likely lies within the code and you will need to do a carefult review.
+During this stage, be sure to leverage Serial.print("TEXT" or VARIABLE) with the Teensy connected to the computer via the USB cable. 
+This will enable you to startigically print text/variables to the serial monitor in the Arduino IDE which can help you identify where issues may be arising.
 
 Downloading the Necessary Software 
 ----------------------------------
@@ -109,15 +107,13 @@ Downloading the Necessary Software
      === VSCODE ===
    </div>
 
-VSCode is the editor we use to write and edit the exoskeleton's code. We'll be 
+VSCode is the editor we use to write and edit the exoskeleton's code. In this walkthrough, we'll be 
 using VSCode to view the code that defines the parameters that we plot in the 
 GUI and to edit the configuration info in the SD card.
 
-VSCode is free and can be downloaded `here <https://code.visualstudio.com/>`_.
-For a guide on getting VSCode set up, refer to Microsoft's own documentation 
-`here <https://code.visualstudio.com/docs>`_. If you get prompted to install 
-any extensions as you're working with the OpenExo code, it's good to go ahead 
-and install them.
+VSCode is free to `download <https://code.visualstudio.com/>`_.
+For a guide on getting VSCode set up, refer to `Microsoft's own documentation <https://code.visualstudio.com/docs>`_. 
+If you get prompted to install any extensions as you're working with the OpenExo code, it's good to go ahead and install them.
 
 It's important to note that while we use VSCode to make edits to the 
 exoskeleton's code, the Arduino IDE is what we use to actually upload that code
@@ -130,13 +126,13 @@ to the exoskeleton. We'll cover this in more detail later.
    </div>
 
 Git is the version control software we use to manage and track changes to the 
-exoskeleton's codebase. It allos multiple developers to collaborate seamlessly,
+exoskeleton's codebase. It allows multiple developers to collaborate seamlessly,
 keep track of revisions, and revert to previous states if necessary. 
 
-Git is free and can be downloaded from the official site `here 
-<https://git-scm.com/downloads>`_.
+Git is free and can be downloaded from the `official site <https://git-scm.com/downloads>`_.
+
 Follow the installation instructions specific to your operating system. Once 
-installed, it's reccomended to verify that the Git installation was successful
+installed, it's recomended to verify that the Git installation was successful
 by opening a terminal or command prompt and typing:
 
 .. code-block:: bash
@@ -146,6 +142,10 @@ by opening a terminal or command prompt and typing:
 If installed correctly, this will display the version of Git installed on your 
 computer.
 
+While we use this process, you are more than welcome to download the code directly onto your computer as a folder and operate in there.
+The major limitation of this approach is that it will not provide version control and thus any changes you make can not be reverted to a prior version if needed. 
+Given this, we highly recommend some internal form (Git or a comprable software) to manage and track changes to the code as you modify it to suit your needs. 
+
 .. raw:: html
 
     <div style="text-align: center;">
@@ -153,7 +153,7 @@ computer.
     </div>
 
 To run the GUI (which allows the exoskeleton to operate) you'll need Python 
-installed on your computer. To install it go to `the Python homepage 
+installed on your computer. To install it go to the `Python homepage 
 <https://www.python.org/>`_ and click the link under "Download."
 
 .. image:: photos/StartupGuide/PythonDownload1.png
@@ -161,13 +161,13 @@ installed on your computer. To install it go to `the Python homepage
 
 Scroll down to the "Files" section and downlaod the installer corresponding to 
 your operating system (likely macOS or Windows 64 bit, but if you're on Windows,
-go to Settings > System > About to verify what your operating systems is)
+go to Settings > System > About to verify what your operating systems is).
 
 .. image:: photos/StartupGuide/PythonDownload2.png
     :align: center
 
 Open the file and follow the installation instructions. Verify that the 
-installation was successful by opening the terminal and typing
+installation was successful by opening the terminal and typing:
 
 .. code-block:: bash
 
@@ -197,20 +197,7 @@ and download the version that corresponds to your operating system.
    </div>
 
 Teensyduino is the software we'll need in order to flash our code to the Teensy
-and Nano. To install it, copy this link:
-
-.. code-block:: html
-
-    https://www.pjrc.com/teensy/package_teensy_index.json
-
-Open the Arduino IDE and go to File > Preferences (or if you're on Mac 
-Arduino IDE > Settings) and paste it in "Additional boards manager URLs."
-
-.. image:: photos/StartupGuide/BoardsManager.png
-    :align: center
-
-Once this is done, go to "Boards Manager" and type "Teensy" into the search bar.
-Download "Teensy (for Arduino IDE 2.0.4 or later)" by Paul Stoffregen.
+and Nano. To install it, follow the instructions on their `website <https://www.pjrc.com/teensy/td_download.html>`__.
 
 Next, we'll need to install the necessary libraries. Go to the "Library Manager"
 tab on the left side of the Arduino IDE. Below is a list of the libraries that 
@@ -222,6 +209,8 @@ you'll need to install:
     Arduino BLE by Arduino
     SD by Arduino, Sparkfun
     Arduino_LPS22HB by Arduino
+
+Libraries can also be found on our `Github <https://github.com/naubiomech/OpenExo/tree/main/Libraries>`__. You can download and move these to your local folder (C:/User/[USER]/Documents/Arduino/libraries/)
 
 .. raw:: html
 
@@ -240,13 +229,12 @@ button. Copy the URL that presents itself.
     :align: center
 
 Next, open up your terminal and navigate to where you would like the files to 
-live. For me, I'd like my files to be in my documents folder. So in my terminal 
-I'll type "cd Documents" (note that the capitalization is important).
+reside. As an example, if you'd like the files to reside in the documents folder, type "cd Documents" (note that the capitalization is important) into the terminal.
 
 .. image:: photos/StartupGuide/cdDocuments.png
     :align: center
 
-Now that I'm in the directory that I want my OpenExo files to be in, I'll use 
+Now that you are in the directory that you want the OpenExo files to be in, Use 
 Git to clone the files into that location by typing "git clone <the url you 
 copied>."
 
@@ -261,6 +249,11 @@ verify that the installation is there.
 
 You've now got all of the files necessary to run the exoskeleton downloaded to 
 your computer.
+
+Note that this will pull the latest of main from the active development of code. While this *should* be stable, it is possible for something to slip through the cracks.
+If you are running into difficulties or suspect that there may be a bug preventing operation, please report the bug to us via the `"Issues" <https://github.com/naubiomech/OpenExo/issues>`__ section on github
+and/or in our `bug reporting form <https://docs.google.com/forms/d/e/1FAIpQLScblFFeYDq-VUPGVVFbQY7tO91_8ZhaYLPIeVKO8P5qDeXGsA/viewform>`__. 
+If you wish to avoid this possibility, instead download the latest `release <https://github.com/naubiomech/OpenExo/releases>`__ which is the last confirmed stable build of the firmware. 
 
 Orienting Yourself
 ------------------
@@ -287,14 +280,13 @@ Nano. We'll walk through this process later.
 
 Going back into the OpenExo folder, you'll see a number of other folders. The 
 Documentation folder contains instructions for adding new controllers, adding 
-new motors, information on the structure of the code, and more. You'll want to 
-spend some time skimming through the contents of this folder to familiarize 
-yourself with what's there.
+new motors, information on the structure of the code, and more. This is also availabe as part of this ReadTheDocs website. 
+You'll want to spend some time skimming through the contents of this folder to familiarize yourself with what's there.
 
 .. raw:: html 
 
     <div style="text-align: center;">
-    === PYTHON_GUI AND SDCARD ===
+    === PYTHON_GUI AND SD CARD ===
     </div>
 
 Also within the OpenExo folder are two other folders relevant to our purposes
@@ -314,25 +306,28 @@ your terminal:
 
 Before we run the GUI for the first time, we'll need to install some 
 dependencies. To do so, run the "install_dependencies.py" file by typing the
-following in the terminal window we opened just now: "python3
-install_dependencies.py."
+following in the terminal window we opened just now::
 
-With the dependencies installed we can now run the GUI. Type "python3 GUI.py" in 
-the same terminal window and give it a moment to start up. Once it starts, you
-will be greeted by this screen: 
+   python3 install_dependencies.py
+
+With the dependencies installed we can now run the GUI. In the terminal, type::
+
+   python3 GUI.py" 
+
+Give it a moment to start up. Once it opens, you will be greeted by this screen: 
 
 .. image:: photos/StartupGuide/GuiHome.png 
     :align: center
 
 We'll be returning to the GUI when we start our first trial, but for now you can
-close the window. 
+close this window. 
 
 Navigating back to the OpenExo folder, we'll now take a look at the SDCard 
 folder. This folder will be copied onto an SDCard that goes into the Teensy.
 We'll cover the contents of this folder more when we flash our OpenExo code to 
 the Teensy and Nano for the first time, but for now it will suffice to know 
-that the contents of this folder allow you to set which controller you use, 
-change torque setpoints, change which motors you're using, etc.
+that the contents of this folder allow you to configrue the system (e.g., set which controller you use, 
+change torque setpoints, change which motors you're using, etc).
 
 .. image:: photos/StartupGuide/SDCardFolder.png 
     :align: center 
@@ -340,10 +335,9 @@ change torque setpoints, change which motors you're using, etc.
 Getting Ready for the First Trial 
 ---------------------------------
 
-Now that we've downloaded everything we need and have oriented ourselves, we'll 
-get set up for our first trial and then conduct that trial. Take a moment to 
-verify the integrity of all of the electrical connections on your device. Also, 
-make sure that your battery is plugged in and that the power is off.
+Now that you've downloaded everything you need and have oriented yourself, you'll 
+get set up and conduct the first trial. First, make sure that your battery is plugged in and that **the power is off**.
+Once this is confirmed, take a moment to verify the integrity of all of the electrical connections on your device.
 
 .. raw:: html 
 
@@ -351,11 +345,13 @@ make sure that your battery is plugged in and that the power is off.
     === LOOKING AT THE PARAMETERS THAT WILL BE PLOTTED ===
     </div>
 
-We'll take a look at the file that defines what gets plotted in the GUI so that 
-we have an understanding of what's going on with the plots.
+Before starting the trial, we'll first take a look at the file that defines what gets plotted in the GUI so that 
+you have an understanding of what's being plotted.
 
-Within OpenExo > ExoCode > src, open uart_commands.h with VSCode. Scroll down 
-to line 340.
+Within OpenExo > ExoCode > src, open uart_commands.h with VSCode and scroll down 
+to the function::
+
+   get_real_time_data [ ~line 330].
 
 .. image:: photos/StartupGuide/line340.png
     :align: center 
@@ -363,26 +359,27 @@ to line 340.
 This is where we define what's being plotted in the GUI. In the picture above, 
 the green comments indicate what each plotting parameter corresponds to in the 
 GUI. You'll notice "Tab 1" and "Tab 2." The GUI has two different plotting 
-windows, each containing two plots: a top plot and a bottom plot. These plots 
-correspond to the left and right sides of the exo. Also within the comments 
-you'll notice that we have an orange line and a blue line for each plot. 
+windows, each containing two plots: a top plot and a bottom plot. Also within the comments 
+you'll notice that we have an orange line and a blue line for each plot (that is, each plot itself can have two lines). 
 
-Below the comments is a switch case. Each case corresponds to a different exo 
-configuration. We're using the bilateral hip configuration so that's the case 
-we'll be concerned with (line 374). 
+Below the comments is a switch case. Each case corresponds to a different exoskeleton 
+configuration. In this walkthrough, we're using the baseline bilateral hip configuration so that's the switch case 
+we'll be concerned with::
 
-As is mentioned in the comments, the plot for the bilateral hip case is 
-configured for the step controller. This is the controller we'll be using. 
-Within the code, you'll see that in the first plotting window (paramters 0-3) 
+   case (uint8_t)config_defs::exo_name::bilateral_hip:) [~line 374] 
+
+As mentioned in the comments, the plot for the bilateral hip case is 
+initally configured for the step controller, which is the controller we'll be using. 
+Within the code, you'll see that in the first plotting window (paramters 0-3, corresponding to 4 data points) 
 we have plots for "filtered_torque_reading" and "ff_setpoint" for the left and 
 right side. "filtered_torque_reading" is a value read from torque sensors, which
 we are not using, so we won't get anything plotted for the blue lines. 
 "ff_setpoint" is the torque prescribed to the motors by the exoskeleton, so the 
-red lines in the plots will correspond to how much torque we're
+orange lines in the plots will correspond to how much torque we're
 telling the motors to give us. 
 
 The paramters in the second plotting window (paramters 4-7) plot data from FSRs, 
-which we aren't using in this guide, so if anything gets plotted there, it will 
+which we aren't using in this example, so if anything gets plotted there, it will 
 just be noise from the FSR pins. 
 
 As is indicated in the comments, parameters 8 and 9 will not get plotted but
@@ -395,29 +392,30 @@ parameters).
     === PERFORMING YOUR FIRST FLASH ===
     </div>
 
-With ExoCode.ino open, connect your computer to the Teensy via USB cable. Click 
-on the "Select Board" dropdown and select the option that says "Teensy 4.1." 
-Now simply press the upload button and wait for the process to complete. You 
-may encounter an error stating that the Teensy loader isn't running. The Teensy 
-loader will have begun running after attempting to flash though, so press upload 
-again. With the Teensy loader now running, the upload should complete 
-successfully. 
+- Open ExoCode.ino in Arduino
+- Connect your computer to the Teensy via USB cable.
+- Click on the "Select Board" dropdown and select the option that says "Teensy 4.1." 
+- Press the upload button (arrow) and wait for the process to complete. 
 
-However, if you are still getting an error, highlight the word "error" in the 
+If you encounter an error stating that the Teensy loader isn't running press upload again (the first attempt should start the loader). 
+
+If you are still getting an error, highlight the word "error" in the 
 output window of the Arduino IDE. On the right side of the output window, you'll 
 see highlights of other instances of the word "error." Look through these to 
 determine what file and lines the error is coming from. From there, you can 
 locate the problematic code and fix the error. Make sure you save your changes 
 before trying to flash again. 
 
-With the code uploaded to the Teensy, we'll move on to the Nano. Plug the USB 
-cable into the Nano, choose the "Arduino Nano 33 BLE" from the "Select Board" 
-dropdown and upload. The process should complete successfully. If it doesn't, 
-try the same troubleshooting method of highlighting the word "error" in the 
-output window and searching for its source.
+With the code uploaded to the Teensy, we'll move on to the Nano. 
 
-Next we'll get the SD card configured and then we'll be ready to run our first 
-trial.
+- Plug the USB cable into the Nano
+- Choose the "Arduino Nano 33 BLE" from the "Select Board" dropdown
+- Upload
+
+Note that this upload usually takes considerably longer than the Teensy (hence we recommend flashing the Teensy first to detect any potential errors).
+The process should complete successfully. If it doesn't, try the same troubleshooting method of highlighting the word "error" in the output window and searching for its source.
+
+Next we'll get the SD card configured and then we'll be ready to run our first trial.
 
 .. raw:: html
 
@@ -425,18 +423,19 @@ trial.
     === SETTING UP THE SD CARD ===
     </div>
 
-Now we need to copy the relevant files over to the SD card, set the exo 
-configuration we're using, the motors we're using, and the controller we want,
-and then we'll be ready for our first trial.
+Here we will:
+   - Copy the relevant files over to the SD card
+   - Set the exo configuration we're using
+   - Establish the motors used 
+   - Set the desired controller
 
-Plug the SD card into your computer (you'll likely need a micro SD to SD
+First, plug the SD card into your computer (you'll likely need a micro SD to SD
 adapter) and navigate to the OpenExo folder that you downloaded onto your 
-computer. Within that folder, open the "SDCard" folder and cppy the contents
-into the SD card you just plugged into your computer. Make sure that any time 
-you want to alter the parameters of the SD card, you're eediting the SD card
-itself, not the folder in OpenExo.
+computer. Within that folder, open the "SDCard" folder and copy the contents
+into the SD card you just plugged into your computer. Make sure that any time you want to alter the parameters of the SD card, 
+you're editing the SD card itself, not the folder in OpenExo.
 
-Now, making sure you're editing the SD card itself, open config.ini. This is 
+Now, making sure you're editing the SD card itself, **open config.ini**. This is 
 what we'll edit first. Here, you'll see various configurations of OpenExo 
 (bilateralHip, bilateralAnkle, etc.) and various parameters you can edit. As the 
 first order of business, we'll go into "[Exo]" and make sure we're using the 
@@ -445,8 +444,17 @@ first order of business, we'll go into "[Exo]" and make sure we're using the
 .. image:: photos/StartupGuide/bilateralHip.png
     :align: center 
 
-Now that we know we're using the correct configuration, find that configuration 
-and its parameters below (line 234). Set the following parameters:
+It is also worth double checking that the software is using the correct PCB. Detailed instructions on confirming the PCB are outlined 
+under "[Board]".Open "Config.h" within the OpenExo src folder and look for "BOARD_VERSION". It is here that you will want to make sure the board 
+corresponds to the one you actually have on the device. Above this section you will see a list of available boards in the codebase and their names. 
+In this example, we are using the default CAN-motor board, "AK_Board_V0_5_1". If this is labeled next to "BOARD_VERSION" (as below) then you are good to go!
+If a different board is there or you are using a different version of the PCB, make sure the version is correct and re-flash the Teensy and Nano.
+
+.. image:: photos/StartupGuide/ConfigBoard.png
+    :align: center
+
+Now that we know we're using the correct configuration and have confirmed the correct PCB is being utilized, locate the desired configuration 
+and its parameters below (in this case the bilateralHip configuration, ~line 234). Set the following parameters:
 
 .. raw:: html
 
@@ -459,11 +467,10 @@ and its parameters below (line 234). Set the following parameters:
 .. image:: photos/StartupGuide/setParams.png 
     :align: center 
 
-With these changes made to config.ini, save and exit. Now, we'll go into the 
-configuration file for the hip version of the step controller. Within the SD
-card, go to hipControllers > step.csv. 
+These will ensure that the desired sides (bilateral), motors/joints (Hip = AK60v1.1), and controller (step) are utilized. 
+With these changes made to config.ini, save and exit. Within the SD card, go to hipControllers > step.csv. 
 
-This file contains configuration info specific to the step controller, such as 
+This file contains controller parameters specific to the step controller, such as 
 the magnitude of the torque prescription, the duration of torque, and the rest 
 perieds between torque applications.
 
@@ -475,15 +482,14 @@ torque setpoint in Newton-meters. 1 Newton-meter is a good value to have for our
 test, as it's a very light application of torque. 
 
 Moving on, you'll see Duration is set to 2. This is how long each "step" of 
-torque is in seconds. Repititions is how many "steps" there are. Spacing is the 
+torque is, in seconds. Repititions is how many "steps" there are. Spacing is the 
 interval (in seconds) between "steps." 
 
 Next is the PID flag, which tells the exoskeleton whether you want to use PID 
-control. 1 means yes, 0 means no. We'll leave it at 0. Last are the individual 
-P, I, and D parameters, which you can tune as you please if and when you use 
-PID control. Alpha is a filtering parameter, which smooths or un-smooths the PID 
-curve. Again, we're not using PID for this test so we won't be concerned with 
-any of the PID parameters.
+control. 1 means yes, 0 means no. We'll leave it at 0 (since we do not have a torque transducer). 
+After this are the individual P, I, and D parameters, which you can tune as you please if and when you use 
+PID control. Finally, Alpha is a filtering parameter, which can help smooth the measured torque (closer to 100 means less filtered, closer to 0 means more filtered). 
+Again, we're not using measured torque for this hip test so we won't be concerned with any of these parameters.
 
 To get some practice editing one of these .csv files, we'll change the duration, 
 repititions, and spacing parameters. 
@@ -494,14 +500,14 @@ the spacing also to 3 seconds. Below you can see what the changes look like.
 .. image:: photos/StartupGuide/stepEdits.png
     :align: center 
 
-Make sure you save the changes. You can eject the SD card and put it back into 
+Make sure you save the changes. Once you have, you can eject the SD card and put it back into 
 the Teensy. With the code flashed to the Teensy and Nano and the SD card 
 configured, we're ready for our first trial.
 
 Conducting the First Trial
 --------------------------
 
-As we mentioned, for our first trial we'll be using the step controller. If you 
+As mentioned, for the first trial we'll be using the step controller. If you 
 run into any issues during this section, there is a troubleshooting section 
 immediately after this one. 
 
@@ -548,7 +554,7 @@ If you ran into an issue during your trial, one of two things likely happened:
     Try conducting the trial again.
 
 All in all, if you're getting issues while trying to use the step controller the 
-source of the problem lies either in the configuration within the SD card or 
+source of the problem likely lies either in the configuration within the SD card or 
 with the CAN communication to the motors. The step controller doesn't use any 
 external sensors. As such, it's a good controller to use for first time startups 
 and troubleshooting. Note that if all else fails and you're absolutely certain 

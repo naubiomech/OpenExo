@@ -16,6 +16,6 @@ Parameter index order can be found in [ControllerData.h](/ExoCode/src/Controller
 - fall_time - Time from peak torque until zero torque (expressed as a % of gait cycle)
 - direction - Flag that flips torque from PF to DF (essentailly an assistance/resistance flag)
 - use_pid - This flag turns PID on(1) or off(0)
-- p_gain - Proportional gain for closed loop controls
-- i_gain - Integral gain for closed loop controls
-- d_gain - Derivative gain for closed loop controls
+- p_gain - Proportional gain for closed loop control
+- i_gain - Integral gain for closed loop control
+- d_gain - Derivative gain for closed loop control

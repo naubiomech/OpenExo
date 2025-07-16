@@ -122,7 +122,8 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a></li>
@@ -136,13 +137,14 @@
 <li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 
         </div>
@@ -160,8 +162,11 @@
 <section id="error-codes-h">
 <h2>error_codes.h<a class="headerlink" href="#error-codes-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>In the <code class="docutils literal notranslate"><span class="pre">ErrorCodes</span></code> enum, create a name for your new error case.
-- This name should be placed below the <code class="docutils literal notranslate"><span class="pre">NO_ERROR</span></code> case and above the <code class="docutils literal notranslate"><span class="pre">ERROR_CODE_LENGTH</span></code> case.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">ErrorCodes</span></code> enum, create a name for your new error case.</p>
+<ul class="simple">
+<li><p>This name should be placed below the <code class="docutils literal notranslate"><span class="pre">NO_ERROR</span></code> case and above the <code class="docutils literal notranslate"><span class="pre">ERROR_CODE_LENGTH</span></code> case.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="error-types-h">
@@ -169,9 +174,11 @@
 <ol class="arabic">
 <li><p>Create a new error type class (use the other error types as a reference).</p></li>
 <li><p>The class should inherit from <code class="docutils literal notranslate"><span class="pre">ErrorType</span></code> and must implement both a <code class="docutils literal notranslate"><span class="pre">check</span></code> and a <code class="docutils literal notranslate"><span class="pre">handle</span></code> function.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">check</span></code> function should:
-- Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if your error has occurred.
-- Return <code class="docutils literal notranslate"><span class="pre">False</span></code> if it has not.</p>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">check</span></code> function should:</p>
+<ul class="simple">
+<li><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if your error has occurred.</p></li>
+<li><p>Return <code class="docutils literal notranslate"><span class="pre">False</span></code> if it has not.</p></li>
+</ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">check</span></code> function only has access to the <code class="docutils literal notranslate"><span class="pre">JointData</span></code> class and is executed for every joint.
@@ -184,8 +191,10 @@ If your error case requires its own data, add that data to the <code class="docu
 <section id="error-map-h">
 <h2>error_map.h<a class="headerlink" href="#error-map-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>In <code class="docutils literal notranslate"><span class="pre">error_map.h</span></code>, add a new key-value pair for your new error case.
-- Use the following format:</p>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">error_map.h</span></code>, add a new key-value pair for your new error case.</p>
+<ul class="simple">
+<li><p>Use the following format:</p></li>
+</ul>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">YOUR_ERROR_CASE_NAME_FROM_PART_ONE</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">YourErrorTypeNameFromPartTwo</span><span class="p">()},</span>
 </pre></div>
 </div>
@@ -194,10 +203,12 @@ If your error case requires its own data, add that data to the <code class="docu
 </section>
 <section id="done">
 <h2>Done<a class="headerlink" href="#done" title="Link to this heading">¶</a></h2>
-<p>Your new error case will now be:
-- Checked by the <code class="docutils literal notranslate"><span class="pre">run</span></code> method in <strong>Joint.cpp</strong> (applied to the hip, knee, and ankle).
-- Handled by your <code class="docutils literal notranslate"><span class="pre">handle</span></code> function when it occurs.
-- Reported to the app appropriately.</p>
+<p>Your new error case will now be:</p>
+<ul class="simple">
+<li><p>Checked by the <code class="docutils literal notranslate"><span class="pre">run</span></code> method in <strong>Joint.cpp</strong> (applied to the hip, knee, and ankle).</p></li>
+<li><p>Handled by your <code class="docutils literal notranslate"><span class="pre">handle</span></code> function when it occurs.</p></li>
+<li><p>Reported to the app appropriately.</p></li>
+</ul>
 </section>
 </section>
 

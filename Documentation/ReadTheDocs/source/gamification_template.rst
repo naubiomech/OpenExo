@@ -8,7 +8,7 @@ Gamification Template
 
 .. warning::
 
-   This section is **placeholder documentation** supplied by the CS Capstone
+   This section is **placeholder documentation** supplied by a CS Capstone
    team. Replace every *TODO* marker as soon as the implementation details are
    finalised.
 

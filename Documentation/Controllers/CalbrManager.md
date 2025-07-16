@@ -21,12 +21,22 @@ When designing a controller, the values returned from the "calc_motor_cmd()" fun
 - At both shoulder joints: Positive for Flexion, and negative for Extension
 - At both elbow joints: Positive for Flexion, and negative for Extension
 
-In summary, this follows the Right-hand rule.
+In summary, this follows the right-hand rule.
 
 ## Torque sensor signs (positive/negative)
 Following the motor direction definitions, we need to verify that, when the motor supplies a positive torque command, the torque sensors, when zeroed properly, also returns a positive reading when the motor shaft is not spinning.
 
 # How to calibrate
-1. To calibrate, set Direction Calibration Manager as the default controller for the current exo. Connect the Teensy to a computer through USB, open up the Arduino Serial monitor. Connect the exo (Arduino Nano) with the python app, power on the exo and start a new session. The Direction Calibration Manager will send a positive torque command (3.5 Nm by default) to each motor.
-2. Feel each torque through, for example, the foot plates on an ankle exo. If the torque applied on, for example, the left foot plate, is not causing it to rotate in the positive direction (see above for the specific directions), flip the motor direction for the left side. Flipping the motor direction is done by modifying the "config.ini" on the SD card.
-3. After modifying all motor directions (if needed), start over again, and this time focus on the sensor readings (e.g., torque, angle) shown on the Arduino Serial Monitor. Feel the motor torque through, for example, a foot plate on an ankle exo, manually move the foot plate back to its neutral position, 0 degree for example. If the corresponding sensor does not return a postive value, flip the sensor direction by modifying the "config.ini" on the microSD card. Go through all torque sensors (if needed).
+1. Set Calibration Manager as the default controller for the current exo. 
+2. Connect the Teensy to a computer through USB and open up the Arduino Serial monitor.
+3. Connect the exo to the python GUI.
+4. Power on the exo and start a new session.
+5. Make sure you are securly holding the joint of interest (either with your hand or worn on your body) so that it can not freely move. If left unsecured the joint will actuate upon start which could cause injury.
+6. Upon start, the Calibration Manager will send a positive torque command (3.5 Nm by default) to each motor.
+7. Feel the direction that the torque is trying to actuate. 
+8. If the torque is not rotating in the positive direction (see above for the specific directions), power off the device, remove the SD Card, and flip the motor direction to its correct direction by modifying the appropriate "JointFlipMotorDir" in "Config.ini".
+9. After modifying all motor directions (if needed), start the test over again [once again making sure the device is secured], and this time focus on the sensor readings (e.g., torque, angle) shown on the Arduino Serial Monitor. 
+10. Again feel the direction that the torque is trying to actuate (it should now match the definitions above).
+11. Now try to manually move the joint back to its neutral position (e.g., move the hip upright away from a flexed position into a neutral position). 
+12. If the corresponding sensor does not return a postive value, you will need to modify the SD card to flip the sensor direction.
+13. Again, power off the device, remove the SD card, and flip the sensor direction by modifying the approriate "JointFlipSensorDir" in "Config.ini". 

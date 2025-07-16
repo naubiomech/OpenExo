@@ -12,6 +12,10 @@ Config.h
 2. Change the current board to your new board if you intend to use it immediately.  
    This helps ensure all changes function properly.
 
+   .. code-block:: c
+
+      #define BOARD_VERSION AK_Board_V0_4 3
+
 ParseIni.h
 ----------
 .. note::

@@ -3,15 +3,24 @@ Add Documentation
 
 This guide explains how to add new content pages to the Read the Docs site for the OpenExo project.
 
-1. Create a new reStructuredText file
---------------------------------------
+0. First time trying to update ReadTheDocs
+------------------------------------------
+   - Enter your command prompt
+   - Install **Sphinx**::
+   
+      pip install sphinx
+
+   - Install **Piccolo Theme**::
+   
+      pip install piccolo-theme
+
+1. Create a new reStructuredText (.rst) file
+--------------------------------------------
    - In your source folder (next to `conf.py`), create a file named, for example, `new_page.rst`.
-   - At the top of `new_page.rst`, add a title and reference label:
-
-     .. _new_page:
-
-     My New Page Title
-     =================
+   - At the top of `new_page.rst`, add a title and reference label::
+   
+      My New Page Title
+      =================
 
    - Write your content below the title.
 
@@ -40,14 +49,21 @@ This guide explains how to add new content pages to the Read the Docs site for t
 
 4. Build and preview locally
 -----------------------------
-.. code-block:: bash
+   - Open the command prompt in the "source" folder (Example: C:\Users\NAME\Desktop\OpenExo\Documentation\ReadTheDocs\source)
+   - Build locally::
+   
+      python -m sphinx -T -b html . _build/html
 
-   cd C:\Users\user\OpenExo\Documentation\ReadTheDocs
-   make html
-   start build\html\index.html   # open the docs in your browser
+   - Preview locally::
+   
+      python -m http.server --directory _build/html/
 
-- If everything looks correct, **log into Read the Docs and click *Build* (or
-  *Trigger Build*) to publish the updated documentation.**
+   - Review changes in browser by typing::
+
+      localhost:8000/index.html
+
+   - If everything looks correct, push to main and **log into Read the Docs and click *Build* (or
+     *Trigger Build*) to publish the updated documentation.**
 
 5. Watch the Tutorial Video
 -----------------------------

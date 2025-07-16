@@ -1,5 +1,5 @@
-Firmware and Software Documentation for OpenExo: An Open-Source Modular Exoskeleton to Augment Human Function
-===================================================================================================================
+Firmware and Software Documentation for OpenExo: An Open-Source Modular Exoskeleton 
+===================================================================================
 
 .. image:: photos/1042_exoskeleton_20250205.jpg
    :alt: OpenSourceLeg Banner
@@ -34,32 +34,19 @@ The easiest and quickest way to install the **OpenExo** library is to clone the 
 
 Getting Started
 ---------------
-For new users, visit the **Background** page for an overview of the project.
-
-Developing
-----------
-If you wish to modify, develop, or contribute to the **OpenExo** library, it is recommended to install **Poetry**, a Python packaging and dependency management tool. Once Poetry is installed, clone the repository and set up your development environment using the following commands:
-
-.. code-block:: bash
-
-   git clone https://github.com/naubiomech/OpenExo.git
-   cd OpenExo
-   poetry install
-   poetry shell
+For new users, review the **Introduction and Background Info** pages for an overview of the project and then begin by following the instructions in **First Time Startup**.
 
 License
 -------
 Hardware License
 ~~~~~~~~~~~~~~~~
-OpenExo’s **hardware** is released under the **CERN-OHL-P v2.0** license.  
+OpenExo’s **hardware** is released under the `CERN-OHL-P v2.0 <https://ohwr.org/project/cernohl/-/wikis/uploads/98ff9662c7ce4252ec91104118c2af8e/cern_ohl_p_v2.pdf>`__ license.  
 You may study, modify, manufacture, and distribute the hardware provided you share modifications under the same license.  
-Full text: https://ohwr.org/project/cernohl/-/wikis/uploads/98ff9662c7ce4252ec91104118c2af8e/cern_ohl_p_v2.pdf
 
 Software License
 ~~~~~~~~~~~~~~~~
-OpenExo’s **software** is released under the **GNU Lesser General Public License v3.0 (LGPL-3.0)**.  
+OpenExo’s **software** is released under the `GNU Lesser General Public License v3.0 (LGPL-3.0) <https://www.gnu.org/licenses/lgpl-3.0.html>`__.  
 You may use, study, share, and modify the software so long as derivative works also comply with the LGPL.  
-Details: https://www.gnu.org/licenses/lgpl-3.0.html
 
 Contact & Resources
 -------------------
@@ -77,13 +64,12 @@ For questions, issues, or further assistance, reach out to us at:
    :caption: Tutorials:
 
    introduction
-   FirstTimeStartUp
    User_Guide
+   FirstTimeStartUp
    installation
    addingelements
    controllers
    gui
-   AddingNewPages
-   vscode_setup
    gamification_template
    StyleGuide
+   AddingNewPages

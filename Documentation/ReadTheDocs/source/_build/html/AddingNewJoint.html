@@ -122,7 +122,8 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a></li>
@@ -136,13 +137,14 @@
 <li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 
         </div>
@@ -159,19 +161,28 @@
 <section id="exocode-ini">
 <h2>Exocode.ini<a class="headerlink" href="#exocode-ini" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p><strong>Line 118:</strong>
+<li><p><strong>~Line 118:</strong>
 Add the new joint to the debug statement that determines if the joint is used.</p></li>
-<li><p><strong>Line 148:</strong>
-Add the new joint to the if statements that decide whether or not the joint is used.
-- Copy the if statements for the left and right sides from an existing joint (e.g., hip) and paste them below the last joint.
-- Modify the joint’s name to match your new joint.</p></li>
-<li><p><strong>Line 398:</strong>
-Add code for calibrating the torque sensor and enabling motors for the new joint while in headless mode.
-- Copy the formatting from another joint—ensure you do this for both the left and right sides.</p></li>
-<li><p><strong>Line 540:</strong>
-Update the section that sets the controller for each joint (while in headless mode).
-- Copy the formatting for one joint and rename it to your new joint.
-- Pull in the default controller information from the config and set the controller based on this configuration.</p></li>
+<li><p><strong>~Line 148:</strong>
+Add the new joint to the if statements that decide whether or not the joint is used.</p>
+<ul class="simple">
+<li><p>Copy the if statements for the left and right sides from an existing joint (e.g., hip) and paste them below the last joint.</p></li>
+<li><p>Modify the joint’s name to match your new joint.</p></li>
+</ul>
+</li>
+<li><p><strong>~Line 398:</strong>
+Add code for calibrating the torque sensor and enabling motors for the new joint while in headless mode.</p>
+<ul class="simple">
+<li><p>Copy the formatting from another joint—ensure you do this for both the left and right sides.</p></li>
+</ul>
+</li>
+<li><p><strong>~Line 540:</strong>
+Update the section that sets the controller for each joint (while in headless mode).</p>
+<ul class="simple">
+<li><p>Copy the formatting for one joint and rename it to your new joint.</p></li>
+<li><p>Pull in the default controller information from the config and set the controller based on this configuration.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="parseini-h">
@@ -179,22 +190,41 @@ Update the section that sets the controller for each joint (while in headless mo
 <ol class="arabic simple">
 <li><p>Update <strong>exo_name</strong> in the <cite>config_defs</cite> namespace—ensure this encompasses any configuration for the new joint (e.g., bilateral, unilateral, multi-joint).</p></li>
 <li><p>Update <strong>JointType</strong> in the <cite>config_defs</cite> namespace.</p></li>
-<li><p>Update <strong>joint_id</strong> to utilize the proper byte for the new joint (refer to the comment in the code).
-- Also update the left and right joint information following the established format.</p></li>
-<li><p>Add a new enum class for the joint’s controllers following the format of existing joints.
-- Include any controllers associated with the joint (you can update further later via “AddNewController”).</p></li>
+<li><p>Update <strong>joint_id</strong> to utilize the proper byte for the new joint (refer to the comment in the code).</p>
+<ul class="simple">
+<li><p>Also update the left and right joint information following the established format.</p></li>
+</ul>
+</li>
+<li><p>Add a new enum class for the joint’s controllers following the format of existing joints.</p>
+<ul class="simple">
+<li><p>Include any controllers associated with the joint (you can update further later via “AddNewController”).</p></li>
+</ul>
+</li>
 <li><p>Update the static const int variables at the end of the <cite>config_defs</cite> namespace to account for the new joint.</p></li>
 <li><p>In the <cite>config_map</cite> namespace, update the IniKeyCode for <strong>exo_name</strong> to include all configurations from the <cite>exo_name</cite> enum in <cite>config_defs</cite>.</p></li>
-<li><p>In the <cite>config_map</cite> namespace, add a new IniKeyCode for the joint’s controllers following the format used by the other joints.
-- Ensure the terminology in the section (after <cite>config_defs::</cite>) is updated accordingly.</p></li>
+<li><p>In the <cite>config_map</cite> namespace, add a new IniKeyCode for the joint’s controllers following the format used by the other joints.</p>
+<ul class="simple">
+<li><p>Ensure the terminology in the section (after <cite>config_defs::</cite>) is updated accordingly.</p></li>
+</ul>
+</li>
 <li><p>Update the <cite>ConfigData</cite> struct at the end to include fields for the new joint.</p></li>
 </ol>
 </section>
 <section id="parseini-cpp">
 <h2>ParseIni.cpp<a class="headerlink" href="#parseini-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>From line 174 onward, copy the template from each section to add the new joint so that it is formatted identically to the other joints.</p></li>
+<li><p>From ~line 180 onward, copy the template from each section to add the new joint so that it is formatted identically to the other joints. For example:</p></li>
 </ol>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">get_section_key</span><span class="p">(</span><span class="n">ini</span><span class="p">,</span><span class="n">temp_exo_name</span><span class="p">,</span><span class="s">&quot;hip&quot;</span><span class="p">,</span><span class="n">buffer</span><span class="p">,</span><span class="n">buffer_len</span><span class="p">);</span>
+<span class="n">data</span><span class="p">.</span><span class="n">exo_hip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">;</span>
+
+<span class="c1">// logger::print(data.exo_hip.c_str());</span>
+<span class="c1">// logger::print(&quot;\t&quot;);</span>
+<span class="c1">// logger::println(config_map::motor[data.exo_hip]);</span>
+
+<span class="n">config_to_send</span><span class="p">[</span><span class="n">config_defs</span><span class="o">::</span><span class="n">hip_idx</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">config_map</span><span class="o">::</span><span class="n">motor</span><span class="p">[</span><span class="n">data</span><span class="p">.</span><span class="n">exo_hip</span><span class="p">];</span>
+</pre></div>
+</div>
 </section>
 <section id="exodata-h">
 <h2>ExoData.h<a class="headerlink" href="#exodata-h" title="Link to this heading">¶</a></h2>
@@ -205,41 +235,47 @@ Update the section that sets the controller for each joint (while in headless mo
 <section id="exodata-cpp">
 <h2>ExoData.cpp<a class="headerlink" href="#exodata-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>In the function <cite>get_used_joints</cite> (line 36), add the new joint following the format of the existing joints—make sure to include both the left and right sides.</p></li>
-<li><p>In the function <cite>get_joint_with</cite> (line 59), add the new joint following the established format for both left and right sides.</p></li>
+<li><p>In the function <cite>get_used_joints</cite> (~line 36), add the new joint following the format of the existing joints—make sure to include both the left and right sides.</p></li>
+<li><p>In the function <cite>get_joint_with</cite> (~line 59), add the new joint following the established format for both left and right sides.</p></li>
 <li><p>In the function <cite>print</cite>, add print statements for the new joint (for each side) following the formatting used for the other joints.</p></li>
 </ol>
 </section>
 <section id="uart-commands-h">
 <h2>UART_commands.h<a class="headerlink" href="#uart-commands-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>In the function <cite>get_config</cite> (line 196), update the mapping with the new <cite>config_defs</cite> values you added in ParseIni.h.
-- Refer to the added static const int values at the end of the <cite>config_defs</cite> namespace.</p></li>
-<li><p>Similarly, update the function <cite>update_config</cite> (line 227) with the new <cite>config_defs</cite> values.</p></li>
-<li><p>In the function <cite>get_real_time_data</cite> (line 306), add a new case to the switch statement corresponding to the bilateral configuration of the new joint and for any multi-joint instances.
-- You can send up to 10 data points at a time, following the established formatting.</p></li>
+<li><p>In the function <cite>get_config</cite> (~line 196), update the mapping with the new <cite>config_defs</cite> values you added in ParseIni.h.</p>
+<ul class="simple">
+<li><p>Refer to the added static const int values at the end of the <cite>config_defs</cite> namespace.</p></li>
+</ul>
+</li>
+<li><p>Similarly, update the function <cite>update_config</cite> (~line 227) with the new <cite>config_defs</cite> values.</p></li>
+<li><p>In the function <cite>get_real_time_data</cite> (~line 306), add a new case to the switch statement corresponding to the bilateral configuration of the new joint and for any multi-joint instances.</p>
+<ul class="simple">
+<li><p>You can send up to 10 data points at a time, following the established formatting.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="side-h">
 <h2>Side.h<a class="headerlink" href="#side-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Create a Joint object specific to the new joint (refer to line 158 where other joint objects are specified; follow their formatting).</p></li>
+<li><p>Create a Joint object specific to the new joint (refer to ~line 158 where other joint objects are specified; follow their formatting).</p></li>
 </ol>
 </section>
 <section id="side-cpp">
 <h2>Side.cpp<a class="headerlink" href="#side-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>In the Side constructor, add the new joint object (created in the header) following the format of the other joints.</p></li>
-<li><p>In the function <cite>disable_motors</cite> (line 58), add the new joint following the existing formatting.</p></li>
-<li><p>In the function <cite>read_data</cite> (line 98), add an if statement at the end (around line 142) to read data specific to the new joint object (use other joints as templates).</p></li>
-<li><p>In the function <cite>check_calibration</cite> (line 161), add an if statement at the end (around line 189) to check calibration for the new joint (follow the established formatting).</p></li>
-<li><p>In the function <cite>update_motor_cmds</cite> (line 534), add an if statement at the end that executes functions for the new joint (use the formatting from other joints).</p></li>
+<li><p>In the function <cite>disable_motors</cite> (~line 58), add the new joint following the existing formatting.</p></li>
+<li><p>In the function <cite>read_data</cite> (~line 98), add an if statement at the end (around line 142) to read data specific to the new joint object (use other joints as templates).</p></li>
+<li><p>In the function <cite>check_calibration</cite> (~line 161), add an if statement at the end (around line 189) to check calibration for the new joint (follow the established formatting).</p></li>
+<li><p>In the function <cite>update_motor_cmds</cite> (~line 534), add an if statement at the end that executes functions for the new joint (use the formatting from other joints).</p></li>
 </ol>
 </section>
 <section id="sidedata-h">
 <h2>SideData.h<a class="headerlink" href="#sidedata-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>At line 42, create a new instance of JointData and add an object for the new joint, following the format of existing joints.</p></li>
+<li><p>At ~line 42, create a new instance of JointData and add an object for the new joint, following the format of existing joints.</p></li>
 </ol>
 </section>
 <section id="sidedata-cpp">
@@ -252,10 +288,13 @@ Update the section that sets the controller for each joint (while in headless mo
 <section id="joint-h">
 <h2>Joint.h<a class="headerlink" href="#joint-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Create a new class for the joint; ensure it inherits from the public <cite>_joint</cite> class.
-- Include a joint-specific constructor, destructor, and the two essential functions: <cite>run_joint</cite> and <cite>set_controller</cite> in the public section.
-- In the private section, declare instances of the controller class specific to this joint and create new objects as needed.
-- Essentially, copy the structure used for the other joints and change the names and controllers accordingly.</p></li>
+<li><p>Create a new class for the joint; ensure it inherits from the public <cite>_joint</cite> class.</p>
+<ul class="simple">
+<li><p>Include a joint-specific constructor, destructor, and the two essential functions: <cite>run_joint</cite> and <cite>set_controller</cite> in the public section.</p></li>
+<li><p>In the private section, declare instances of the controller class specific to this joint and create new objects as needed.</p></li>
+<li><p>Essentially, copy the structure used for the other joints and change the names and controllers accordingly.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="joint-cpp">
@@ -264,56 +303,68 @@ Update the section that sets the controller for each joint (while in headless mo
 <li><p>In the <cite>_Joint</cite> constructor (around line 40), add the new joint to the Joint Debug statement.</p></li>
 <li><p>In the function <cite>get_torque_sensor_pin</cite>, add a new case to the switch statement for your added joint, following the existing format.</p></li>
 <li><p>In the function <cite>get_motor_enable_pin</cite>, add a new case to the switch statement for the new joint.</p></li>
-<li><p>Add the new joint class following the format of the existing joints:
-- Include all controller instances in the initializer list along with the <cite>_Joint</cite> instance.
-- Update debug statements to reflect the new joint.
-- Update the switch case that creates an object for the specific motor type.
-- Update the call to <cite>set_controller</cite> at the end of the constructor.
-- In the function <cite>run_joint</cite>, update the debug statements (the remaining code is non-joint specific).
-- In <cite>set_controller</cite>, update the debug statement and the switch case for the controller ID.</p></li>
+<li><p>Add the new joint class following the format of the existing joints:</p>
+<ul class="simple">
+<li><p>Include all controller instances in the initializer list along with the <cite>_Joint</cite> instance.</p></li>
+<li><p>Update debug statements to reflect the new joint.</p></li>
+<li><p>Update the switch case that creates an object for the specific motor type.</p></li>
+<li><p>Update the call to <cite>set_controller</cite> at the end of the constructor.</p></li>
+<li><p>In the function <cite>run_joint</cite>, update the debug statements (the remaining code is non-joint specific).</p></li>
+<li><p>In <cite>set_controller</cite>, update the debug statement and the switch case for the controller ID.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="jointdata-cpp">
 <h2>JointData.cpp<a class="headerlink" href="#jointdata-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Update the switch statement in the JointData initializer (line 31) to include the new joint.
-- Include the segment that sets the value for <cite>is_used</cite> and the if statement that flips the direction.
-- Follow the format used for other joints.</p></li>
+<li><p>Update the switch statement in the JointData initializer (~line 31) to include the new joint.</p>
+<ul class="simple">
+<li><p>Include the segment that sets the value for <cite>is_used</cite> and the if statement that flips the direction.</p></li>
+<li><p>Follow the format used for other joints.</p></li>
+</ul>
+</li>
 <li><p>Repeat the process for the <cite>reconfigure</cite> function.</p></li>
 </ol>
 </section>
 <section id="motor-cpp">
 <h2>Motor.cpp<a class="headerlink" href="#motor-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Update the switch statement in the motor initializer (line 39) to include the new joint.</p></li>
+<li><p>Update the switch statement in the motor initializer (~line 39) to include the new joint.</p></li>
 </ol>
 </section>
 <section id="motordata-cpp">
 <h2>MotorData.cpp<a class="headerlink" href="#motordata-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Update the switch statement in the initializer (line 16) to incorporate the new joint.
-- Include both the gearing and the flip direction portions.</p></li>
+<li><p>Update the switch statement in the initializer (~line 16) to incorporate the new joint.</p>
+<ul class="simple">
+<li><p>Include both the gearing and the flip direction portions.</p></li>
+</ul>
+</li>
 <li><p>Repeat the process for the <cite>reconfigure</cite> function.</p></li>
 </ol>
 </section>
 <section id="controllerdata-cpp">
 <h2>ControllerData.cpp<a class="headerlink" href="#controllerdata-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Update the switch statement in the constructor (line 16) to include the new joint.</p></li>
-<li><p>Repeat the process for the <cite>reconfigure</cite> function (line 56).</p></li>
+<li><p>Update the switch statement in the constructor (~line 16) to include the new joint.</p></li>
+<li><p>Repeat the process for the <cite>reconfigure</cite> function (~line 56).</p></li>
 </ol>
 </section>
 <section id="controller-cpp">
 <h2>Controller.cpp<a class="headerlink" href="#controller-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Update the switch statement in the constructor of <cite>_Controller</cite> to incorporate the new joint (line 35).</p></li>
+<li><p>Update the switch statement in the constructor of <cite>_Controller</cite> to incorporate the new joint (~line 35).</p></li>
 </ol>
 </section>
 <section id="ble-commands-h">
 <h2>ble_commands.h<a class="headerlink" href="#ble-commands-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>In the function <cite>new_trq</cite>, update the joint_id mapping to include the new joint (ensure you update both left and right sides).
-- Adjust the joint id number to maintain a logical order (e.g., left_hip = 1, left_knee = 2, left_ankle = 3, left_elbow = 4, …).</p></li>
+<li><p>In the function <cite>new_trq</cite>, update the joint_id mapping to include the new joint (ensure you update both left and right sides).</p>
+<ul class="simple">
+<li><p>Adjust the joint id number to maintain a logical order (e.g., left_hip = 1, left_knee = 2, left_ankle = 3, left_elbow = 4, …).</p></li>
+</ul>
+</li>
 <li><p>Update the if statement that associates controller data with the joint ID.</p></li>
 </ol>
 </section>
@@ -326,11 +377,17 @@ Update the section that sets the controller for each joint (while in headless mo
 <section id="paramsfromsd-cpp">
 <h2>ParamsfromSD.cpp<a class="headerlink" href="#paramsfromsd-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>In the function <cite>print_param_error_message</cite>, update the switch statement to include the new joint.
-- Update the entire switch statement (around line 10) and add a case for the new joint.</p></li>
-<li><p>In the function <cite>set_controller_params</cite>:
-- Copy a case from another joint (paste it below the last joint) and update any references to the specific joint (e.g., elbow, ankle, etc.) to your new joint.
-- Make sure no references to the existing joints are missed in this section.</p></li>
+<li><p>In the function <cite>print_param_error_message</cite>, update the switch statement to include the new joint.</p>
+<ul class="simple">
+<li><p>Update the entire switch statement (around line 10) and add a case for the new joint.</p></li>
+</ul>
+</li>
+<li><p>In the function <cite>set_controller_params</cite>:</p>
+<ul class="simple">
+<li><p>Copy a case from another joint (paste it below the last joint) and update any references to the specific joint (e.g., elbow, ankle, etc.) to your new joint.</p></li>
+<li><p>Make sure no references to the existing joints are missed in this section.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="realtimei2c-h">
@@ -342,17 +399,23 @@ Update the section that sets the controller for each joint (while in headless mo
 <section id="statusdefs-h">
 <h2>StatusDefs.h<a class="headerlink" href="#statusdefs-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>In the <cite>messages</cite> namespace, update the error messages to include the new joint:
-- Update for Torque Sensor, Motor, and Controller messages for both sides (left and right).
-- Make sure to update the numbering appropriately.</p></li>
+<li><p>In the <cite>messages</cite> namespace, update the error messages to include the new joint:</p>
+<ul class="simple">
+<li><p>Update for Torque Sensor, Motor, and Controller messages for both sides (left and right).</p></li>
+<li><p>Make sure to update the numbering appropriately.</p></li>
+</ul>
+</li>
 <li><p>Update any remaining “error_to_be_used” nomenclature if necessary.</p></li>
 </ol>
 </section>
 <section id="statusdefs-cpp">
 <h2>StatusDefs.cpp<a class="headerlink" href="#statusdefs-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Update the switch statement in <cite>print_status_message</cite> to include the new joint.
-- Include cases for Torque Sensor, Motor, and Controller for both sides.</p></li>
+<li><p>Update the switch statement in <cite>print_status_message</cite> to include the new joint.</p>
+<ul class="simple">
+<li><p>Include cases for Torque Sensor, Motor, and Controller for both sides.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="statusled-h">
@@ -376,20 +439,26 @@ Update the section that sets the controller for each joint (while in headless mo
 <li><p>Create a folder named <cite>jointControllers</cite> and include the CSV files for the controllers specific to the new joint.</p></li>
 </ol>
 </section>
-<section id="python-gui-activetrialsettings-py">
-<h2>Python GUI - ActiveTrialSettings.py<a class="headerlink" href="#python-gui-activetrialsettings-py" title="Link to this heading">¶</a></h2>
+<section id="python-gui-activetrialsettings-py-in-views-folder">
+<h2>Python GUI - ActiveTrialSettings.py (in “views” folder)<a class="headerlink" href="#python-gui-activetrialsettings-py-in-views-folder" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Find the section titled <strong>“jointMap”</strong>.
-- Add the new joint name and increment the integer value following the format of the other joints.</p></li>
+<li><p>Find the section titled <strong>“jointMap”</strong>.</p>
+<ul class="simple">
+<li><p>Add the new joint name and increment the integer value following the format of the other joints.</p></li>
+</ul>
+</li>
 <li><p>In the <cite>UpdateTorque</cite> class, update the string list in the <strong>“Joint Select”</strong> section to include the new joint name (e.g., Left elbow, Right elbow).</p></li>
 </ol>
 </section>
-<section id="python-gui-exodevicemanager-py">
-<h2>Python GUI - exoDeviceManager.py<a class="headerlink" href="#python-gui-exodevicemanager-py" title="Link to this heading">¶</a></h2>
+<section id="python-gui-exodevicemanager-py-in-device-folder">
+<h2>Python GUI - exoDeviceManager.py (in “Device” folder)<a class="headerlink" href="#python-gui-exodevicemanager-py-in-device-folder" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Locate <strong>“jointDictionary”</strong> under the <cite>ExoDeviceManager</cite> class.
-- Update the dictionary with the new joint numbers you added in <cite>ActiveTrialSettings.py</cite> and associate them with the Motor ID number set via RLink and in the software.
-- Follow the format of the other joints (e.g., <cite>1: 33, 0 = “Left Hip”</cite> with an ID of 33).</p></li>
+<li><p>Locate <strong>“jointDictionary”</strong> under the <cite>ExoDeviceManager</cite> class.</p>
+<ul class="simple">
+<li><p>Update the dictionary with the new joint numbers you added in <cite>ActiveTrialSettings.py</cite> and associate them with the Motor ID number set via RLink and in the software.</p></li>
+<li><p>Follow the format of the other joints (e.g., <cite>1: 33, 0 = “Left Hip”</cite> with an ID of 33).</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="done">
@@ -439,8 +508,8 @@ Update the section that sets the controller for each joint (while in headless mo
 <li><a class="reference internal" href="#statusled-h">StatusLED.h</a></li>
 <li><a class="reference internal" href="#config-ini">Config.ini</a></li>
 <li><a class="reference internal" href="#sd-card">SD Card</a></li>
-<li><a class="reference internal" href="#python-gui-activetrialsettings-py">Python GUI - ActiveTrialSettings.py</a></li>
-<li><a class="reference internal" href="#python-gui-exodevicemanager-py">Python GUI - exoDeviceManager.py</a></li>
+<li><a class="reference internal" href="#python-gui-activetrialsettings-py-in-views-folder">Python GUI - ActiveTrialSettings.py (in “views” folder)</a></li>
+<li><a class="reference internal" href="#python-gui-exodevicemanager-py-in-device-folder">Python GUI - exoDeviceManager.py (in “Device” folder)</a></li>
 <li><a class="reference internal" href="#done">Done</a></li>
 </ul>
 </li>

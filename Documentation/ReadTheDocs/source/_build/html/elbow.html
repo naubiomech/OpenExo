@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Elbow Min Max Controller &#8212; OpenExo Documentation</title>
+    <title>Elbow &#8212; OpenExo Documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=0ac4fbd8" />
@@ -16,8 +16,8 @@
     <script src="_static/js/petite-vue.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Hip" href="hip.html" />
-    <link rel="prev" title="Zhang Collins Controller" href="ZhangCollins.html" /> 
+    <link rel="next" title="Elbow Min Max Controller" href="ElbowMinMax.html" />
+    <link rel="prev" title="Proportional Hip Moment Controller" href="ProportionalHipMomentController.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
 <div id="top_nav">
@@ -122,19 +122,24 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="controllers.html">Controllers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Elbow Min Max Controller</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Elbow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ElbowMinMax.html">Elbow Min Max Controller</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
 </ul>
 
         </div>
@@ -146,52 +151,19 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="elbow-min-max-controller">
-<h1>Elbow Min Max Controller<a class="headerlink" href="#elbow-min-max-controller" title="Link to this heading">¶</a></h1>
-<section id="description">
-<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
-<p>This controller applies a torque to the elbow based on FSRs placed on the hand. It is meant to be used for weighted lifting. More details on this controller can be found in:</p>
-<p>D Colley, C. D. Bowersock, and Z. F. Lerner,
-“[A Lightweight Powered Elbow Exoskeleton for Manual Handling Tasks]”
-in IEEE Transactions on Medical Robotics and Bionics.</p>
-</section>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
-<dl class="simple">
-<dt>Parameter index order can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>.</dt><dd><p>The parameters for this controller are:</p>
-</dd>
-</dl>
-<ul class="simple">
-<li><p><strong>FLEXamplitude</strong>
-Torque setpoint, in Nm, for flexion assistance.</p></li>
-<li><p><strong>DigitFSR_threshold</strong>
-Upper threshold for finger (grip) FSRs.</p></li>
-<li><p><strong>PalmFSR_threshold</strong>
-Upper threshold for palm FSR.</p></li>
-<li><p><strong>DigitFSR_LOWthreshold</strong>
-Lower threshold for finger (grip) FSRs.</p></li>
-<li><p><strong>PalmFSR_LOWthreshold</strong>
-Lower threshold for palm FSR.</p></li>
-<li><p><strong>CaliRequest</strong>
-Flag to request calibration of sensors.</p></li>
-<li><p><strong>TrqProfile</strong>
-Flag that toggles between torque states (1 = spring, 0 = constant).</p></li>
-<li><p><strong>p_gain</strong>
-Proportional gain for closed-loop controls.</p></li>
-<li><p><strong>i_gain</strong>
-Integral gain for closed-loop controls.</p></li>
-<li><p><strong>d_gain</strong>
-Derivative gain for closed-loop controls.</p></li>
-<li><p><strong>TorqueLimit</strong>
-Torque safety limit, in Nm; prevents the controller from prescribing a torque larger than this value.</p></li>
-<li><p><strong>SpringPkTorque</strong>
-Sets the maximum spring torque in Nm.</p></li>
-<li><p><strong>EXTamplitude</strong>
-Extension torque setpoint in Nm.</p></li>
-<li><p><strong>FiltStrength</strong>
-Sets the strength of the setpoint filter.</p></li>
+  <section id="elbow">
+<h1>Elbow<a class="headerlink" href="#elbow" title="Link to this heading">¶</a></h1>
+<p>Overview of the elbow controller.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Controllers:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ElbowMinMax.html">Elbow Min Max Controller</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ElbowMinMax.html#description">Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ElbowMinMax.html#parameters">Parameters</a></li>
 </ul>
-</section>
+</li>
+</ul>
+</div>
 </section>
 
 
@@ -200,24 +172,6 @@ Sets the strength of the setpoint filter.</p></li>
         </div>
       </div>
     
-        <div id="show_right_sidebar">
-            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents</span></a></p>
-        </div>
-
-        <div id="right_sidebar">
-            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
-            <div class="page_toc">
-                <ul>
-<li><a class="reference internal" href="#">Elbow Min Max Controller</a><ul>
-<li><a class="reference internal" href="#description">Description</a></li>
-<li><a class="reference internal" href="#parameters">Parameters</a></li>
-</ul>
-</li>
-</ul>
-
-            </div>
-        </div>
-    
 
       <div class="clearer"></div>
     </div>
@@ -225,14 +179,14 @@ Sets the strength of the setpoint filter.</p></li>
         <div class="button_nav">
             <div class="left">
                 
-                <a href="ZhangCollins.html">
-                    <span class="icon">&lt;</span><span>Zhang Collins Controller</span></a>
+                <a href="ProportionalHipMomentController.html">
+                    <span class="icon">&lt;</span><span>Proportional Hip Moment Controller</span></a>
                 
             </div>
 
             <div class="right">
                 
-                    <a href="hip.html"><span>Hip</span><span class="icon">&gt;</span></a>
+                    <a href="ElbowMinMax.html"><span>Elbow Min Max Controller</span><span class="icon">&gt;</span></a>
                 
             </div>
         </div>

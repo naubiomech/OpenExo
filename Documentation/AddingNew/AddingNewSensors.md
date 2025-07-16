@@ -13,6 +13,7 @@ In our codebase, sensor integration varies depending on the sensor. Below, we li
     - SPI (Teensy-SD Card interface)
 
 Here, we'll demonstrate how the Teensy communicates with sensors using an example of an analog input sensor and another example with the I2C protocol.
+We also have a detailed example available as part of our [wiki](https://wiki.theopenexo.org/app/page/1wFgeHE1jJ0RdbhfDIQUPjvBr5m3PwdyW?p=14AIGjap02Wv8jPJxyezvfYJYFVIJIoO1).
 
 ---
 
@@ -36,7 +37,7 @@ The following `.cpp` files utilize `analogRead()`:
 - `TorqueSensor.cpp`
 
 ### Available analog pins
-If you're using our reference printed circuit boards (PCB), check the PCB design documentation for the list of available analog pins. You can always use stacking headers for Teensy 4.1 to make certain pins easier to access.
+If you're using our reference printed circuit boards (PCB), check the [PCB design documentation](https://wiki.theopenexo.org/app/page/1IDIvK_TSzBucPz_MaAadYhhmePD3nf_bLp5UVSXbmy0?p=14AIGjap02Wv8jPJxyezvfYJYFVIJIoO1) for the list of available analog pins. You can always use stacking headers for Teensy 4.1 to make certain pins easier to access.
 
 ---
 
@@ -140,7 +141,7 @@ The following `.cpp` or `.h` files utilize CAN:
 - `Motor.cpp`
 
 ### Available pins for bus protocols
-If you're using our reference printed circuit boards (PCB), check the PCB design documentation for the list of available pins for bus protocols. You can always use stacking headers with Teensy 4.1 to make certain pins easier to access.
+If you're using our reference printed circuit boards (PCB), check the [PCB design documentation](https://wiki.theopenexo.org/app/page/1IDIvK_TSzBucPz_MaAadYhhmePD3nf_bLp5UVSXbmy0?p=14AIGjap02Wv8jPJxyezvfYJYFVIJIoO1) for the list of available pins for bus protocols. You can always use stacking headers with Teensy 4.1 to make certain pins easier to access.
 
 ---
 To ensure a sensor readings are accessible from various locations, we've created the following procedures to help you embed your new sensor into the codebase.

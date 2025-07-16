@@ -41,10 +41,13 @@ Motor.h
 Motor.cpp
 ---------
 1. Define the behavior of the member functions of ``_YourMotorType``.
+
    - Ideally, these behaviors will be shared by all motors of this type.
+
 2. Define the behavior of the member functions and any class-specific variables for ``ANewMotor``.
 
 Connect to Everything Else
 ---------------------------
 1. Follow the steps in :doc:`AddingNewCanMotor <AddingNewCanMotor>` to connect this new motor type to the rest of the codebase.
+
    - This step is detailed in the referenced document so that you only need to update information in one place.

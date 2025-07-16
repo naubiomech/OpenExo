@@ -1,15 +1,11 @@
 Hip
-============
+===
 
-Overview of the hip process.
+Overview of the hip controllers.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Installation Subcategories:
+   :caption: Controllers:
 
    FranksCollinsHip
-   CalbrManager
-   Chirp
-   ConstantTorque
-   Step
-   ZeroTorque
+   ProportionalHipMomentController

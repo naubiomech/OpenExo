@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Franks Collins Hip Controller" href="FranksCollinsHip.html" />
-    <link rel="prev" title="Elbow Min Max Controller" href="elbow.html" /> 
+    <link rel="prev" title="PJMC_Plus" href="PJMC_Plus.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
 <div id="top_nav">
@@ -122,27 +122,25 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="controllers.html">Controllers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Hip</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="FranksCollinsHip.html">Franks Collins Hip Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Chirp.html">Chirp Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Step.html">Step Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ProportionalHipMomentController.html">Proportional Hip Moment Controller</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
 </ul>
 
         </div>
@@ -156,42 +154,18 @@
             
   <section id="hip">
 <h1>Hip<a class="headerlink" href="#hip" title="Link to this heading">¶</a></h1>
-<p>Overview of the hip process.</p>
+<p>Overview of the hip controllers.</p>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Installation Subcategories:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Controllers:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="FranksCollinsHip.html">Franks Collins Hip Controller</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="FranksCollinsHip.html#description">Description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="FranksCollinsHip.html#parameters">Parameters</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#parameters">Parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#purposes">Purposes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#motor-directions">Motor Directions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#torque-sensor-signs-positive-negative">Torque Sensor Signs (Positive/Negative)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="CalbrManager.html#how-to-calibrate">How to Calibrate</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Chirp.html">Chirp Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Chirp.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Chirp.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ConstantTorque.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ConstantTorque.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Step.html">Step Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Step.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Step.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ZeroTorque.html#description">Description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ZeroTorque.html#parameters">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProportionalHipMomentController.html">Proportional Hip Moment Controller</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ProportionalHipMomentController.html#description">Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ProportionalHipMomentController.html#parameters">Parameters</a></li>
 </ul>
 </li>
 </ul>
@@ -211,8 +185,8 @@
         <div class="button_nav">
             <div class="left">
                 
-                <a href="elbow.html">
-                    <span class="icon">&lt;</span><span>Elbow Min Max Controller</span></a>
+                <a href="PJMC_Plus.html">
+                    <span class="icon">&lt;</span><span>PJMC_Plus</span></a>
                 
             </div>
 

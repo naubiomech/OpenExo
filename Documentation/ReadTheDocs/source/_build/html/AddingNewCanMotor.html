@@ -122,7 +122,8 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a></li>
@@ -136,13 +137,14 @@
 <li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 
         </div>
@@ -166,31 +168,53 @@ Make sure you add it to <em>all</em> the exoskeleton configurations.</p></li>
 <section id="parseini-h">
 <h2>parseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>In the <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> namespace, add a new enumeration value to the <strong>motor enum</strong>.</p></li>
-<li><p>In the <code class="docutils literal notranslate"><span class="pre">config_map</span></code> namespace, add a case for your new motor in the motor mapping.
-Use the <strong>string</strong> you added to <code class="docutils literal notranslate"><span class="pre">config.ini</span></code>.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> namespace, add a new enumeration value to the <strong>enum class motor : uint8_t</strong> section.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">config_map</span></code> namespace, add a case for your new motor in the <strong>const IniKeyCode motor</strong> section.
+Use the ** same string** you added to <code class="docutils literal notranslate"><span class="pre">config.ini</span></code>.</p></li>
 </ol>
 </section>
 <section id="motor-h">
 <h2>Motor.h<a class="headerlink" href="#motor-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Define a new <strong>CAN motor</strong> class that inherits <code class="docutils literal notranslate"><span class="pre">_CANMotor</span></code> (see <code class="docutils literal notranslate"><span class="pre">class</span> <span class="pre">AK60</span></code> as an example).
-- To define a motor class, copy one of the existing CAN motor classes at the bottom of the file and rename it.
-- Ensure the class name is <strong>unique</strong> and descriptive.</p></li>
+<li><p>Define a new <strong>CAN motor</strong> class that inherits <code class="docutils literal notranslate"><span class="pre">_CANMotor</span></code> (see <code class="docutils literal notranslate"><span class="pre">class</span> <span class="pre">AK60</span></code> as an example).</p>
+<ul class="simple">
+<li><p>To define a motor class, copy one of the existing CAN motor classes at the bottom of the file and rename it.</p></li>
+<li><p>Ensure the class name is <strong>unique</strong> and descriptive.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="motor-cpp">
 <h2>Motor.cpp<a class="headerlink" href="#motor-cpp" title="Link to this heading">¶</a></h2>
-<ol class="arabic">
-<li><p>Define the <strong>constructor</strong> for your new class.</p></li>
-<li><p>Following the other CAN motor classes, define your <code class="docutils literal notranslate"><span class="pre">_T_MAX</span></code> and <code class="docutils literal notranslate"><span class="pre">_V_MAX</span></code> to match the motor’s maximum torque and velocity:
-- <code class="docutils literal notranslate"><span class="pre">_T_MAX</span></code> is the peak torque in Nm.
-- <code class="docutils literal notranslate"><span class="pre">_V_MAX</span></code> is the max speed (rpm) converted to rad/s:</p>
-<blockquote>
-<div><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[rev/min] / 60 [s/min] * (2 * PI) [rad/rev]
+<ol class="arabic simple">
+<li><p>Define the <strong>constructor</strong> for your new class. Follow the general format fo the other motor classes, such as:</p></li>
+</ol>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">AK60</span><span class="o">::</span><span class="n">AK60</span><span class="p">(</span><span class="n">config_defs</span><span class="o">::</span><span class="n">joint_id</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">ExoData</span><span class="o">*</span><span class="w"> </span><span class="n">exo_data</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">enable_pin</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="c1">//Constructor: type is the motor type</span>
+<span class="n">_CANMotor</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">exo_data</span><span class="p">,</span><span class="w"> </span><span class="n">enable_pin</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">_I_MAX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">22.0f</span><span class="p">;</span>
+<span class="w">    </span><span class="n">_V_MAX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">41.87f</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">kt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.068</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<span class="w">    </span><span class="n">set_Kt</span><span class="p">(</span><span class="n">kt</span><span class="p">);</span>
+<span class="w">    </span><span class="n">exo_data</span><span class="o">-&gt;</span><span class="n">get_joint_with</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">id</span><span class="p">))</span><span class="o">-&gt;</span><span class="n">motor</span><span class="p">.</span><span class="n">kt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kt</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cp">#ifdef MOTOR_DEBUG</span>
+<span class="w">        </span><span class="n">logger</span><span class="o">::</span><span class="n">println</span><span class="p">(</span><span class="s">&quot;AK60::AK60 : Leaving Constructor&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="cp">#endif</span>
+<span class="p">};</span>
 </pre></div>
 </div>
-</div></blockquote>
+<ol class="arabic" start="2">
+<li><p>Following the other CAN motor classes, define your <code class="docutils literal notranslate"><span class="pre">_T_MAX</span></code> and <code class="docutils literal notranslate"><span class="pre">_V_MAX</span></code> (found on motor’s datasheet) to match the motor’s maximum torque and velocity:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">_T_MAX</span></code> is the peak torque in Nm.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_V_MAX</span></code> is the max speed (rpm) converted to rad/s:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[rev/min] / 60 [s/min] * (2 * PI) [rad/rev]
+</pre></div>
+</div>
+</li>
+</ul>
 </li>
 </ol>
 </section>

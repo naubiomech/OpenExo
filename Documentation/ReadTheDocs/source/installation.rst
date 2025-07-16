@@ -7,4 +7,5 @@ Overview of the installation process.
    :maxdepth: 2
    :caption: Installation Subcategories:
 
+   vscode_setup
    BuildAndFlash

@@ -16,7 +16,7 @@
     <script src="_static/js/petite-vue.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Calibration Manager Controller" href="CalbrManager.html" />
+    <link rel="next" title="Proportional Hip Moment Controller" href="ProportionalHipMomentController.html" />
     <link rel="prev" title="Hip" href="hip.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
@@ -122,27 +122,25 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="controllers.html">Controllers</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="hip.html">Hip</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Franks Collins Hip Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="CalbrManager.html">Calibration Manager Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Chirp.html">Chirp Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ConstantTorque.html">Constant Torque Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="Step.html">Step Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ZeroTorque.html">Zero Torque Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ProportionalHipMomentController.html">Proportional Hip Moment Controller</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
 </ul>
 
         </div>
@@ -158,27 +156,31 @@
 <h1>Franks Collins Hip Controller<a class="headerlink" href="#franks-collins-hip-controller" title="Link to this heading">¶</a></h1>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
-<p>Provides Hip assistance based on a series of splines that have an extension and flexion portion. Uses percent gait, requiring heel FSR. Based on:</p>
-<p>Franks, P. W., Bryan, G. M., Martin, R. M., Reyes, R., Lakmazaheri, A. C., &amp; Collins, S. H. (2021). <a class="reference external" href="https://www.cambridge.org/core/journals/wearable-technologies/article/comparing-optimized-exoskeleton-assistance-of-the-hip-knee-and-ankle-in-single-and-multijoint-configurations/9FBC1580F11614B388BE621D716800AD">Comparing optimized exoskeleton assistance of the hip, knee, and ankle in single and multi-joint configurations</a>. Wearable Technologies, 2.</p>
+<p>Provides Hip assistance based on a series of splines that have an extension and flexion portion.
+Uses percent gait, requiring heel FSR.</p>
+<p>Based on:</p>
+<p>P.W. Franks, G.M. Bryan, R.M. Martin, R. Reyes, A.C. Lakmazaheri, &amp; S.H. Collins (2021).
+<a class="reference external" href="https://www.cambridge.org/core/journals/wearable-technologies/article/comparing-optimized-exoskeleton-assistance-of-the-hip-knee-and-ankle-in-single-and-multijoint-configurations/9FBC1580F11614B388BE621D716800AD">Comparing optimized exoskeleton assistance of the hip, knee, and ankle in single and multi-joint configurations</a>.
+in Wearable Technologies, vol. 2, pp. e16, doi: 10.1017/wtc.2021.14.</p>
 </section>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
 <p>Parameter index order can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>.</p>
 <ul class="simple">
-<li><p>mass - User mass in kg used for denormalizing torque.</p></li>
-<li><p>trough_normalized_torque_Nm_kg - Largest extension torque normalized to user mass (Nm/kg).</p></li>
-<li><p>peak_normalized_torque_Nm_kg - Largest flexion torque normalized to user mass (Nm/kg).</p></li>
-<li><p>start_percent_gait - Percent gait to start the torque pattern so it doesn’t have a discontinuity at heel strike.</p></li>
-<li><p>trough_onset_percent_gait - Percent gait to start applying extension torque.</p></li>
-<li><p>trough_percent_gait - Percent gait to apply the largest extension torque.</p></li>
-<li><p>mid_time - Transition point between extension and flexion to apply 0 torque.</p></li>
-<li><p>mid_duration - The duration of the transition pause as a percent of the gait cycle.</p></li>
-<li><p>peak_percent_gait - Percent gait to apply the largest flexion torque.</p></li>
-<li><p>peak_offset_percent_gait - Percent gait to stop applying flexion torque.</p></li>
-<li><p>use_pid - This flag turns PID on(1) or off(0)</p></li>
-<li><p>p_gain - Proportional gain for closed loop controls</p></li>
-<li><p>i_gain - Integral gain for closed loop controls</p></li>
-<li><p>d_gain - Derivative gain for closed loop controls</p></li>
+<li><p><strong>mass</strong>: User mass in kg used for denormalizing torque, currently not used in the controller but easy to implement if desired, defaults to zero as a result.</p></li>
+<li><p><strong>trough_normalized_torque_Nm_kg</strong>: Largest extension torque (Nm). Note: Currently not noramlized by user mass.</p></li>
+<li><p><strong>peak_normalized_torque_Nm_kg</strong>: Largest flexion torque (Nm). Note: Currently not noramlized by user mass.</p></li>
+<li><p><strong>start_percent_gait</strong>: Percent gait to start the torque pattern so it doesn’t have a discontinuity at heel strike.</p></li>
+<li><p><strong>trough_onset_percent_gait</strong>: Percent gait to start applying extension torque.</p></li>
+<li><p><strong>trough_percent_gait</strong>: Percent gait to apply the largest extension torque.</p></li>
+<li><p><strong>mid_time</strong>: Transition point between extension and flexion to apply 0 torque.</p></li>
+<li><p><strong>mid_duration</strong>: The duration of the transition pause as a percent of the gait cycle.</p></li>
+<li><p><strong>peak_percent_gait</strong>: Percent gait to apply the largest flexion torque.</p></li>
+<li><p><strong>peak_offset_percent_gait</strong>: Percent gait to stop applying flexion torque.</p></li>
+<li><p><strong>use_pid</strong>: This flag turns PID on(1) or off(0)</p></li>
+<li><p><strong>p_gain</strong>: Proportional gain for closed loop control</p></li>
+<li><p><strong>i_gain</strong>: Integral gain for closed loop control</p></li>
+<li><p><strong>d_gain</strong>: Derivative gain for closed loop control</p></li>
 </ul>
 </section>
 </section>
@@ -221,7 +223,7 @@
 
             <div class="right">
                 
-                    <a href="CalbrManager.html"><span>Calibration Manager Controller</span><span class="icon">&gt;</span></a>
+                    <a href="ProportionalHipMomentController.html"><span>Proportional Hip Moment Controller</span><span class="icon">&gt;</span></a>
                 
             </div>
         </div>

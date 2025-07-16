@@ -81,9 +81,9 @@ Bytes are composed of 8 bits and are typically the units used on a computer as a
 Bitwise Operators
 ^^^^^^^^^^^^^^^^^
 
-& - bitwise AND; takes two bytes and performs AND on every bit. Will result in a 1 only if both bits are 1.
+Bitwise AND (&); takes two bytes and performs AND on every bit. Will result in a 1 only if both bits are 1.
 
-| - bitwise OR; takes two bytes and performs OR on every bit. Will result in a 1 if either of the two bits is a 1.
+Bitwise OR (|); takes two bytes and performs OR on every bit. Will result in a 1 if either of the two bits is a 1.
 
 **ex.** Simple Example
 
@@ -613,7 +613,7 @@ If the expression matches the case value (x, y, z in the above syntax), then the
 Functions
 ~~~~~~~~~
 
-Functions, sometimes refered to as methods or procdures, are a reusable block of code designed to do a particular task. Functions allow for code to be split into smaller, modular pieces and are particularly useful when sets of code need to be used several times.
+Functions, sometimes refered to as methods or procedures, are a reusable block of code designed to do a particular task. Functions allow for code to be split into smaller, modular pieces and are particularly useful when sets of code need to be used several times.
 
 There are typically two parts to creating a function:
 
@@ -844,7 +844,7 @@ Note: Constructors must have the same name as the class and all members within a
 Inheritance
 ^^^^^^^^^^^
 
-Inheritance is when a class (called a child, derived, or sub class) takes (inherits, hence the name) attributes and methods from another class (called a partent, base, or super class). Typically this new class then extends upon the inherited members of the parent class through new attributes and/or methods. This can be used in a modular sense to considerablly reduce the amount of potentially redundent code within a program. It is possible to inherit from a class which itself inherited from another class. This can allow us to start with a very general class that then becomes progressivly more specific with each instance of inheritance.
+Inheritance is when a class (called a child, derived, or sub class) takes (inherits, hence the name) attributes and methods from another class (called a parent, base, or super class). Typically this new class then extends upon the inherited members of the parent class through new attributes and/or methods. This can be used in a modular sense to considerablly reduce the amount of potentially redundent code within a program. It is possible to inherit from a class which itself inherited from another class. This can allow us to start with a very general class that then becomes progressivly more specific with each instance of inheritance.
 
 **Syntax:**
 
@@ -1163,12 +1163,12 @@ So when we call reconfigure for the ExoData objects we call the reconfigure memb
 Introduction
 ------------
 
-This guide is designed to provide background information on OpenExo’s software. This system is designed to be flexible, where the system can be easily adapted to the user’s needs, changing the motors used, number of joints, etc.
+This guide is designed to provide background information on OpenExo’s software, which was designed to be easily adapted to the user’s needs (e.g.,changing the motors used, number of joints, etc).
 
 Code Location
 ~~~~~~~~~~~~~
 
-If you are reading this you have found the location, but for completeness it can be found `here <https://github.com/naubiomech/ExoCode/tree/nano_teensy_board>`__
+If you are reading this you have likely found the location, but for completeness it can be found `here <https://github.com/naubiomech/ExoCode/tree/nano_teensy_board>`__
 
 Style Guide
 ~~~~~~~~~~~
@@ -1188,6 +1188,8 @@ Details of the components can be found in `presentations <https://github.com/nau
 How to Deploy
 ~~~~~~~~~~~~~
 
+A detailed guide to deploying for the first time can be found in our `First Time Setup Guide <https://theopenexo.readthedocs.io/en/latest/FirstTimeStartUp.html>`__.
+
 First, you will need to connect the physical components.
 
 #. Mount the motors on the system as appropriate.
@@ -1202,17 +1204,16 @@ First, you will need to connect the physical components.
 #. The control board may have multiple microcontrollers on it they should all be flashed with ExoCode.ino through the Arduino IDE. The compiler will select the correct parts of the code to use if you select the correct microcontroller.
 
    * Update /ExoCode/src/Config.h BOARD_VERSION with the version number found on the control board before compiling.
-   * Update the libraries. Move the files/folders in the `Libraries Folder <https://github.com/naubiomech/OpenExo/tree/main/Libraries>`__. To your local Folder C:\User\[USER]\Documents\Arduino\libraries\ or system equivalent. Details on the libraries that are used are used can be found in `Libraries Folder <https://github.com/naubiomech/OpenExo/blob/main/Libraries/README.md>`__.
+   * Update the libraries. Move the files/folders in the `Libraries Folder <https://github.com/naubiomech/OpenExo/tree/main/Libraries>`__. To your local folder C:/User/[USER]/Documents/Arduino/libraries/ or system equivalent. Details on the libraries that are used are used can be found in `Libraries Folder <https://github.com/naubiomech/OpenExo/blob/main/Libraries/README.md>`__.
    * `Arduino Instructions <https://docs.google.com/document/d/1ToLq6Zqv58Q4YEmf4SzqJDKCTp52LUaKgYg5vNmHdaI/edit?usp=sharing>`__
 
 #. Lastly, is the SD card.
 
     * Transfer the content of the SD Card folder to the micro SD card.
     * Update the config.ini file
-        * Change the board version
         * Change the Exo name
         * Go to the section for that name and confirm the settings match your system.
-    * For the joints you are using, go to that folder and update the controllers you plan to use.
+    * For the joints you are using, go to that folder and update the controller parameters you plan to use.
 
 Those are the rough points. Detailed explanations can be found in the coming sections.
 
@@ -1283,7 +1284,7 @@ More information on the Python GUI, and its operation, can be found
 SD Card
 -------
 
-The files for the SD card can be found in the `SDCard <https://github.com/naubiomech/OpenExo/tree/main/SDCard>`__ folder in the main directory. The contents of this file should be copied to the root of the SD card, e.g. when you open the SD Card you should see config.ini. The file contains the configuration file and the parameter files for the controllers. These parameter files are a temporary measure till the new app is running.
+The files for the SD card can be found in the `SDCard <https://github.com/naubiomech/OpenExo/tree/main/SDCard>`__ folder in the main directory. The contents of this file should be copied to the root of the SD card (e.g., when you open the SD Card you should see config.ini). The file contains the configuration file and the parameter files for the controllers. These parameter files are a temporary measure till the new app is running.
 
 SD Configuration
 ~~~~~~~~~~~~~~~~
@@ -1295,13 +1296,15 @@ This separates information that is related into groups. Within the section you h
 We have some premade exoskeleton configurations you can choose from by putting their name in the Exo section. Just check to make sure the settings in that section match your system. If we are using a bilateral hip system we would set ``[Exo] name = bilateralHip``, then go to the section [bilateralHip] and check it matches the system we are using.
 
 * sides - are you using the left, right, or both sides.
-* hip, knee, ankle - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won’t use that joint).
+* hip, knee, ankle, elbow - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won’t use that joint).
 * gear ratio - sets the transmission ratio for the joint torque to the motor output torque. If the motor has a built in gearbox that should not appear here but rather be coded into the motor class in Motor.cpp.
 * default controller - is the controller the system starts with.
 * use torque sensor - flag to determine if you want to use a torque sensor with your joint (0 = no, 1 = yes)
 * flip motor dir - is if the direction of the motor values should be flipped. For example if we have two motors pointing in towards the hip and both rotate counter clockwise with a positive current one of them will need to be sent a negative current so they both rotate in the same direction on the body.
 * flip torque dir - flips the sign of the torque sensor on the selected side. This helps align the torque sensor reading to be in the same direction as the motor command to avoid PID issues.
 * flip angle dir - flips the sign of the angle sensor on the selected side. This helps align the angle sensor reading to be in the same direction as the motor command to avoid controller issues.
+* ROM - can manually set the range of motion known for configuraiton so that the angle sensor can convert it's values accordingly.
+* torque offset - can manually set the torque sensor calibration value if known, used to avoid having to reclaibrate every time. 
 
 SD Controller Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1310,7 +1313,7 @@ The parameters for each controller are stored in their corresponding joint folde
 
 The order of the parameters should match how they appear in the parameter array which can be found in `ControllerData.h <https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h>`__. in the controller_defs namespace.
 
-These will be selected using the update controller field in the app where you set the joint, controller, and parameter set.
+These will be selected using the update controller field in the app where you set the joint, controller, parameter, and value.
 
 --------------
 
@@ -1356,6 +1359,7 @@ Sync LED
 The sync LED can be used to synchronize the data recorded by the exoskeleton and other systems, primarily infrared based optical motion capture systems. The state of this LED must be included in the recorded data for this to work.
 
 | Essentially, the LEDs nominal state is either on or off, selectable using the sync default pin on the PCB.
+
 | When triggered it gives a long pulse, then gives short pulses till triggered again when it gives a long pulse again.
 
 .. figure:: /photos/SyncPattern.png 
@@ -1397,12 +1401,12 @@ We decided that the motors would always be used in torque control mode so transa
 Adding New Actuators
 ~~~~~~~~~~~~~~~~~~~~
 
-Details to adding a new motor type can be found in :doc:`Adding New Motor Type <AddingNewMotorType>`. Details on adding a new CAN motor can be found in :doc:`Adding New CAN Motor <AddingNewCanMotor>`. This is specifically for the TMotor CAN motors but can be adapted to new types of motors when we have them.
+Details to adding a new motor type can be found in :doc:`Adding New Motor Type <AddingNewMotorType>`. Details on adding a new CAN motor can be found in :doc:`Adding New CAN Motor <AddingNewCanMotor>`. This is specifically for the CubeMars CAN motors but can be adapted to new types of motors when we have them.
 
-T-motor Initialization
-~~~~~~~~~~~~~~~~~~~~~~
+CAN-motor Initialization
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-TMotor initialization information can be found `here <https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b\_?usp=drive_link>`__
+CAN-motor initialization information can be found `here <https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b\_?usp=drive_link>`__.
 
 --------------
 
@@ -1411,7 +1415,7 @@ Controllers
 
 Much like the motor the controllers have a parallel ControllerData class to store data for the controller. ControllerData details can be found in `Data Structure <https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/ExoDataStructure.md>`__, but contains state and configuration information.
 
-The Joint instance uses a `pointer <#pointers>`__ to the controller that is currently being used. The main difference is that the Joint has an instance to all the possible controllers that will be used so we just need to point to the correct one. That is why the constructor to the a joint like the hip looks like:
+The Joint instance uses a `pointer <#pointers>`__ to the controller that is currently being used. The main difference is that the Joint has an instance to all the possible controllers that will be used so we just need to point to the correct one. That is why the constructor to a joint like the hip looks like:
 
 ::
 
@@ -1457,47 +1461,41 @@ Controller Parameters
 
 The controller parameters are dependent on what controller is being used but a description of the parameters for each controller can be found below.
 
+Multi-Joint
+^^^^^^^^^^^
+
+- :doc:`Zero Torque <ZeroTorque>`
+- :doc:`Constant Torque <ConstantTorque>`
+- :doc:`Calibration Manager <CalbrManager>`
+- :doc:`Step <Step>`
+- :doc:`Chirp <Chirp>`
+
 Hip
 ^^^
 
-- :doc:`Zero Torque <ZeroTorque>`
 - :doc:`Franks Collins Hip <FranksCollinsHip>`
-- :doc:`Constant Torque <ConstantTorque>`
-- :doc:`Chirp <Chirp>`
-- :doc:`Step <Step>`
-- :doc:`Calibration Manager <CalbrManager>`
+- :doc:`Proportional Hip Moment <ProportionalHipMomentController>`
 
 Knee
 ^^^^
 
-- :doc:`Zero Torque <ZeroTorque>`
-- :doc:`Constant Torque <ConstantTorque>`
-- :doc:`Chirp <Chirp>`
-- :doc:`Step <Step>`
-- :doc:`Calibration Manager <CalbrManager>`
 
 Ankle
 ^^^^^
 
-- :doc:`Zero Torque <ZeroTorque>`
-- :doc:`Constant Torque <ConstantTorque>`
-- :doc:`Chirp <Chirp>`
-- :doc:`Step <Step>`
-- :doc:`Calibration Manager <CalbrManager>`
 - :doc:`Proportional Joint Moment <ProportionalJointMoment>`
 - :doc:`Zhang Collins <ZhangCollins>`
+- :doc:`TREC <TREC>`
+- :doc:`SPV2 <spv2>`
+- :doc:`PJMC_Plus <PJMC_Plus>`
 
 Elbow
 ^^^^^
 
-- :doc:`Zero Torque <ZeroTorque>`
 - :doc:`Elbow Min Max <elbow>`
-- :doc:`Constant Torque <ConstantTorque>`
-- :doc:`Chirp <Chirp>`
-- :doc:`Step <Step>`
-- :doc:`Calibration Manager <CalbrManager>`
 
 --------------
+
 Bluetooth
 ---------
 
@@ -1516,7 +1514,7 @@ The CommsMCU class is the highest class in the Communications firmware heirarchy
 Sending a Message
 ~~~~~~~~~~~~~~~~~
 
-If you would like to add a new message, see the “AddingNewBLEMessage” doc. The messages are all created in the ble_commands.h file. ble_commands.h also defines the functions that are called when a command is received. To send a new message you must package a BleMessage object with your desired command and data. The data must be packaged correctly, both in length and index. Currently there is no method to ensure the correct index is used for a specific command, but the length of the commands can be found in the ble namespace. Here is an example message (Sending messages must be done in the ComsMCU):
+If you would like to add a new message, see `AddingNewBLEMessage <AddingNewBLEMessage>`. The messages are all created in the ble_commands.h file. ble_commands.h also defines the functions that are called when a command is received. To send a new message you must package a BleMessage object with your desired command and data. The data must be packaged correctly, both in length and index. Currently there is no method to ensure the correct index is used for a specific command, but the length of the commands can be found in the ble namespace. Here is an example message (Sending messages must be done in the ComsMCU):
 
 ::
 
@@ -1525,6 +1523,8 @@ If you would like to add a new message, see the “AddingNewBLEMessage” doc. T
    batt_msg.expecting = ble_command_helpers::get_length_for_command(batt_msg.command);
    batt_msg.data[0] = _data->battery_value;
    _exo_ble->send_message(batt_msg);
+
+It should also be noted, that the GUI would need to be updated to access this newly added command! 
 
 --------------
 
@@ -1546,6 +1546,7 @@ The reason we do it file by file rather than printing everything is because it a
 You will also notice several “logger” print statments throughout the code. If you wish to print these, you need to switch the loglevel in the logging namespace in `Config.h </ExoCode/src/Config.h>`__ from “Release” to “Debug”. When not troubleshooting the device, make sure the logger is set to “Release” in order to most efficiently operate the system.
 
 --------------
+
 Adding New
 ----------
 
@@ -1561,14 +1562,14 @@ This would be done if you are creating a new PCB which may have moved what pins 
 Adding New Microcontroller
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Details can be found in :doc:`Adding New microcontroller <AddingNewMicrocontroller>`.
+Details can be found in :doc:`Adding New Microcontroller <AddingNewMicrocontroller>`.
 
 This would be done if you are changing the type of microcontroller is being used.
 
 Adding New Item To Config
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Details can be found in :doc:`Adding New Controller <AddingNewItemToConfig>`.
+Details can be found in :doc:`Adding New Item to Config <AddingNewItemToConfig>`.
 
 This would be done if new features need to be configured.
 

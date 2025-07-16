@@ -123,6 +123,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a></li>
@@ -141,9 +142,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
 <li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 
         </div>
@@ -172,7 +173,7 @@
 <ul class="simple">
 <li><p>Create <strong>idx</strong> values that will be used to access the different parameters (remember, indexing starts at 0).</p></li>
 <li><p>Add a <strong>num_parameter</strong> value that stores the number of parameters the controller needs.</p></li>
-<li><p>If this number is larger than the current <code class="docutils literal notranslate"><span class="pre">max_parameters</span></code> in <code class="docutils literal notranslate"><span class="pre">controller_defs</span></code>, update <code class="docutils literal notranslate"><span class="pre">max_parameters</span></code> accordingly.</p></li>
+<li><p>If this number is larger than the current <code class="docutils literal notranslate"><span class="pre">max_parameters</span></code> at the bottom of <code class="docutils literal notranslate"><span class="pre">controller_defs</span></code>, update <code class="docutils literal notranslate"><span class="pre">max_parameters</span></code> accordingly.</p></li>
 </ul>
 </li>
 </ol>
@@ -186,7 +187,7 @@
 <ul>
 <li><p>A <strong>constructor</strong> that takes in the joint ID and an <code class="docutils literal notranslate"><span class="pre">exo_data</span></code> pointer.</p></li>
 <li><p>A <strong>destructor</strong>.</p></li>
-<li><p>A <code class="docutils literal notranslate"><span class="pre">calc_motor_cmd()</span></code> function that returns the torque command in mNm.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">calc_motor_cmd()</span></code> function that returns the torque command in Nm.</p></li>
 </ul>
 </li>
 <li><p>Additional private functions or variables can be added as needed, but note that external calls will only invoke these three required functions.</p></li>
@@ -208,14 +209,17 @@
 <section id="controller-cpp">
 <h2>Controller.cpp<a class="headerlink" href="#controller-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Define all the functions for your new controller.
-- When calling the constructor, make sure to use an initializer list for the base class <code class="docutils literal notranslate"><span class="pre">_Controller</span></code>.</p></li>
+<li><p>Define all the functions for your new controller.</p>
+<ul class="simple">
+<li><p>When calling the constructor, make sure to use an initializer list for the base class <code class="docutils literal notranslate"><span class="pre">_Controller</span></code>.</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="joint-h">
 <h2>Joint.h<a class="headerlink" href="#joint-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Within the header file for the joint (hip, knee, ankle) where the controller applies, add an object instance of your new controller.</p></li>
+<li><p>Within the header file for the controller’s joint (hip, knee, ankle, elbow), add a protected object instance of your new controller.</p></li>
 </ol>
 </section>
 <section id="joint-cpp">
@@ -223,8 +227,8 @@
 <ol class="arabic">
 <li><p>For each joint that your controller is valid for:</p>
 <ol class="arabic simple">
-<li><p>Add the constructor for the new controller object in the initializer list.</p></li>
-<li><p>In the <code class="docutils literal notranslate"><span class="pre">set_controller()</span></code> function, add a new case to the switch statement:</p>
+<li><p>Add the constructor for the new controller object in the initializer list (the same name as in Joint.h).</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">set_controller()</span></code> function of the joint, add a new case to the switch statement:</p>
 <ul class="simple">
 <li><p>Reference the joint controller namespace in the <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> namespace.</p></li>
 <li><p>Use one of the existing controllers as a template.</p></li>
@@ -243,7 +247,7 @@
 <li><p>In the SDCard folder corresponding to the joint your controller is for, create a new parameter CSV file. It is recommended to copy one of the existing files as a starting template.</p></li>
 <li><p>The first cell in the first line should indicate the number of header lines. Parameter reading will begin after this number of lines.</p></li>
 <li><p>The first cell in the second line should state the number of parameters to read; this must match the value specified in <code class="docutils literal notranslate"><span class="pre">ControllerData.h</span></code>.</p></li>
-<li><p>After the header, list the parameter sets you wish to use, one set per line. The parameters should be listed in the order defined by <code class="docutils literal notranslate"><span class="pre">ControllerData.h</span></code>. The first set will be used as the default.</p></li>
+<li><p>After the header lines, list the parameter sets you wish to use, one set per line. The parameters should be listed in the order defined by <code class="docutils literal notranslate"><span class="pre">ControllerData.h</span></code>. The first set (row) after the header will be used as the default values for the controller.</p></li>
 <li><p>If the controller applies to multiple joints, copy the file into the corresponding joint folders.</p></li>
 </ol>
 </section>
@@ -257,17 +261,21 @@
 <section id="uart-commands-h">
 <h2>uart_commands.h<a class="headerlink" href="#uart-commands-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>(Optional) If you want to plot or save one of the variables defined in <code class="docutils literal notranslate"><span class="pre">ControllerData.h</span></code>, proceed as follows in <code class="docutils literal notranslate"><span class="pre">get_real_time_data()</span></code>:
-- Find the case corresponding to the joint where your controller is used (e.g., <code class="docutils literal notranslate"><span class="pre">bilateral_hip</span></code>).
-- Assign the variable to one of the data spots in the <code class="docutils literal notranslate"><span class="pre">rx_msg</span></code> structure (e.g., <code class="docutils literal notranslate"><span class="pre">rx_msg.data[0]</span></code>).</p>
+<li><p>(Optional) If you want to plot or save one of the variables defined in <code class="docutils literal notranslate"><span class="pre">ControllerData.h</span></code>, proceed as follows in <code class="docutils literal notranslate"><span class="pre">get_real_time_data()</span></code>:</p>
+<ul class="simple">
+<li><p>Find the case corresponding to the joint where your controller is used (e.g., <code class="docutils literal notranslate"><span class="pre">bilateral_hip</span></code>).</p></li>
+<li><p>Assign the variable to one of the data spots in the <code class="docutils literal notranslate"><span class="pre">rx_msg</span></code> structure (e.g., <code class="docutils literal notranslate"><span class="pre">rx_msg.data[0]</span></code>).</p></li>
+</ul>
 <p>For controller-specific variables, format the assignment like this:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rx_msg.data[#] = exo_data-&gt;NAME_side.JOINT.controller.VARIABLENAME;
 </pre></div>
 </div>
-<p>where:
-- <code class="docutils literal notranslate"><span class="pre">NAME_side</span></code> should be either <code class="docutils literal notranslate"><span class="pre">left_side</span></code> or <code class="docutils literal notranslate"><span class="pre">right_side</span></code>,
-- <code class="docutils literal notranslate"><span class="pre">JOINT</span></code> is the joint you are working with, and
-- <code class="docutils literal notranslate"><span class="pre">VARIABLENAME</span></code> is the variable to plot.</p>
+<p>where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">NAME_side</span></code> should be either <code class="docutils literal notranslate"><span class="pre">left_side</span></code> or <code class="docutils literal notranslate"><span class="pre">right_side</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JOINT</span></code> is the joint you are working with, and</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VARIABLENAME</span></code> is the variable to plot.</p></li>
+</ul>
 <p>To plot variables specific to a side (defined in <code class="docutils literal notranslate"><span class="pre">SideData.h</span></code>), you may use:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>rx_msg.data[#] = exo_data-&gt;NAME_side.VARIABLENAME;
 </pre></div>
@@ -278,7 +286,7 @@
 <section id="done">
 <h2>Done<a class="headerlink" href="#done" title="Link to this heading">¶</a></h2>
 <p>Your new controller should now be integrated and ready to use!</p>
-<p>Remember to change the active controller and update the parameters as necessary.</p>
+<p>Remember to change the active controller in the SD Card and update the parameters as necessary.</p>
 </section>
 </section>
 

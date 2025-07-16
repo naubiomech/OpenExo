@@ -122,7 +122,8 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="controllers.html">Controllers</a><ul class="current">
@@ -130,16 +131,19 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Proportional Joint Moment Controller</a></li>
 <li class="toctree-l3"><a class="reference internal" href="TREC.html">Terrain Responsive Exoskeleton Controller (TREC)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ZhangCollins.html">Zhang Collins Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SPV2.html">SPV2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PJMC_Plus.html">PJMC_Plus</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow Min Max Controller</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
 </ul>
 
         </div>
@@ -157,30 +161,22 @@
 <h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
 <p>This controller applies a torque to the ankle proportional to the normalized FSR reading of the toe.
 More details on this controller can be found in:</p>
-<p>G. M. Gasparri, J. Luque and Z. F. Lerner,
-“[Proportional Joint-Moment Control for Instantaneously Adaptive Ankle Exoskeleton Assistance](<a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/8669971">https://ieeexplore.ieee.org/abstract/document/8669971</a>),”
-in IEEE Transactions on Neural Systems and Rehabilitation Engineering, vol. 27, no. 4, pp. 751-759, April 2019, doi: 10.1109/TNSRE.2019.2905979.</p>
+<p>G. M. Gasparri, J. Luque and Z. F. Lerner (2019).
+<a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/8669971">Proportional Joint-Moment Control for Instantaneously Adaptive Ankle Exoskeleton Assistance</a>.
+in IEEE Transactions on Neural Systems and Rehabilitation Engineering, vol. 27, no. 4, pp. 751-759, doi: 10.1109/TNSRE.2019.2905979.</p>
 </section>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
 <p>Parameter index order can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>.</p>
 <ul class="simple">
-<li><p><strong>stance_max</strong>
-The peak torque (in Nm) during stance. When the normalized FSR is 1, this will be the torque applied to the ankle.</p></li>
-<li><p><strong>swing_max</strong>
-The constant torque (in Nm) during swing. This value is rarely used.</p></li>
-<li><p><strong>is_assitance</strong>
-When set to 1 (assistive), the system applies the torque in the plantar flexion direction; when set to 0 (resistive), the torque is applied in the dorsiflexion direction.</p></li>
-<li><p><strong>use_pid</strong>
-This flag turns PID control on (1) or off (0).</p></li>
-<li><p><strong>p_gain</strong>
-Proportional gain for closed-loop control.</p></li>
-<li><p><strong>i_gain</strong>
-Integral gain for closed-loop control.</p></li>
-<li><p><strong>d_gain</strong>
-Derivative gain for closed-loop control.</p></li>
-<li><p><strong>torque_alpha</strong>
-Filtering term for the exponentially weighted moving average (EWMA) filter used on the torque sensor to reduce noise. Lower values increase the delay due to filtering.</p></li>
+<li><p><strong>stance_max</strong>: The peak torque, in Nm, during stance. When the normalized FSR is 1, this will be the torque applied to the ankle.</p></li>
+<li><p><strong>swing_max</strong>: The constant torque, in Nm, during swing. This will be a constant torque and is rarely used</p></li>
+<li><p><strong>is_assitance</strong>: When this is 1(assistive) the system will apply the torque in the plantar flexion direction, when 0(resistive) will be in the dorsiflexion direction</p></li>
+<li><p><strong>use_pid</strong>: This flag turns PID control on (1) or off (0)</p></li>
+<li><p><strong>p_gain</strong>: Proportional gain for closed-loop control</p></li>
+<li><p><strong>i_gain</strong>: Integral gain for closed-loop control</p></li>
+<li><p><strong>d_gain</strong>: Derivative gain for closed-loop control</p></li>
+<li><p><strong>torque_alpha</strong>: Filtering term for exponentially wieghted moving average (EWMA) filter, used on torque sensor to cut down on noise. The lower this value the higher the delay caused by the filtering</p></li>
 </ul>
 </section>
 </section>

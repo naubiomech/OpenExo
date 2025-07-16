@@ -122,7 +122,8 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Adding a New BLE Message</a></li>
@@ -136,13 +137,14 @@
 <li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 
         </div>
@@ -159,10 +161,10 @@
 <section id="ble-commands-h">
 <h2>ble_commands.h<a class="headerlink" href="#ble-commands-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>In the <code class="docutils literal notranslate"><span class="pre">names</span></code> namespace, assign a <strong>name</strong> to the character you want to use.</p></li>
-<li><p>In the <code class="docutils literal notranslate"><span class="pre">commands</span></code> array, add your new message and specify the number of variables the system should expect to receive or transmit.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">ble_names</span></code> namespace, assign a <strong>name</strong> to the character you want to use.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">commands</span></code> array within the <code class="docutils literal notranslate"><span class="pre">ble</span></code> namespace, add your new message name and specify the number of variables the system should expect to receive or transmit.</p></li>
 <li><p><strong>If your message is sent by the Exo</strong>, you’re done.</p></li>
-<li><p><strong>If your message is received by the Exo</strong>, navigate to the <code class="docutils literal notranslate"><span class="pre">handlers</span></code> namespace and implement the function that should run when your message is received.</p>
+<li><p><strong>If your message is received by the Exo</strong>, navigate to the <code class="docutils literal notranslate"><span class="pre">ble_handlers</span></code> namespace and implement the function that should run when your message is received.</p>
 <p>The function must be declared like so:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kr">inline</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">my_new_function</span><span class="p">(</span><span class="n">ExoData</span><span class="o">*</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">BleMessage</span><span class="o">*</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span>
 </pre></div>
@@ -173,20 +175,21 @@
 <section id="comsmcu-cpp">
 <h2>ComsMCU.cpp<a class="headerlink" href="#comsmcu-cpp" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p><strong>If your message is received by the Exo</strong>, open the switch statement in the function:</p>
+<li><p><strong>If your message is received by the Exo</strong>, locate the switch statement in the function:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">ComsMCU</span><span class="o">::</span><span class="n">_process_complete_gui_command</span><span class="p">(</span><span class="n">BleMessage</span><span class="o">*</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
-<li><p>Add a new <code class="docutils literal notranslate"><span class="pre">case</span></code> for your message, using the variable you created in the <code class="docutils literal notranslate"><span class="pre">names</span></code> namespace.
-The case should call the corresponding function in the <code class="docutils literal notranslate"><span class="pre">handlers</span></code> namespace.</p></li>
+<li><p>Add a new <code class="docutils literal notranslate"><span class="pre">case</span></code> for your message, using the variable you created in the <code class="docutils literal notranslate"><span class="pre">ble_names</span></code> namespace.
+The case should call the corresponding function in the <code class="docutils literal notranslate"><span class="pre">ble_handlers</span></code> namespace.</p></li>
 </ol>
 </section>
 <section id="done">
 <h2>Done<a class="headerlink" href="#done" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>If your command is sent by the Exo</strong>, the parser recognizes and packages your data automatically.</p></li>
-<li><p><strong>If your command is received</strong>, the parser packages your data and calls the function defined in the <code class="docutils literal notranslate"><span class="pre">handlers</span></code> namespace.</p></li>
+<li><p><strong>If your command is received</strong>, the parser packages your data and calls the function defined in the <code class="docutils literal notranslate"><span class="pre">ble_handlers</span></code> namespace.</p></li>
+<li><p><strong>Note</strong>: You may have to update the GUI to interface with the newly added BLEMessage, refer to GUI documentation if needed.</p></li>
 </ul>
 </section>
 </section>

@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installation" href="installation.html" />
-    <link rel="prev" title="Introduction" href="introduction.html" /> 
+    <link rel="prev" title="First Time Startup" href="FirstTimeStartUp.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
 <div id="top_nav">
@@ -122,6 +122,7 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Background Info</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
@@ -229,10 +230,8 @@
 <p>Bytes are composed of 8 bits and are typically the units used on a computer as a single bit is usually too small. One byte is usually capable of holding information for one character (e.g., ‘D’, ‘o’, ‘g’, ‘!’) whereas 4 or 8 bytes are usually used to store intergers (e.g., 1, 4, 6, 8).</p>
 <section id="bitwise-operators">
 <h4>Bitwise Operators<a class="headerlink" href="#bitwise-operators" title="Link to this heading">¶</a></h4>
-<p>&amp; - bitwise AND; takes two bytes and performs AND on every bit. Will result in a 1 only if both bits are 1.</p>
-<div class="line-block">
-<div class="line">- bitwise OR; takes two bytes and performs OR on every bit. Will result in a 1 if either of the two bits is a 1.</div>
-</div>
+<p>Bitwise AND (&amp;); takes two bytes and performs AND on every bit. Will result in a 1 only if both bits are 1.</p>
+<p>Bitwise OR (|); takes two bytes and performs OR on every bit. Will result in a 1 if either of the two bits is a 1.</p>
 <p><strong>ex.</strong> Simple Example</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">V0</span><span class="p">:</span>     <span class="mb">0b10101010</span>
 <span class="n">V1</span><span class="p">:</span>     <span class="mb">0b11110000</span>
@@ -665,7 +664,7 @@ cout &lt;&lt; result;
 </section>
 <section id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h3>
-<p>Functions, sometimes refered to as methods or procdures, are a reusable block of code designed to do a particular task. Functions allow for code to be split into smaller, modular pieces and are particularly useful when sets of code need to be used several times.</p>
+<p>Functions, sometimes refered to as methods or procedures, are a reusable block of code designed to do a particular task. Functions allow for code to be split into smaller, modular pieces and are particularly useful when sets of code need to be used several times.</p>
 <p>There are typically two parts to creating a function:</p>
 <p>Declaration - tells the code’s compiler what the functions name, return type, and parameters are</p>
 <p>Definintion - the main body of the function, the instructions for what the function does</p>
@@ -855,7 +854,7 @@ type function_name(parameters)
 </section>
 <section id="inheritance">
 <h4>Inheritance<a class="headerlink" href="#inheritance" title="Link to this heading">¶</a></h4>
-<p>Inheritance is when a class (called a child, derived, or sub class) takes (inherits, hence the name) attributes and methods from another class (called a partent, base, or super class). Typically this new class then extends upon the inherited members of the parent class through new attributes and/or methods. This can be used in a modular sense to considerablly reduce the amount of potentially redundent code within a program. It is possible to inherit from a class which itself inherited from another class. This can allow us to start with a very general class that then becomes progressivly more specific with each instance of inheritance.</p>
+<p>Inheritance is when a class (called a child, derived, or sub class) takes (inherits, hence the name) attributes and methods from another class (called a parent, base, or super class). Typically this new class then extends upon the inherited members of the parent class through new attributes and/or methods. This can be used in a modular sense to considerablly reduce the amount of potentially redundent code within a program. It is possible to inherit from a class which itself inherited from another class. This can allow us to start with a very general class that then becomes progressivly more specific with each instance of inheritance.</p>
 <p><strong>Syntax:</strong></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Class</span> <span class="n">Child</span><span class="p">:</span> <span class="n">Class</span> <span class="n">Parent</span>
 <span class="p">{</span>
@@ -1121,10 +1120,10 @@ type function_name(parameters)
 <hr class="docutils" />
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
-<p>This guide is designed to provide background information on OpenExo’s software. This system is designed to be flexible, where the system can be easily adapted to the user’s needs, changing the motors used, number of joints, etc.</p>
+<p>This guide is designed to provide background information on OpenExo’s software, which was designed to be easily adapted to the user’s needs (e.g.,changing the motors used, number of joints, etc).</p>
 <section id="code-location">
 <h3>Code Location<a class="headerlink" href="#code-location" title="Link to this heading">¶</a></h3>
-<p>If you are reading this you have found the location, but for completeness it can be found <a class="reference external" href="https://github.com/naubiomech/ExoCode/tree/nano_teensy_board">here</a></p>
+<p>If you are reading this you have likely found the location, but for completeness it can be found <a class="reference external" href="https://github.com/naubiomech/ExoCode/tree/nano_teensy_board">here</a></p>
 </section>
 <section id="style-guide">
 <h3>Style Guide<a class="headerlink" href="#style-guide" title="Link to this heading">¶</a></h3>
@@ -1140,6 +1139,7 @@ type function_name(parameters)
 </section>
 <section id="how-to-deploy">
 <h3>How to Deploy<a class="headerlink" href="#how-to-deploy" title="Link to this heading">¶</a></h3>
+<p>A detailed guide to deploying for the first time can be found in our <a class="reference external" href="https://theopenexo.readthedocs.io/en/latest/FirstTimeStartUp.html">First Time Setup Guide</a>.</p>
 <p>First, you will need to connect the physical components.</p>
 <ol class="arabic">
 <li><p>Mount the motors on the system as appropriate.</p></li>
@@ -1153,7 +1153,7 @@ type function_name(parameters)
 <li><p>The control board may have multiple microcontrollers on it they should all be flashed with ExoCode.ino through the Arduino IDE. The compiler will select the correct parts of the code to use if you select the correct microcontroller.</p>
 <ul class="simple">
 <li><p>Update /ExoCode/src/Config.h BOARD_VERSION with the version number found on the control board before compiling.</p></li>
-<li><p>Update the libraries. Move the files/folders in the <a class="reference external" href="https://github.com/naubiomech/OpenExo/tree/main/Libraries">Libraries Folder</a>. To your local Folder C:User[USER]DocumentsArduinolibrariesor system equivalent. Details on the libraries that are used are used can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/Libraries/README.md">Libraries Folder</a>.</p></li>
+<li><p>Update the libraries. Move the files/folders in the <a class="reference external" href="https://github.com/naubiomech/OpenExo/tree/main/Libraries">Libraries Folder</a>. To your local folder C:/User/[USER]/Documents/Arduino/libraries/ or system equivalent. Details on the libraries that are used are used can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/Libraries/README.md">Libraries Folder</a>.</p></li>
 <li><p><a class="reference external" href="https://docs.google.com/document/d/1ToLq6Zqv58Q4YEmf4SzqJDKCTp52LUaKgYg5vNmHdaI/edit?usp=sharing">Arduino Instructions</a></p></li>
 </ul>
 </li>
@@ -1163,14 +1163,13 @@ type function_name(parameters)
 <li><p>Transfer the content of the SD Card folder to the micro SD card.</p></li>
 <li><dl class="simple">
 <dt>Update the config.ini file</dt><dd><ul>
-<li><p>Change the board version</p></li>
 <li><p>Change the Exo name</p></li>
 <li><p>Go to the section for that name and confirm the settings match your system.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><p>For the joints you are using, go to that folder and update the controllers you plan to use.</p></li>
+<li><p>For the joints you are using, go to that folder and update the controller parameters you plan to use.</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -1250,7 +1249,7 @@ More information on the Python GUI, and its operation, can be found
 <hr class="docutils" />
 <section id="sd-card">
 <h2>SD Card<a class="headerlink" href="#sd-card" title="Link to this heading">¶</a></h2>
-<p>The files for the SD card can be found in the <a class="reference external" href="https://github.com/naubiomech/OpenExo/tree/main/SDCard">SDCard</a> folder in the main directory. The contents of this file should be copied to the root of the SD card, e.g. when you open the SD Card you should see config.ini. The file contains the configuration file and the parameter files for the controllers. These parameter files are a temporary measure till the new app is running.</p>
+<p>The files for the SD card can be found in the <a class="reference external" href="https://github.com/naubiomech/OpenExo/tree/main/SDCard">SDCard</a> folder in the main directory. The contents of this file should be copied to the root of the SD card (e.g., when you open the SD Card you should see config.ini). The file contains the configuration file and the parameter files for the controllers. These parameter files are a temporary measure till the new app is running.</p>
 <section id="sd-configuration">
 <h3>SD Configuration<a class="headerlink" href="#sd-configuration" title="Link to this heading">¶</a></h3>
 <p><a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/SDCard/config.ini">config.ini</a> is used to tell the code how they system is configured. The fields should all be less than 25 characters as that is limited by the size of the array that is parsing it. The file is broken into sections denoted by being in [ ], e.g. [Board], containing information related to the board.</p>
@@ -1258,20 +1257,22 @@ More information on the Python GUI, and its operation, can be found
 <p>We have some premade exoskeleton configurations you can choose from by putting their name in the Exo section. Just check to make sure the settings in that section match your system. If we are using a bilateral hip system we would set <code class="docutils literal notranslate"><span class="pre">[Exo]</span> <span class="pre">name</span> <span class="pre">=</span> <span class="pre">bilateralHip</span></code>, then go to the section [bilateralHip] and check it matches the system we are using.</p>
 <ul class="simple">
 <li><p>sides - are you using the left, right, or both sides.</p></li>
-<li><p>hip, knee, ankle - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won’t use that joint).</p></li>
+<li><p>hip, knee, ankle, elbow - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won’t use that joint).</p></li>
 <li><p>gear ratio - sets the transmission ratio for the joint torque to the motor output torque. If the motor has a built in gearbox that should not appear here but rather be coded into the motor class in Motor.cpp.</p></li>
 <li><p>default controller - is the controller the system starts with.</p></li>
 <li><p>use torque sensor - flag to determine if you want to use a torque sensor with your joint (0 = no, 1 = yes)</p></li>
 <li><p>flip motor dir - is if the direction of the motor values should be flipped. For example if we have two motors pointing in towards the hip and both rotate counter clockwise with a positive current one of them will need to be sent a negative current so they both rotate in the same direction on the body.</p></li>
 <li><p>flip torque dir - flips the sign of the torque sensor on the selected side. This helps align the torque sensor reading to be in the same direction as the motor command to avoid PID issues.</p></li>
 <li><p>flip angle dir - flips the sign of the angle sensor on the selected side. This helps align the angle sensor reading to be in the same direction as the motor command to avoid controller issues.</p></li>
+<li><p>ROM - can manually set the range of motion known for configuraiton so that the angle sensor can convert it’s values accordingly.</p></li>
+<li><p>torque offset - can manually set the torque sensor calibration value if known, used to avoid having to reclaibrate every time.</p></li>
 </ul>
 </section>
 <section id="sd-controller-parameters">
 <h3>SD Controller Parameters<a class="headerlink" href="#sd-controller-parameters" title="Link to this heading">¶</a></h3>
 <p>The parameters for each controller are stored in their corresponding joint folder. This way if both joints are using a zero torque controller but need different gains they can pull from different files. The files are comma separated value files, so there are commas between cells. The first cell in the <em>first</em> row contains the number of lines in the header, how many lines we need to get through to get to the parameters. The first cell in the <em>second</em> row contains the number of parameters to read. The rest of the header just contains useful info for the person, such as the parameter order. The first parameter row will be the default values, set 0. The nth parameter row is n-1 parameter set, e.g. parameter row 2 will be referenced as set 1.</p>
 <p>The order of the parameters should match how they appear in the parameter array which can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/ExoCode/src/ControllerData.h">ControllerData.h</a>. in the controller_defs namespace.</p>
-<p>These will be selected using the update controller field in the app where you set the joint, controller, and parameter set.</p>
+<p>These will be selected using the update controller field in the app where you set the joint, controller, parameter, and value.</p>
 </section>
 </section>
 <hr class="docutils" />
@@ -1306,6 +1307,8 @@ More information on the Python GUI, and its operation, can be found
 <p>The sync LED can be used to synchronize the data recorded by the exoskeleton and other systems, primarily infrared based optical motion capture systems. The state of this LED must be included in the recorded data for this to work.</p>
 <div class="line-block">
 <div class="line">Essentially, the LEDs nominal state is either on or off, selectable using the sync default pin on the PCB.</div>
+</div>
+<div class="line-block">
 <div class="line">When triggered it gives a long pulse, then gives short pulses till triggered again when it gives a long pulse again.</div>
 </div>
 <figure class="align-center">
@@ -1335,18 +1338,18 @@ More information on the Python GUI, and its operation, can be found
 </section>
 <section id="adding-new-actuators">
 <h3>Adding New Actuators<a class="headerlink" href="#adding-new-actuators" title="Link to this heading">¶</a></h3>
-<p>Details to adding a new motor type can be found in <a class="reference internal" href="AddingNewMotorType.html"><span class="doc">Adding New Motor Type</span></a>. Details on adding a new CAN motor can be found in <a class="reference internal" href="AddingNewCanMotor.html"><span class="doc">Adding New CAN Motor</span></a>. This is specifically for the TMotor CAN motors but can be adapted to new types of motors when we have them.</p>
+<p>Details to adding a new motor type can be found in <a class="reference internal" href="AddingNewMotorType.html"><span class="doc">Adding New Motor Type</span></a>. Details on adding a new CAN motor can be found in <a class="reference internal" href="AddingNewCanMotor.html"><span class="doc">Adding New CAN Motor</span></a>. This is specifically for the CubeMars CAN motors but can be adapted to new types of motors when we have them.</p>
 </section>
-<section id="t-motor-initialization">
-<h3>T-motor Initialization<a class="headerlink" href="#t-motor-initialization" title="Link to this heading">¶</a></h3>
-<p>TMotor initialization information can be found <a class="reference external" href="https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b_?usp=drive_link">here</a></p>
+<section id="can-motor-initialization">
+<h3>CAN-motor Initialization<a class="headerlink" href="#can-motor-initialization" title="Link to this heading">¶</a></h3>
+<p>CAN-motor initialization information can be found <a class="reference external" href="https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b_?usp=drive_link">here</a>.</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="controllers">
 <h2>Controllers<a class="headerlink" href="#controllers" title="Link to this heading">¶</a></h2>
 <p>Much like the motor the controllers have a parallel ControllerData class to store data for the controller. ControllerData details can be found in <a class="reference external" href="https://github.com/naubiomech/OpenExo/blob/main/Documentation/Structure/ExoDataStructure.md">Data Structure</a>, but contains state and configuration information.</p>
-<p>The Joint instance uses a <a class="reference external" href="#pointers">pointer</a> to the controller that is currently being used. The main difference is that the Joint has an instance to all the possible controllers that will be used so we just need to point to the correct one. That is why the constructor to the a joint like the hip looks like:</p>
+<p>The Joint instance uses a <a class="reference external" href="#pointers">pointer</a> to the controller that is currently being used. The main difference is that the Joint has an instance to all the possible controllers that will be used so we just need to point to the correct one. That is why the constructor to a joint like the hip looks like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">HipJoint</span><span class="p">::</span><span class="n">HipJoint</span><span class="p">(</span><span class="n">config_defs</span><span class="p">::</span><span class="n">joint_id</span> <span class="nb">id</span><span class="p">,</span> <span class="n">ExoData</span><span class="o">*</span> <span class="n">exo_data</span><span class="p">)</span>
 <span class="p">:</span> <span class="n">_Joint</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>  <span class="o">//</span> <span class="o">&lt;--</span> <span class="n">Initializer</span> <span class="nb">list</span>
 <span class="p">,</span> <span class="n">_zero_torque</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">exo_data</span><span class="p">)</span>
@@ -1382,52 +1385,48 @@ More information on the Python GUI, and its operation, can be found
 <section id="controller-parameters">
 <h3>Controller Parameters<a class="headerlink" href="#controller-parameters" title="Link to this heading">¶</a></h3>
 <p>The controller parameters are dependent on what controller is being used but a description of the parameters for each controller can be found below.</p>
+<section id="multi-joint">
+<h4>Multi-Joint<a class="headerlink" href="#multi-joint" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference internal" href="ZeroTorque.html"><span class="doc">Zero Torque</span></a></p></li>
+<li><p><a class="reference internal" href="ConstantTorque.html"><span class="doc">Constant Torque</span></a></p></li>
+<li><p><a class="reference internal" href="CalbrManager.html"><span class="doc">Calibration Manager</span></a></p></li>
+<li><p><a class="reference internal" href="Step.html"><span class="doc">Step</span></a></p></li>
+<li><p><a class="reference internal" href="Chirp.html"><span class="doc">Chirp</span></a></p></li>
+</ul>
+</section>
 <section id="hip">
 <h4>Hip<a class="headerlink" href="#hip" title="Link to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><a class="reference internal" href="ZeroTorque.html"><span class="doc">Zero Torque</span></a></p></li>
 <li><p><a class="reference internal" href="FranksCollinsHip.html"><span class="doc">Franks Collins Hip</span></a></p></li>
-<li><p><a class="reference internal" href="ConstantTorque.html"><span class="doc">Constant Torque</span></a></p></li>
-<li><p><a class="reference internal" href="Chirp.html"><span class="doc">Chirp</span></a></p></li>
-<li><p><a class="reference internal" href="Step.html"><span class="doc">Step</span></a></p></li>
-<li><p><a class="reference internal" href="CalbrManager.html"><span class="doc">Calibration Manager</span></a></p></li>
+<li><p><span class="xref std std-doc">Proportional Hip Moment</span></p></li>
 </ul>
 </section>
 <section id="knee">
 <h4>Knee<a class="headerlink" href="#knee" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p><a class="reference internal" href="ZeroTorque.html"><span class="doc">Zero Torque</span></a></p></li>
-<li><p><a class="reference internal" href="ConstantTorque.html"><span class="doc">Constant Torque</span></a></p></li>
-<li><p><a class="reference internal" href="Chirp.html"><span class="doc">Chirp</span></a></p></li>
-<li><p><a class="reference internal" href="Step.html"><span class="doc">Step</span></a></p></li>
-<li><p><a class="reference internal" href="CalbrManager.html"><span class="doc">Calibration Manager</span></a></p></li>
-</ul>
 </section>
 <section id="ankle">
 <h4>Ankle<a class="headerlink" href="#ankle" title="Link to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><a class="reference internal" href="ZeroTorque.html"><span class="doc">Zero Torque</span></a></p></li>
-<li><p><a class="reference internal" href="ConstantTorque.html"><span class="doc">Constant Torque</span></a></p></li>
-<li><p><a class="reference internal" href="Chirp.html"><span class="doc">Chirp</span></a></p></li>
-<li><p><a class="reference internal" href="Step.html"><span class="doc">Step</span></a></p></li>
-<li><p><a class="reference internal" href="CalbrManager.html"><span class="doc">Calibration Manager</span></a></p></li>
 <li><p><a class="reference internal" href="ProportionalJointMoment.html"><span class="doc">Proportional Joint Moment</span></a></p></li>
 <li><p><a class="reference internal" href="ZhangCollins.html"><span class="doc">Zhang Collins</span></a></p></li>
+<li><p><a class="reference internal" href="TREC.html"><span class="doc">TREC</span></a></p></li>
+<li><p><span class="xref std std-doc">SPV2</span></p></li>
+<li><p><span class="xref std std-doc">PJMC_Plus</span></p></li>
 </ul>
 </section>
 <section id="elbow">
 <h4>Elbow<a class="headerlink" href="#elbow" title="Link to this heading">¶</a></h4>
 <ul class="simple">
-<li><p><a class="reference internal" href="ZeroTorque.html"><span class="doc">Zero Torque</span></a></p></li>
 <li><p><a class="reference internal" href="elbow.html"><span class="doc">Elbow Min Max</span></a></p></li>
-<li><p><a class="reference internal" href="ConstantTorque.html"><span class="doc">Constant Torque</span></a></p></li>
-<li><p><a class="reference internal" href="Chirp.html"><span class="doc">Chirp</span></a></p></li>
-<li><p><a class="reference internal" href="Step.html"><span class="doc">Step</span></a></p></li>
-<li><p><a class="reference internal" href="CalbrManager.html"><span class="doc">Calibration Manager</span></a></p></li>
 </ul>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="bluetooth">
+<h2>Bluetooth<a class="headerlink" href="#bluetooth" title="Link to this heading">¶</a></h2>
 <p>The system uses Bluetooth Low Energy (BLE) to communicate with a graphical user interface (GUI). For an introduction to BLE, <a class="reference external" href="https://learn.adafruit.com/introduction-to-bluetooth-low-energy">see</a>.</p>
-</section>
-</section>
 <section id="bluetooth-background">
 <h3>Bluetooth Background<a class="headerlink" href="#bluetooth-background" title="Link to this heading">¶</a></h3>
 <p>The Exosekeleton uses Norduc’s UART Service (NUS) to communicate with the GUI. This service has RX and TX characteristics mimicking UART. In order for the app to connect with the Exoskeleton it’s name must begin with “EXOBLE_” and advertise the NUS. When a trial is started the device will begin transmitting a subset of the ExoData struct.</p>
@@ -1438,7 +1437,7 @@ More information on the Python GUI, and its operation, can be found
 </section>
 <section id="sending-a-message">
 <h3>Sending a Message<a class="headerlink" href="#sending-a-message" title="Link to this heading">¶</a></h3>
-<p>If you would like to add a new message, see the “AddingNewBLEMessage” doc. The messages are all created in the ble_commands.h file. ble_commands.h also defines the functions that are called when a command is received. To send a new message you must package a BleMessage object with your desired command and data. The data must be packaged correctly, both in length and index. Currently there is no method to ensure the correct index is used for a specific command, but the length of the commands can be found in the ble namespace. Here is an example message (Sending messages must be done in the ComsMCU):</p>
+<p>If you would like to add a new message, see <cite>AddingNewBLEMessage &lt;AddingNewBLEMessage&gt;</cite>. The messages are all created in the ble_commands.h file. ble_commands.h also defines the functions that are called when a command is received. To send a new message you must package a BleMessage object with your desired command and data. The data must be packaged correctly, both in length and index. Currently there is no method to ensure the correct index is used for a specific command, but the length of the commands can be found in the ble namespace. Here is an example message (Sending messages must be done in the ComsMCU):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BleMessage</span> <span class="n">batt_msg</span> <span class="o">=</span> <span class="n">BleMessage</span><span class="p">();</span>
 <span class="n">batt_msg</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="n">ble_names</span><span class="p">::</span><span class="n">send_batt</span><span class="p">;</span>
 <span class="n">batt_msg</span><span class="o">.</span><span class="n">expecting</span> <span class="o">=</span> <span class="n">ble_command_helpers</span><span class="p">::</span><span class="n">get_length_for_command</span><span class="p">(</span><span class="n">batt_msg</span><span class="o">.</span><span class="n">command</span><span class="p">);</span>
@@ -1446,6 +1445,7 @@ More information on the Python GUI, and its operation, can be found
 <span class="n">_exo_ble</span><span class="o">-&gt;</span><span class="n">send_message</span><span class="p">(</span><span class="n">batt_msg</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>It should also be noted, that the GUI would need to be updated to access this newly added command!</p>
 </section>
 </section>
 <hr class="docutils" />
@@ -1460,6 +1460,10 @@ More information on the Python GUI, and its operation, can be found
 <p>This is because serial printing is a pretty slow process, so you only want to do it if you are actively using it. So if you are adding a print statement you should wrap it in an <code class="docutils literal notranslate"><span class="pre">#ifdef</span></code> for that file.</p>
 <p>The reason we do it file by file rather than printing everything is because it allows you to focus in on the area you are working on. Even within this you may still want to comment out some of the prints within the file to really focus on the area you are using.</p>
 <p>You will also notice several “logger” print statments throughout the code. If you wish to print these, you need to switch the loglevel in the logging namespace in <a class="reference external" href="/ExoCode/src/Config.h">Config.h</a> from “Release” to “Debug”. When not troubleshooting the device, make sure the logger is set to “Release” in order to most efficiently operate the system.</p>
+</section>
+<hr class="docutils" />
+<section id="adding-new">
+<h2>Adding New<a class="headerlink" href="#adding-new" title="Link to this heading">¶</a></h2>
 <p>This section links to how to add new elements not covered by other sections</p>
 <section id="adding-new-board">
 <h3>Adding New Board<a class="headerlink" href="#adding-new-board" title="Link to this heading">¶</a></h3>
@@ -1468,12 +1472,12 @@ More information on the Python GUI, and its operation, can be found
 </section>
 <section id="adding-new-microcontroller">
 <h3>Adding New Microcontroller<a class="headerlink" href="#adding-new-microcontroller" title="Link to this heading">¶</a></h3>
-<p>Details can be found in <a class="reference internal" href="AddingNewMicrocontroller.html"><span class="doc">Adding New microcontroller</span></a>.</p>
+<p>Details can be found in <a class="reference internal" href="AddingNewMicrocontroller.html"><span class="doc">Adding New Microcontroller</span></a>.</p>
 <p>This would be done if you are changing the type of microcontroller is being used.</p>
 </section>
 <section id="adding-new-item-to-config">
 <h3>Adding New Item To Config<a class="headerlink" href="#adding-new-item-to-config" title="Link to this heading">¶</a></h3>
-<p>Details can be found in <a class="reference internal" href="AddingNewItemToConfig.html"><span class="doc">Adding New Controller</span></a>.</p>
+<p>Details can be found in <a class="reference internal" href="AddingNewItemToConfig.html"><span class="doc">Adding New Item to Config</span></a>.</p>
 <p>This would be done if new features need to be configured.</p>
 </section>
 <section id="adding-new-joint">
@@ -1615,25 +1619,30 @@ More information on the Python GUI, and its operation, can be found
 <li><a class="reference internal" href="#actuators">Actuators</a><ul>
 <li><a class="reference internal" href="#actuator-structure">Actuator Structure</a></li>
 <li><a class="reference internal" href="#adding-new-actuators">Adding New Actuators</a></li>
-<li><a class="reference internal" href="#t-motor-initialization">T-motor Initialization</a></li>
+<li><a class="reference internal" href="#can-motor-initialization">CAN-motor Initialization</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#controllers">Controllers</a><ul>
 <li><a class="reference internal" href="#controller-structure">Controller Structure</a></li>
 <li><a class="reference internal" href="#adding-new-controllers">Adding New Controllers</a></li>
 <li><a class="reference internal" href="#controller-parameters">Controller Parameters</a><ul>
+<li><a class="reference internal" href="#multi-joint">Multi-Joint</a></li>
 <li><a class="reference internal" href="#hip">Hip</a></li>
 <li><a class="reference internal" href="#knee">Knee</a></li>
 <li><a class="reference internal" href="#ankle">Ankle</a></li>
 <li><a class="reference internal" href="#elbow">Elbow</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bluetooth">Bluetooth</a><ul>
 <li><a class="reference internal" href="#bluetooth-background">Bluetooth Background</a></li>
 <li><a class="reference internal" href="#bluetooth-structure">Bluetooth Structure</a></li>
 <li><a class="reference internal" href="#sending-a-message">Sending a Message</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#debug">Debug</a><ul>
+<li><a class="reference internal" href="#debug">Debug</a></li>
+<li><a class="reference internal" href="#adding-new">Adding New</a><ul>
 <li><a class="reference internal" href="#adding-new-board">Adding New Board</a></li>
 <li><a class="reference internal" href="#adding-new-microcontroller">Adding New Microcontroller</a></li>
 <li><a class="reference internal" href="#adding-new-item-to-config">Adding New Item To Config</a></li>
@@ -1664,8 +1673,8 @@ More information on the Python GUI, and its operation, can be found
         <div class="button_nav">
             <div class="left">
                 
-                <a href="introduction.html">
-                    <span class="icon">&lt;</span><span>Introduction</span></a>
+                <a href="FirstTimeStartUp.html">
+                    <span class="icon">&lt;</span><span>First Time Startup</span></a>
                 
             </div>
 

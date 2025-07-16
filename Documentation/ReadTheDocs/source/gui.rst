@@ -10,12 +10,12 @@ Overview
 
 This application runs on any system with Python 3.12 installed. Required libraries can be installed via pip.
 
-**Open Source Application** utilizing the OpenExo API to search, connect to, and control NAU Biomechatronics Lab's OpenExo systems.
+**Open Source Application** utilizing the OpenExo API to search, connect to, and control OpenExo systems.
 
 This project is licensed under the MIT License and provides an open-source solution for accessible, modifiable control of the OpenExo system.
 
 Minimum System Requirements
---------------------------
+---------------------------
 
 **Operating System:**
 
@@ -36,9 +36,9 @@ Minimum System Requirements
 Installation Guide
 ------------------
 
-**Video Guide:** https://youtu.be/VnQeUM2K6Vg
+`Video Guide <https://youtu.be/VnQeUM2K6Vg>`__
 
-BLE (Bluetooth Low Energy) provides connections between this API and the exoskeletons. We use [Bleak](https://bleak.readthedocs.io/en/latest/) for all BLE operations.
+BLE (Bluetooth Low Energy) provides connections between this API and the exoskeletons. We use `Bleak <https://bleak.readthedocs.io/en/latest/>`__ for all BLE operations.
 
 Required Python libraries:
 
@@ -52,7 +52,7 @@ Required Python libraries:
 - micromlgen
 - pillow
 
-To install all dependencies, run::
+To install all dependencies, open the command prompt in the "Python_GUI" folder and run::
 
    python install_dependencies.py
 
@@ -61,7 +61,7 @@ General Workflow
 
 Program control flow diagram::
 
-   .. image:: programflow.png
+   .. image:: photos/programflow.png
       :alt: Program Control Flow
       :width: 500px
 
@@ -72,7 +72,7 @@ Starting the Application
 2. Open a terminal and navigate to the project directory.
 3. Run::
 
-   python3 GUI.py
+      python3 GUI.py
 
 4. The GUI will launch with frames for system interaction.
 

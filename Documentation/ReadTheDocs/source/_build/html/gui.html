@@ -16,8 +16,8 @@
     <script src="_static/js/petite-vue.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Adding New Pages to OpenExo Documentation" href="AddingNewPages.html" />
-    <link rel="prev" title="Zero Torque Controller" href="ZeroTorque.html" /> 
+    <link rel="next" title="Gamification Template" href="gamification_template.html" />
+    <link rel="prev" title="Elbow Min Max Controller" href="ElbowMinMax.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
 <div id="top_nav">
@@ -122,14 +122,15 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 
         </div>
@@ -147,7 +148,7 @@
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
 <p>This application runs on any system with Python 3.12 installed. Required libraries can be installed via pip.</p>
-<p><strong>Open Source Application</strong> utilizing the OpenExo API to search, connect to, and control NAU Biomechatronics Lab’s OpenExo systems.</p>
+<p><strong>Open Source Application</strong> utilizing the OpenExo API to search, connect to, and control OpenExo systems.</p>
 <p>This project is licensed under the MIT License and provides an open-source solution for accessible, modifiable control of the OpenExo system.</p>
 </section>
 <section id="minimum-system-requirements">
@@ -171,8 +172,8 @@
 </section>
 <section id="installation-guide">
 <h2>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading">¶</a></h2>
-<p><strong>Video Guide:</strong> <a class="reference external" href="https://youtu.be/VnQeUM2K6Vg">https://youtu.be/VnQeUM2K6Vg</a></p>
-<p>BLE (Bluetooth Low Energy) provides connections between this API and the exoskeletons. We use [Bleak](<a class="reference external" href="https://bleak.readthedocs.io/en/latest/">https://bleak.readthedocs.io/en/latest/</a>) for all BLE operations.</p>
+<p><a class="reference external" href="https://youtu.be/VnQeUM2K6Vg">Video Guide</a></p>
+<p>BLE (Bluetooth Low Energy) provides connections between this API and the exoskeletons. We use <a class="reference external" href="https://bleak.readthedocs.io/en/latest/">Bleak</a> for all BLE operations.</p>
 <p>Required Python libraries:</p>
 <ul class="simple">
 <li><p>matplotlib</p></li>
@@ -185,7 +186,7 @@
 <li><p>micromlgen</p></li>
 <li><p>pillow</p></li>
 </ul>
-<p>To install all dependencies, run:</p>
+<p>To install all dependencies, open the command prompt in the “Python_GUI” folder and run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">install_dependencies</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
@@ -193,7 +194,7 @@
 <section id="general-workflow">
 <h2>General Workflow<a class="headerlink" href="#general-workflow" title="Link to this heading">¶</a></h2>
 <p>Program control flow diagram:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">image</span><span class="p">::</span> <span class="n">programflow</span><span class="o">.</span><span class="n">png</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">image</span><span class="p">::</span> <span class="n">photos</span><span class="o">/</span><span class="n">programflow</span><span class="o">.</span><span class="n">png</span>
    <span class="p">:</span><span class="n">alt</span><span class="p">:</span> <span class="n">Program</span> <span class="n">Control</span> <span class="n">Flow</span>
    <span class="p">:</span><span class="n">width</span><span class="p">:</span> <span class="mi">500</span><span class="n">px</span>
 </pre></div>
@@ -204,7 +205,9 @@
 <li><p>Ensure Bluetooth is enabled on your device.</p></li>
 <li><p>Open a terminal and navigate to the project directory.</p></li>
 <li><p>Run:</p>
-<p>python3 GUI.py</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">GUI</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
 </li>
 <li><p>The GUI will launch with frames for system interaction.</p></li>
 </ol>
@@ -402,14 +405,14 @@
         <div class="button_nav">
             <div class="left">
                 
-                <a href="ZeroTorque.html">
-                    <span class="icon">&lt;</span><span>Zero Torque Controller</span></a>
+                <a href="ElbowMinMax.html">
+                    <span class="icon">&lt;</span><span>Elbow Min Max Controller</span></a>
                 
             </div>
 
             <div class="right">
                 
-                    <a href="AddingNewPages.html"><span>Adding New Pages to OpenExo Documentation</span><span class="icon">&gt;</span></a>
+                    <a href="gamification_template.html"><span>Gamification Template</span><span class="icon">&gt;</span></a>
                 
             </div>
         </div>

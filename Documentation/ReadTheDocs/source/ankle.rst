@@ -1,12 +1,14 @@
 Ankle
-============
+=====
 
-Overview of the ankle process.
+Overview of the ankle controllers.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Installation Subcategories:
+   :caption: Controllers:
 
    ProportionalJointMoment
    TREC
    ZhangCollins
+   SPV2
+   PJMC_Plus

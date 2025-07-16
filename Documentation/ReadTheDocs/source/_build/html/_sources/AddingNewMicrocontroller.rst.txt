@@ -8,6 +8,7 @@ Selecting Microcontroller
 You should confirm that the microcontroller includes the required elements. As of 20220517, the microcontroller should include:
 
 **Controller:**
+
 - SPI
 - CAN
 - 8 Analog Inputs
@@ -19,11 +20,13 @@ You should confirm that the microcontroller includes the required elements. As o
 - Floating Point Unit
 
 **Coms:**
+
 - I2C
 - SPI
 - Bluetooth Low Energy
 
 **IMU:**
+
 - Floating Point Unit
 
 It is also advisable to check that there are existing Arduino libraries for the modules, ideally with identical interfaces. Note that the SPI peripheral in slave mode can be particularly challenging, as most SPI libraries assume the microcontroller is the controller (master).
@@ -39,7 +42,9 @@ Board.h
 -------
 1. Create a new ``#define`` for your board, where you define both the board's name and an associated number.
 2. Create a new ``#elif`` for the new board, defining the pins for your board.
+
    - Add a preprocessor condition such as ``#if defined([Microcontroller])`` so you can use pin names like ``A19`` without compiling errors when building for a different board.
+
 3. Assign the pins based on your board design—use existing boards as a template.
 
 config.ini
@@ -79,6 +84,7 @@ Determining the Correct Microcontroller Name for Defines
 - Navigate to your Arduino directory: ``arduino/hardware/[type]/boards.txt``.
 - Locate your microcontroller and look for an entry like ``*.board.name=[name]``.
 - In your define, prepend the obtained board name with ``ARDUINO_``.
+
   - For example, if the board name is ``TEENSY41`` (for Teensy 4.1), then you will use ``ARDUINO_TEENSY41``.
   - Note: The Nano 33 appears as ``ARDUINO_NANO33BLE``, so the corresponding define will be ``ARDUINO_ARDUINO_NANO33BLE``.
-  **Be careful** to follow the naming conventions exactly to ensure consistency.
+  - **Be careful** to follow the naming conventions exactly to ensure consistency.

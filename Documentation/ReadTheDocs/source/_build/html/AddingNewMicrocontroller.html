@@ -122,7 +122,8 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartUp.html">First Time Startup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a></li>
@@ -136,13 +137,14 @@
 <li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Adding New Pages to OpenExo Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
 </ul>
 
         </div>
@@ -160,26 +162,29 @@
 <section id="selecting-microcontroller">
 <h2>Selecting Microcontroller<a class="headerlink" href="#selecting-microcontroller" title="Link to this heading">¶</a></h2>
 <p>You should confirm that the microcontroller includes the required elements. As of 20220517, the microcontroller should include:</p>
-<p><strong>Controller:</strong>
-- SPI
-- CAN
-- 8 Analog Inputs
-- 9 Digital outputs</p>
-<blockquote>
-<div><ul class="simple">
+<p><strong>Controller:</strong></p>
+<ul class="simple">
+<li><p>SPI</p></li>
+<li><p>CAN</p></li>
+<li><p>8 Analog Inputs</p></li>
+<li><p>9 Digital outputs</p>
+<ul>
 <li><p><em>Ideally with 3 PWM outputs for LED</em></p></li>
 </ul>
-</div></blockquote>
-<ul class="simple">
+</li>
 <li><p>2 Digital inputs</p></li>
 <li><p>Floating Point Unit</p></li>
 </ul>
-<p><strong>Coms:</strong>
-- I2C
-- SPI
-- Bluetooth Low Energy</p>
-<p><strong>IMU:</strong>
-- Floating Point Unit</p>
+<p><strong>Coms:</strong></p>
+<ul class="simple">
+<li><p>I2C</p></li>
+<li><p>SPI</p></li>
+<li><p>Bluetooth Low Energy</p></li>
+</ul>
+<p><strong>IMU:</strong></p>
+<ul class="simple">
+<li><p>Floating Point Unit</p></li>
+</ul>
 <p>It is also advisable to check that there are existing Arduino libraries for the modules, ideally with identical interfaces. Note that the SPI peripheral in slave mode can be particularly challenging, as most SPI libraries assume the microcontroller is the controller (master).</p>
 </section>
 <section id="design-board">
@@ -195,8 +200,11 @@
 <h2>Board.h<a class="headerlink" href="#board-h" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Create a new <code class="docutils literal notranslate"><span class="pre">#define</span></code> for your board, where you define both the board’s name and an associated number.</p></li>
-<li><p>Create a new <code class="docutils literal notranslate"><span class="pre">#elif</span></code> for the new board, defining the pins for your board.
-- Add a preprocessor condition such as <code class="docutils literal notranslate"><span class="pre">#if</span> <span class="pre">defined([Microcontroller])</span></code> so you can use pin names like <code class="docutils literal notranslate"><span class="pre">A19</span></code> without compiling errors when building for a different board.</p></li>
+<li><p>Create a new <code class="docutils literal notranslate"><span class="pre">#elif</span></code> for the new board, defining the pins for your board.</p>
+<ul class="simple">
+<li><p>Add a preprocessor condition such as <code class="docutils literal notranslate"><span class="pre">#if</span> <span class="pre">defined([Microcontroller])</span></code> so you can use pin names like <code class="docutils literal notranslate"><span class="pre">A19</span></code> without compiling errors when building for a different board.</p></li>
+</ul>
+</li>
 <li><p>Assign the pins based on your board design—use existing boards as a template.</p></li>
 </ol>
 </section>
@@ -239,10 +247,13 @@
 <ul class="simple">
 <li><p>Navigate to your Arduino directory: <code class="docutils literal notranslate"><span class="pre">arduino/hardware/[type]/boards.txt</span></code>.</p></li>
 <li><p>Locate your microcontroller and look for an entry like <code class="docutils literal notranslate"><span class="pre">*.board.name=[name]</span></code>.</p></li>
-<li><p>In your define, prepend the obtained board name with <code class="docutils literal notranslate"><span class="pre">ARDUINO_</span></code>.
-- For example, if the board name is <code class="docutils literal notranslate"><span class="pre">TEENSY41</span></code> (for Teensy 4.1), then you will use <code class="docutils literal notranslate"><span class="pre">ARDUINO_TEENSY41</span></code>.
-- Note: The Nano 33 appears as <code class="docutils literal notranslate"><span class="pre">ARDUINO_NANO33BLE</span></code>, so the corresponding define will be <code class="docutils literal notranslate"><span class="pre">ARDUINO_ARDUINO_NANO33BLE</span></code>.
-<strong>Be careful</strong> to follow the naming conventions exactly to ensure consistency.</p></li>
+<li><p>In your define, prepend the obtained board name with <code class="docutils literal notranslate"><span class="pre">ARDUINO_</span></code>.</p>
+<ul>
+<li><p>For example, if the board name is <code class="docutils literal notranslate"><span class="pre">TEENSY41</span></code> (for Teensy 4.1), then you will use <code class="docutils literal notranslate"><span class="pre">ARDUINO_TEENSY41</span></code>.</p></li>
+<li><p>Note: The Nano 33 appears as <code class="docutils literal notranslate"><span class="pre">ARDUINO_NANO33BLE</span></code>, so the corresponding define will be <code class="docutils literal notranslate"><span class="pre">ARDUINO_ARDUINO_NANO33BLE</span></code>.</p></li>
+<li><p><strong>Be careful</strong> to follow the naming conventions exactly to ensure consistency.</p></li>
+</ul>
+</li>
 </ul>
 </section>
 </section>

@@ -22,6 +22,6 @@ Parameter index order can be found in [ControllerData.h](/ExoCode/src/Controller
 - peak_percent_gait - Percent gait to apply the largest flexion torque.
 - peak_offset_percent_gait - Percent gait to stop applying flexion torque.
 - use_pid - This flag turns PID on(1) or off(0)
-- p_gain - Proportional gain for closed loop controls
-- i_gain - Integral gain for closed loop controls
-- d_gain - Derivative gain for closed loop controls
+- p_gain - Proportional gain for closed loop control
+- i_gain - Integral gain for closed loop control
+- d_gain - Derivative gain for closed loop control
