@@ -2174,16 +2174,44 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
         logger::println("AngleBased::Constructor");
     #endif
 
+    /*
+    int thigh_size = _controller_data->parameters[controller_defs::angle_based::tigh_size_idx];
+    if(thigh_size == 1) //small thigh cuff
+    {
+        //These will need to be adjusted to fit a regression for small size
+        correction_factor[0] = 2.8870;
+        correction_factor[1] = 0.0519;
+        correction_factor[2] = -0.0133;
+    }
+    else if(thigh_size == 2) //medium thigh cuff
+    { 
+        correction_factor[0] = 2.8870;
+        correction_factor[1] = 0.0519;
+        correction_factor[2] = -0.0133;
+    }
+    else if(thigh_size == 3) //large thigh cuff
+    { 
+        //These also need to be adjusted to fit regression for large size
+        correction_factor[0] = 2.8870;
+        correction_factor[1] = 0.0519;
+        correction_factor[2] = -0.0133;
+    }
+    else
+    {
+        Serial.println("thigh cuff size does not match given sizes (1-3)");
+    }
+    */
+
     encoder_angle = 0.0;
     combined_fsr = 0.0;
     encoder_offset = _joint_data->position;
     intended_encoder_offset = -50;
-    correction_factor[0] = 2.8870;
-    correction_factor[1] = 0.0519;
-    correction_factor[2] = -0.0133;
     limit_rate = 0.025;
     ewma_alpha = 0.1;
     last_update_time = millis();
+    correction_factor[0] = 2.8870;
+    correction_factor[1] = 0.0519;
+    correction_factor[2] = -0.0133;
 
     first_loop = true;
 
@@ -2251,7 +2279,7 @@ float AngleBased::calc_motor_cmd()
         float stance_extension_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_extension_setpoint_idx];
         float stance_flexion_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_flexion_setpoint_idx];
         float swing_setpoint = _controller_data->parameters[controller_defs::angle_based::swing_setpoint_idx];
-        float swing_assist_duration = _controller_data->parameters[controller_defs::angle_based::swing_assist_duration_idx];
+        float swing_assist_endpoint = _controller_data->parameters[controller_defs::angle_based::swing_assist_endpoint_idx];
         float max_torque = _controller_data->parameters[controller_defs::angle_based::max_torque_idx];
         int recalibrate_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_flag_idx];
         int recal_angle_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_angle_idx];
@@ -2510,7 +2538,7 @@ float AngleBased::calc_motor_cmd()
         // Determine Torque Setpoint
         if (state == 1) // If we are in early stance
         {
-            if(!calibrating)
+            if((!calibrating) && (abs(normalized_angle) > 0.075))
             {
                 cmd_ff = -1.0 * normalized_stance_moment * stance_extension_setpoint; // Calculate the setpoint by multiplying the normalized_stance_moment (ranging from -1 to 1) by the user defined setpoint
             }
@@ -2524,7 +2552,7 @@ float AngleBased::calc_motor_cmd()
 
         else if (state == 2) // If we are in late stance
         {
-            if(!calibrating)
+            if((!calibrating) && (abs(normalized_angle) > 0.075))
             {
                 cmd_ff = -1.0 * normalized_stance_moment * stance_flexion_setpoint; // Calculate the setpoint by multiplying the normalized_stance_moment (ranging from -1 to 1) by the user defined setpoint
             }
@@ -2550,7 +2578,7 @@ float AngleBased::calc_motor_cmd()
                 }
                 startFlag = false;
             }
-            else if (swingStartPhase + swing_assist_duration >= _side_data->percent_gait) // If we are within the user defined assistive duration, provide swing assistance
+            else if (swing_assist_endpoint >= _side_data->percent_gait) // If we are within the user defined assistive duration, provide swing assistance
             {
                 if(!calibrating)
                 {
@@ -2559,16 +2587,16 @@ float AngleBased::calc_motor_cmd()
                 Serial.println("swing assist");
                 Serial.print("current percent gait: ");
                 Serial.println(_side_data->percent_gait);
-                Serial.print("> Swing Start Phase + Swing Assist: ");
-                Serial.println(swingStartPhase + swing_assist_duration);
+                Serial.print("Swing Assist Endpoint: ");
+                Serial.println(swingStartPhase + swing_assist_endpoint);
             }
             else // If we are not within the user defined assistive duration, send zero torque
             {
                 Serial.println("no assistance");
                 Serial.print("current percent gait: ");
                 Serial.println(_side_data->percent_gait);
-                Serial.print("> Swing Start Phase + Swing Assist: ");
-                Serial.println(swingStartPhase + swing_assist_duration);
+                Serial.print("Swing Assist Endpoint: ");
+                Serial.println(swing_assist_endpoint);
                 cmd_ff = 0.0;
             }
 
