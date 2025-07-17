@@ -1,6 +1,6 @@
-5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,
-6,"parameter number, the number of parameters to read per line",,,,,
-,Parameter list for the ZeroTorque controller,,,,,
-,Parameter order: ,,,,,
-Stance Extension Setpoint (Nm),Stance Flexion Setpoint (Nm),swing_setpoint,Swing Assistance Duration (ms),Maximum Torque Setpoint (Nm),Recalibrate Flag,Recalibrate_Angle
-5,3,2.5,200,9,0,0
+5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,,
+6,"parameter number, the number of parameters to read per line",,,,,,
+,Parameter list for the ZeroTorque controller,,,,,,
+,Parameter order: ,,,,,,
+Stance Extension Setpoint (Nm),Stance Flexion Setpoint (Nm),swing_setpoint,Swing Assistance Endpoint (% gait phase),Maximum Torque Setpoint (Nm),Recalibrate Flag,Recalibrate_Angle,Thigh Cuff Size
+5,3,2.5,80,9,0,0,2

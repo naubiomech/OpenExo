@@ -2528,7 +2528,7 @@ float AngleBased::calc_motor_cmd()
             }
         }
 
-        if ((raw_toe_fsr <= prev_toe_fsr && _side_data->toe_stance) || (!_side_data->heel_stance && !_side_data->toe_stance))
+        if ((abs(raw_toe_fsr - prev_toe_fsr) > 0.01 && _side_data->toe_stance) || (!_side_data->heel_stance && !_side_data->toe_stance))
         {
             state = 3;
         }
@@ -2632,6 +2632,11 @@ float AngleBased::calc_motor_cmd()
 
         // Store the feed-forward setpoint for plotting
         _controller_data->ff_setpoint = cmd_ff;
+
+        if(((prev_cmd < 0.0) && (cmd_ff > 0.0)) || ((prev_cmd > 0.0) && (cmd_ff < 0.0)))
+        {
+            cmd_ff = 0.0;
+        }
 
         // Set the motor command to be equal to the feed-foward setpoint (Note: if doing closed-loop control, this is where you would do PID)
         float cmd = cmd_ff;
