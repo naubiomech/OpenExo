@@ -1,5 +1,5 @@
-First Time Startup
-==========================
+First Time StartUp
+==================
 
 .. contents:: Table of Contents
     :depth: 2
