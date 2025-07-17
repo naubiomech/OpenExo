@@ -1464,11 +1464,11 @@ The controller parameters are dependent on what controller is being used but a d
 Multi-Joint
 ^^^^^^^^^^^
 
-- :doc:`Zero Torque <ZeroTorque>`
-- :doc:`Constant Torque <ConstantTorque>`
-- :doc:`Calibration Manager <CalbrManager>`
-- :doc:`Step <Step>`
-- :doc:`Chirp <Chirp>`
+- :doc:`Zero Torque <controllers>`
+- :doc:`Constant Torque <controllers>`
+- :doc:`Calibration Manager <controllers>`
+- :doc:`Step <controllers>`
+- :doc:`Chirp <controllers>`
 
 Hip
 ^^^
@@ -1486,7 +1486,7 @@ Ankle
 - :doc:`Proportional Joint Moment <ProportionalJointMoment>`
 - :doc:`Zhang Collins <ZhangCollins>`
 - :doc:`TREC <TREC>`
-- :doc:`SPV2 <spv2>`
+- :doc:`SPV2 <SPV2>`
 - :doc:`PJMC_Plus <PJMC_Plus>`
 
 Elbow
