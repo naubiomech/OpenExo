@@ -25,6 +25,8 @@
 #include "GattDb.h"
 #include "BleMessage.h"
 #include "BleMessageQueue.h"
+#include "ExoData.h"
+#include "ParseIni.h"
 
 class ExoBLE 
 {
@@ -83,6 +85,11 @@ class ExoBLE
 
         //The parser used to serialize and deserialize the BLE data
         BleParser _ble_parser = BleParser();
+
+        //Flag to indicate if this is the first time the device is connecting
+        bool first_connect = true;
+        uint8_t config_to_send;
+        ExoData* _data
 };
 
 /**

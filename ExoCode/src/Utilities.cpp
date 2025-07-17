@@ -377,4 +377,12 @@ namespace utils
     {
         return (val < min || val > max);
     }
+
+    std::string trimControllerName(const std::string& input) {
+    size_t slash = input.find('/');
+    size_t dot = input.find('.');
+    size_t start = (slash == std::string::npos) ? 0 : slash + 1;
+    size_t end = (dot == std::string::npos || dot < start) ? input.size() : dot;
+    return input.substr(start, end - start);
+    }
 }

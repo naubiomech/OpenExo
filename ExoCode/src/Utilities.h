@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <utility>  //std::pair
 #include <queue>    //std::queue
+#include <string>
 
 /**
  * @brief contains general utility functions for the exo
@@ -299,6 +300,15 @@ namespace utils
      * @return false 
      */
     bool is_outside_range(float val, float min, float max);
+
+    
+    /**
+     * @brief Trims the controller name to just the name without the path or file extension
+     * 
+     * @param input : The full controller name with path and extension
+     * @return std::string : The trimmed controller name
+     */
+    std::string trim_controller_name(const std::string& input);
 }
 
 #endif

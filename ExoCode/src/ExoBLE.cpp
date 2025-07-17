@@ -10,9 +10,10 @@
 
 #define EXOBLE_DEBUG 0
 
-ExoBLE::ExoBLE()
+ExoBLE::ExoBLE(ExoData* data, uint8_t config_to_send)
 {
-    ;
+    _data = data;
+    config_to_send = config_to_send;
 }
 
 bool ExoBLE::setup()
@@ -159,6 +160,30 @@ bool ExoBLE::handle_updates()
 
         BLE.poll();
         int32_t current_status = BLE.connected();
+
+        if(current_status && first_connect)
+        {
+            if(config_to_send::config_defs::JointType == hip)
+            {
+                controller_list_msg = "";
+            }
+            if(config_to_send::config_defs::JointType == knee)
+            {
+                controller_list_msg = "";
+            }
+            if(config_to_send::config_defs::JointType == ankle)
+            {
+                controller_list_msg = "";
+            }
+            if(config_to_send::config_defs::JointType == elbow)
+            {
+                controller_list_msg = "";
+            }
+
+            //Send the controller list to the GUI
+            send_message(&controller_list_msg);
+            first_connect = false;
+        }
 
         if (_connected == current_status)
         {
