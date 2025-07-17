@@ -59,7 +59,7 @@ To install all dependencies, open the command prompt in the "Python_GUI" folder 
 General Workflow
 ----------------
 
-Program control flow diagram::
+Program control flow diagram:
 
    .. image:: photos/programflow.png
       :alt: Program Control Flow
@@ -141,42 +141,46 @@ Each plot subclass has an ``animate()`` method—modify it to change data sourci
 Adding a New Frame
 ------------------
 
-1. **Create the frame class:** Add a new file (e.g., ``views/newFeature.py``)
-::
-   import tkinter as tk
+1. **Create the frame class:** Add a new file (e.g., ``views/newFeature.py``):
+   
+   .. code-block:: python
+   
+      import tkinter as tk
 
-   class NewFeature(tk.Frame):
-       def __init__(self, parent, controller):
-           super().__init__(parent)
-           self.controller = controller
+      class NewFeature(tk.Frame):
+          def __init__(self, parent, controller):
+              super().__init__(parent)
+              self.controller = controller
 
-           label = tk.Label(self, text="New Feature Frame", font=("Arial", 24))
-           label.pack(pady=20)
+              label = tk.Label(self, text="New Feature Frame", font=("Arial", 24))
+              label.pack(pady=20)
 
-           button = tk.Button(
-               self,
-               text="Go to Scan Window",
-               command=lambda: controller.show_frame("ScanWindow")
-           )
-           button.pack(pady=10)
+              button = tk.Button(
+                  self,
+                  text="Go to Scan Window",
+                  command=lambda: controller.show_frame("ScanWindow")
+              )
+              button.pack(pady=10)
 
-2. **Update the controller:** In your main app file, import and register the new frame
-::
+2. **Update the controller:** In your main app file, import and register the new frame:
 
-   from views.newFeature import NewFeature
+   .. code-block:: python
+   
+      from views.newFeature import NewFeature
 
-   for F in (ScanWindow, ActiveTrial, UpdateTorque, BioFeedback, MachineLearning, NewFeature):
-       # existing frame setup
+      for F in (ScanWindow, ActiveTrial, UpdateTorque, BioFeedback, MachineLearning, NewFeature):
+          # existing frame setup
 
-3. **Add navigation:** Create a button in any frame to show the new feature
-::
+3. **Add navigation:** Create a button in any frame to show the new feature:
 
-   button = tk.Button(
-       self,
-       text="Go to New Feature",
-       command=lambda: controller.show_frame("NewFeature")
-   )
-   button.pack(pady=10)
+   .. code-block:: python
+   
+      button = tk.Button(
+          self,
+          text="Go to New Feature",
+          command=lambda: controller.show_frame("NewFeature")
+      )
+      button.pack(pady=10)
 
 Biofeedback Frame
 -----------------
@@ -198,9 +202,11 @@ Modifying the Signal
 ~~~~~~~~~~~~~~~~~~~~
 
 1. Locate the ``FSRPlot`` class in ``chart.py``.
-2. Update the data source variable::
+2. Update the data source variable:
 
-   self.master.controller.deviceManager._realTimeProcessor._chart_data
+   .. code-block::
+
+      self.master.controller.deviceManager._realTimeProcessor._chart_data
 
 Features and Controls
 ~~~~~~~~~~~~~~~~~~~~~

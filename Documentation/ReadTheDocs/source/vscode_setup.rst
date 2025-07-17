@@ -2,7 +2,7 @@ VS Code + GitHub Quick-Start
 ==============================
 
 Download and Install VS Code
----------------------------
+----------------------------
 
 1. Go to the official site: https://code.visualstudio.com.
 2. Download the installer for **Windows / macOS / Linux**.
@@ -31,7 +31,7 @@ If you have access to Copilot, install **GitHub Copilot** from the same
 marketplace and sign in; otherwise ignore this step.
 
 Clone a Repository from GitHub
------------------------------
+------------------------------
 
 1. Press ``F1`` (or ``Ctrl + Shift + P``) → **Git: Clone**.
 2. Paste the repository HTTPS/SSH URL, e.g. ``https://github.com/YourOrg/Project.git``.
@@ -77,7 +77,6 @@ Action               Shortcut (Win/Linux defaults)
 Command Palette      ``Ctrl + Shift + P``
 File Explorer        ``Ctrl + Shift + E``
 Source Control       ``Ctrl + Shift + G``
-Open Terminal        ``Ctrl + ` ``
 Search + Replace     ``Ctrl + Shift + F``
 Run / Debug          ``F5``
 ===================  =============================

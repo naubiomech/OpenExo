@@ -194,11 +194,10 @@
 <section id="general-workflow">
 <h2>General Workflow<a class="headerlink" href="#general-workflow" title="Link to this heading">¶</a></h2>
 <p>Program control flow diagram:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">image</span><span class="p">::</span> <span class="n">photos</span><span class="o">/</span><span class="n">programflow</span><span class="o">.</span><span class="n">png</span>
-   <span class="p">:</span><span class="n">alt</span><span class="p">:</span> <span class="n">Program</span> <span class="n">Control</span> <span class="n">Flow</span>
-   <span class="p">:</span><span class="n">width</span><span class="p">:</span> <span class="mi">500</span><span class="n">px</span>
-</pre></div>
-</div>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/programflow.png"><img alt="Program Control Flow" src="_images/programflow.png" style="width: 500px;" />
+</a>
+</div></blockquote>
 <section id="starting-the-application">
 <h3>Starting the Application<a class="headerlink" href="#starting-the-application" title="Link to this heading">¶</a></h3>
 <ol class="arabic">
@@ -276,8 +275,9 @@
 </section>
 <section id="adding-a-new-frame">
 <h2>Adding a New Frame<a class="headerlink" href="#adding-a-new-frame" title="Link to this heading">¶</a></h2>
-<p>1. <strong>Create the frame class:</strong> Add a new file (e.g., <code class="docutils literal notranslate"><span class="pre">views/newFeature.py</span></code>)</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tk</span>
+<ol class="arabic">
+<li><p><strong>Create the frame class:</strong> Add a new file (e.g., <code class="docutils literal notranslate"><span class="pre">views/newFeature.py</span></code>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tk</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">NewFeature</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">controller</span><span class="p">):</span>
@@ -295,15 +295,17 @@
         <span class="n">button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">pady</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>2. <strong>Update the controller:</strong> In your main app file, import and register the new frame</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">views.newFeature</span><span class="w"> </span><span class="kn">import</span> <span class="n">NewFeature</span>
+</li>
+<li><p><strong>Update the controller:</strong> In your main app file, import and register the new frame:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">views.newFeature</span><span class="w"> </span><span class="kn">import</span> <span class="n">NewFeature</span>
 
 <span class="k">for</span> <span class="n">F</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ScanWindow</span><span class="p">,</span> <span class="n">ActiveTrial</span><span class="p">,</span> <span class="n">UpdateTorque</span><span class="p">,</span> <span class="n">BioFeedback</span><span class="p">,</span> <span class="n">MachineLearning</span><span class="p">,</span> <span class="n">NewFeature</span><span class="p">):</span>
     <span class="c1"># existing frame setup</span>
 </pre></div>
 </div>
-<p>3. <strong>Add navigation:</strong> Create a button in any frame to show the new feature</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+</li>
+<li><p><strong>Add navigation:</strong> Create a button in any frame to show the new feature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Go to New Feature&quot;</span><span class="p">,</span>
     <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">controller</span><span class="o">.</span><span class="n">show_frame</span><span class="p">(</span><span class="s2">&quot;NewFeature&quot;</span><span class="p">)</span>
@@ -311,6 +313,8 @@
 <span class="n">button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">pady</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
+</li>
+</ol>
 </section>
 <section id="biofeedback-frame">
 <h2>Biofeedback Frame<a class="headerlink" href="#biofeedback-frame" title="Link to this heading">¶</a></h2>
@@ -334,7 +338,9 @@
 <ol class="arabic">
 <li><p>Locate the <code class="docutils literal notranslate"><span class="pre">FSRPlot</span></code> class in <code class="docutils literal notranslate"><span class="pre">chart.py</span></code>.</p></li>
 <li><p>Update the data source variable:</p>
-<p>self.master.controller.deviceManager._realTimeProcessor._chart_data</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">master</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">deviceManager</span><span class="o">.</span><span class="n">_realTimeProcessor</span><span class="o">.</span><span class="n">_chart_data</span>
+</pre></div>
+</div>
 </li>
 </ol>
 </section>
