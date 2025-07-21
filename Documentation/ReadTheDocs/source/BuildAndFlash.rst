@@ -34,7 +34,7 @@ Once you have all the tools installed, follow these steps to flash your device:
 8. Press the **Upload** button.  
    *Note: The Nano will take significantly longer to build than the Teensy.*
 
-If this is your first time, we recommend our `First Time Startup Guide <https://theopenexo.readthedocs.io/en/latest/FirstTimeStartUp.html>`__,
+If this is your first time, we recommend our `First Time Startup Guide <https://theopenexo.readthedocs.io/en/latest/FirstTimeStartup.html>`__,
 which, in detail, walks you through downloading the relevant software, setting up the system, and running the system for the first time.
 It also outlines potential error handling approaches to aid in troubleshooting should the system not work.
 

@@ -1188,7 +1188,7 @@ Details of the components can be found in `presentations <https://github.com/nau
 How to Deploy
 ~~~~~~~~~~~~~
 
-A detailed guide to deploying for the first time can be found in our `First Time Setup Guide <https://theopenexo.readthedocs.io/en/latest/FirstTimeStartUp.html>`__.
+A detailed guide to deploying for the first time can be found in our `First Time Setup Guide <https://theopenexo.readthedocs.io/en/latest/FirstTimeStartup.html>`__.
 
 First, you will need to connect the physical components.
 

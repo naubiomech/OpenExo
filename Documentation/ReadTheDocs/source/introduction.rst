@@ -6,7 +6,7 @@ Welcome to the OpenExo Software Documentation! This documentation serves as a co
 Key topics covered in this documentation include:
 
 - `User Guide <https://theopenexo.readthedocs.io/en/latest/User_Guide.html>`__: A concise overview of the coding standards and engineering principles our group follows.
-- `First Time Startup <https://theopenexo.readthedocs.io/en/latest/FirstTimeStartUp.html>`__: Guide to starting up the exoskeleton and running a controller for the first time. 
+- `First Time Startup <https://theopenexo.readthedocs.io/en/latest/FirstTimeStartup.html>`__: Guide to starting up the exoskeleton and running a controller for the first time. 
 - `Installation <https://theopenexo.readthedocs.io/en/latest/installation.html>`__: Step-by-step guidance to set up the software and hardware components.
 - `Adding Elements <https://theopenexo.readthedocs.io/en/latest/addingelements.html>`__: Practical examples that show how to extend the platform with new sensors, actuators, and algorithms.
 - `Controllers <https://theopenexo.readthedocs.io/en/latest/controllers.html>`__: Reference material and tutorials for implementing ankle and elbow controllers.
