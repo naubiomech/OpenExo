@@ -65,7 +65,7 @@ For questions, issues, or further assistance, reach out to us at:
 
    introduction
    User_Guide
-   FirstTimeStartUp
+   FirstTimeStartup
    installation
    addingelements
    controllers
