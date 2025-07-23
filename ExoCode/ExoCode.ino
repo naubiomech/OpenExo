@@ -743,6 +743,8 @@ void setup()
         led->set_color(0, 255, 0);
     }
 
+    Serial.println("we are running nano");
+
     #if REAL_TIME_I2C
       logger::print("Init I2C");  
       real_time_i2c::init();

@@ -379,10 +379,12 @@ namespace utils
     }
 
     std::string trimControllerName(const std::string& input) {
-    size_t slash = input.find('/');
-    size_t dot = input.find('.');
-    size_t start = (slash == std::string::npos) ? 0 : slash + 1;
-    size_t end = (dot == std::string::npos || dot < start) ? input.size() : dot;
-    return input.substr(start, end - start);
+    size_t pos = input.find('>');
+    if (pos != std::string::npos && pos + 1 < input.size()) {
+        // Return the substring starting after the '>' character
+        return input.substr(pos + 1);
     }
+    // Return an empty string if '>' is not found
+    return input;
+}
 }

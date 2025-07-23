@@ -7,6 +7,9 @@
 #include "Config.h"
 #include "error_codes.h"
 #include "Logger.h"
+#include <cstring>
+#include "uart_commands.h"
+#include "UARTHandler.h"
 
 #define EXOBLE_DEBUG 0
 
@@ -14,6 +17,7 @@ ExoBLE::ExoBLE(ExoData* data, uint8_t config_to_send)
 {
     _data = data;
     config_to_send = config_to_send;
+    Serial.println("created ExoBLE object");
 }
 
 bool ExoBLE::setup()
@@ -108,6 +112,8 @@ void ExoBLE::advertising_onoff(bool onoff)
     {
         //Start Advertising
         // logger::println("Start Advertising");
+        Serial.println("Start Advertising");
+        first_connect = true; //Reset first connect flag
         BLE.advertise();
 
         //Turn the blue led off
@@ -159,29 +165,26 @@ bool ExoBLE::handle_updates()
         #endif
 
         BLE.poll();
-        int32_t current_status = BLE.connected();
+        int32_t current_status = BLE.connected(); //True if the device is connected, False if not
 
         if(current_status && first_connect)
         {
-            if(config_to_send::config_defs::JointType == hip)
-            {
-                controller_list_msg = "";
-            }
-            if(config_to_send::config_defs::JointType == knee)
-            {
-                controller_list_msg = "";
-            }
-            if(config_to_send::config_defs::JointType == ankle)
-            {
-                controller_list_msg = "";
-            }
-            if(config_to_send::config_defs::JointType == elbow)
-            {
-                controller_list_msg = "";
-            }
+            //Get a list of the parameters to send to the GUI
+            //char param_list[UART_command_handlers::param_names_len] = {*UART_command_handlers::param_names.c_str()};
+            UART_msg_t msg;
+            UART_command_handlers::get_real_time_data(_uart_handler, _data, msg, _data->config);
 
-            //Send the controller list to the GUI
-            send_message(&controller_list_msg);
+            std::string param_names = UART_command_handlers::param_names;
+            char* param_names_buffer = const_cast<char*>(param_names.c_str());
+
+            //Send the parameter list to the GUI
+            Serial.println("can we see the param list? current_status && first_connect");
+            Serial.println(param_names_buffer);
+            Serial.println(UART_command_handlers::param_names_len);
+            BleMessage* param_list_msg = _ble_parser.handle_raw_data(param_names_buffer, UART_command_handlers::param_names_len);
+            Serial.println(param_list_msg->command);
+            send_message(*param_list_msg);
+
             first_connect = false;
         }
 

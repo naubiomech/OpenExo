@@ -16,6 +16,8 @@
 #include "Board.h"
 #include "ParseIni.h"
 #include <stdint.h>
+#include <string>
+#include <vector>
 
 //Forward declaration
 class ExoData;
@@ -212,7 +214,6 @@ class ControllerData {
          */
         uint8_t get_parameter_length();
         
-        
         uint8_t controller;                                 /**< Id of the current controller */
         config_defs::JointType joint;                       /**< Id of the current joint */
 
@@ -292,6 +293,8 @@ class ControllerData {
         //Variables for the PHMC Controller
         float fs;
         float state;
+        
+        
 };      
 
 #endif

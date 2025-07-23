@@ -106,8 +106,6 @@
      */
     uint8_t set_controller_params(uint8_t joint_id, uint8_t controller_id, uint8_t set_num, ExoData* exo_data);
 
-    
-
 
 #endif
 #endif

@@ -50,6 +50,8 @@ class ExoDeviceManager:
             8: 72.0
         }
 
+        self.parameter_names = ""
+
         self.isConnected = False
 
     # Set scan results from the BLE scanner

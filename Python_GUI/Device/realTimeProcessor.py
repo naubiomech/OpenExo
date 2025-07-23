@@ -19,11 +19,13 @@ class RealTimeProcessor:
         self._data_length = None
         self.x_time = 0
         self._predictor= MLModel.MLModel() #create the machine learning model object
+        self.first_msg = True  # Flag to indicate if the first message has been processed
         
 
     def processEvent(self, event):
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
+        print(dataUnpacked)
         if "c" in dataUnpacked:  # 'c' acts as a delimiter for data
             data_split = dataUnpacked.split(
                 "c"

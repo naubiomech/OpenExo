@@ -27,6 +27,7 @@
 #include "BleMessageQueue.h"
 #include "ExoData.h"
 #include "ParseIni.h"
+#include "UARTHandler.h"
 
 class ExoBLE 
 {
@@ -36,7 +37,7 @@ class ExoBLE
          * 
          * @param data A reference to the ExoData object
          */
-        ExoBLE();
+        ExoBLE(ExoData* data, uint8_t config_to_send);
         
         /**
          * @brief Sets GATT DB, device name, and begins advertising. 
@@ -89,7 +90,8 @@ class ExoBLE
         //Flag to indicate if this is the first time the device is connecting
         bool first_connect = true;
         uint8_t config_to_send;
-        ExoData* _data
+        ExoData* _data;
+        UARTHandler* _uart_handler = UARTHandler::get_instance();
 };
 
 /**

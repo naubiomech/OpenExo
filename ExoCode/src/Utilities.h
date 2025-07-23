@@ -308,7 +308,7 @@ namespace utils
      * @param input : The full controller name with path and extension
      * @return std::string : The trimmed controller name
      */
-    std::string trim_controller_name(const std::string& input);
+    std::string trimControllerName(const std::string& input);
 }
 
 #endif

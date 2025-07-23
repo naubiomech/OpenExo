@@ -31,7 +31,7 @@ ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
     }
 
     _battery->init();
-    _exo_ble = new ExoBLE(data, config_to_send);
+    _exo_ble = new ExoBLE(data, *config_to_send);
     _exo_ble->setup();
 
     uint8_t rt_data_len = 0;

@@ -845,4 +845,55 @@
         return error_type;
     }
 
+    /*get_controller_names(config_to_send)
+    {
+        if(config_to_send::config_defs::JointType == hip)
+            {
+                controller_list_msg = strcat(controller_list_msg,
+                "disabled,
+                zeor_torque,
+                frank_collins_hip,
+                constant_torque,
+                chirp,
+                step,
+                phmc,"
+                );
+            }
+            if(config_to_send::config_defs::JointType == knee)
+            {
+                controller_list_msg = strcat(controller_list_msg,
+                "disabled,
+                zero_torque,
+                constant_torque,
+                chirp,
+                step,"
+                );
+            }
+            if(config_to_send::config_defs::JointType == ankle)
+            {
+                controller_list_msg = strcat(controller_list_msg,
+                "disabled,
+                zero_torque,
+                pjmc,
+                zhang_collins,
+                constant_torque,
+                trec,
+                chirp,
+                step,
+                spv2,"
+                );
+            }
+            if(config_to_send::config_defs::JointType == elbow)
+            {
+                controller_list_msg = strcat(controller_list_msg,
+                "disabled,
+                zero_torque,
+                elbow_min_max,
+                chirp,
+                step,"
+                );
+            }
+    }
+    */
+
 #endif
