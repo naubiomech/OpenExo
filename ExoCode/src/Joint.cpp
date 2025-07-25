@@ -595,6 +595,7 @@ KneeJoint::KneeJoint(config_defs::joint_id id, ExoData* exo_data)
 , _constant_torque(id, exo_data)
 , _chirp(id, exo_data)
 , _step(id, exo_data)
+, _calibr_manager(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
@@ -762,6 +763,9 @@ void KneeJoint::set_controller(uint8_t controller_id)  //Changes the high level 
             break;
         case (uint8_t)config_defs::knee_controllers::step:
             _controller = &_step;
+            break;
+		case (uint8_t)config_defs::knee_controllers::calibr_manager:
+            _controller = &_calibr_manager;
             break;
         default :
             logger::print("Unkown Controller!\n", LogLevel::Error);

@@ -155,6 +155,7 @@ namespace config_defs
         constant_torque = 3,
         chirp = 4,
         step = 5,
+		calibr_manager = 6,
     };
         
     enum class ankle_controllers : uint8_t  //Ankle Controller IDs
@@ -425,6 +426,7 @@ namespace config_defs
             {"constantTorque", (uint8_t)config_defs::knee_controllers::constant_torque},
             {"chirp", (uint8_t)config_defs::knee_controllers::chirp},
             {"step", (uint8_t)config_defs::knee_controllers::step},
+			{"calibrManager", (uint8_t)config_defs::knee_controllers::calibr_manager},
         };
         
         const IniKeyCode ankle_controllers 
