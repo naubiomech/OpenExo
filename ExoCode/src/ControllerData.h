@@ -126,7 +126,7 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 	
 	namespace calibr_manager
 	{
-		const uint8_t calibr_cmd = 0;
+		const uint8_t calibr_cmd = 0;					// Not being used
 		const uint8_t num_parameter = 1;
 	}
 

@@ -400,6 +400,7 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
 , _chirp(id, exo_data)
 , _step(id, exo_data)
 , _proportional_hip_moment(id, exo_data)
+, _calibr_manager(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
@@ -570,8 +571,11 @@ void HipJoint::set_controller(uint8_t controller_id)
         case (uint8_t)config_defs::hip_controllers::step:
             _controller = &_step;
             break;
-        case (uint8_t)config_defs::hip_controllers::phmc :
+        case (uint8_t)config_defs::hip_controllers::phmc:
             _controller = &_proportional_hip_moment;
+            break;
+		case (uint8_t)config_defs::hip_controllers::calibr_manager:
+            _controller = &_calibr_manager;
             break;
         default :
             logger::print("Unkown Controller!\n", LogLevel::Error);

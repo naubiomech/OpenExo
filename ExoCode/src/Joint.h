@@ -161,7 +161,8 @@ class HipJoint : public _Joint
         Chirp _chirp;                                   /**< Chirp Controller for Device Characterization */                    
         Step _step;                                     /**< Step Controller for Device Characterization */
         ProportionalHipMoment _proportional_hip_moment; /**< Proportional Hip Moment Conroller */
-        
+        CalibrManager _calibr_manager;                  /**< Calibration Manager "Controller" */
+		
 };
 
 /**
