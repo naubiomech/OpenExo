@@ -59,6 +59,7 @@ namespace ble_names
     static const char send_trq_cal        = 'H';
     static const char send_step_count     = 's';
     static const char cal_fsr_finished    = 'n';
+    static const char send_param_list     = 'p';
 
 };
 
@@ -92,6 +93,7 @@ namespace ble
         {ble_names::send_trq_cal,           2},
         {ble_names::send_step_count,        2},
         {ble_names::cal_fsr_finished,       0},
+        {ble_names::send_param_list,        1},
     };
 };
 

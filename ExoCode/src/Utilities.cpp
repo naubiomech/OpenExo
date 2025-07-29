@@ -378,7 +378,7 @@ namespace utils
         return (val < min || val > max);
     }
 
-    std::string trimControllerName(const std::string& input) {
+    std::string trim_controller_name(const std::string& input) {
     size_t pos = input.find('>');
     if (pos != std::string::npos && pos + 1 < input.size()) {
         // Return the substring starting after the '>' character

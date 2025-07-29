@@ -10,6 +10,7 @@
 #include <cstring>
 #include "uart_commands.h"
 #include "UARTHandler.h"
+#include <vector>
 
 #define EXOBLE_DEBUG 0
 
@@ -167,6 +168,7 @@ bool ExoBLE::handle_updates()
         BLE.poll();
         int32_t current_status = BLE.connected(); //True if the device is connected, False if not
 
+        /*
         if(current_status && first_connect)
         {
             //Get a list of the parameters to send to the GUI
@@ -177,16 +179,34 @@ bool ExoBLE::handle_updates()
             std::string param_names = UART_command_handlers::param_names;
             char* param_names_buffer = const_cast<char*>(param_names.c_str());
 
-            //Send the parameter list to the GUI
-            Serial.println("can we see the param list? current_status && first_connect");
-            Serial.println(param_names_buffer);
-            Serial.println(UART_command_handlers::param_names_len);
-            BleMessage* param_list_msg = _ble_parser.handle_raw_data(param_names_buffer, UART_command_handlers::param_names_len);
-            Serial.println(param_list_msg->command);
-            send_message(*param_list_msg);
+            
+            // BleMessage param_msg = BleMessage();
+            // param_msg.command = ble_names::send_param_list;
+            // param_msg.expecting = UART_command_handlers::param_names_len;
+            // send_message_w_string(param_msg, param_names.c_str());
+            
 
-            first_connect = false;
+            Serial.println("first time connecting, sending param list");
+            Serial.println(param_names.c_str());
+
+            static const char* msg_str = "Connor";
+
+            //Send the parameter list to the GUI
+            int success = _gatt_db.TXChar.writeValue(msg_str, true);
+            Serial.print("write value");
+            Serial.println(success);
+
+            // //Send the parameter list to the GUI
+            // Serial.println("can we see the param list? current_status && first_connect");
+            // Serial.println(param_names_buffer);
+            // Serial.println(UART_command_handlers::param_names_len);
+            // BleMessage* param_list_msg = _ble_parser.handle_raw_data(param_names_buffer, UART_command_handlers::param_names_len);
+            // Serial.println(param_list_msg->command);
+            // send_message(*param_list_msg);
+
+            //first_connect = false;
         }
+        */
 
         if (_connected == current_status)
         {
@@ -230,7 +250,54 @@ bool ExoBLE::handle_updates()
     return ble_queue::size();
 }
 
+/**
+ * @brief Send a BLE message using the Nordic UART Service. The data is serialized with the parser object. Called by the ComsMCU class
+ */
 void ExoBLE::send_message(BleMessage &msg)
+{
+    if (!this->_connected)
+    {
+        return; /* Don't bother sending anything if no one is listening */
+    }
+
+    // if this is the first time connecting, send the parameter list
+    if(first_connect)
+    {
+        Serial.println("first connect");
+        UART_msg_t msg; // make a message  so we can properly call get_real_time_data, this msg is currently blank
+        Serial.println("getting real time data");
+        UART_command_handlers::get_real_time_data(_uart_handler, _data, msg, _data->config);
+        static const int num_entries = UART_command_handlers::num_entries;
+        Serial.println("got param names arr");
+        //for each entry in the param_names_arr, send the name to the GUI individually
+        for (int i = 0; i < num_entries; i++)
+        {
+            Serial.print(i);
+            Serial.print(": ");
+            std::string param_name = UART_command_handlers::param_names_arr[i];
+            Serial.println(param_name.c_str());
+            int success = _gatt_db.TXChar.writeValue(param_name.c_str(), true);
+        }
+        std::string end_str = "END"; //marks the end of the parameter names list
+        _gatt_db.TXChar.writeValue(end_str.c_str(), true);
+
+        first_connect = false;
+    }
+
+    #if EXOBLE_DEBUG
+        BleMessage::print(msg);
+    #endif
+
+    static const int k_preamble_length = 3;
+    int max_payload_length = ((k_preamble_length + msg.expecting) * (MAX_PARSER_CHARACTERS + 1));
+    byte buffer[max_payload_length];
+
+    int bytes_to_send = _ble_parser.package_raw_data(buffer, msg);
+
+    _gatt_db.TXChar.writeValue(buffer, bytes_to_send);
+}
+
+void ExoBLE::send_message_w_string(BleMessage &msg, const char* msg_text)
 {
     if (!this->_connected)
     {
@@ -247,7 +314,7 @@ void ExoBLE::send_message(BleMessage &msg)
 
     int bytes_to_send = _ble_parser.package_raw_data(buffer, msg);
 
-    _gatt_db.TXChar.writeValue(buffer, bytes_to_send);
+    _gatt_db.TXChar.writeValue(msg_text, false);
 }
 
 void ExoBLE::send_error(int error_code, int joint_id)

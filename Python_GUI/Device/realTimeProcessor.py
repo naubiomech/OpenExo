@@ -20,13 +20,34 @@ class RealTimeProcessor:
         self.x_time = 0
         self._predictor= MLModel.MLModel() #create the machine learning model object
         self.first_msg = True  # Flag to indicate if the first message has been processed
+        self.param_names = []  # List to store parameter names
+        self.num_params = 0 # Number of parameters
+        self.param_values = [] # List to store parameter values
         
 
     def processEvent(self, event):
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
-        print(dataUnpacked)
-        if "c" in dataUnpacked:  # 'c' acts as a delimiter for data
+        if(self.first_msg): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
+            print("First msg = ")
+            print(dataUnpacked)
+            print((dataUnpacked == "END"))
+            if(dataUnpacked == "END"): # marks the end of the parameter names
+                self.first_msg = False  
+                for name in self.param_names:
+                    print(name)
+                # Once all the parameter names have been recieved we need to update the relevant data structures (chart_data and exoData)
+                self._chart_data.updateNames(
+                    self.param_names, 
+                    self.num_params
+                )
+            else:
+                # If this is not the end of the parameter names, then we need to add the name to the list and increment the number of parameters
+                print(self.num_params)
+                self.param_names.append(dataUnpacked)
+                self.num_params += 1
+        elif "c" in dataUnpacked:  # 'c' acts as a delimiter for data
+            print(dataUnpacked)
             data_split = dataUnpacked.split(
                 "c"
             )  # Split data into 2 messages using 'c' as divider
@@ -107,16 +128,19 @@ class RealTimeProcessor:
         stancetime = payload[14] if datalength >= 15 and len(payload) > 14 else 0
         swingtime = payload[15] if datalength >= 16 and len(payload) > 15 else 0
 
-        self._chart_data.updateValues(
-            rightTorque,
-            rightState,
-            leftTorque,
-            leftState,
-            rightSet,
-            leftSet,
-            rightFsr,
-            leftFsr,
+        self._chart_data.updateParamValues(
+            self.param_names
         )
+        # self._chart_data.updateValues(
+        #     rightTorque,
+        #     rightState,
+        #     leftTorque,
+        #     leftState,
+        #     rightSet,
+        #     leftSet,
+        #     rightFsr,
+        #     leftFsr,
+        # )
         self._predictor.addDataPoints([minSV,maxSV,minSA,maxSA,maxFSR,stancetime,swingtime,self._predictor.state]) #add data to model, if recording data
         
         self._predictor.predictModel([minSV,maxSV,minSA,maxSA, maxFSR,stancetime,swingtime]) #predict results from model

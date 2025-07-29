@@ -13,7 +13,11 @@
 #include "RealTimeI2C.h"
 
 #include <string>
+#include <vector>
 
+/**
+ * @brief Enum to define the type of data that is being sent used with the data entry struct
+ */
 enum DataType {
     TYPE_FLOAT,
     TYPE_INT,
@@ -21,7 +25,7 @@ enum DataType {
 };
 
 /**
- *   @brief Struct to hold a data entry with its name and pointer
+ *   @brief Struct to hold a data entry with its name and pointer as well as its type
  */
 struct DataEntry
 {
@@ -30,6 +34,9 @@ struct DataEntry
     DataType type; /**< Type of the data using DataType enum*/
 };
 
+/**
+ * @brief Macro to define a data entry with its value, name, and type used to create a data entry struct
+ */
 #define Data_Entry(data, dtype) {(void*)&(data), #data, dtype}
 
 /**
@@ -349,13 +356,13 @@ namespace UART_command_handlers
     {
     }
 
-     /**
-    * string to hold the names of the parameters that are sent over BLE
-    */
-    static std::string param_names = ""; 
-    static const char* param_list = param_names.c_str();
-    static int param_names_len = 2;
+    static int num_entries = 0; // Number of data entries (parameters) that will be sent to the GUI
+    static std::vector<std::string> param_names_arr; // Vector of strings to hold the names of the parameters that will be sent to the GUI
 
+    /**
+     * @brief Function to get the real-time data from the exo_data and send it to the GUI
+     * This function must be run before sending parameters to the GUI as it populates the param_names_arr
+     */
     inline static void get_real_time_data(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg, uint8_t *config)
     {
         UART_msg_t rx_msg;
@@ -366,6 +373,7 @@ namespace UART_command_handlers
         // logger::println("config[config_defs::exo_name_idx] :: "); //Uncomment if you want to check that system is receiving correct config info
         // logger::println(config[config_defs::exo_name_idx]);
 
+        // Outdated but holding onto for reference should delete when the branch is stable
         //Plotting Guide [Mapping data value (o,1,2,etc.) to the color and tab of the Python GUI). 
         //0 = Right Controller [Blue Line]
         //1 = Right Sensor [Blue Line]
@@ -378,7 +386,6 @@ namespace UART_command_handlers
         //8 = Not Plotted, Will Save
         //9 = Not Plotted, Will Save
 
-        //DataEntry data_entries[8]; 
         //Our list of data entries to send to the GUI currently capped at 8 may look into dynamic allocation later
         DataEntry data_entries[8] = {
             Data_Entry(exo_data->right_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT),
@@ -390,7 +397,9 @@ namespace UART_command_handlers
             Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT),
             Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT)
         };
+        Serial.println("created data entries");
 
+        // again outdated to be removed when stable but shows how the data was originally being sent
         /*
         switch (config[config_defs::exo_name_idx])
         {
@@ -535,24 +544,17 @@ namespace UART_command_handlers
         }
         */
 
-        //Set the length of the msg and copy the data
-        int Num_Entries = sizeof(data_entries)/sizeof(DataEntry);
-
-        for (int i = 0; i < Num_Entries; i++) {
-            param_names += utils::trimControllerName(data_entries[i].name);
-            if (i < Num_Entries - 1) 
-            {
-                param_names += ",";
-            }
+        /*Set the length of the msg and copy the data into a vector to be accessed by ExoBLE*/
+        num_entries = sizeof(data_entries)/sizeof(DataEntry);
+        for (int i = 0; i < num_entries; i++) {
+            std::string param_name = data_entries[i].name;
+            param_names_arr.push_back(param_name);
         }
 
-        param_names_len = param_names.length();
-        Serial.println("param names from uart commands");
-        Serial.println(param_names.c_str());
+        rx_msg.len = num_entries;
 
-        rx_msg.len = Num_Entries;
-
-        for (int i = 0; i < Num_Entries; i++)
+        /*fill the msg with the values from data_entries array in same order as the param names were sent*/
+        for (int i = 0; i < num_entries; i++)
         {
             switch(data_entries[i].type)
             {

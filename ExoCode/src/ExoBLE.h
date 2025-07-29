@@ -70,6 +70,13 @@ class ExoBLE
         void send_message(BleMessage &msg);
 
         /**
+         * @brief Overload to send a c_style string BLE message using the Nordic UART Service. The data is serialized with the parser object. 
+         * 
+         * @param msg The message that you would like to send.
+         */
+        void send_message_w_string(BleMessage &msg, const char* msg_text);
+
+        /**
          * @brief Send an error code to the GUI, uses a seperate service and characteristic
          * 
          * @param error_code 
