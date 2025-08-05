@@ -280,7 +280,7 @@ class ControllerData {
         /**
          * @brief Write the parameter names to the GATT database
          */
-        void write_parameter_names(GattDb gatt_db);
+        void write_parameter_names(GattDb gatt_db, std::string key_char);
         
         uint8_t controller;                                 /**< Id of the current controller */
         config_defs::JointType joint;                       /**< Id of the current joint */

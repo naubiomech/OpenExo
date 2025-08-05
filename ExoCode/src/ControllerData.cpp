@@ -97,23 +97,28 @@ uint8_t ControllerData::get_parameter_length()
     return length;
 }
 
-void ControllerData::write_parameter_names(GattDb gatt_db)
+void ControllerData::write_parameter_names(GattDb gatt_db, std::string key_char)
 {
     //Write the parameter names to the GATT database
     for (int i = 0; i < controller_defs::num_controllers; i++)
     {
         std::string controller_name = controller_defs::controller_names[i];
-        gatt_db.TXChar.writeValue(controller_name.c_str(), true);
         Serial.println(controller_name.c_str());
+        std::string controller_name_w_key = key_char + controller_name;
+        gatt_db.TXChar.writeValue(controller_name_w_key.c_str(), true);
+        Serial.println(controller_name_w_key.c_str());
         auto it = controller_registry.find(controller_name);
         // if (it != controller_registry.end() && it->second != nullptr) 
         // {
             std::vector<std::string> controller_param_names = *(it->second);
         // }
+        delay(10);
         for (int j = 0; j < controller_param_names.size(); j++)
         {
-            gatt_db.TXChar.writeValue(controller_param_names[j].c_str(), true);
-            Serial.println(controller_param_names[j].c_str());
+            std::string temp_str = key_char + key_char + controller_param_names[j];
+            gatt_db.TXChar.writeValue(temp_str.c_str(), true);
+            Serial.println(temp_str.c_str());
+            delay(10);
         }
     }
 

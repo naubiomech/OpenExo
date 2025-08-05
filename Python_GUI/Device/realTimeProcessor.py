@@ -20,33 +20,66 @@ class RealTimeProcessor:
         self.x_time = 0
         self._predictor= MLModel.MLModel() #create the machine learning model object
         self.first_msg = True  # Flag to indicate if the first message has been processed
-        self.param_names = []  # List to store parameter names
-        self.num_params = 0 # Number of parameters
+        self.plotting_param_names = []  # List to store parameter names
+        self.num_plotting_params = 0 # Number of parameters
         self.param_values = [] # List to store parameter values
-        
+        self.controllers = [] # List to store controller names
+        self.controller_parameters = [] # 2D list to store controller parameters
+        self.num_controllers = 0 # Number of controllers we have stored
+        self.num_control_parameters = 0 # Number of controller parameters in the most recently updated controller
+        self.temp_control_param_list = []
 
     def processEvent(self, event):
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
         if(self.first_msg): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
+            #Should change this to use special character to mark that these belong in plotting parameters (see regular data and controller parameters)
             print("First msg = ")
             print(dataUnpacked)
             print((dataUnpacked == "END"))
             if(dataUnpacked == "END"): # marks the end of the parameter names
                 self.first_msg = False  
-                for name in self.param_names:
+                for name in self.plotting_param_names:
                     print(name)
                 # Once all the parameter names have been recieved we need to update the relevant data structures (chart_data and exoData)
                 self._chart_data.updateNames(
-                    self.param_names, 
-                    self.num_params
+                    self.plotting_param_names, 
+                    self.num_plotting_params
                 )
             else:
                 # If this is not the end of the parameter names, then we need to add the name to the list and increment the number of parameters
-                print(self.num_params)
-                self.param_names.append(dataUnpacked)
-                self.num_params += 1
-        elif "c" in dataUnpacked:  # 'c' acts as a delimiter for data
+                print(self.num_plotting_params)
+                self.plotting_param_names.append(dataUnpacked)
+                self.num_plotting_params += 1
+        elif "!" in dataUnpacked:   # process controllers and control parameters
+            data_split = dataUnpacked.split("!", 1)
+            if "!" in data_split[1]:
+                #this is a controller parameter
+                # print("control parameter")
+                data_split = data_split[1].split("!")
+                # print(data_split[1])
+                self.temp_control_param_list.append(data_split[1]) # add the parameter name to the 2D list of controller parameters
+                self.num_control_parameters += self.num_control_parameters
+            else:
+                if(len(self.temp_control_param_list) != 0):
+                    self.controller_parameters.append(self.temp_control_param_list)
+                    self.temp_control_param_list = []
+                if(data_split[1] == 'END'):
+                    for controller in self.controllers:
+                        print("Controller: ")
+                        print(controller)
+                        for parameter in self.controller_parameters:
+                            print("Parameter")
+                            print(parameter)
+                else:
+                    #this is a controller name
+                    # print("controller")
+                    # print(self.num_controllers)
+                    self.controllers.append(data_split[1])
+                    self.num_controllers += 1
+
+        elif "c" in dataUnpacked:  # 'c' acts as a delimiter for data     
+            # I'd like to change this to a 'special cahracter' like '&' or '@' to avoid issues with controller and plotting parameters 
             print(dataUnpacked)
             data_split = dataUnpacked.split(
                 "c"
@@ -130,7 +163,7 @@ class RealTimeProcessor:
         swingtime = payload[15] if datalength >= 16 and len(payload) > 15 else 0
 
         self._chart_data.updateParamValues(
-            self.param_names
+            self.plotting_param_names
         )
         # self._chart_data.updateValues(
         #     rightTorque,
