@@ -18,6 +18,36 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <unordered_map>
+
+#include "GattDb.h"
+
+// struct ParameterEntry
+// {
+//     int* idx; /**< Pointer to the float data */
+//     const char* name; /**< Name of the data */
+// };
+
+// #define Parameter_Entry(parameter) {&parameter, #parameter}
+
+#define REGISTER_NAMESPACE_VECTOR(ns) \
+    ns_registry[#ns] = &ns::control_param_names;
+
+// inline std::unordered_map<std::string, std::vector<std::string>*> controller_registry;     // A registry mapping namespace names to pointers to their vectors
+
+inline std::unordered_map<std::string, std::vector<std::string>*> controller_registry;     // A registry mapping namespace names to pointers to their vectors
+
+struct NamespaceRegistrar {
+    NamespaceRegistrar(const std::string& name, std::vector<std::string>* vec) {
+        controller_registry[name] = vec;
+    }
+};
+
+#define AUTO_REGISTER_NAMESPACE(ns) \
+    static NamespaceRegistrar ns##_registrar(#ns, &ns::control_param_names);
+
+#define GET_NUM_CONTROL_PARAMS(ns) \
+    ns::num_parameter;
 
 //Forward declaration
 class ExoData;
@@ -29,8 +59,22 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t use_pid_idx = 0;              //Flag to use PID control
         const uint8_t p_gain_idx = 1;               //Value of P Gain for PID control
         const uint8_t i_gain_idx = 2;               //Value of I Gain for PID control
-        const uint8_t d_gain_idx = 3;               //Value of D Gain for PID control 
+        const uint8_t d_gain_idx = 3;               //Value of D Gain for PID control
         const uint8_t num_parameter = 4;
+        static std::vector<std::string> control_param_names =
+        {
+            "use_pid",
+            "p_gain",
+            "i_gain",
+            "d_gain"
+        };
+        AUTO_REGISTER_NAMESPACE(zero_torque)
+        // ParameterEntry control_parameters[num_parameter] = {
+        //     Parameter_Entry(use_pid_idx = 0),              //Flag to use PID control
+        //     Parameter_Entry(p_gain_idx = 1),               //Value of P Gain for PID control
+        //     Parameter_Entry(i_gain_idx = 2),               //Value of I Gain for PID control
+        //     Parameter_Entry(d_gain_idx = 3),               //Value of D Gain for PID control 
+        // };
     }
     
     namespace proportional_joint_moment
@@ -44,6 +88,18 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t d_gain_idx = 6;                       //Value of D Gain for PID control 
         const uint8_t torque_alpha_idx = 7;
         const uint8_t num_parameter = 8;
+        static std::vector<std::string> control_param_names =
+        {
+            "stance_max",
+            "swing_max",
+            "is_assitance",
+            "use_pid",
+            "p_gain",
+            "i_gain",
+            "d_gain",
+            "torque_alpha"
+        };
+        AUTO_REGISTER_NAMESPACE(proportional_joint_moment)
     }
 
     namespace zhang_collins
@@ -189,6 +245,13 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t num_parameter = 17;
     }
 
+    const int num_controllers = 2;                      //Total number of controllers defined in the controller_defs namespace so we can iterate through them.
+    static std::vector<std::string> controller_names =
+    {
+        "zero_torque",
+        "proportional_joint_moment"
+    };
+
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
 }
 
@@ -213,6 +276,11 @@ class ControllerData {
          * @return uint8_t parameter length 
          */
         uint8_t get_parameter_length();
+
+        /**
+         * @brief Write the parameter names to the GATT database
+         */
+        void write_parameter_names(GattDb gatt_db);
         
         uint8_t controller;                                 /**< Id of the current controller */
         config_defs::JointType joint;                       /**< Id of the current joint */

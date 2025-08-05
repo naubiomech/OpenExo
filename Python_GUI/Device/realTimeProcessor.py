@@ -102,6 +102,7 @@ class RealTimeProcessor:
                 else:
                     return
         else:
+            print(dataUnpacked)
             print("Unkown command!\n")
 
     def set_debug_event_listener(self, on_debug_event):

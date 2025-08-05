@@ -281,6 +281,9 @@ void ExoBLE::send_message(BleMessage &msg)
         std::string end_str = "END"; //marks the end of the parameter names list
         _gatt_db.TXChar.writeValue(end_str.c_str(), true);
 
+        _data->left_side.hip.controller.write_parameter_names(_gatt_db);
+        
+
         first_connect = false;
     }
 
