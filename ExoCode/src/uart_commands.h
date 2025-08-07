@@ -515,6 +515,15 @@ namespace UART_command_handlers
 				// rx_msg.data[7] = 7;
 				// rx_msg.data[8] = 8;
 				// rx_msg.data[9] = 9;
+				
+				rx_msg.data[0] = exo_data->right_side.ankle.joint_position;
+				rx_msg.data[1] = exo_data->right_side.ankle.joint_position;
+				rx_msg.data[2] = local_scalar * exo_data->right_side.ankle.controller.setpoint2use_spv2;
+				rx_msg.data[3] = local_scalar * exo_data->right_side.ankle.controller.filtered_torque_reading;
+				rx_msg.data[4] = local_scalar * 100 * exo_data->right_side.ankle.controller.percent_grf2plot;
+				rx_msg.data[5] = local_scalar * 100 * exo_data->right_side.ankle.controller.percent_grf_heel2plot;
+				rx_msg.data[6] = pwr2plot;
+				rx_msg.data[7] = pwr2plot;
 
                 break;
 			}
