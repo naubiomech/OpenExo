@@ -163,6 +163,13 @@ class ExoDeviceManager:
 
         await self.client.write_gatt_char(char, command, True)
 
+    # Turn on motors
+    async def motorOn(self):
+        command = bytearray(b"x")
+        char = self.get_char_handle(self.UART_TX_UUID)
+
+        await self.client.write_gatt_char(char, command, True)
+
     # Update torque values based on the parameters
     async def updateTorqueValues(self, parameter_list):
         totalLoops = 1
@@ -254,7 +261,7 @@ class ExoDeviceManager:
                         print(self.client)
 
                         # Get list of services from Exo
-                        self.set_services(await self.client.get_services())
+                        self.set_services(self.client.services) #Get_Services Not Supported in v1.0 and beyond of bleak library, previously was [await self.client.get_services()] instead of [self.client.services].
                         
                         # Start incoming data stream
                         await self.client.start_notify(self.UART_RX_UUID, self.DataIn)
@@ -336,9 +343,3 @@ class ExoDeviceManager:
 
         await self.client.write_gatt_char(char, command, True)
 
-    # Pause
-    async def pause(self):
-        command = bytearray(b"W")
-        char = self.get_char_handle(self.UART_TX_UUID)
-
-        await self.client.write_gatt_char(char, command, True)

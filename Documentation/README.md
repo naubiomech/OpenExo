@@ -537,7 +537,7 @@ switch (month)
 ```
 
 ### Functions
-Functions, sometimes refered to as methods or procdures, are a reusable block of code designed to do a particular task. 
+Functions, sometimes refered to as methods or procedures, are a reusable block of code designed to do a particular task. 
 Functions allow for code to be split into smaller, modular pieces and are particularly useful when sets of code need to be used several times. 
 
 There are typically two parts to creating a function:
@@ -756,7 +756,7 @@ class ProportionalJointMoment : public _Controller
 ```
 
 #### Inheritance
-Inheritance is when a class (called a child, derived, or sub class) takes (inherits, hence the name) attributes and methods from another class (called a partent, base, or super class).
+Inheritance is when a class (called a child, derived, or sub class) takes (inherits, hence the name) attributes and methods from another class (called a parent, base, or super class).
 Typically this new class then extends upon the inherited members of the parent class through new attributes and/or methods.
 This can be used in a modular sense to considerablly reduce the amount of potentially redundent code within a program.
 It is possible to inherit from a class which itself inherited from another class. This can allow us to start with a very general class that then becomes progressivly more specific with each instance of inheritance.
@@ -1061,23 +1061,24 @@ So when we call reconfigure for the ExoData objects we call the reconfigure memb
 
 ***
 ## Introduction   
-This guide is designed to provide background information on OpenExo's software.
-This system is designed to be flexible, where the system can be easily adapted to the user's needs, changing the motors used, number of joints, etc. 
+This guide is designed to provide background information on OpenExo's software, which was designed to be easily adapted to the user’s needs (e.g.,changing the motors used, number of joints, etc).
 
 ### Code Location  
-If you are reading this you have found the location, but for completeness it can be found at: https://github.com/naubiomech/ExoCode/tree/nano_teensy_board. 
+If you are reading this you have likely found the location, but for completeness it can be found at: https://github.com/naubiomech/ExoCode/tree/nano_teensy_board. 
 
 ### Style Guide  
 The detailed style guide can be found [here](StyleGuide.md).
  
 ### System Structure
-![Diagram](Figures/CodeDiagram.svg)
+![Diagram](Figures/Code_Structure.png)
 
 Details of the components can be found in [/Presentations/20220914_Pridham_NewCodeBase.pptx](/Presentations/)
 Note: At the time of the presentaiton the terminology "Leg/LegData" was used instead of "Side/SideData" and communication between the boards 
 occured via SPI instead of UART. The functionality and structure is the same, but to avoid confusion we wanted to specify. 
 
 ### How to Deploy 
+A detailed guide to deploying for the first time can be found in our [First Time Setup Guide](https://theopenexo.readthedocs.io/en/latest/FirstTimeStartup.html).
+
 First, you will need to connect the physical components.
 1. Mount the motors on the system as appropriate.  
 2. Connect the power and communication cables to the control board.
@@ -1091,10 +1092,9 @@ First, you will need to connect the physical components.
 5. Lastly, is the SD card.
     - Transfer the content of the SD Card folder to the micro SD card. 
     - Update the config.ini file
-        - Change the board version
         - Change the Exo name 
         - Go to the section for that name and confirm the settings match your system.
-    - For the joints you are using, go to that folder and update the controllers you plan to use.
+    - For the joints you are using, go to that folder and update the controller parameters you plan to use.
 
 Those are the rough points.
 Detailed explanations can be found in the coming sections.
@@ -1153,7 +1153,7 @@ We have developed a Python GUI to aid in the operation of the device. More infor
 ***
 ## SD Card  
 The files for the SD card can be found in the [SDCard](/SDCard/) folder in the main directory.
-The contents of this file should be copied to the root of the SD card, e.g. when you open the SD Card you should see config.ini.
+The contents of this file should be copied to the root of the SD card (e.g., when you open the SD Card you should see config.ini).
 The file contains the configuration file and the parameter files for the controllers.
 These parameter files are a temporary measure till the new app is running.
 
@@ -1169,13 +1169,15 @@ We have some premade exoskeleton configurations you can choose from by putting t
 Just check to make sure the settings in that section match your system.
 If we are using a bilateral hip system we would set ```[Exo] name = bilateralHip```, then go to the section \[bilateralHip\] and check it matches the system we are using.
 - sides - are you using the left, right, or both sides.
-- hip, knee, ankle - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won't use that joint).
+- hip, knee, ankle, elbow - sets the type of motor the joint uses (also determines which joint is actually used, that is, if you set the value to 0 it won't use that joint).
 - gear ratio - sets the transmission ratio for the joint torque to the motor output torque.  If the motor has a built in gearbox that should not appear here but rather be coded into the motor class in Motor.cpp.
 - default controller - is the controller the system starts with.
 - use torque sensor - flag to determine if you want to use a torque sensor with your joint (0 = no, 1 = yes)
 - flip motor dir - is if the direction of the motor values should be flipped.  For example if we have two motors pointing in towards the hip and both rotate counter clockwise with a positive current one of them will need to be sent a negative current so they both rotate in the same direction on the body.
 - flip torque dir - flips the sign of the torque sensor on the selected side. This helps align the torque sensor reading to be in the same direction as the motor command to avoid PID issues.
 - flip angle dir - flips the sign of the angle sensor on the selected side. This helps align the angle sensor reading to be in the same direction as the motor command to avoid controller issues.
+- ROM - can manually set the range of motion known for configuraiton so that the angle sensor can convert it's values accordingly.
+- torque offset - can manually set the torque sensor calibration value if known, used to avoid having to reclaibrate every time. 
 
 ### SD Controller Parameters 
 The parameters for each controller are stored in their corresponding joint folder.
@@ -1189,7 +1191,7 @@ The nth parameter row is n-1 parameter set, e.g. parameter row 2 will be referen
 
 The order of the parameters should match how they appear in the parameter array which can be found in [ControllerData.h](/ExoCode/src/ControllerData.h). in the controller_defs namespace.
 
-These will be selected using the update controller field in the app where you set the joint, controller, and parameter set.
+These will be selected using the update controller field in the app where you set the joint, controller, parameter, and value.
 
 *** 
 ## Sensors
@@ -1271,10 +1273,10 @@ This was done since most any motor will have access to torque controller, even i
 ### Adding New Actuators 
 Details to adding a new motor type can be found in [Adding New Motor Type](AddingNew/AddingNewMotorType.md).
 Details on adding a new CAN motor can be found in [Adding New CAN Motor](AddingNew/AddingNewCanMotor.md).
-This is specifically for the TMotor CAN motors but can be adapted to new types of motors when we have them.
+This is specifically for the CubeMars CAN motors but can be adapted to new types of motors when we have them.
 
-### T-motor Initialization 
-TMotor initialization information can be found [here] (https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b_?usp=drive_link)
+### CAN-motor Initialization 
+CAN-motor initialization information can be found [here] (https://drive.google.com/drive/folders/112uRESszPLOKpT7L96roRqkAQ4_Bt3b_?usp=drive_link).
 
 *** 
 ## Controllers 
@@ -1283,7 +1285,7 @@ ControllerData details can be found in [Data Structure](Structure/ExoDataStructu
 
 The Joint instance uses a [pointer](#pointers) to the controller that is currently being used.
 The main difference is that the Joint has an instance to all the possible controllers that will be used so we just need to point to the correct one.
-That is why the constructor to the a joint like the hip looks like:
+That is why the constructor to a joint like the hip looks like:
 
 ```
 HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
@@ -1327,37 +1329,28 @@ Details can be found in [Adding New Controller](AddingNew/AddingNewController.md
 ### Controller Parameters 
 The controller parameters are dependent on what controller is being used but a description of the parameters for each controller can be found below.
 
-#### Hip
+#### Multi-Joint
 - [Zero Torque](Controllers/ZeroTorque.md)
+- [Constant Torque](Controllers/ConstantTorque.md)
+- [Calibration Manager](Controllers/CalbrManager.md)
+- [Step](Controllers/Step.md)
+- [Chirp](Controllers/Chirp.md)
+
+#### Hip
 - [Franks Collins Hip](Controllers/Hip/FranksCollinsHip.md)
-- [Constant Torque] (Controllers/ConstantTorque.md)
-- [Chirp] (Controllers/Chirp.md)
-- [Step] (Controllers/Step.md)
-- [Calibration Manager] (Controllers/CalbrManager.md)
+- [Proportional Hip Moment](Controllers/Hip/ProportionalHipMomentController.md)
 
 #### Knee
-- [Zero Torque](Controllers/ZeroTorque.md)
-- [Constant Torque] (Controllers/ConstantTorque.md)
-- [Chirp] (Controllers/Chirp.md)
-- [Step] (Controllers/Step.md)
-- [Calibration Manager] (Controllers/CalbrManager.md)
 
 #### Ankle
-- [Zero Torque](Controllers/ZeroTorque.md)
-- [Constant Torque] (Controllers/ConstantTorque.md)
-- [Chirp] (Controllers/Chirp.md)
-- [Step] (Controllers/Step.md)
-- [Calibration Manager] (Controllers/CalbrManager.md)
 - [Proportional Joint Moment](Controllers/Ankle/ProportionalJointMoment.md)
 - [Zhang Collins](Controllers/Ankle/ZhangCollins.md)
+- [TREC](Controllers/Ankle/TREC.md)
+- [SPV2](Controllers/Ankle/spv2.md)
+- [PJMC_Plus](Controllers/Ankle/PJMC_Plus.md)
 
 #### Elbow
-- [Zero Torque](Controllers/ZeroTorque.md)
 - [Elbow Min Max](Controllers/Elbow/ElbowMinMax.md)
-- [Constant Torque] (Controllers/ConstantTorque.md)
-- [Chirp] (Controllers/Chirp.md)
-- [Step] (Controllers/Step.md)
-- [Calibration Manager] (Controllers/CalbrManager.md)
 
 ***
 ## Bluetooth 
@@ -1384,6 +1377,8 @@ batt_msg.expecting = ble_command_helpers::get_length_for_command(batt_msg.comman
 batt_msg.data[0] = _data->battery_value;
 _exo_ble->send_message(batt_msg);
 ```
+
+It should also be noted, that the GUI would need to be updated to access this newly added command! 
 
 ***
 ## Debug
@@ -1413,17 +1408,17 @@ Details can be found in [Adding New Board](AddingNew/AddingNewBoard.md).
 This would be done if you are creating a new PCB which may have moved what pins are connected where, or uses new sensors or motor types
 
 ### Adding New Microcontroller
-Details can be found in [Adding New microcontroller](AddingNew/AddingNewMicroontroller.md).
+Details can be found in [Adding New Microcontroller](AddingNew/AddingNewMicroontroller.md).
 
 This would be done if you are changing the type of microcontroller is being used.
 
 ### Adding New Item To Config 
-Details can be found in [Adding New Controller](AddingNew/AddingNewItemToConfig.md).
+Details can be found in [Adding New Item to Config](AddingNew/AddingNewItemToConfig.md).
 
 This would be done if new features need to be configured.
 
 ### Adding New Joint
-Details can be found in [Adding New Joint] (AddingNew/AddingNewJoint.md)
+Details can be found in [Adding New Joint](AddingNew/AddingNewJoint.md)
 
 ***
 ## Resources

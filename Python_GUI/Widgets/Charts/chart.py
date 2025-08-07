@@ -61,6 +61,20 @@ class BasePlot:
         self.figure.set_size_inches(BasePlot.figure_size)
         self.canvas.draw()
         
+    def clear_plot(self):
+        """Clear the plot data and refresh the display."""
+        self.xValues = []
+        self.yValues = []
+        self.secondY = []
+        # Optionally clear the axes if you want to remove any lingering data
+        self.ax.cla()
+        self.ax.set_title(None)
+        self.ax.set_xticks([])  # Restore x-ticks hidden state
+        # Reinitialize the lines
+        self.line1, = self.ax.plot([], [], label='Controller Value', color='blue')
+        self.line2, = self.ax.plot([], [], label='Measurement Value', color='red')
+        self.canvas.draw_idle()
+
 class TopPlot(BasePlot):
     def __init__(self, master):
         super().__init__(master, "Left Torque")
@@ -69,22 +83,22 @@ class TopPlot(BasePlot):
         title = " "
         bottomLimit = -1
         topLimit = 1
-        if chartSelection == "Controller":
+        if chartSelection == "Data 0-3":
             topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftTorque
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightTorque
             )
             topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightState
             )
-            title = "Controller"
-        elif chartSelection == "Sensor":
+            title = "Data 0 and 1"
+        elif chartSelection == "Data 4-7":
             topController = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.leftState
             )
             topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
             )
-            title = "Sensor"
+            title = "Data 4 and 5"
             bottomLimit = 0
             topLimit = 1.1
 
@@ -95,6 +109,7 @@ class TopPlot(BasePlot):
         self.xValues.append(dt.datetime.now())
         self.yValues.append(topController)
         self.secondY.append(topMeasure)
+        self.ax.set_title(title)
 
         self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit,topLimit,title)
 
@@ -107,24 +122,24 @@ class BottomPlot(BasePlot):
         topController = None
         bottomLimit = -1
         topLimit = 1
-        if chartSelection == "Controller":
+        if chartSelection == "Data 0-3":
             topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightTorque
-            )
-            topMeasure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.rightSet
             )
-            title = "Controller"
-        elif chartSelection == "Sensor":
+            topMeasure = (
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftTorque
+            )
+            title = "Data 2 and 3"
+        elif chartSelection == "Data 4-7":
             topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightState
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightFsr
             )
             topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightFsr
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
             )
             bottomLimit = 0
             topLimit = 1.1
-            title = "Sensor"
+            title = "Data 6 and 7"
 
         if topController is None or topMeasure is None:
             topController = 0
@@ -133,6 +148,7 @@ class BottomPlot(BasePlot):
         self.xValues.append(dt.datetime.now())
         self.yValues.append(topController)
         self.secondY.append(topMeasure)
+        self.ax.set_title(title)
 
         self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit,topLimit,title)
 
@@ -155,16 +171,16 @@ class FSRPlot(BasePlot):
         title = " "
         bottomLimit = 0
         topLimit = 1.1
-        if chartSelection == "Left Leg":
+        if chartSelection == "Right Leg":
+            topMeasure = (
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
+            )
+            title = "Right Leg"
+        elif chartSelection == "Left Leg":
             topMeasure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
             )
             title = "Left Leg"
-        elif chartSelection == "Right Leg":
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightFsr
-            )
-            title = "Right Leg"
 
         if topMeasure is None:
             topMeasure = 0
@@ -172,6 +188,7 @@ class FSRPlot(BasePlot):
         self.xValues.append(dt.datetime.now())
         self.yValues.append(self.goal)
         self.secondY.append(topMeasure)
+        self.ax.set_title(title)
 
         # Check if topMeasure crosses the goal
         if self.goal is not None:

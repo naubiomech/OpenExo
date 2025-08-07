@@ -23,7 +23,7 @@ class MachineLearning(tk.Frame):
         # Variables to manage states and UI elements
         self.var = IntVar()
         self.chartVar = StringVar()
-        self.chartVar.set("Controller")
+        self.chartVar.set("Data 0-3")
         self.graphVar = StringVar()
         self.graphVar.set("Both Graphs")  # Default to "Both Graphs"
 
@@ -65,17 +65,21 @@ class MachineLearning(tk.Frame):
         small_image = small_image.resize((80, 40))  # Resize the image to a smaller size
         self.small_bg_image = ImageTk.PhotoImage(small_image)
 
+        # Load and place the smaller image behind the timer and battery
+        small_image = Image.open("./Resources/Images/OpenExo.png").convert("RGBA")
+        small_image = small_image.resize((int(1736*.06), int(336*.06)))  # Resize the image to a smaller size
+        self.small_bg_image = ImageTk.PhotoImage(small_image)
+
         # Create a Canvas for the smaller image
-        small_canvas = tk.Canvas(self, width=80, height=50, highlightthickness=0)
-        small_canvas.create_image(0, 0, image=self.small_bg_image, anchor="nw")
-        small_canvas.grid(row=0, column=8, sticky="ne", padx=5, pady=10)  # Top-right corner
+        small_label = ttk.Label(self, image=self.small_bg_image)
+        small_label.grid(row=0, column=8, sticky="NE", padx=5, pady=10)
 
         # Dropdown for chart selection
         self.chartDropdown = ttk.Combobox(
             self,
             textvariable=self.chartVar,
             state="readonly",
-            values=["Controller", "Sensor"],
+            values=["Data 0-3", "Data 4-7"],
         )
         self.chartDropdown.grid(row=4,columnspan=5, sticky="NSEW", pady=5, padx=5)
 
@@ -282,10 +286,10 @@ class MachineLearning(tk.Frame):
     # Handle back button press
     def handle_back_button(self):
         self.stop_plot_updates()  # Stop ongoing plot updates
-        self.controller.show_frame("ActiveTrial")  # Switch to ActiveTrial frame
         active_trial_frame = self.controller.frames["ActiveTrial"]
         active_trial_frame.newSelection(self)  # Start plotting in the active trial
-
+        active_trial_frame.clear_both_plot()  # Start plotting in the active trial
+        self.controller.show_frame("ActiveTrial")  # Switch to ActiveTrial frame
     # Show frame and update plots
     def show(self):
         # Show the frame and update plots
@@ -419,7 +423,16 @@ class MachineLearning(tk.Frame):
 
         # Enable interactions after the first plot update is complete
         self.after(20, self.enable_interactions)
+        
+    def clear_top_plot(self):
+        self.topPlot.clear_plot()
 
+    def clear_bottom_plot(self):
+        self.bottomPlot.clear_plot()
+
+    def clear_both_plot(self):
+        self.bottomPlot.clear_plot()
+        self.topPlot.clear_plot()
     # Handle new selection in dropdown
     def newSelection(self, event=None):
         # Disable buttons and dropdown until process completes

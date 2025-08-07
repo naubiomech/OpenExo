@@ -928,88 +928,85 @@ ConstantTorque::ConstantTorque(config_defs::joint_id id, ExoData* exo_data)
 float ConstantTorque::calc_motor_cmd()
 {
 
-    if ((_joint_data->is_left))
+    //Creates the cmd variable and initializes it to 0;
+    float cmd_ff = 0;     
+
+    if (_side_data->do_calibration_toe_fsr)          //If the FSRs are being calibrated or if the toe fsr is 0, send a command of zero
     {
-        //Creates the cmd variable and initializes it to 0;
-        float cmd_ff = 0;     
-
-        if (_side_data->do_calibration_toe_fsr)          //If the FSRs are being calibrated or if the toe fsr is 0, send a command of zero
-        {
-            cmd_ff = 0;
-        }
-        else
-        {
-            cmd_ff = _controller_data->parameters[controller_defs::constant_torque::amplitude_idx];         //Send a command at the specified amplitude
-
-            if (_controller_data->parameters[controller_defs::constant_torque::direction_idx] == 0)         //If the user wants to send a PF/Flexion torque
-            {
-                cmd_ff = 1 * cmd_ff;
-            }
-            else if (_controller_data->parameters[controller_defs::constant_torque::direction_idx] == 1)    //If the user wants to send a DF/Extension torque
-            {
-                cmd_ff = -1 * cmd_ff;
-            }
-            else
-            {
-                cmd_ff = cmd_ff;                                                                            //If the direction flag is something other than 0 or 1, do nothing to the motor command
-            }
-        }
-
-        //If the command changes
-        if (cmd_ff != previous_command)
-        {
-            flag = 1;                                   //Set the filter flag to 1
-            difference = cmd_ff - previous_command;     //Determine the sign of the change in command 
-        }
-
-        //If the command is to send a larger torque
-        if (difference > 0)
-        {
-            if (flag == 1 && previous_torque_reading >= cmd_ff)   //Set the flag to 0 when the measured torque reaches the desired setpoint
-            {
-                flag = 0;
-            }
-        }
-
-        //If the command is to send a smaller torque 
-        if (difference < 0)
-        {
-            if (flag == 1 && previous_torque_reading <= cmd_ff)   //Set the flag to 0 when the measured torque reaches the desired setpoint 
-            {
-                flag = 0;
-            }
-        }
-
-        if (flag == 0)   //If the torque is not changing to meet a new prescribed torque, filter the data
-        {
-            _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, (_controller_data->parameters[controller_defs::constant_torque::alpha_idx]) / 100);
-        }
-        else            //If the torque is changing to meet a new prescribed torque, filter the data
-        {
-            _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, 1);
-        }
-
-       //Set the feed-forward setpoint
-        _controller_data->ff_setpoint = cmd_ff;
-
-        float cmd = 0;
-
-        //Perform PID control if desired 
-        if (_controller_data->parameters[controller_defs::constant_torque::use_pid_idx] > 0)
-        {
-            cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::constant_torque::p_gain_idx], _controller_data->parameters[controller_defs::constant_torque::i_gain_idx], _controller_data->parameters[controller_defs::constant_torque::d_gain_idx]);
-        }
-        else
-        {
-            cmd = cmd_ff;
-        }
-
-        previous_command = cmd_ff;
-
-        previous_torque_reading = _controller_data->filtered_torque_reading;
-
-        return cmd;
+        cmd_ff = 0;
     }
+    else
+    {
+        cmd_ff = _controller_data->parameters[controller_defs::constant_torque::amplitude_idx];         //Send a command at the specified amplitude
+
+        if (_controller_data->parameters[controller_defs::constant_torque::direction_idx] == 0)         //If the user wants to send a PF/Flexion torque
+        {
+            cmd_ff = 1 * cmd_ff;
+        }
+        else if (_controller_data->parameters[controller_defs::constant_torque::direction_idx] == 1)    //If the user wants to send a DF/Extension torque
+        {
+            cmd_ff = -1 * cmd_ff;
+        }
+        else
+        {
+            cmd_ff = cmd_ff;                                                                            //If the direction flag is something other than 0 or 1, do nothing to the motor command
+        }
+    }
+
+    //If the command changes
+    if (cmd_ff != previous_command)
+    {
+        flag = 1;                                   //Set the filter flag to 1
+        difference = cmd_ff - previous_command;     //Determine the sign of the change in command 
+    }
+
+    //If the command is to send a larger torque
+    if (difference > 0)
+    {
+        if (flag == 1 && previous_torque_reading >= cmd_ff)   //Set the flag to 0 when the measured torque reaches the desired setpoint
+        {
+            flag = 0;
+        }
+    }
+
+    //If the command is to send a smaller torque 
+    if (difference < 0)
+    {
+        if (flag == 1 && previous_torque_reading <= cmd_ff)   //Set the flag to 0 when the measured torque reaches the desired setpoint 
+        {
+            flag = 0;
+        }
+    }
+
+    if (flag == 0)   //If the torque is not changing to meet a new prescribed torque, filter the data
+    {
+        _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, (_controller_data->parameters[controller_defs::constant_torque::alpha_idx]) / 100);
+    }
+    else            //If the torque is changing to meet a new prescribed torque, filter the data
+    {
+        _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, 1);
+    }
+
+    //Set the feed-forward setpoint
+    _controller_data->ff_setpoint = cmd_ff;
+
+    float cmd = 0;
+
+    //Perform PID control if desired 
+    if (_controller_data->parameters[controller_defs::constant_torque::use_pid_idx] > 0)
+    {
+        cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::constant_torque::p_gain_idx], _controller_data->parameters[controller_defs::constant_torque::i_gain_idx], _controller_data->parameters[controller_defs::constant_torque::d_gain_idx]);
+    }
+    else
+    {
+        cmd = cmd_ff;
+    }
+
+    previous_command = cmd_ff;
+
+    previous_torque_reading = _controller_data->filtered_torque_reading;
+
+    return cmd;
 }
 
 //****************************************************
@@ -1964,7 +1961,7 @@ float ProportionalHipMoment::calc_motor_cmd()
 //****************************************************
 
 SPV2::SPV2(config_defs::joint_id id, ExoData* exo_data)
-: _Controller(id, exo_data)
+    : _Controller(id, exo_data)
 {
     #ifdef CONTROLLER_DEBUG
         logger::println("SPV2::Constructor");
@@ -2900,5 +2897,52 @@ float SPV2::calc_motor_cmd()
 		}
 
 	}
+}
+
+//****************************************************
+
+PJMC_PLUS::PJMC_PLUS(config_defs::joint_id id, ExoData* exo_data)
+: _Controller(id, exo_data)
+{
+    #ifdef CONTROLLER_DEBUG
+        logger::println("PJMC_PLUS::Constructor");
+    #endif
+}
+
+float PJMC_PLUS::calc_motor_cmd()
+{
+	// Calculate Generic Contribution
+	float plantar_setpoint = _controller_data->parameters[controller_defs::pjmc_plus::plantar_scaling];
+	float dorsi_setpoint = _controller_data->parameters[controller_defs::pjmc_plus::dorsi_scaling];
+	float threshold = constrain(_controller_data->parameters[controller_defs::pjmc_plus::timing_threshold]/100, 0, 99);
+	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.5);
+	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.5);
+	float cmd_ff = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
+
+	// if (!_joint_data->is_left){
+		// Serial.print("\nRunning pjmcPlus...");
+		// Serial.print(cmd_ff);
+	// }
+    
+    //Low-pass filter on torque_reading
+    const float torque = _joint_data->torque_reading;
+    const float alpha = 0.5;
+    _controller_data->filtered_torque_reading = utils::ewma(torque, _controller_data->filtered_torque_reading, alpha);
+	
+	float cmd;
+	
+    //PID on Motor Command
+    cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::pjmc_plus::kp], 80 * _controller_data->parameters[controller_defs::pjmc_plus::ki], 20 * _controller_data->parameters[controller_defs::pjmc_plus::kd]);
+
+    #ifdef CONTROLLER_DEBUG
+    logger::println("pjmcPlus::calc_motor_cmd : stop");
+    #endif
+	
+	//Establish Setpoints
+	_controller_data->ff_setpoint = cmd_ff; 
+	_controller_data->setpoint = cmd;
+    _controller_data->filtered_setpoint = cmd;
+	
+	return cmd;
 }
 #endif

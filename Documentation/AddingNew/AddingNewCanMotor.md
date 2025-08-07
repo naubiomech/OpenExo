@@ -3,8 +3,8 @@
 1. Go to the individual exoskeletons and add the name of the motor to the values comments above the joints.  Make sure to add it to all of the exoskeleton configurations.
 
 ## parseIni.h
-1. Go to the config_defs namespace and add an enumeration to the motor enum.
-2. Go to the config_map namespace and add a case for your new motor in the motor mapping.  The string is the value you added to config.ini.
+1. Go to the config_defs namespace and add an enumeration to the "enum class motor : uint8_t" section.
+2. Go to the config_map namespace and add a case for your new motor in the "const IniKeyCode motor" section.  The string is the value you added to config.ini.
 
 ## Motor.h
 1. Define a new CAN motor class, these are the motors that inherit _CANMotor, see class AK60 as and example.

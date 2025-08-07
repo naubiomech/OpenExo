@@ -4,4 +4,3 @@
 ,Parameter order:,,,,,,,
 Amplitdue,Start Frequency (Hz),End Frequency (Hz) ,Duration,yshift,PID Flag,P Gain,I Gain,D Gain
 0,0,2,40,0,0,18,0,80
-1,1,2,10,0,0,0,0,0

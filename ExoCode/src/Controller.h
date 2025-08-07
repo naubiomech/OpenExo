@@ -488,5 +488,24 @@ private:
     //void _plantar_setpoint_adjuster(SideData* side_data, ControllerData* controller_data, float pjmcSpringDamper);
 };
 
+/**
+ * @brief PJMC_PLUS Controller
+ * 
+ * NOTE: THIS CONTROLLER IS STILL UNDER DEVELOPMENT 
+ * 
+ * See ControllerData.h for details on the parameters used.
+ */
+class PJMC_PLUS : public _Controller
+{
+public:
+    PJMC_PLUS(config_defs::joint_id id, ExoData* exo_data);
+    ~PJMC_PLUS() {};
+
+    float calc_motor_cmd();
+
+private:
+
+};
+
 #endif
 #endif

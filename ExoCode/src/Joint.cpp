@@ -523,7 +523,7 @@ void HipJoint::run_joint()
 
     //Enable or disable the motor.
     _motor->on_off(); 
-    _motor->enable();
+    _motor->enable();               //Do not enable the motors until the GUI tells you to, defaults to not enabled to prevent running until desired. 
 
     //Send the new command to the motor.
     _motor->transaction(_joint_data->controller.setpoint / _joint_data->motor.gearing);
@@ -779,13 +779,13 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
 , _chirp(id, exo_data)
 , _step(id, exo_data)
 , _spv2(id, exo_data)
+, _pjmc_plus(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
         logger::println("Ankle : Ankle Constructor");
     #endif
 
-    _ankle_angle.init(_is_left);
 
     //Set _joint_data to point to the data specific to this joint.
     if (_is_left)
@@ -987,6 +987,9 @@ void AnkleJoint::set_controller(uint8_t controller_id)  //Changes the high level
             break;
 		case (uint8_t)config_defs::ankle_controllers::spv2:
             _controller = &_spv2;
+            break;
+		case (uint8_t)config_defs::ankle_controllers::pjmc_plus:
+            _controller = &_pjmc_plus;
             break;
         default :
             logger::print("Unkown Controller!\n", LogLevel::Error);

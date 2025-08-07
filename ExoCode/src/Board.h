@@ -41,6 +41,17 @@
                 //Sync LED Pins
                 const unsigned int sync_led_pin = 29;
                 const unsigned int sync_default_pin = 25;
+				
+				//For Maxon PCB only
+				const unsigned int maxon_err_right_pin;
+				const unsigned int maxon_err_left_pin;
+				const unsigned int maxon_ctrl_left_pin;
+				const unsigned int maxon_ctrl_right_pin;
+				const unsigned int maxon_current_left_pin;
+				const unsigned int maxon_current_right_pin;
+				const unsigned int maxon_pwm_neutral_val;
+				const unsigned int maxon_pwm_u_bound;
+				const unsigned int maxon_pwm_l_bound;
             #endif
 
             const unsigned int sync_led_on_state = LOW;
@@ -124,6 +135,17 @@
                 //Sync LED Pins
                 const unsigned int sync_led_pin = 15;
                 const unsigned int sync_default_pin = 5;
+				
+				//For Maxon PCB only
+				const unsigned int maxon_err_right_pin;
+				const unsigned int maxon_err_left_pin;
+				const unsigned int maxon_ctrl_left_pin;
+				const unsigned int maxon_ctrl_right_pin;
+				const unsigned int maxon_current_left_pin;
+				const unsigned int maxon_current_right_pin;
+				const unsigned int maxon_pwm_neutral_val;
+				const unsigned int maxon_pwm_u_bound;
+				const unsigned int maxon_pwm_l_bound;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -222,6 +244,17 @@
                 //Sync LED Pins
                 const unsigned int sync_led_pin = 15;
                 const unsigned int sync_default_pin = 5;
+				
+				//For Maxon PCB only
+				const unsigned int maxon_err_right_pin;
+				const unsigned int maxon_err_left_pin;
+				const unsigned int maxon_ctrl_left_pin;
+				const unsigned int maxon_ctrl_right_pin;
+				const unsigned int maxon_current_left_pin;
+				const unsigned int maxon_current_right_pin;
+				const unsigned int maxon_pwm_neutral_val;
+				const unsigned int maxon_pwm_u_bound;
+				const unsigned int maxon_pwm_l_bound;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -322,6 +355,17 @@
                 //Sync LED Pins
                 const unsigned int sync_led_pin = 15;
                 const unsigned int sync_default_pin = 5;
+				
+				//For Maxon PCB only
+				const unsigned int maxon_err_right_pin;
+				const unsigned int maxon_err_left_pin;
+				const unsigned int maxon_ctrl_left_pin;
+				const unsigned int maxon_ctrl_right_pin;
+				const unsigned int maxon_current_left_pin;
+				const unsigned int maxon_current_right_pin;
+				const unsigned int maxon_pwm_neutral_val;
+				const unsigned int maxon_pwm_u_bound;
+				const unsigned int maxon_pwm_l_bound;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -395,9 +439,15 @@
 		{
 			 #if defined(ARDUINO_TEENSY41)
 				//Maxon motor Pins
-				const unsigned int maxon_err_pin = 37;          //Pin definition not utilized at the moment
-				const unsigned int maxon_ctrl_left_pin;
-				const unsigned int maxon_ctrl_right_pin = A9;   //Pin definition not utilized at the moment
+				const unsigned int maxon_err_right_pin = 37;
+				const unsigned int maxon_err_left_pin = 36;
+				const unsigned int maxon_ctrl_left_pin = A8;
+				const unsigned int maxon_ctrl_right_pin = A9;
+				const unsigned int maxon_current_left_pin = A0;
+				const unsigned int maxon_current_right_pin = A1;
+				const unsigned int maxon_pwm_neutral_val = 2048;
+				const unsigned int maxon_pwm_u_bound = 3690;
+				const unsigned int maxon_pwm_l_bound = 655;
 				
 				//SPV2 Additional Pins
 				const unsigned int SPV2_servo_pin = 27;         //Pin definition not utilized at the moment
@@ -464,9 +514,9 @@
 				//Pin to use when we need a value but don't actually want to use it.
 				const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
 				
-				//Motor enable Pins (To Do: Fix this)
-				const unsigned int enable_left_pin[] = {28, 29};
-				const unsigned int enable_right_pin[] = {33, 33};
+				//Motor enable Pins
+				const unsigned int enable_left_pin[] = {33};
+				const unsigned int enable_right_pin[] = {33};
 				
 				const unsigned int speed_check_pin;
 				

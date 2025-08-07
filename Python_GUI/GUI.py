@@ -15,7 +15,7 @@ class ControllerApp(tk.Tk):
         super().__init__(*args, **kwargs)
         self.trial = exoTrial.ExoTrial(True, 1, True)
         self.deviceManager = exoDeviceManager.ExoDeviceManager()
-        self.title("NAU Lab of Biomechatronics")
+        self.title("OpenExo GUI")
         self.geometry("920x720")
         self.minsize(900, 700)
 
