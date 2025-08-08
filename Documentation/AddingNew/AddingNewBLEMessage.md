@@ -7,7 +7,7 @@
 The function must be declared like this: 'inline static void my_new_function(ExoData* data, BleMessage* msg)'
 
 ## ComsMCU.cpp
-1. If you're message is being received by the Exo, locate the switch statement in ComsMCU::_process_complete_gui_command(BleMessage* msg). 
+1. If your message is being received by the Exo, locate the switch statement in ComsMCU::_process_complete_gui_command(BleMessage* msg). 
 2. Add a case for your message using the variable you made in the 'ble_names' namespace. The case should only call the function that your made in the 'ble_handlers'
 namespace. 
 
