@@ -24,15 +24,16 @@ bool AnkleAngles::init(bool is_left)
     _is_initialized = true;
 }
 
-float AnkleAngles::get(bool return_normalized)
+float AnkleAngles::get(bool is_left, bool return_normalized)
 {
     if (!_is_initialized) {
+		init(is_left);
         return 0;
     }
     
     //Convert ADC counts to ratio
     const int adc_counts = _left ? analogRead(_left_pin):analogRead(_right_pin);
-    const float ratio = adc_counts / 4095.0f;
+	const float ratio = adc_counts / 4095.0f;
     if (!return_normalized) {
         return ratio;
     }

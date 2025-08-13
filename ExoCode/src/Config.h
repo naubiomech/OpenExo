@@ -13,16 +13,13 @@
 #include "LogLevels.h"
     #define FIRMWARE_VERSION 0_1_0
 
-    //Available Boards that could be utilized
     #define AK_Board_V0_1 1
     #define AK_Board_V0_3 2
     #define AK_Board_V0_4 3
     #define AK_Board_V0_5_1 4
 	#define AK_Board_V0_6_Maxon 5
 
-    //Board that will actually be used
-    #define BOARD_VERSION AK_Board_V0_5_1       //Note: Only include name (e.g., AK_Board_V0_5_1), no need for number (e.g., 4)
-    
+    #define BOARD_VERSION AK_Board_V0_6_Maxon             
     #define REAL_TIME_I2C 1
     #define LOOP_FREQ_HZ 500
     #define LOOP_TIME_TOLERANCE 0.1 
