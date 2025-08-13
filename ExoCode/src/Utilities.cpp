@@ -379,6 +379,7 @@ namespace utils
         return (val < min || val > max);
     }
 	
+	#if defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)
 	void init_servos() {
 		static bool first_run = true;
 		if (first_run) {
@@ -387,7 +388,7 @@ namespace utils
 				uint8_t pin = logic_micro_pins::servo_pins[i];
 				if (!servo_map[pin].attached())
 				{
-					servo_map[pin].attach(pin,500,2500);     //Attach the servo object
+					servo_map[pin].attach(pin,500,2500);     //Attach a servo
 				}
 			}
 			first_run = false;
@@ -398,10 +399,7 @@ namespace utils
 		init_servos();
 		if (servo_map.count(servo_pin) > 0) {
 			servo_map[servo_pin].write(target_angle);
-			if (servo_pin==27) {
-				Serial.print("\n  |  target_angle: ");
-				Serial.print(target_angle);
-			}
 		}
 	}
+	#endif
 }

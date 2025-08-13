@@ -358,27 +358,16 @@ namespace UART_command_handlers
         switch (config[config_defs::exo_name_idx])
         {
         case (uint8_t)config_defs::exo_name::bilateral_ankle:
-            {
             rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN;
-            // rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading; 
-            // rx_msg.data[1] = exo_data->right_side.toe_stance;
-            // rx_msg.data[2] = exo_data->right_side.ankle.controller.ff_setpoint;
-            // rx_msg.data[3] = exo_data->left_side.ankle.controller.filtered_torque_reading; 
-            // rx_msg.data[4] = exo_data->left_side.toe_stance;
-            // rx_msg.data[5] = exo_data->left_side.ankle.controller.ff_setpoint; 
-            // rx_msg.data[6] = exo_data->right_side.toe_fsr; 
-            // rx_msg.data[7] = exo_data->left_side.toe_fsr;
-			float pwr2plot = exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001;
-			rx_msg.data[0] = exo_data->right_side.ankle.joint_position;
-			rx_msg.data[1] = exo_data->right_side.ankle.joint_position;
-			rx_msg.data[2] = exo_data->right_side.ankle.controller.setpoint2use_spv2;
-			rx_msg.data[3] = exo_data->right_side.ankle.controller.filtered_torque_reading;
-			rx_msg.data[4] = 100 * exo_data->right_side.ankle.controller.percent_grf2plot;
-			rx_msg.data[5] = 100 * exo_data->right_side.ankle.controller.percent_grf_heel2plot;
-			rx_msg.data[6] = pwr2plot;
-			rx_msg.data[7] = pwr2plot;
+            rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading; 
+            rx_msg.data[1] = exo_data->right_side.toe_stance;
+            rx_msg.data[2] = exo_data->right_side.ankle.controller.ff_setpoint;
+            rx_msg.data[3] = exo_data->left_side.ankle.controller.filtered_torque_reading; 
+            rx_msg.data[4] = exo_data->left_side.toe_stance;
+            rx_msg.data[5] = exo_data->left_side.ankle.controller.ff_setpoint; 
+            rx_msg.data[6] = exo_data->right_side.toe_fsr; 
+            rx_msg.data[7] = exo_data->left_side.toe_fsr;
 			break;
-			}
 
         case (uint8_t)config_defs::exo_name::bilateral_hip:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_RT_LEN;

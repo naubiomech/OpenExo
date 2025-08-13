@@ -52,6 +52,9 @@
 				const unsigned int maxon_pwm_neutral_val;
 				const unsigned int maxon_pwm_u_bound;
 				const unsigned int maxon_pwm_l_bound;
+				
+				//Servo motor pins
+				const unsigned int servo_pins;
             #endif
 
             const unsigned int sync_led_on_state = LOW;
@@ -146,6 +149,9 @@
 				const unsigned int maxon_pwm_neutral_val;
 				const unsigned int maxon_pwm_u_bound;
 				const unsigned int maxon_pwm_l_bound;
+				
+				//Servo motor pins
+				const unsigned int servo_pins[] = {};
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -255,6 +261,9 @@
 				const unsigned int maxon_pwm_neutral_val;
 				const unsigned int maxon_pwm_u_bound;
 				const unsigned int maxon_pwm_l_bound;
+				
+				//Servo motor pins
+				const unsigned int servo_pins[] = {};
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -367,6 +376,8 @@
 				const unsigned int maxon_pwm_u_bound;
 				const unsigned int maxon_pwm_l_bound;
 				
+				//Servo motor pins
+				const unsigned int servo_pins[] = {};
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -433,7 +444,7 @@
             const unsigned int spi_mode = 16;
         };
         #endif
-	#elif BOARD_VERSION == AK_Board_V0_6_Maxon //Note: Also Compatible with AK Board 0.7 (No need to have a seperate v0.7)
+	#elif BOARD_VERSION == OpenExo_Board_V0_6_Maxon //Note: Also Compatible with OpenExo Board 0.7 (No need to have a seperate v0.7)
    
 		#include "Arduino.h"
 		namespace logic_micro_pins  //teensy
@@ -451,10 +462,7 @@
 				const unsigned int maxon_pwm_l_bound = 655;
 				
 				//Servo motor pins
-				const int servo_pins[] = {26,27};
-				
-				//SPV2 Additional Pins
-				const unsigned int SPV2_servo_pin = 27;         //Pin definition not utilized at the moment
+				const unsigned int servo_pins[] = {26,27};
 			 
 				//Serial Pins, NC
 				const unsigned int rx1_pin ;

@@ -303,11 +303,19 @@ namespace utils
      */
     bool is_outside_range(float val, float min, float max);
 	
-	//void init_servos(uint8_t servo_pins[], uint8_t num_servos);
-	//void init_servos(uint8_t servo_pins[]);
+	/**
+     * @brief Attach the servos
+     * 
+     */
 	void init_servos();
-	void actuate_servo(uint8_t servo_pin, uint8_t target_angle);
 	
+	/**
+     * @brief Actuate a servo
+     * 
+     * @param servo_pin
+     * @param target_angle 
+     */
+	void actuate_servo(uint8_t servo_pin, uint8_t target_angle);
 }
 
 #endif
