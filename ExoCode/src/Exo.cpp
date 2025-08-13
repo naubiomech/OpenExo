@@ -83,11 +83,14 @@ bool Exo::run()
         {
             data->for_each_joint([](JointData* j_data, float* args){j_data->motor.enabled = false;});
         }
-
+		
+		//Initialize the servos
+		//utils::init_servos();
+		
         //Record the side data and send new commands to the motors.
         left_side.run_side();
         right_side.run_side();
-
+		
         //Update status LED
         status_led.update(data->get_status());
         #ifdef EXO_DEBUG

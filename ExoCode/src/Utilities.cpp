@@ -4,7 +4,8 @@
  */
 #include "Utilities.h"
 #include "Logger.h"
- 
+std::map<uint8_t, Servo> servo_map;
+
 namespace utils
 {
     bool get_is_left(config_defs::joint_id id)
@@ -377,4 +378,30 @@ namespace utils
     {
         return (val < min || val > max);
     }
+	
+	void init_servos() {
+		static bool first_run = true;
+		if (first_run) {
+			size_t num_servos = sizeof(logic_micro_pins::servo_pins)/sizeof(logic_micro_pins::servo_pins[0]);
+			for (uint8_t i = 0; i < num_servos; i++) {
+				uint8_t pin = logic_micro_pins::servo_pins[i];
+				if (!servo_map[pin].attached())
+				{
+					servo_map[pin].attach(pin,500,2500);     //Attach the servo object
+				}
+			}
+			first_run = false;
+		}
+	}
+	
+	void actuate_servo(uint8_t servo_pin, uint8_t target_angle) {
+		init_servos();
+		if (servo_map.count(servo_pin) > 0) {
+			servo_map[servo_pin].write(target_angle);
+			if (servo_pin==27) {
+				Serial.print("\n  |  target_angle: ");
+				Serial.print(target_angle);
+			}
+		}
+	}
 }

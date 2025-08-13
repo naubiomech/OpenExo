@@ -16,6 +16,9 @@
 #include <stdint.h>
 #include <utility>  //std::pair
 #include <queue>    //std::queue
+#include "Board.h"
+#include <map>
+#include <Servo.h>
 
 /**
  * @brief contains general utility functions for the exo
@@ -299,6 +302,12 @@ namespace utils
      * @return false 
      */
     bool is_outside_range(float val, float min, float max);
+	
+	//void init_servos(uint8_t servo_pins[], uint8_t num_servos);
+	//void init_servos(uint8_t servo_pins[]);
+	void init_servos();
+	void actuate_servo(uint8_t servo_pin, uint8_t target_angle);
+	
 }
 
 #endif

@@ -1305,10 +1305,10 @@ float CalibrManager::calc_motor_cmd()
         (exo_status == status_defs::messages::fsr_calibration) ||
         (exo_status == status_defs::messages::fsr_refinement);
 	
-	Serial.print("\nExo status: ");
-	Serial.print(String(exo_status));
-	Serial.print("  |  doToeRefinement: ");
-	Serial.print(String(_side_data->do_calibration_refinement_toe_fsr));
+	// Serial.print("\nExo status: ");
+	// Serial.print(String(exo_status));
+	// Serial.print("  |  doToeRefinement: ");
+	// Serial.print(String(_side_data->do_calibration_refinement_toe_fsr));
 	
     if (active_trial)
     {
@@ -2677,6 +2677,10 @@ float SPV2::calc_motor_cmd()
 	bool optimizer_switch = _controller_data->parameters[controller_defs::spv2::do_update_stiffness];
 	bool SD_content_imported = (((servo_home == 0)&&(servo_target == 0)&&(servo_fsr_threshold == 0))?false: true);
 	
+	Serial.print("\nservo_home: ");
+	Serial.print(servo_home);
+	Serial.print("  |  servo_target: ");
+	Serial.print(servo_target);
 	// servo_home = 40;
 	// servo_target = 20;
 	
@@ -2704,7 +2708,8 @@ float SPV2::calc_motor_cmd()
 	{
 		if (SD_content_imported)
 		{
-			_servo_runner(27, servo_home);
+			//_servo_runner(27, servo_home);
+			utils::actuate_servo(27, servo_home);
 		}
 	}
 	else
@@ -2712,9 +2717,18 @@ float SPV2::calc_motor_cmd()
 		// Serial.print("  |  |  |  Battery voltage (mV): ");
 		// Serial.print(_controller_data->SPV2_current_voltage);
 		
+		_controller_data->SPV2_currentAngle = _controller_data->parameters[controller_defs::spv2::neutral_angle];
+		utils::actuate_servo(26, _controller_data->SPV2_currentAngle);
 		if (!servo_switch)
         {
-			_servo_runner(27, servo_home);
+			//_servo_runner(27, servo_home);
+			utils::actuate_servo(27, servo_home);
+			
+			return 0;
+		}
+		else {
+			utils::actuate_servo(27, servo_target);
+			return 0;
 		}
 		
 		if (exo_status == status_defs::messages::fsr_refinement)
@@ -2753,7 +2767,8 @@ float SPV2::calc_motor_cmd()
                 {
 					if ((millis() - _controller_data->servo_departure_time) < 300)
                     {
-						_servo_runner(27, servo_target);   //Servo goes to the target position (DOWN)
+						//_servo_runner(27, servo_target);   //Servo goes to the target position (DOWN)
+						utils::actuate_servo(27, servo_target);
 						_controller_data->servo_did_go_down = true;
 					}
 					else
@@ -2794,7 +2809,8 @@ float SPV2::calc_motor_cmd()
 					
 					}
 					
-					_servo1_runner(26, _controller_data->SPV2_currentAngle);
+					//_servo1_runner(26, _controller_data->SPV2_currentAngle);
+					utils::actuate_servo(26, _controller_data->SPV2_currentAngle);
 					//Servo1 debugging
 					// Serial.print("\n----- currentAngle: ");
 					// Serial.print(_controller_data->SPV2_currentAngle);
@@ -2817,7 +2833,8 @@ float SPV2::calc_motor_cmd()
 			
 		}
 		else {
-			_servo_runner(27, servo_home);//when the FSR is being calibrated, move the servo out of the way
+			//_servo_runner(27, servo_home);//when the FSR is being calibrated, move the servo out of the way
+			utils::actuate_servo(27, servo_home);
 		}
 	}
 

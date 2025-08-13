@@ -886,7 +886,6 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
  */
 void AnkleJoint::run_joint()
 {
-    Serial.print("\nAnkleJoint::run_joint()");
 	#ifdef JOINT_DEBUG
         logger::print("AnkleJoint::run_joint::Start");
     #endif

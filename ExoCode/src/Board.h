@@ -366,6 +366,7 @@
 				const unsigned int maxon_pwm_neutral_val;
 				const unsigned int maxon_pwm_u_bound;
 				const unsigned int maxon_pwm_l_bound;
+				
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -448,6 +449,9 @@
 				const unsigned int maxon_pwm_neutral_val = 2048;
 				const unsigned int maxon_pwm_u_bound = 3690;
 				const unsigned int maxon_pwm_l_bound = 655;
+				
+				//Servo motor pins
+				const int servo_pins[] = {26,27};
 				
 				//SPV2 Additional Pins
 				const unsigned int SPV2_servo_pin = 27;         //Pin definition not utilized at the moment
