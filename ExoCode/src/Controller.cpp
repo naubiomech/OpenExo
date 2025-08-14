@@ -2589,7 +2589,7 @@ float SPV2::calc_motor_cmd()
 	float cmd;
 
 
-		if (cmd_ff < -5)
+		/* if (cmd_ff < -5)
         {
 			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 			// cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
@@ -2598,7 +2598,7 @@ float SPV2::calc_motor_cmd()
         {
 			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]); // less jittery during zero-torque mode
 			// cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
-		}
+		} */
 	
     //Establish Setpoints
 	_controller_data->ff_setpoint = cmd_ff; 
@@ -2805,7 +2805,8 @@ float SPV2::calc_motor_cmd()
 			return 0;
 		}
 		else {
-			return cmd;
+			//return cmd;
+			return 0;
 		}
 
 	}

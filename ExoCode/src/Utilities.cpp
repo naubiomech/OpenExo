@@ -4,7 +4,9 @@
  */
 #include "Utilities.h"
 #include "Logger.h"
+#if defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)
 std::map<uint8_t, Servo> servo_map;
+#endif
 
 namespace utils
 {
