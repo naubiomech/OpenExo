@@ -371,7 +371,7 @@ namespace UART_command_handlers
 			float pwr2plot = exo_data->right_side.ankle.controller.SPV2_filtered_pwr * 0.001;
 			rx_msg.data[0] = exo_data->right_side.ankle.joint_position;
 			rx_msg.data[1] = exo_data->right_side.ankle.joint_position;
-			rx_msg.data[2] = exo_data->right_side.ankle.controller.ff_setpoint;
+			rx_msg.data[2] = exo_data->right_side.ankle.controller.cmd_ff2plot;
 			rx_msg.data[3] = exo_data->right_side.ankle.controller.filtered_torque_reading;
 			rx_msg.data[4] = 100 * exo_data->right_side.ankle.controller.percent_grf2plot;
 			rx_msg.data[5] = 100 * exo_data->right_side.ankle.controller.percent_grf_heel2plot;

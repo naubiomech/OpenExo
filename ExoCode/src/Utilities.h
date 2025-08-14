@@ -16,9 +16,12 @@
 #include <stdint.h>
 #include <utility>  //std::pair
 #include <queue>    //std::queue
+
+#if defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)
 #include "Board.h"
 #include <map>
 #include <Servo.h>
+#endif
 
 /**
  * @brief contains general utility functions for the exo

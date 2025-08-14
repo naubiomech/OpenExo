@@ -1985,7 +1985,7 @@ void SPV2::_plantar_setpoint_adjuster(SideData* side_data, ControllerData* contr
 			
 			if (_controller_data->oldMaxPrescription < _controller_data->parameters[controller_defs::spv2::plantar_scaling]) 
             {
-			_controller_data->setpoint2use_spv2 ++;
+			_controller_data->setpoint2use_spv2 = _controller_data->setpoint2use_spv2 + 3;
 			}
 			else 
             {
@@ -2537,12 +2537,16 @@ float SPV2::calc_motor_cmd()
 	//Use a symmetric sigmoid to squelch the propulsive term
 	float propulsive_squelch_offset = -1.2 + threshold;
 	float propulsive_grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))+1);
+	propulsive_grf_squelch_multiplier = min(percent_grf,1);
 	float squelched_propulsive_term = propulsive*propulsive_grf_squelch_multiplier;
+	_controller_data->filtered_propulsive_term = utils::ewma(squelched_propulsive_term, _controller_data->filtered_propulsive_term, 0.01);
+
 	
 	// _controller_data->cmd_ff_kb = -_controller_data->filtered_squelched_supportive_term;
 	_controller_data->cmd_ff_kb = assistive;
-	_controller_data->cmd_ff_pushOff = -squelched_propulsive_term;
+	_controller_data->cmd_ff_pushOff = -_controller_data->filtered_propulsive_term;
 	_controller_data->cmd_ff_generic = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
+	_controller_data->cmd_ff_generic = min(dorsi_setpoint, _controller_data->cmd_ff_generic);
 	
 	// _controller_data->cmd_ff_kb = min(_controller_data->cmd_ff_kb, 0);
 	// _controller_data->cmd_ff_pushOff = min(_controller_data->cmd_ff_pushOff, 0);
@@ -2559,6 +2563,7 @@ float SPV2::calc_motor_cmd()
 	
 	float cmd_ff = cmd_pjmc + assistive + _controller_data->cmd_ff_pushOff;
 	cmd_ff = constrain(cmd_ff, -45, 5);
+	_controller_data->cmd_ff2plot = _controller_data->cmd_ff_generic + assistive + _controller_data->cmd_ff_pushOff;
 	
 	//cmd_ff = cmd_ff + _controller_data->cmd_ff_kb + _controller_data->cmd_ff_pushOff;
 	Serial.print("  |  cmd_ff: ");
@@ -2575,8 +2580,8 @@ float SPV2::calc_motor_cmd()
     {
 		
 		if (_data->user_paused || !active_trial) {
-			plantar_setpoint = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
-			_controller_data->setpoint2use_spv2 = plantar_setpoint;
+			//plantar_setpoint = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
+			//_controller_data->setpoint2use_spv2 = plantar_setpoint;
 		}
 		else {
 			
@@ -2585,6 +2590,8 @@ float SPV2::calc_motor_cmd()
 		}
 		
 	}
+	Serial.print("\n-----------_controller_data->setpoint2use_spv2: ");
+	Serial.print(_controller_data->setpoint2use_spv2);
 	
 	float cmd;
 

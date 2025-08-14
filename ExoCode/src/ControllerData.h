@@ -311,6 +311,7 @@ class ControllerData {
 		float previous_cmd = 0;
 		
         //Variables for the SPV2 Controller
+		float cmd_ff2plot = 0;
 		int plotting_scalar = 1;                //Maxon servo interrupter
 		unsigned long servo_departure_time;
 		bool servo_did_go_down = true;
@@ -383,6 +384,7 @@ class ControllerData {
 		float cmd_ff_generic = 0;
 		bool SPV2_virtual_spring_ON = false;
 		float SPV2_virtual_spring_entry_angle = 50;
+		float filtered_propulsive_term = 0;           /**< Low pass on final propulsive output */
 		
 		//SPV2 leaf spring stiffness measurement
 		bool SPV2_do_measure_stiffness1 = false;
