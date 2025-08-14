@@ -377,6 +377,7 @@ namespace UART_command_handlers
 			rx_msg.data[5] = 100 * exo_data->right_side.ankle.controller.percent_grf_heel2plot;
 			rx_msg.data[6] = pwr2plot;
 			rx_msg.data[7] = pwr2plot;
+			rx_msg.data[8] = exo_data->right_side.ankle.controller.SPV2_current_voltage * 0.001;
 			break;
 			}
 

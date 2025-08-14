@@ -452,7 +452,7 @@
 			 #if defined(ARDUINO_TEENSY41)
 				//Maxon motor Pins
 				const unsigned int maxon_err_right_pin = 37;
-				const unsigned int maxon_err_left_pin ;
+				const unsigned int maxon_err_left_pin = 37;
 				const unsigned int maxon_ctrl_left_pin ;
 				const unsigned int maxon_ctrl_right_pin = A9;
 				const unsigned int maxon_current_left_pin ;

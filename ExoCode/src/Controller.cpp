@@ -2479,7 +2479,7 @@ float SPV2::calc_motor_cmd()
 	_update_reference_angles(_side_data, _controller_data, percent_grf, percent_grf_heel);   //When current toe FSR > set threshold, use the current ankle angle as the "reference angle"
 	float k = 0.01 * _controller_data->parameters[controller_defs::spv2::spring_stiffness];
 	float b = 0.01 * _controller_data->parameters[controller_defs::spv2::damping];
-	if (!_controller_data->parameters[controller_defs::spv2::plantar_scaling]) {
+	if (_controller_data->parameters[controller_defs::spv2::plantar_scaling] < 1) {
 		k = 0;
 		b = 0;
 	}
@@ -2539,7 +2539,7 @@ float SPV2::calc_motor_cmd()
 	float propulsive_grf_squelch_multiplier = (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))) / (exp(sigmoid_exp_scalar*(percent_grf+propulsive_squelch_offset))+1);
 	propulsive_grf_squelch_multiplier = min(percent_grf,1);
 	float squelched_propulsive_term = propulsive*propulsive_grf_squelch_multiplier;
-	_controller_data->filtered_propulsive_term = utils::ewma(squelched_propulsive_term, _controller_data->filtered_propulsive_term, 0.01);
+	_controller_data->filtered_propulsive_term = utils::ewma(squelched_propulsive_term, _controller_data->filtered_propulsive_term, 0.8);
 
 	
 	// _controller_data->cmd_ff_kb = -_controller_data->filtered_squelched_supportive_term;
@@ -2596,7 +2596,7 @@ float SPV2::calc_motor_cmd()
 	float cmd;
 
 
-		/* if (cmd_ff < -5)
+		if (cmd_ff < -5)
         {
 			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 			// cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
@@ -2605,7 +2605,7 @@ float SPV2::calc_motor_cmd()
         {
 			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]); // less jittery during zero-torque mode
 			// cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
-		} */
+		}
 	
     //Establish Setpoints
 	_controller_data->ff_setpoint = cmd_ff; 
@@ -2743,8 +2743,8 @@ float SPV2::calc_motor_cmd()
 
 			if ((servo_switch) && (_controller_data->servo_did_go_down) && (_controller_data->filtered_torque_reading - cmd_ff) < 0)
 			{
-				cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
-				cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
+				// cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
+				// cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
 			
 			}
 			
@@ -2809,11 +2809,12 @@ float SPV2::calc_motor_cmd()
 		//Leaf spring stiffness measurement ends
 		
 		if (!(cmd == cmd)) {
+			Serial.print("\n!(cmd == cmd)............");
 			return 0;
 		}
 		else {
-			//return cmd;
-			return 0;
+			return cmd;
+			//return 0;
 		}
 
 	}
