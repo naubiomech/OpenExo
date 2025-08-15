@@ -613,7 +613,7 @@ void MaxonMotor::send_data(float torque) //Always send motor command regardless 
 		uint16_t post_fuse_torque = max(_pwm_l_bound,_pwm_neutral_val+(direction_modifier*torque));    //Set the lowest allowed PWM command
 		post_fuse_torque = min(_pwm_u_bound,post_fuse_torque);                              //Set the highest allowed PWM command
 		analogWrite((_motor_data->is_left? _ctrl_left_pin : _ctrl_right_pin),post_fuse_torque);	//Send the motor command to the motor driver
-    }
+	}
 };
 
 void MaxonMotor::master_switch()

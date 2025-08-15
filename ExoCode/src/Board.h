@@ -52,6 +52,9 @@
 				const unsigned int maxon_pwm_neutral_val;
 				const unsigned int maxon_pwm_u_bound;
 				const unsigned int maxon_pwm_l_bound;
+				
+				//Servo motor pins
+				const unsigned int servo_pins;
             #endif
 
             const unsigned int sync_led_on_state = LOW;
@@ -146,6 +149,9 @@
 				const unsigned int maxon_pwm_neutral_val;
 				const unsigned int maxon_pwm_u_bound;
 				const unsigned int maxon_pwm_l_bound;
+				
+				//Servo motor pins
+				const unsigned int servo_pins[] = {};
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -255,6 +261,9 @@
 				const unsigned int maxon_pwm_neutral_val;
 				const unsigned int maxon_pwm_u_bound;
 				const unsigned int maxon_pwm_l_bound;
+				
+				//Servo motor pins
+				const unsigned int servo_pins[] = {};
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -366,6 +375,9 @@
 				const unsigned int maxon_pwm_neutral_val;
 				const unsigned int maxon_pwm_u_bound;
 				const unsigned int maxon_pwm_l_bound;
+				
+				//Servo motor pins
+				const unsigned int servo_pins[] = {};
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -432,7 +444,7 @@
             const unsigned int spi_mode = 16;
         };
         #endif
-	#elif BOARD_VERSION == AK_Board_V0_6_Maxon //Note: Also Compatible with AK Board 0.7 (No need to have a seperate v0.7)
+	#elif BOARD_VERSION == OpenExo_Board_V0_6_Maxon //Note: Also Compatible with OpenExo Board 0.7 (No need to have a seperate v0.7)
    
 		#include "Arduino.h"
 		namespace logic_micro_pins  //teensy
@@ -440,17 +452,17 @@
 			 #if defined(ARDUINO_TEENSY41)
 				//Maxon motor Pins
 				const unsigned int maxon_err_right_pin = 37;
-				const unsigned int maxon_err_left_pin = 36;
-				const unsigned int maxon_ctrl_left_pin = A8;
+				const unsigned int maxon_err_left_pin = 37;
+				const unsigned int maxon_ctrl_left_pin ;
 				const unsigned int maxon_ctrl_right_pin = A9;
-				const unsigned int maxon_current_left_pin = A0;
+				const unsigned int maxon_current_left_pin ;
 				const unsigned int maxon_current_right_pin = A1;
 				const unsigned int maxon_pwm_neutral_val = 2048;
 				const unsigned int maxon_pwm_u_bound = 3690;
 				const unsigned int maxon_pwm_l_bound = 655;
 				
-				//SPV2 Additional Pins
-				const unsigned int SPV2_servo_pin = 27;         //Pin definition not utilized at the moment
+				//Servo motor pins
+				const unsigned int servo_pins[] = {26,27};
 			 
 				//Serial Pins, NC
 				const unsigned int rx1_pin ;
@@ -461,15 +473,15 @@
 				const unsigned int can_tx_pin ;
 				
 				//FSR Pins
-				const unsigned int fsr_sense_left_heel_pin = A14;
-				const unsigned int fsr_sense_left_toe_pin = A15;
-				const unsigned int fsr_sense_right_heel_pin= A3;
-				const unsigned int fsr_sense_right_toe_pin = A2;
+				const unsigned int fsr_sense_left_heel_pin ;
+				const unsigned int fsr_sense_left_toe_pin ;
+				const unsigned int fsr_sense_right_heel_pin= 17;
+				const unsigned int fsr_sense_right_toe_pin = 16;
 				
 				//Torque Sensor Pins (This will need to be updated/fixed)
 				const unsigned int num_available_joints = 2;
 				//const unsigned int torque_sensor_left[] = {A16, A17};
-				const unsigned int torque_sensor_left[] = {A16};
+				const unsigned int torque_sensor_left[] = {A6};
 				//const unsigned int torque_sensor_left1 = A16;
 				//const unsigned int torque_sensor_right[] = {A6, A7};
 				const unsigned int torque_sensor_right[] = {A6};
@@ -520,8 +532,8 @@
 				
 				const unsigned int speed_check_pin;
 				
-				const unsigned int left_ankle_angle_pin;
-				const unsigned int right_ankle_angle_pin;
+				const unsigned int left_ankle_angle_pin ;
+				const unsigned int right_ankle_angle_pin = A8;
 				
 				// I2C 
 				// SDA 18

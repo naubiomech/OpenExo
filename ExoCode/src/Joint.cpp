@@ -886,13 +886,13 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
  */
 void AnkleJoint::run_joint()
 {
-    #ifdef JOINT_DEBUG
+	#ifdef JOINT_DEBUG
         logger::print("AnkleJoint::run_joint::Start");
     #endif
 
     //Angle Sensor data
     _joint_data->prev_joint_position = _joint_data->joint_position;
-    const float raw_angle = _joint_data->joint_RoM * _ankle_angle.get();
+    const float raw_angle = _joint_data->joint_RoM * _ankle_angle.get(_is_left, false);
     const float new_angle = _joint_data->do_flip_angle ? (_joint_data->joint_RoM - raw_angle):(raw_angle);
     _joint_data->joint_position = utils::ewma(new_angle, _joint_data->joint_position, _joint_data->joint_position_alpha);
     _joint_data->joint_velocity = utils::ewma((_joint_data->joint_position - _joint_data->prev_joint_position) / (1.0f / LOOP_FREQ_HZ), _joint_data->joint_velocity, _joint_data->joint_velocity_alpha);
