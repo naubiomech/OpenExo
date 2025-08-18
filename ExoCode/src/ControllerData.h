@@ -261,7 +261,7 @@ class ControllerData {
 
         /* Controller Specific Variables That You Want To Plot. If you do not want to plot, than put variables in Controller.h under the controller of interest. */
 
-        //Variables for TREC Controller (MOVE TO Controller.h)
+        //Variables for TREC Controller (MOVE NON-PLOTTED VARIABLES TO Controller.h WHEN FINISHED WITH CONTROLLER DEVELOPMENT)
         float reference_angle = 0;                              /**< Reference angle for the spring term */
         float reference_angle_offset = 0;                       /**< Offset for the reference angle */
         bool reference_angle_updated = false;                   /**< Flag to indicate if the reference angle was updated this step */
@@ -310,6 +310,8 @@ class ControllerData {
 		//Variables for the Zhang-Collins Controller
 		float previous_cmd = 0;
 		
+        //TO DO:: MOVE NON - PLOTTED SPV2 VARIABLES TO CONTROLLER.h WHEN FINISHED WITH CONTROLLER DEVELOPMENT
+
         //Variables for the SPV2 Controller
 		float cmd_ff2plot = 0;
 		int plotting_scalar = 1;                //Maxon servo interrupter
