@@ -172,8 +172,8 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t timing_threshold = 2;                     //Toe FSR threshold (unit: %)
         const uint8_t spring_stiffness_adj_factor = 3;
         const uint8_t neutral_angle = 4;
-		const uint8_t min_angle = 5;
-        const uint8_t max_angle = 6;
+		const uint8_t min_angle = 5;                            //Minimum Angle
+        const uint8_t max_angle = 6;                            //Maximum Angle 
         const uint8_t kp = 7;
 		const uint8_t kd = 8;
 		const uint8_t turn_on_peak_limiter = 9;
