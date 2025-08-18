@@ -2205,13 +2205,14 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     encoder_angle = 0.0;
     combined_fsr = 0.0;
     encoder_offset = _joint_data->position;
-    intended_encoder_offset = -50;
+    intended_encoder_offset = 0.0;
     limit_rate = 0.025;
-    ewma_alpha = 0.1;
+    ewma_alpha = 0.09;
     last_update_time = millis();
     correction_factor[0] = 2.8870;
     correction_factor[1] = 0.0519;
     correction_factor[2] = -0.0133;
+    skip_intended_encoder_offset = false;
 
     first_loop = true;
 
@@ -2232,6 +2233,10 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
 
     steps = 0;
     ending_step = 0;
+
+    local_toe_stance = true;
+    lower_toe_threshold = 0.4; // Threshold for toe stance detection
+    upper_toe_threshold = 0.6; // Upper threshold for toe stance detection
 
     prev_toe_fsr = 0.0;
 
@@ -2283,10 +2288,13 @@ float AngleBased::calc_motor_cmd()
         float max_torque = _controller_data->parameters[controller_defs::angle_based::max_torque_idx];
         int recalibrate_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_flag_idx];
         int recal_angle_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_angle_idx];
+        //ewma_alpha = _controller_data->parameters[controller_defs::angle_based::ewma_alpha_idx]
 
         // Pull in FSR values (double check that Toe FSR, located in Side.h, is not drawing from the FSR_Regressed Function)
         float raw_heel_fsr = _side_data->heel_fsr;
         float raw_toe_fsr = _side_data->toe_fsr;
+        local_toe_stance = utils::schmitt_trigger(raw_toe_fsr, local_toe_stance, lower_toe_threshold, upper_toe_threshold);
+        _controller_data->local_toe_stance = local_toe_stance; // Store the local toe stance for plotting
 
         // If we just started, calculate the offset for the angle encoders
         if (first_loop & (_joint_data->position != 0.0))
@@ -2517,6 +2525,11 @@ float AngleBased::calc_motor_cmd()
         // State Logic
         if ((_side_data->heel_stance || _side_data->toe_stance) && normalized_stance_moment > 0)
         {
+            if(state == 3) // If we just entered stance we need to reset encoder offset to prevent large jumps in percieved angle
+            {
+                skip_intended_encoder_offset = true; // Skip the intended encoder offset calculation
+            }
+
             state = 1;
         }
 
@@ -2528,7 +2541,7 @@ float AngleBased::calc_motor_cmd()
             }
         }
 
-        if ((abs(raw_toe_fsr - prev_toe_fsr) > 0.01 && _side_data->toe_stance) || (!_side_data->heel_stance && !_side_data->toe_stance))
+        if (((raw_toe_fsr - prev_toe_fsr < -0.01) && _side_data->toe_stance) || (!_side_data->heel_stance && !_side_data->toe_stance))
         {
             state = 3;
         }
@@ -2620,8 +2633,15 @@ float AngleBased::calc_motor_cmd()
 
         //Handle the offset created due to motor lash back and soft tissue deformation   
 
-        float intended_encoder_offset_deg = utils::radians_to_degrees(encoder_offset_0) + prev_cmd * correction_factor[0] + prev_cmd*prev_cmd * correction_factor[1] + prev_cmd*prev_cmd*prev_cmd * correction_factor[2];
-        intended_encoder_offset = utils::degrees_to_radians(intended_encoder_offset_deg);
+        if(!skip_intended_encoder_offset)
+        {
+            float intended_encoder_offset_deg = utils::radians_to_degrees(encoder_offset_0) + prev_cmd * correction_factor[0] + prev_cmd*prev_cmd * correction_factor[1] + prev_cmd*prev_cmd*prev_cmd * correction_factor[2];
+            intended_encoder_offset = utils::degrees_to_radians(intended_encoder_offset_deg);
+        }
+        else
+        {
+            skip_intended_encoder_offset = false; // Reset the skip intended encoder offset flag for the next iteration
+        }
         _controller_data->intended_encoder_offset = intended_encoder_offset;
 
         // Filter the offset to prevent spikes and noise
@@ -2632,11 +2652,6 @@ float AngleBased::calc_motor_cmd()
 
         // Store the feed-forward setpoint for plotting
         _controller_data->ff_setpoint = cmd_ff;
-
-        if(((prev_cmd < 0.0) && (cmd_ff > 0.0)) || ((prev_cmd > 0.0) && (cmd_ff < 0.0)))
-        {
-            cmd_ff = 0.0;
-        }
 
         // Set the motor command to be equal to the feed-foward setpoint (Note: if doing closed-loop control, this is where you would do PID)
         float cmd = cmd_ff;

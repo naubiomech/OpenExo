@@ -196,7 +196,7 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t max_torque_idx = 4;                       //Maximum Torque Limit (Nm)
         const uint8_t recalibrate_flag_idx = 5;                 //Flag to Recalibrate Normalized Moment (change value to recalibrate)
         const uint8_t recalibrate_angle_idx = 6;                //Flag to recalibrate normalized angle
-        //const uint8_t tigh_size_idx = 7;                        //Enum for thigh cuff size used (1->small, 2->medium, 3->large)
+        const uint8_t ewma_alpha_idx = 7;                       //value of EWMA alpha for angle offset (between 0 and 1)
         const uint8_t num_parameter = 8;
     }
 
@@ -324,6 +324,7 @@ class ControllerData {
         float minAngle;
         int steps;
         float sum_min;
+        bool local_toe_stance;
 };      
 
 #endif

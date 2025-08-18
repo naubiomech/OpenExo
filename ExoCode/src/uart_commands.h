@@ -366,15 +366,15 @@ namespace UART_command_handlers
         case (uint8_t)config_defs::exo_name::bilateral_hip:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_RT_LEN;
             rx_msg.data[0] = exo_data->right_side.hip.controller.ff_setpoint;
-            rx_msg.data[1] = utils::radians_to_degrees(exo_data->right_side.hip.position); 
+            rx_msg.data[1] = exo_data->right_side.hip.controller.encoder_angle; 
             rx_msg.data[2] = exo_data->right_side.toe_fsr; 
-            rx_msg.data[3] = exo_data->left_side.hip.controller.ff_setpoint;
-            rx_msg.data[4] =  utils::radians_to_degrees(exo_data->left_side.hip.position);
-            rx_msg.data[5] = exo_data->left_side.toe_fsr;
+            rx_msg.data[3] = exo_data->right_side.hip.controller.control_state;
+            rx_msg.data[4] = utils::radians_to_degrees(exo_data->right_side.hip.controller.encoder_offset);
+            rx_msg.data[5] = utils::radians_to_degrees(exo_data->right_side.hip.controller.intended_encoder_offset);
             rx_msg.data[6] = exo_data->right_side.hip.controller.normalized_stance_moment;
-            rx_msg.data[7] = exo_data->left_side.hip.controller.normalized_stance_moment;
+            rx_msg.data[7] = exo_data->right_side.hip.controller.local_toe_stance;
             rx_msg.data[8] = exo_data->right_side.hip.controller.normalized_angle;
-            rx_msg.data[9] = exo_data->left_side.hip.controller.normalized_angle;
+            rx_msg.data[9] = exo_data->right_side.hip.controller.combined_fsr;
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_elbow:

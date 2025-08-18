@@ -499,6 +499,7 @@ public:
     float encoder_offset;           /* Store the encoder offset from the calibarition phase at the initation of the trial. */
     float intended_encoder_offset;  /* Stores the goal encoder offset while the rate limit begins to chage the actual encoder offset */
     float encoder_offset_0;         /* Stores original encoder offset*/
+    bool skip_intended_encoder_offset; /* Flag to skip the intended encoder offset calculation. */
 
     bool first_loop;                /* Flag to initiate encoder calibration at the initiation of the trial.*/
     
@@ -521,6 +522,10 @@ public:
     float local_min;
 
     int ending_step;
+
+    bool local_toe_stance;          /* Flag to indicate if the toe is in stance phase. Needs different thresholds than the ankle so keeping it here to avoid conflict */
+    float lower_toe_threshold;
+    float upper_toe_threshold;
 
     float prev_toe_fsr;
     
