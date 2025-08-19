@@ -1445,3 +1445,5 @@ The FSR regression equation for Ankle Control alters accuracy of percent gait es
 Future work will handle FSRs slightly differently to allow for better control.
 
 An unknown change in later versions of Teensy cause the errors in operation of the code, for the time being we recommend using only [Teensy 1.56] (https://drive.google.com/drive/folders/1KPKqQVOz_tkL_bVR01A6eaRcMwZrPEkt?usp=drive_link)
+
+When updating the controller parameters from the GUI decimal points do not get sent/saved to the device. Instead the value gets truncated.
