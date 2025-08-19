@@ -2207,7 +2207,7 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     encoder_offset = _joint_data->position;
     intended_encoder_offset = 0.0;
     limit_rate = 0.025;
-    ewma_alpha = 0.09;
+    //ewma_alpha = 0.0875; //I expect alpha should be between 0.05 and 0.1
     last_update_time = millis();
     correction_factor[0] = 2.8870;
     correction_factor[1] = 0.0519;
@@ -2288,7 +2288,8 @@ float AngleBased::calc_motor_cmd()
         float max_torque = _controller_data->parameters[controller_defs::angle_based::max_torque_idx];
         int recalibrate_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_flag_idx];
         int recal_angle_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_angle_idx];
-        //ewma_alpha = _controller_data->parameters[controller_defs::angle_based::ewma_alpha_idx]
+        float ewma_alpha = _controller_data->parameters[controller_defs::angle_based::ewma_alpha_idx];
+        _controller_data->fs = swing_setpoint;
 
         // Pull in FSR values (double check that Toe FSR, located in Side.h, is not drawing from the FSR_Regressed Function)
         float raw_heel_fsr = _side_data->heel_fsr;
@@ -2523,7 +2524,7 @@ float AngleBased::calc_motor_cmd()
         float cmd_ff = 0.0; // Initialize the feed-foward command to 0
 
         // State Logic
-        if ((_side_data->heel_stance || _side_data->toe_stance) && normalized_stance_moment > 0)
+        if ((_side_data->heel_stance || local_toe_stance) && normalized_stance_moment > 0)
         {
             if(state == 3) // If we just entered stance we need to reset encoder offset to prevent large jumps in percieved angle
             {
@@ -2533,7 +2534,7 @@ float AngleBased::calc_motor_cmd()
             state = 1;
         }
 
-        if ((_side_data->heel_stance || _side_data->toe_stance) && normalized_stance_moment <= 0)
+        if ((_side_data->heel_stance || local_toe_stance) && normalized_stance_moment <= 0)
         {
             if(state != 3)
             {
