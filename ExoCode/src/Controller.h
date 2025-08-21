@@ -530,6 +530,7 @@ public:
     float prev_toe_fsr;
     
     int state;
+    int prev_state;
 
 
     float normalized_angle;

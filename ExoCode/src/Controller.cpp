@@ -2207,7 +2207,7 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     encoder_offset = _joint_data->position;
     intended_encoder_offset = 0.0;
     limit_rate = 0.025;
-    //ewma_alpha = 0.0875; //I expect alpha should be between 0.05 and 0.1
+    ewma_alpha = 0.0875; //I expect alpha should be between 0.08 and 0.1
     last_update_time = millis();
     correction_factor[0] = 2.8870;
     correction_factor[1] = 0.0519;
@@ -2241,6 +2241,7 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     prev_toe_fsr = 0.0;
 
     state = 0;
+    prev_state = 0;
 
     normalized_angle = 0.0;
     max_angle = -100.0;
@@ -2288,8 +2289,8 @@ float AngleBased::calc_motor_cmd()
         float max_torque = _controller_data->parameters[controller_defs::angle_based::max_torque_idx];
         int recalibrate_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_flag_idx];
         int recal_angle_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_angle_idx];
-        float ewma_alpha = _controller_data->parameters[controller_defs::angle_based::ewma_alpha_idx];
-        _controller_data->fs = swing_setpoint;
+        //ewma_alpha = _controller_data->parameters[controller_defs::angle_based::ewma_alpha_idx]/1000.0;
+        _controller_data->recal_flag = ewma_alpha*100.0;
 
         // Pull in FSR values (double check that Toe FSR, located in Side.h, is not drawing from the FSR_Regressed Function)
         float raw_heel_fsr = _side_data->heel_fsr;
@@ -2322,6 +2323,7 @@ float AngleBased::calc_motor_cmd()
         {
             steps++; // Increase the step count by 1
         }
+        _controller_data->steps = steps;
 
         // Calculate Average Min and Max from Seven Steps
         if (steps < 8)
@@ -2526,23 +2528,23 @@ float AngleBased::calc_motor_cmd()
         // State Logic
         if ((_side_data->heel_stance || local_toe_stance) && normalized_stance_moment > 0)
         {
-            if(state == 3) // If we just entered stance we need to reset encoder offset to prevent large jumps in percieved angle
+            state = 1;
+            if(prev_state == 3) // If we just entered stance, we need to reset the encoder offset to prevent large jumps in perceived angle
             {
                 skip_intended_encoder_offset = true; // Skip the intended encoder offset calculation
             }
-
-            state = 1;
         }
 
         if ((_side_data->heel_stance || local_toe_stance) && normalized_stance_moment <= 0)
         {
+            //return to this idea now that we have local toe stance
             if(state != 3)
             {
                 state = 2;
             }
         }
 
-        if (((raw_toe_fsr - prev_toe_fsr < -0.01) && _side_data->toe_stance) || (!_side_data->heel_stance && !_side_data->toe_stance))
+        if (((raw_toe_fsr - prev_toe_fsr < -0.01) && local_toe_stance) || (!_side_data->heel_stance && !local_toe_stance))
         {
             state = 3;
         }
@@ -2584,8 +2586,6 @@ float AngleBased::calc_motor_cmd()
             {
                 swingStartTime = millis();
                 swingStartPhase = _side_data->percent_gait;
-                Serial.print("Swing Start Phase: ");
-                Serial.println(swingStartPhase);
                 if(!calibrating)
                 {
                     cmd_ff = swing_setpoint;
@@ -2598,19 +2598,9 @@ float AngleBased::calc_motor_cmd()
                 {
                     cmd_ff = swing_setpoint;
                 }
-                Serial.println("swing assist");
-                Serial.print("current percent gait: ");
-                Serial.println(_side_data->percent_gait);
-                Serial.print("Swing Assist Endpoint: ");
-                Serial.println(swingStartPhase + swing_assist_endpoint);
             }
             else // If we are not within the user defined assistive duration, send zero torque
             {
-                Serial.println("no assistance");
-                Serial.print("current percent gait: ");
-                Serial.println(_side_data->percent_gait);
-                Serial.print("Swing Assist Endpoint: ");
-                Serial.println(swing_assist_endpoint);
                 cmd_ff = 0.0;
             }
 
@@ -2633,20 +2623,22 @@ float AngleBased::calc_motor_cmd()
         }
 
         //Handle the offset created due to motor lash back and soft tissue deformation   
-
-        if(!skip_intended_encoder_offset)
-        {
-            float intended_encoder_offset_deg = utils::radians_to_degrees(encoder_offset_0) + prev_cmd * correction_factor[0] + prev_cmd*prev_cmd * correction_factor[1] + prev_cmd*prev_cmd*prev_cmd * correction_factor[2];
-            intended_encoder_offset = utils::degrees_to_radians(intended_encoder_offset_deg);
-        }
-        else
-        {
-            skip_intended_encoder_offset = false; // Reset the skip intended encoder offset flag for the next iteration
-        }
-        _controller_data->intended_encoder_offset = intended_encoder_offset;
+        float intended_encoder_offset_deg = utils::radians_to_degrees(encoder_offset_0) + prev_cmd * correction_factor[0] + prev_cmd*prev_cmd * correction_factor[1] + prev_cmd*prev_cmd*prev_cmd * correction_factor[2];
+        intended_encoder_offset = utils::degrees_to_radians(intended_encoder_offset_deg);
 
         // Filter the offset to prevent spikes and noise
         encoder_offset = utils::ewma(intended_encoder_offset, encoder_offset, ewma_alpha); 
+
+        _controller_data->max_torque = (state == 1) && (prev_state == 3);
+        if((state == 1) && (prev_state == 3))
+        {
+            Serial.println("Skipping intended encoder offset");
+            skip_intended_encoder_offset = false; // Reset the skip intended encoder offset flag for the next iteration
+            encoder_offset = encoder_offset_0; // If we are skipping the intended encoder offset, we just use the initial encoder offset
+        }
+
+        // Store the intended encoder offset for plotting
+        _controller_data->intended_encoder_offset = intended_encoder_offset;
 
         // Store the encoder offset for plotting
         _controller_data->encoder_offset = encoder_offset;
@@ -2668,6 +2660,8 @@ float AngleBased::calc_motor_cmd()
         prev_step = steps;
 
         prev_cmd = cmd;
+
+        prev_state = state;
 
         return cmd;
     //    prev_time = millis();

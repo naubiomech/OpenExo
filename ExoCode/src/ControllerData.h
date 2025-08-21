@@ -325,6 +325,7 @@ class ControllerData {
         int steps;
         float sum_min;
         bool local_toe_stance;
+        float max_torque;
 };      
 
 #endif
