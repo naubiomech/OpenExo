@@ -26,7 +26,15 @@ class ActiveTrial(tk.Frame):
         self.elapsed_time = 0  # Store the elapsed time
         self.timer_label = None  # Label for displaying the time
         self.timer_job = None  # Store the timer update job reference
+        self.paused_flag = False
 
+        # Load pause and play icons
+        pause_img = Image.open("Resources/Images/pause.png").convert("RGBA")
+        play_img = Image.open("Resources/Images//play.png").convert("RGBA")
+        # Optionally resize them to the desired dimensions
+        self.pause_icon = ImageTk.PhotoImage(pause_img.resize((40, 40)))
+        self.play_icon = ImageTk.PhotoImage(play_img.resize((40, 40)))
+        
         # Set the disconnection callback
         self.controller.deviceManager.on_disconnect = self.ActiveTrial_on_device_disconnected
         
@@ -35,7 +43,7 @@ class ActiveTrial(tk.Frame):
 
         self.var = IntVar()
         self.chartVar = StringVar()
-        self.chartVar.set("Controller")
+        self.chartVar.set("Data 0-3")
         self.graphVar = StringVar()
         self.graphVar.set("Both Graphs")  # Default to "Both Graphs"
 
@@ -43,23 +51,22 @@ class ActiveTrial(tk.Frame):
 
     # Frame UI elements
     def create_widgets(self):
-
+        
         style = ttk.Style()
         style.configure("Custom.TCombobox", font=(self.fontstyle, 16), padding=10)
 
         # Active Trial title label
         calibrationMenuLabel = ttk.Label(self, text="Active Trial", font=(self.fontstyle, 40))
-        calibrationMenuLabel.grid(row=0, column=0, columnspan=8, pady=20)
+        calibrationMenuLabel.grid(row=0, column=0, columnspan=8, pady=20,padx=(100, 0))
 
         # Load and place the smaller image behind the timer and battery
         small_image = Image.open("./Resources/Images/OpenExo.png").convert("RGBA")
-        small_image = small_image.resize((80, 40))  # Resize the image to a smaller size
+        small_image = small_image.resize((int(1736*.06), int(336*.06)))  # Resize the image to a smaller size
         self.small_bg_image = ImageTk.PhotoImage(small_image)
 
         # Create a Canvas for the smaller image
-        small_canvas = tk.Canvas(self, width=80, height=50, highlightthickness=0)
-        small_canvas.create_image(0, 0, image=self.small_bg_image, anchor="nw")
-        small_canvas.grid(row=0, column=4, sticky="ne", padx=5, pady=10)  # Top-right corner
+        small_label = ttk.Label(self, image=self.small_bg_image)
+        small_label.grid(row=0, column=4, sticky="ne", padx=5, pady=10)
 
         # Timer label
         self.timer_label = ttk.Label(self, text="Time: 0:00", font=(self.fontstyle, 12))
@@ -74,16 +81,16 @@ class ActiveTrial(tk.Frame):
 
         # Create and place the top plot
         self.topPlot = TopPlot(self)
-        self.topPlot.canvas.get_tk_widget().grid(row=1, column=1, columnspan=6, sticky="NSEW", pady=5, padx=5)
+        self.topPlot.canvas.get_tk_widget().grid(row=1, column=1, columnspan=5, sticky="NSEW", pady=5, padx=5)
 
         # Create and place the bottom plot
         self.bottomPlot = BottomPlot(self)
-        self.bottomPlot.canvas.get_tk_widget().grid(row=2, column=1, columnspan=6, sticky="NSEW", pady=5, padx=5)
+        self.bottomPlot.canvas.get_tk_widget().grid(row=2, column=1, columnspan=5, sticky="NSEW", pady=5, padx=5)
             
         # Chart selection button
         self.chartButton = ttk.Button(
             self,
-            text="Controller",
+            text="Data 0-3",
             command=self.toggle_chart,
             style="Custom.TButton",
         )
@@ -113,7 +120,6 @@ class ActiveTrial(tk.Frame):
         self.bottomGraphButton = ttk.Button(
             graph_button_frame,
             text="Bottom Graph",
-            width = 15,
             command=lambda: self.set_graph("Bottom Graph"),
             style="Custom.TButton",
         )
@@ -131,6 +137,19 @@ class ActiveTrial(tk.Frame):
         )
         #endTrialButton.pack(side=LEFT)  # Pack the button next to the title
         endTrialButton.grid(row=0, column=0, pady=10)
+
+        saveAndStartNewButton = ttk.Button(
+            self,
+            text="Save CSV",
+            command=async_handler(self.save_and_start_new_csv)
+        )
+        saveAndStartNewButton.grid(row=0, column=1)
+
+        # Pause/Play Icon as a Label (no button border)
+        self.pauseIconLabel = tk.Label(self, image=self.pause_icon, borderwidth=0, cursor="hand2")
+        self.pauseIconLabel.grid(row=1, column=0, sticky = N)
+        self.pauseIconLabel.bind("<Button-1>", lambda event: async_handler(self.on_pause_button_clicked)())
+
 
         # Buttons at the bottom
         button_frame = ttk.Frame(self)
@@ -188,12 +207,12 @@ class ActiveTrial(tk.Frame):
     def toggle_chart(self):
         """Toggle between 'Controller' and 'Sensor' for the chart."""
         current = self.chartVar.get()
-        if current == "Controller":
-            self.chartVar.set("Sensor")
-            self.chartButton.config(text="Sensor")
+        if current == "Data 0-3":
+            self.chartVar.set("Data 4-7")
+            self.chartButton.config(text="Data 4-7")
         else:
-            self.chartVar.set("Controller")
-            self.chartButton.config(text="Controller")
+            self.chartVar.set("Data 0-3")
+            self.chartButton.config(text="Data 0-3")
         self.newSelection()
 
     def set_graph(self, selection):
@@ -264,9 +283,10 @@ class ActiveTrial(tk.Frame):
         bioFeedback_frame.newSelection(self)
 
     def handle_MachineLearning_button(self):
-        self.controller.show_frame("MachineLearning")
         machineLearning_frame = self.controller.frames["MachineLearning"]
         machineLearning_frame.newSelection(self)
+        machineLearning_frame.clear_both_plot()
+        self.controller.show_frame("MachineLearning")
 
     def newSelection(self, event=None):
         # Disable buttons and dropdown untill proccess complete
@@ -322,8 +342,10 @@ class ActiveTrial(tk.Frame):
             plots_to_update = [self.topPlot, self.bottomPlot]
         elif graph_selection == "Top Graph":
             plots_to_update = [self.topPlot]
+            self.clear_bottom_plot()
         elif graph_selection == "Bottom Graph":
             plots_to_update = [self.bottomPlot]
+            self.clear_top_plot()
 
         # Animate the selected plots
         for plot in plots_to_update:
@@ -336,6 +358,16 @@ class ActiveTrial(tk.Frame):
 
         # Enable interactions after the first plot update is complete
         self.after(20, self.enable_interactions)
+
+    def clear_top_plot(self):
+        self.topPlot.clear_plot()
+
+    def clear_bottom_plot(self):
+        self.bottomPlot.clear_plot()
+
+    def clear_both_plot(self):
+        self.bottomPlot.clear_plot()
+        self.topPlot.clear_plot()
 
     def stop_plot_updates(self):
         if self.plot_update_job:
@@ -378,11 +410,31 @@ class ActiveTrial(tk.Frame):
     async def on_end_trial_button_clicked(self):
         await self.endTrialButtonClicked()
 
+    async def on_pause_button_clicked(self):
+        if not self.paused_flag:
+            # Pause the system
+            await self.controller.deviceManager.motorOff()  # Turn off motors
+            self.paused_flag = True
+            # Update the label to show the "play" icon (for resuming)
+            self.pauseIconLabel.config(image=self.play_icon)
+        else:
+            # Resume the system
+            await self.controller.deviceManager.motorOn()  # Enable motors
+            self.paused_flag = False
+            # Update the label to show the "pause" icon (for pausing again)
+            self.pauseIconLabel.config(image=self.pause_icon)
+        
     async def endTrialButtonClicked(self):
-        await self.ShutdownExo()
         self.controller.show_frame("ScanWindow")
+        self.controller.frames["ScanWindow"].disable_elements()  # Call show method to reset elements
+        
+        await self.ShutdownExo()
         self.controller.frames["ScanWindow"].show()  # Call show method to reset elements
 
+        # Reset pause button to default state
+        self.paused_flag = False
+        self.pauseIconLabel.config(image=self.pause_icon)
+        
     async def ShutdownExo(self):
         # End trial
         await self.controller.deviceManager.motorOff()  # Turn off motors
@@ -398,3 +450,12 @@ class ActiveTrial(tk.Frame):
         self.controller.deviceManager._realTimeProcessor._exo_data.MarkLabel.set(
             "Mark: " + str(self.controller.
                 deviceManager._realTimeProcessor._exo_data.MarkVal))
+
+    def pauseMotorButton(self):
+        self.paused_flag = True
+        self.pauseIconLabel.config(image=self.play_icon)  
+
+    async def save_and_start_new_csv(self):
+            self.controller.trial.loadDataToCSV(
+                self.controller.deviceManager
+            )  # Load data from Exo into CSV

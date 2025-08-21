@@ -25,33 +25,33 @@
 8. Update the ConfigData struct at the end to match 
  
 ## ParseIni.cpp
-1. Line 174 -> Onward: Copy template in each section to add in new joint so that it is formatted same as other joints.
+1. ~Line 180 -> Onward: Copy template in each section to add in new joint so that it is formatted same as other joints.
 
 ## ExoData.h
 1. In the functions "for_each_joint", add in the new joint following the format of the previous joints
     
 ## ExoData.cpp
-1. In the function "get_used_joints" (36), add in the new joint following the format of the other joints already there, make sure to do both the left and right sides
-2. In the function "get_joint_with" (59), add in the new joint following the format of the other joints already there, make sure to do both the left and right sides
+1. In the function "get_used_joints" (~ Line 36), add in the new joint following the format of the other joints already there, make sure to do both the left and right sides
+2. In the function "get_joint_with" (~ Line 59), add in the new joint following the format of the other joints already there, make sure to do both the left and right sides
 3. Similarly, in the function "print" add in the prints of the new joint for each side (left and right) following the establish formatting.
 
 ## UART_commands.h
-1. Update the function "get_config" (Line 196) with the config_defs you added in ParseIni.h, refer to that file and look at the added "static const int" at the end of the config_defs namespace
-2. Similarly, update the function "update_config" (Line 227) with the config_defs you added in ParseIni.h, refer to that file and look at the added "static const int" at the end of the config_defs namespace
-3. In "get_real_time_data" (Line 306), add in a new case in the switch statement corresponding to the bilateral configuration of the joint and for any multi-joint instances. You can send up to 10 data points at a time using the established formmating.
+1. Update the function "get_config" (~Line 196) with the config_defs you added in ParseIni.h, refer to that file and look at the added "static const int" at the end of the config_defs namespace
+2. Similarly, update the function "update_config" (~Line 227) with the config_defs you added in ParseIni.h, refer to that file and look at the added "static const int" at the end of the config_defs namespace
+3. In "get_real_time_data" (~Line 306), add in a new case in the switch statement corresponding to the bilateral configuration of the joint and for any multi-joint instances. You can send up to 10 data points at a time using the established formmating.
 
 ## Side.h
-1. Create Joint object specific to the joint that you are adding (Line 158, is where the other joint objects are specificed, follow their formmating)
+1. Create Joint object specific to the joint that you are adding (~Line 158, is where the other joint objects are specificed, follow their formmating)
 
 ## Side.cpp
 1. Add in the new joint object you just created in the .h file into the constructer of the side following the format of the other joints in the constructer 
-2. In the "disable_motors" function (Line 58), add in the new joint following the formatting of the other joints.
-3. In the "read_data" function (Line 98), add in an if statment at the end (Line 142) that reads the data specific to the joint object (see other joints for formatting)
-4. In the "check_calibration" function (Line 161), add in a if statment at the end of the end of the function (Line 189) that checks the calibration specific to the new joint object (see other joints for formatting)
-5. In the "update_motor_cmds" function (Line 534), add in a new if statement at the end that runs the new joint functions (see other joints for formatting)
+2. In the "disable_motors" function (~Line 58), add in the new joint following the formatting of the other joints.
+3. In the "read_data" function (~Line 98), add in an if statment at the end (~Line 142) that reads the data specific to the joint object (see other joints for formatting)
+4. In the "check_calibration" function (~Line 161), add in a if statment at the end of the end of the function (Line 189) that checks the calibration specific to the new joint object (see other joints for formatting)
+5. In the "update_motor_cmds" function (~Line 534), add in a new if statement at the end that runs the new joint functions (see other joints for formatting)
 
 ## SideData.h
-1. Line 42: Create a new instance of jointdata and create an object for it for your new joint (see other joints for formatting)
+1. ~Line 42: Create a new instance of jointdata and create an object for it for your new joint (see other joints for formatting)
 
 ## SideData.cpp
 1. Add in the new joint object you just created in the .h file into the constructer of the sidedata following the format of the other joints in the constructer 
@@ -64,7 +64,7 @@
 	- Aka copy what the other joints did and change the names and controllers
 
 ## Joint.cpp
-1.	Add the new joint to the Joint Debug statement (Line 40) in the _Joint constructor at the begining
+1.	Add the new joint to the Joint Debug statement (~Line 40) in the _Joint constructor at the begining
 2. 	In the function "get_torque_sensor_pin" add a new case to the switch statment specific to your added joint following the format of the other joints
 3.	Similarly, in the function "get_motor_enable_pin", add a new case to the switch statement specific to your added joint.
 4. 	Add in the new joint class following the format of the other joints
@@ -79,25 +79,25 @@
 		- Update switch case for controller ID
 
 ## JointData.cpp
-1. Update the switch statement in the JointData initializer to include the new joint (Line 31) 
+1. Update the switch statement in the JointData initializer to include the new joint (~Line 31) 
 	- Include the portion that sets the value for "is_used" and the if statment to flip the direction 
 	- Follow the format of the other joints in this section 
 2. Repeat this process for the "reconfigure" function 
 
 ## Motor.cpp
-1. Update the switch statment in the motor initializer (Line 39) to include the new joint
+1. Update the switch statment in the motor initializer (~Line 39) to include the new joint
 
 ## MotorData.cpp
-1.	Update the switch statement in the initalizer (Line 16) to include the new joint
+1.	Update the switch statement in the initalizer (~Line 16) to include the new joint
 	- Include both the gearing and the flip direction portions
 2. 	Repeat this process for the "reconfigure" function 
 
 ## ControllerData.cpp
-1.	Update the switch statement in the constructor (Line 16) to include the new joint
-2. 	Repeat process for the "reconfigure" function (Line 56)
+1.	Update the switch statement in the constructor (~Line 16) to include the new joint
+2. 	Repeat process for the "reconfigure" function (~Line 56)
 
 ## Controller.cpp
-1.	Update the switch statement in the constructor of _Controller to incorporate the new joint (Line 35)
+1.	Update the switch statement in the constructor of _Controller to incorporate the new joint (~Line 35)
 
 ## ble_commands.h
 1. In the function "new_trq" update the joint_id mapping to encompass the new joint (make sure to do both left and right side)
@@ -109,7 +109,7 @@
 
 ## ParamsfromSD.cpp
 1.	In the "print_param_error_message" function, update the switch statment to include the new joint
-	- Make sure to update the actual switch statment itself during this process (Line 10) in addition to adding the new case 
+	- Make sure to update the actual switch statment itself during this process (~Line 10) in addition to adding the new case 
 2. In the "set_controller_params" function 
 	- Copy a case of the switch statement from another joint below the last added joint, update any reference to the specific joint (e.g., elbow, ankle,...) to your new joint
 	- There is a lot going on here so make sure you did not miss any reference to the specific joint in this section. 

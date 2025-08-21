@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Adding Elements &#8212; OpenExo Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=0ac4fbd8" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <script src="_static/js/petite-vue.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Adding a New BLE Message" href="AddingNewBLEMessage.html" />
+    <link rel="prev" title="Build And Flash" href="BuildAndFlash.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="index.html" title="Go to homepage">OpenExo</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding Elements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBoard.html">Adding a New Board</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html">Adding a New CAN Motor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html">Adding a New Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewErrorCase.html">Adding a New Error Case</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewItemToConfig.html">Adding New Item to Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html">Adding a New Joint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMicrocontroller.html">Adding a New Microcontroller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="adding-elements">
+<h1>Adding Elements<a class="headerlink" href="#adding-elements" title="Link to this heading">¶</a></h1>
+<p>This section provides instructions on how to modify the software to add new functionality or hardware.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Adding Elements:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html#ble-commands-h">ble_commands.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html#comsmcu-cpp">ComsMCU.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewBoard.html">Adding a New Board</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBoard.html#config-h">Config.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBoard.html#parseini-h">ParseIni.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBoard.html#board-h">Board.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBoard.html#done">Done!!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewCanMotor.html">Adding a New CAN Motor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html#config-ini">config.ini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html#parseini-h">parseIni.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html#motor-h">Motor.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html#motor-cpp">Motor.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html#joint-cpp">Joint.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewController.html">Adding a New Controller</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#parseini-h">parseIni.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#controllerdata-h-controller-definition">ControllerData.h (Controller Definition)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#controller-h">Controller.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#controllerdata-h-optional-additional-data">ControllerData.h (Optional Additional Data)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#controller-cpp">Controller.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#joint-h">Joint.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#joint-cpp">Joint.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#create-parameter-file">Create Parameter File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#paramsfromsd-h">ParamsFromSD.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#uart-commands-h">uart_commands.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewErrorCase.html">Adding a New Error Case</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewErrorCase.html#error-codes-h">error_codes.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewErrorCase.html#error-types-h">error_types.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewErrorCase.html#error-map-h">error_map.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewErrorCase.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewItemToConfig.html">Adding New Item to Config</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewItemToConfig.html#config-ini">config.ini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewItemToConfig.html#parseini-h">ParseIni.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewItemToConfig.html#parseini-cpp">ParseIni.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewItemToConfig.html#uart-commands-h">uart_commands.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewItemToConfig.html#done">Done!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewJoint.html">Adding a New Joint</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#exocode-ini">Exocode.ini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#parseini-h">ParseIni.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#parseini-cpp">ParseIni.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#exodata-h">ExoData.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#exodata-cpp">ExoData.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#uart-commands-h">UART_commands.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#side-h">Side.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#side-cpp">Side.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#sidedata-h">SideData.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#sidedata-cpp">SideData.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#joint-h">Joint.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#joint-cpp">Joint.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#jointdata-cpp">JointData.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#motor-cpp">Motor.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#motordata-cpp">MotorData.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#controllerdata-cpp">ControllerData.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#controller-cpp">Controller.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#ble-commands-h">ble_commands.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#paramsfromsd-h">ParamsfromSD.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#paramsfromsd-cpp">ParamsfromSD.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#realtimei2c-h">RealTimeI2C.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#statusdefs-h">StatusDefs.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#statusdefs-cpp">StatusDefs.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#statusled-h">StatusLED.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#config-ini">Config.ini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#sd-card">SD Card</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#python-gui-activetrialsettings-py-in-views-folder">Python GUI - ActiveTrialSettings.py (in “views” folder)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#python-gui-exodevicemanager-py-in-device-folder">Python GUI - exoDeviceManager.py (in “Device” folder)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewMicrocontroller.html">Adding a New Microcontroller</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMicrocontroller.html#selecting-microcontroller">Selecting Microcontroller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMicrocontroller.html#design-board">Design Board</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMicrocontroller.html#board-h">Board.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMicrocontroller.html#config-ini">config.ini</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMicrocontroller.html#parseini-h">ParseIni.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMicrocontroller.html#other-files">Other Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html#motor-h">Motor.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html#motor-cpp">Motor.cpp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html#connect-to-everything-else">Connect to Everything Else</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html#analog-input">Analog Input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html#bus-protocols">Bus Protocols</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html#integrating-new-sensors-into-the-codebase">Integrating New Sensors into the Codebase</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html#messaging-structure">Messaging Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html#declare-message-id-s">Declare Message ID(s)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html#declare-message-handler">Declare Message Handler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html#add-your-function-to-the-list-of-callable-functions">Add Your Function to the List of Callable Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html#done">Done</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#first-time-trying-to-update-readthedocs">0. First time trying to update ReadTheDocs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#create-a-new-restructuredtext-rst-file">1. Create a new reStructuredText (.rst) file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#include-the-new-page-in-the-table-of-contents">2. Include the new page in the table of contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#update-conf-py-if-needed">3. Update <cite>conf.py</cite> if needed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#build-and-preview-locally">4. Build and preview locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#watch-the-tutorial-video">5. Watch the Tutorial Video</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+                <a href="BuildAndFlash.html">
+                    <span class="icon">&lt;</span><span>Build And Flash</span></a>
+                
+            </div>
+
+            <div class="right">
+                
+                    <a href="AddingNewBLEMessage.html"><span>Adding a New BLE Message</span><span class="icon">&gt;</span></a>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Landon Coonrod, Jack Williams, and Prof. Zach Lerner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>

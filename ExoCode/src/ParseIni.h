@@ -145,7 +145,8 @@ namespace config_defs
         chirp = 5,
         step = 6,
         phmc = 7,
-        angle_based = 8,
+        calibr_manager = 8,
+        angle_based = 9,
     };
     
     enum class knee_controllers : uint8_t   //Knee Controller IDs
@@ -155,6 +156,7 @@ namespace config_defs
         constant_torque = 3,
         chirp = 4,
         step = 5,
+		calibr_manager = 6,
     };
         
     enum class ankle_controllers : uint8_t  //Ankle Controller IDs
@@ -169,6 +171,7 @@ namespace config_defs
         chirp = 8,
         step = 9,
 		spv2 = 10,
+		pjmc_plus = 11,
     };
 
     enum class elbow_controllers : uint8_t  //Elbow Controller IDs
@@ -413,7 +416,9 @@ namespace config_defs
             {"chirp", (uint8_t)config_defs::hip_controllers::chirp},
             {"step", (uint8_t)config_defs::hip_controllers::step},
             {"phmc", (uint8_t)config_defs::hip_controllers::phmc},
+            {"calibrManager", (uint8_t)config_defs::hip_controllers::calibr_manager},
             {"angleBased", (uint8_t)config_defs::hip_controllers::angle_based},
+
         };
         
         const IniKeyCode knee_controllers 
@@ -423,6 +428,7 @@ namespace config_defs
             {"constantTorque", (uint8_t)config_defs::knee_controllers::constant_torque},
             {"chirp", (uint8_t)config_defs::knee_controllers::chirp},
             {"step", (uint8_t)config_defs::knee_controllers::step},
+			{"calibrManager", (uint8_t)config_defs::knee_controllers::calibr_manager},
         };
         
         const IniKeyCode ankle_controllers 
@@ -437,6 +443,7 @@ namespace config_defs
             {"chirp", (uint8_t)config_defs::ankle_controllers::chirp},
             {"step", (uint8_t)config_defs::ankle_controllers::step},
 			{"SPV2", (uint8_t)config_defs::ankle_controllers::spv2},
+			{"PJMC_PLUS", (uint8_t)config_defs::ankle_controllers::pjmc_plus},
         };  
 
         const IniKeyCode elbow_controllers

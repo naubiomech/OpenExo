@@ -42,7 +42,7 @@ class AnkleAngles
      * @param return_normalized true to return normalized angle data, based on moving peak detection
      * @return float 
      */
-    float get(bool return_normalized = false);
+    float get(bool is_left, bool return_normalized = false);
 
     private:
     float _update_population_statistics(const float new_value);

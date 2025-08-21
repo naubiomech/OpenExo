@@ -17,6 +17,12 @@
 #include <utility>  //std::pair
 #include <queue>    //std::queue
 
+#if defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)
+#include "Board.h"
+#include <map>
+#include <Servo.h>
+#endif
+
 /**
  * @brief contains general utility functions for the exo
  */
@@ -301,6 +307,20 @@ namespace utils
      * @return false 
      */
     bool is_outside_range(float val, float min, float max);
+	
+	/**
+     * @brief Attach the servos
+     * 
+     */
+	void init_servos();
+	
+	/**
+     * @brief Actuate a servo
+     * 
+     * @param servo_pin
+     * @param target_angle 
+     */
+	void actuate_servo(uint8_t servo_pin, uint8_t target_angle);
 }
 
 #endif

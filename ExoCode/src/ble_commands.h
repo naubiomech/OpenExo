@@ -418,7 +418,7 @@ namespace ble_handlers
         tx_msg.joint_id = (uint8_t) msg->data[0];
         tx_msg.data[(uint8_t)UART_command_enums::controller_param::CONTROLLER_ID] = (uint8_t) msg->data[1];
         tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_INDEX] = (uint8_t) msg->data[2];
-        tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE] = (uint8_t) msg->data[3];
+        tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE] = (float) msg->data[3];
         tx_msg.len = 3;
         uart_handler->UART_msg(tx_msg);
     }

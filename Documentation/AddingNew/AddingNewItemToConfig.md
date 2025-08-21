@@ -32,8 +32,8 @@
         - For the keys that have been added create new index values.  Values should be unique an consecutive.
         - As a check go back up to namespace ini_config, and confirm that the number_of_keys matches the number of indexes (should be one more than the largest index, since we started at zero)
 - namespace config_map        
-    - The config file will be interpreted as text.  Here we will create a map to convert the text to the uint8_t we declared above.
-    - We have created and IniKeyCode type that is "indexed" with a std:string, e.g. config_map::hip_controllers["extensionAngle"] returns config_defs::hip_controllers::extension_angle
+    - The config file is interpreted as text.  This creates a map to convert the text to the uint8_t declared above.
+    - We have created an IniKeyCode type that is "indexed" with a std:string, e.g. config_map::hip_controllers["extensionAngle"] returns config_defs::hip_controllers::extension_angle
     - Create a new IniKeyCode for your new key (follow the others as a template), the string portion should be all valid values from the ini file, and the uint8_t should be the values defined in the config_defs namespace.
 - struct ConfigData
     - This structure will store the string values during the parsing.

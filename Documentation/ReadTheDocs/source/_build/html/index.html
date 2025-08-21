@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Firmware and Software Documentation for OpenExo: An Open-Source Modular Exoskeleton &#8212; OpenExo Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=0ac4fbd8" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <script src="_static/js/petite-vue.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introduction" href="introduction.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="#" title="Go to homepage">OpenExo</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartup.html">First Time StartUp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="firmware-and-software-documentation-for-openexo-an-open-source-modular-exoskeleton">
+<h1>Firmware and Software Documentation for OpenExo: An Open-Source Modular Exoskeleton<a class="headerlink" href="#firmware-and-software-documentation-for-openexo-an-open-source-modular-exoskeleton" title="Link to this heading">¶</a></h1>
+<img alt="OpenSourceLeg Banner" class="align-center" src="_images/1042_exoskeleton_20250205.jpg" />
+<div align="center">
+  <a href="https://github.com/naubiomech/OpenExo">
+    <img src="https://img.shields.io/badge/GitHub-OpenExo-black?logo=github"
+         alt="OpenExo on GitHub">
+  </a>
+   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.9%2B-blue" alt="Python Versions"></a>
+   <a href="https://opensource.org/licenses/GPL-3.0"><img src="https://img.shields.io/badge/license-GPL--3.0-green" alt="License"></a>
+</div><section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<p>Before installing the <strong>OpenExo</strong> library, ensure you have the following installed:</p>
+<ul class="simple">
+<li><p><strong>Python 3.9</strong> or later</p></li>
+<li><p><strong>pip</strong> package manager</p></li>
+</ul>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<p>The easiest and quickest way to install the <strong>OpenExo</strong> library is to clone the repository directly from GitHub:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/naubiomech/OpenExo.git
+<span class="nb">cd</span><span class="w"> </span>OpenExo
+</pre></div>
+</div>
+</section>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h2>
+<p>For new users, review the <strong>Introduction and Background Info</strong> pages for an overview of the project and then begin by following the instructions in <strong>First Time Startup</strong>.</p>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
+<section id="hardware-license">
+<h3>Hardware License<a class="headerlink" href="#hardware-license" title="Link to this heading">¶</a></h3>
+<p>OpenExo’s <strong>hardware</strong> is released under the <a class="reference external" href="https://ohwr.org/project/cernohl/-/wikis/uploads/98ff9662c7ce4252ec91104118c2af8e/cern_ohl_p_v2.pdf">CERN-OHL-P v2.0</a> license.
+You may study, modify, manufacture, and distribute the hardware provided you share modifications under the same license.</p>
+</section>
+<section id="software-license">
+<h3>Software License<a class="headerlink" href="#software-license" title="Link to this heading">¶</a></h3>
+<p>OpenExo’s <strong>software</strong> is released under the <a class="reference external" href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License v3.0 (LGPL-3.0)</a>.
+You may use, study, share, and modify the software so long as derivative works also comply with the LGPL.</p>
+</section>
+</section>
+<section id="contact-resources">
+<h2>Contact &amp; Resources<a class="headerlink" href="#contact-resources" title="Link to this heading">¶</a></h2>
+<p>For questions, issues, or further assistance, reach out to us at:</p>
+<ul class="simple">
+<li><p><strong>Email:</strong> <a class="reference external" href="mailto:theopenexo&#37;&#52;&#48;gmail&#46;com">theopenexo<span>&#64;</span>gmail<span>&#46;</span>com</a></p></li>
+<li><p><strong>GitHub:</strong> <a class="reference external" href="https://github.com/naubiomech/OpenExo">https://github.com/naubiomech/OpenExo</a></p></li>
+<li><p><strong>Website:</strong> <a class="reference external" href="http://theopenexo.org">http://theopenexo.org</a></p></li>
+<li><p><strong>Biomechanics Lab:</strong> <a class="reference external" href="https://biomech.nau.edu">https://biomech.nau.edu</a></p></li>
+</ul>
+<div class="toctree-wrapper compound" id="toc">
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#outline">Outline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#high-level-functionality">High-Level Functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#sd-card">SD Card</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#sensors">Sensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#displays">Displays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#actuators">Actuators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#controllers">Controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#bluetooth">Bluetooth</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#debug">Debug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#adding-new">Adding New</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="User_Guide.html#known-issues">Known Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="FirstTimeStartup.html">First Time StartUp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="FirstTimeStartup.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FirstTimeStartup.html#walkthrough-of-components">Walkthrough of Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FirstTimeStartup.html#downloading-the-necessary-software">Downloading the Necessary Software</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FirstTimeStartup.html#orienting-yourself">Orienting Yourself</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FirstTimeStartup.html#getting-ready-for-the-first-trial">Getting Ready for the First Trial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FirstTimeStartup.html#conducting-the-first-trial">Conducting the First Trial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FirstTimeStartup.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vscode_setup.html">VS Code + GitHub Quick-Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BuildAndFlash.html">Build And Flash</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBoard.html">Adding a New Board</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html">Adding a New CAN Motor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html">Adding a New Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewErrorCase.html">Adding a New Error Case</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewItemToConfig.html">Adding New Item to Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html">Adding a New Joint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMicrocontroller.html">Adding a New Microcontroller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ankle.html">Ankle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hip.html">Hip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elbow.html">Elbow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#calibration-manager-controller">Calibration Manager Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#chirp-controller">Chirp Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#constant-torque-controller">Constant Torque Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#step-controller">Step Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#zero-torque-controller">Zero Torque Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html#controller-subfolders-by-joint">Controller Subfolders by Joint</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#minimum-system-requirements">Minimum System Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#installation-guide">Installation Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#general-workflow">General Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#adding-a-button">Adding a Button</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#modifying-the-graphing">Modifying the Graphing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#adding-a-new-frame">Adding a New Frame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui.html#biofeedback-frame">Biofeedback Frame</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gamification_template.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gamification_template.html#architecture-diagram">Architecture Diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gamification_template.html#api-endpoints">API Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gamification_template.html#extending-the-gui">Extending the GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gamification_template.html#future-work">Future Work</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="StyleGuide.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="StyleGuide.html#commenting">Commenting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="StyleGuide.html#naming">Naming</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#first-time-trying-to-update-readthedocs">0. First time trying to update ReadTheDocs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#create-a-new-restructuredtext-rst-file">1. Create a new reStructuredText (.rst) file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#include-the-new-page-in-the-table-of-contents">2. Include the new page in the table of contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#update-conf-py-if-needed">3. Update <cite>conf.py</cite> if needed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#build-and-preview-locally">4. Build and preview locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html#watch-the-tutorial-video">5. Watch the Tutorial Video</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+        <div id="show_right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents</span></a></p>
+        </div>
+
+        <div id="right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
+            <div class="page_toc">
+                <ul>
+<li><a class="reference internal" href="#">Firmware and Software Documentation for OpenExo: An Open-Source Modular Exoskeleton</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#license">License</a><ul>
+<li><a class="reference internal" href="#hardware-license">Hardware License</a></li>
+<li><a class="reference internal" href="#software-license">Software License</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contact-resources">Contact &amp; Resources</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+        </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+            </div>
+
+            <div class="right">
+                
+                    <a href="introduction.html"><span>Introduction</span><span class="icon">&gt;</span></a>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Landon Coonrod, Jack Williams, and Prof. Zach Lerner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>

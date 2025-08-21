@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Adding a New Microcontroller &#8212; OpenExo Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=0ac4fbd8" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <script src="_static/js/petite-vue.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Adding a New Motor Type" href="AddingNewMotorType.html" />
+    <link rel="prev" title="Adding a New Joint" href="AddingNewJoint.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="index.html" title="Go to homepage">OpenExo</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="User_Guide.html">Background Info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="addingelements.html">Adding Elements</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBLEMessage.html">Adding a New BLE Message</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewBoard.html">Adding a New Board</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewCanMotor.html">Adding a New CAN Motor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewController.html">Adding a New Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewErrorCase.html">Adding a New Error Case</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewItemToConfig.html">Adding New Item to Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewJoint.html">Adding a New Joint</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding a New Microcontroller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewMotorType.html">Adding a New Motor Type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewSensors.html">Adding New Sensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewUARTMessage.html">Adding New UART Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="controllers.html">Controllers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">OpenExo GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gamification_template.html">Gamification Template</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StyleGuide.html">OpenExo C++ Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AddingNewPages.html">Add Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="adding-a-new-microcontroller">
+<h1>Adding a New Microcontroller<a class="headerlink" href="#adding-a-new-microcontroller" title="Link to this heading">¶</a></h1>
+<p>This file assumes you are still using Arduino. If you are moving away from Arduino, you will need to remove Arduino-specific items (e.g., <code class="docutils literal notranslate"><span class="pre">logger::prints</span></code>, pin definitions using <code class="docutils literal notranslate"><span class="pre">A#</span></code>, etc.). Most of the code should run with little modification, but some reformatting may be necessary. If you are migrating away from Arduino, it is assumed that you have sufficient knowledge to handle those changes without further direction.</p>
+<section id="selecting-microcontroller">
+<h2>Selecting Microcontroller<a class="headerlink" href="#selecting-microcontroller" title="Link to this heading">¶</a></h2>
+<p>You should confirm that the microcontroller includes the required elements. As of 20220517, the microcontroller should include:</p>
+<p><strong>Controller:</strong></p>
+<ul class="simple">
+<li><p>SPI</p></li>
+<li><p>CAN</p></li>
+<li><p>8 Analog Inputs</p></li>
+<li><p>9 Digital outputs</p>
+<ul>
+<li><p><em>Ideally with 3 PWM outputs for LED</em></p></li>
+</ul>
+</li>
+<li><p>2 Digital inputs</p></li>
+<li><p>Floating Point Unit</p></li>
+</ul>
+<p><strong>Coms:</strong></p>
+<ul class="simple">
+<li><p>I2C</p></li>
+<li><p>SPI</p></li>
+<li><p>Bluetooth Low Energy</p></li>
+</ul>
+<p><strong>IMU:</strong></p>
+<ul class="simple">
+<li><p>Floating Point Unit</p></li>
+</ul>
+<p>It is also advisable to check that there are existing Arduino libraries for the modules, ideally with identical interfaces. Note that the SPI peripheral in slave mode can be particularly challenging, as most SPI libraries assume the microcontroller is the controller (master).</p>
+</section>
+<section id="design-board">
+<h2>Design Board<a class="headerlink" href="#design-board" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>When designing the board, start from the current board as a template.</p></li>
+<li><p>In the schematic, place components close to where they are needed on the board—this is particularly important for capacitors and resistors.</p></li>
+<li><p>For the board layout, ensure those components are placed correctly.</p></li>
+<li><p>For the CAN bus, place a restriction (or shield) above the traces to prevent capacitive coupling.</p></li>
+</ul>
+</section>
+<section id="board-h">
+<h2>Board.h<a class="headerlink" href="#board-h" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Create a new <code class="docutils literal notranslate"><span class="pre">#define</span></code> for your board, where you define both the board’s name and an associated number.</p></li>
+<li><p>Create a new <code class="docutils literal notranslate"><span class="pre">#elif</span></code> for the new board, defining the pins for your board.</p>
+<ul class="simple">
+<li><p>Add a preprocessor condition such as <code class="docutils literal notranslate"><span class="pre">#if</span> <span class="pre">defined([Microcontroller])</span></code> so you can use pin names like <code class="docutils literal notranslate"><span class="pre">A19</span></code> without compiling errors when building for a different board.</p></li>
+</ul>
+</li>
+<li><p>Assign the pins based on your board design—use existing boards as a template.</p></li>
+</ol>
+</section>
+<section id="config-ini">
+<h2>config.ini<a class="headerlink" href="#config-ini" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Add your board and its version to the file.</p></li>
+</ol>
+</section>
+<section id="parseini-h">
+<h2>ParseIni.h<a class="headerlink" href="#parseini-h" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">config_defs</span></code> namespace, add your board name and board version.</p></li>
+<li><p>For the controller board, ensure that the <code class="docutils literal notranslate"><span class="pre">std::map</span></code> is available.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">config_map</span></code> namespace, add the mapping for your board and version.</p></li>
+</ol>
+</section>
+<section id="other-files">
+<h2>Other Files<a class="headerlink" href="#other-files" title="Link to this heading">¶</a></h2>
+<p>This section gets more involved. You will need to update multiple files with preprocessor directives and specific includes to ensure that the code compiles correctly for your microcontroller.</p>
+<section id="preprocessor-defines">
+<h3>Preprocessor Defines<a class="headerlink" href="#preprocessor-defines" title="Link to this heading">¶</a></h3>
+<p>Go through each file and add preprocessor defines around the areas that should compile for your microcontroller.</p>
+<ul>
+<li><p>For the <strong>controller micro</strong>, add your micro in a condition similar to:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#if defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)</span>
+</pre></div>
+</div>
+</li>
+<li><p>For the <strong>coms micro</strong>, add your micro in a condition like:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#if defined(ARDUINO_ARDUINO_NANO33BLE)</span>
+</pre></div>
+</div>
+</li>
+<li><p>In some cases, you may need to add specific includes (for example, include SPI in <code class="docutils literal notranslate"><span class="pre">ExoCode.ino</span></code>).</p></li>
+</ul>
+</section>
+<section id="determining-the-correct-microcontroller-name-for-defines">
+<h3>Determining the Correct Microcontroller Name for Defines<a class="headerlink" href="#determining-the-correct-microcontroller-name-for-defines" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Navigate to your Arduino directory: <code class="docutils literal notranslate"><span class="pre">arduino/hardware/[type]/boards.txt</span></code>.</p></li>
+<li><p>Locate your microcontroller and look for an entry like <code class="docutils literal notranslate"><span class="pre">*.board.name=[name]</span></code>.</p></li>
+<li><p>In your define, prepend the obtained board name with <code class="docutils literal notranslate"><span class="pre">ARDUINO_</span></code>.</p>
+<ul>
+<li><p>For example, if the board name is <code class="docutils literal notranslate"><span class="pre">TEENSY41</span></code> (for Teensy 4.1), then you will use <code class="docutils literal notranslate"><span class="pre">ARDUINO_TEENSY41</span></code>.</p></li>
+<li><p>Note: The Nano 33 appears as <code class="docutils literal notranslate"><span class="pre">ARDUINO_NANO33BLE</span></code>, so the corresponding define will be <code class="docutils literal notranslate"><span class="pre">ARDUINO_ARDUINO_NANO33BLE</span></code>.</p></li>
+<li><p><strong>Be careful</strong> to follow the naming conventions exactly to ensure consistency.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+        <div id="show_right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents</span></a></p>
+        </div>
+
+        <div id="right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
+            <div class="page_toc">
+                <ul>
+<li><a class="reference internal" href="#">Adding a New Microcontroller</a><ul>
+<li><a class="reference internal" href="#selecting-microcontroller">Selecting Microcontroller</a></li>
+<li><a class="reference internal" href="#design-board">Design Board</a></li>
+<li><a class="reference internal" href="#board-h">Board.h</a></li>
+<li><a class="reference internal" href="#config-ini">config.ini</a></li>
+<li><a class="reference internal" href="#parseini-h">ParseIni.h</a></li>
+<li><a class="reference internal" href="#other-files">Other Files</a><ul>
+<li><a class="reference internal" href="#preprocessor-defines">Preprocessor Defines</a></li>
+<li><a class="reference internal" href="#determining-the-correct-microcontroller-name-for-defines">Determining the Correct Microcontroller Name for Defines</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+        </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+                <a href="AddingNewJoint.html">
+                    <span class="icon">&lt;</span><span>Adding a New Joint</span></a>
+                
+            </div>
+
+            <div class="right">
+                
+                    <a href="AddingNewMotorType.html"><span>Adding a New Motor Type</span><span class="icon">&gt;</span></a>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Landon Coonrod, Jack Williams, and Prof. Zach Lerner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>

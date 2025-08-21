@@ -7,6 +7,10 @@
 ```
 2. Change the current board to your board if you are wanting to use it now.  This is a good idea to make sure all your changes work.
 
+```
+#define BOARD_VERSION AK_Board_V0_4 3
+```
+
 ## ParseIni.h
 Note: this is not currently used but should be added for future proofing.
 1. In config_def::board_name add your board name if different from the existing ones

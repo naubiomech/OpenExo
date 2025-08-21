@@ -402,6 +402,7 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
 , _chirp(id, exo_data)
 , _step(id, exo_data)
 , _proportional_hip_moment(id, exo_data)
+, _calibr_manager(id, exo_data)
 , _angle_based(id, exo_data)
 {
     #ifdef JOINT_DEBUG
@@ -529,7 +530,7 @@ void HipJoint::run_joint()
 
     //Enable or disable the motor.
     _motor->on_off(); 
-    _motor->enable();
+    _motor->enable();               //Do not enable the motors until the GUI tells you to, defaults to not enabled to prevent running until desired. 
 
     //Send the new command to the motor.
     _motor->transaction(_joint_data->controller.setpoint / _joint_data->motor.gearing);
@@ -576,10 +577,13 @@ void HipJoint::set_controller(uint8_t controller_id)
         case (uint8_t)config_defs::hip_controllers::step:
             _controller = &_step;
             break;
-        case (uint8_t)config_defs::hip_controllers::phmc :
+        case (uint8_t)config_defs::hip_controllers::phmc:
             _controller = &_proportional_hip_moment;
             break;
-        case (uint8_t)config_defs::hip_controllers::angle_based :
+            case (uint8_t)config_defs::hip_controllers::calibr_manager:
+            _controller = &_calibr_manager;
+            break;
+        case (uint8_t)config_defs::hip_controllers::angle_based:
             _controller = &_angle_based;
             break;
         default :
@@ -629,6 +633,7 @@ KneeJoint::KneeJoint(config_defs::joint_id id, ExoData* exo_data)
 , _constant_torque(id, exo_data)
 , _chirp(id, exo_data)
 , _step(id, exo_data)
+, _calibr_manager(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
@@ -797,6 +802,9 @@ void KneeJoint::set_controller(uint8_t controller_id)  //Changes the high level 
         case (uint8_t)config_defs::knee_controllers::step:
             _controller = &_step;
             break;
+		case (uint8_t)config_defs::knee_controllers::calibr_manager:
+            _controller = &_calibr_manager;
+            break;
         default :
             logger::print("Unkown Controller!\n", LogLevel::Error);
             _controller = &_zero_torque;
@@ -817,11 +825,13 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
 , _chirp(id, exo_data)
 , _step(id, exo_data)
 , _spv2(id, exo_data)
+, _pjmc_plus(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
         logger::println("Ankle : Ankle Constructor");
     #endif
+
 
     //Set _joint_data to point to the data specific to this joint.
     if (_is_left)
@@ -914,13 +924,13 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
  */
 void AnkleJoint::run_joint()
 {
-    #ifdef JOINT_DEBUG
+	#ifdef JOINT_DEBUG
         logger::print("AnkleJoint::run_joint::Start");
     #endif
 
     //Angle Sensor data
     _joint_data->prev_joint_position = _joint_data->joint_position;
-    const float raw_angle = _joint_data->joint_RoM * _ankle_angle.get();
+    const float raw_angle = _joint_data->joint_RoM * _ankle_angle.get(_is_left, false);
     const float new_angle = _joint_data->do_flip_angle ? (_joint_data->joint_RoM - raw_angle):(raw_angle);
     _joint_data->joint_position = utils::ewma(new_angle, _joint_data->joint_position, _joint_data->joint_position_alpha);
     _joint_data->joint_velocity = utils::ewma((_joint_data->joint_position - _joint_data->prev_joint_position) / (1.0f / LOOP_FREQ_HZ), _joint_data->joint_velocity, _joint_data->joint_velocity_alpha);
@@ -1017,6 +1027,9 @@ void AnkleJoint::set_controller(uint8_t controller_id)  //Changes the high level
             break;
 		case (uint8_t)config_defs::ankle_controllers::spv2:
             _controller = &_spv2;
+            break;
+		case (uint8_t)config_defs::ankle_controllers::pjmc_plus:
+            _controller = &_pjmc_plus;
             break;
         default :
             logger::print("Unkown Controller!\n", LogLevel::Error);

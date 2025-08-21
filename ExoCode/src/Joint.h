@@ -162,8 +162,9 @@ class HipJoint : public _Joint
         Chirp _chirp;                                   /**< Chirp Controller for Device Characterization */                    
         Step _step;                                     /**< Step Controller for Device Characterization */
         ProportionalHipMoment _proportional_hip_moment; /**< Proportional Hip Moment Conroller */
+        CalibrManager _calibr_manager;                  /**< Calibration Manager "Controller" */
         AngleBased _angle_based;                        /**< Angle Based controller */
-
+        
         const int right_hip_nano = 8;                   //interger address for the hip nano relevant to the side the nano is on
         const int left_hip_nano = 9;
 
@@ -206,6 +207,7 @@ class KneeJoint : public _Joint
         ConstantTorque _constant_torque;        /**< Constant torque controller */
         Chirp _chirp;                           /**< Chirp Controller for Device Characterization */ 
         Step _step;                             /**< Step Controller for Device Characterization */
+		CalibrManager _calibr_manager;          /**< Calibration Manager "Controller" */
 };
 
 /**
@@ -249,6 +251,7 @@ class AnkleJoint : public _Joint
         Chirp _chirp;                                           /**< Chirp Controller for Device Characterization */
         Step _step;                                             /**< Step Controller for Device Characterization */
         SPV2 _spv2;												/**< SPV2 */
+		PJMC_PLUS _pjmc_plus;									/**< The new proportional joint moment controller */
 };
 
 /**

@@ -10,6 +10,6 @@ Parameter index order can be found in [ControllerData.h](/ExoCode/src/Controller
 - direction - Flag to flip the direction of the applied torque
 - alpha - Filtering term for exponentially wieghted moving average (EWMA) filter, used on torque sensor to cut down on noise. The lower this value the higher the delay caused by the filtering. 
 - use_pid - This flag turns PID on(1) or off(0)
-- p_gain - Proportional gain for closed loop controls
-- i_gain - Integral gain for closed loop controls
-- d_gain - Derivative gain for closed loop controls
+- p_gain - Proportional gain for closed loop control
+- i_gain - Integral gain for closed loop control
+- d_gain - Derivative gain for closed loop control

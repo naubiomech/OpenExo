@@ -74,6 +74,7 @@
             {(uint8_t)config_defs::ankle_controllers::chirp,"ankleControllers/chirp.csv"},
             {(uint8_t)config_defs::ankle_controllers::step,"ankleControllers/step.csv"},
 			{(uint8_t)config_defs::ankle_controllers::spv2,"ankleControllers/spv2.csv"},
+			{(uint8_t)config_defs::ankle_controllers::pjmc_plus,"ankleControllers/pjmc_plus.csv"},
         };
 
         const ParamFilenameKey elbow
