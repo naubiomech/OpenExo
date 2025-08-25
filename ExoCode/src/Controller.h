@@ -90,15 +90,6 @@ class _Controller
         float _pid(float cmd, float measurement, float p_gain, float i_gain, float d_gain);
 		
 		/**
-         * @brief Actuate the servo motor (might need to move this out of the controller class) 
-         * 
-         * @param signal pin
-         * @param target angle
-         */
-		void _servo_runner(uint8_t servo_pin, uint8_t target_angle);
-		void _servo1_runner(uint8_t servo_pin, uint8_t target_angle);
-		
-		/**
          * @brief A function that returns cmd_ff for stateless PJMC. 
          * 
          * @param current fsr percentage value (after calibration, this value should typical range from 0 to 1 
