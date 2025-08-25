@@ -2938,8 +2938,8 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     ending_step = 0;
 
     local_toe_stance = true;
-    lower_toe_threshold = 0.4; // Threshold for toe stance detection
-    upper_toe_threshold = 0.6; // Upper threshold for toe stance detection
+    //lower_toe_threshold = 0.4; // Threshold for toe stance detection
+    //upper_toe_threshold = 0.6; // Upper threshold for toe stance detection
 
     prev_toe_fsr = 0.0;
 
@@ -2992,8 +2992,10 @@ float AngleBased::calc_motor_cmd()
         float max_torque = _controller_data->parameters[controller_defs::angle_based::max_torque_idx];
         int recalibrate_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_flag_idx];
         int recal_angle_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_angle_idx];
-        //ewma_alpha = _controller_data->parameters[controller_defs::angle_based::ewma_alpha_idx]/1000.0;
-        _controller_data->recal_flag = ewma_alpha*100.0;
+        float lower_toe_threshold = _controller_data->parameters[controller_defs::angle_based::lower_toe_threshold_idx];
+        float upper_toe_threshold = _controller_data->parameters[controller_defs::angle_based::upper_toe_threshold_idx];
+        //ewma_alpha = _controller_data->parameters[controller_defs::angle_based::ewma_alpha_idx];
+        _controller_data->recal_flag = lower_toe_threshold;
 
         // Pull in FSR values (double check that Toe FSR, located in Side.h, is not drawing from the FSR_Regressed Function)
         float raw_heel_fsr = _side_data->heel_fsr;

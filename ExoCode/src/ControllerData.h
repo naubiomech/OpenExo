@@ -224,7 +224,9 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t recalibrate_flag_idx = 5;                 //Flag to Recalibrate Normalized Moment (change value to recalibrate)
         const uint8_t recalibrate_angle_idx = 6;                //Flag to recalibrate normalized angle
         const uint8_t ewma_alpha_idx = 7;                       //value of EWMA alpha for angle offset (between 0 and 1)
-        const uint8_t num_parameter = 8;
+        const uint8_t lower_toe_threshold_idx = 8;              //Toe FSR threshold to enter stance (0-1)
+        const uint8_t upper_toe_threshold_idx = 9;              //Toe FSR threshold to enter swing (0-1)
+        const uint8_t num_parameter = 10;
     }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters

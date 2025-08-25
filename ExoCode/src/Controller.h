@@ -548,8 +548,8 @@ public:
     int ending_step;
 
     bool local_toe_stance;          /* Flag to indicate if the toe is in stance phase. Needs different thresholds than the ankle so keeping it here to avoid conflict */
-    float lower_toe_threshold;
-    float upper_toe_threshold;
+    //float lower_toe_threshold;
+    //float upper_toe_threshold;
 
     float prev_toe_fsr;
     
