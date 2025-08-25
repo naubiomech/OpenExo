@@ -11,11 +11,8 @@
 #include <math.h>
 #include <random>
 #include <cmath>
-#include <Servo.h>
 #include <Adafruit_INA260.h>
 
-Servo myservo;          //TO DO: Move servo definition code out of Controller.cpp
-Servo myservo1;
 Adafruit_INA260 ina260 = Adafruit_INA260();
 
 _Controller::_Controller(config_defs::joint_id id, ExoData* exo_data)
@@ -249,32 +246,6 @@ float _Controller::_pjmc_generic(float current_fsr, float fsr_threshold, float s
 	float prescribed_val = setpoint_positive - slope * (current_fsr - fsr_threshold);
 
 	return prescribed_val;      //Note: This prescribed value is not capped
-}
-
-//****************************************************
-
-//Specific function for Servo Control, will be moved to appropriate location in future 
-void _Controller::_servo_runner(uint8_t servo_pin, uint8_t target_angle)
-{
-	if (!myservo.attached())
-    {
-		myservo.attach(servo_pin,500,2500);     //Attach the servo object
-	}
-	
-	myservo.write(target_angle);
-	
-}
-
-//Specific function for Servo Control, will be moved to appropriate location in future 
-void _Controller::_servo1_runner(uint8_t servo_pin, uint8_t target_angle)
-{
-	if (!myservo1.attached())
-    {
-		myservo1.attach(servo_pin,500,2500);     //Attach the servo object
-	}
-
-	myservo1.write(target_angle);
-
 }
 
 //****************************************************
@@ -2400,7 +2371,7 @@ float SPV2::calc_motor_cmd()
 		
 		// Serial.print("  |  Power: ");
 		_controller_data->SPV2_current_pwr = ina260.readPower();
-		_controller_data->SPV2_filtered_pwr = utils::ewma(_controller_data->SPV2_current_pwr, _controller_data->SPV2_filtered_pwr, 0.05);
+		_controller_data->SPV2_filtered_pwr = utils::ewma(_controller_data->SPV2_current_pwr, _controller_data->SPV2_filtered_pwr, 0.05);//0.05 returns a profile that matches the average Maxon motor current
 		//Serial.print(ina260.readPower());
 		// Serial.print(_controller_data->SPV2_current_pwr);
 		// Serial.print(" mW");
@@ -2561,9 +2532,11 @@ float SPV2::calc_motor_cmd()
 	Serial.print(assistive);
 	//TREC section ends
 	
-	float cmd_ff = cmd_pjmc + assistive + _controller_data->cmd_ff_pushOff;
+	// float cmd_ff = cmd_pjmc + assistive + _controller_data->cmd_ff_pushOff;
+	float cmd_ff = cmd_pjmc;
 	cmd_ff = constrain(cmd_ff, -45, 5);
-	_controller_data->cmd_ff2plot = _controller_data->cmd_ff_generic + assistive + _controller_data->cmd_ff_pushOff;
+	// _controller_data->cmd_ff2plot = _controller_data->cmd_ff_generic + assistive + _controller_data->cmd_ff_pushOff;
+	_controller_data->cmd_ff2plot = _controller_data->cmd_ff_generic;
 	
 	//cmd_ff = cmd_ff + _controller_data->cmd_ff_kb + _controller_data->cmd_ff_pushOff;
 	Serial.print("  |  cmd_ff: ");
@@ -2596,7 +2569,7 @@ float SPV2::calc_motor_cmd()
 	float cmd;
 
 
-		if (cmd_ff < -5)
+		if (cmd_ff < -1)
         {
 			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 			// cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
@@ -2743,8 +2716,8 @@ float SPV2::calc_motor_cmd()
 
 			if ((servo_switch) && (_controller_data->servo_did_go_down) && (_controller_data->filtered_torque_reading - cmd_ff) < 0)
 			{
-				// cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
-				// cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
+				cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
+				cmd = -50;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
 			
 			}
 			
@@ -2763,10 +2736,10 @@ float SPV2::calc_motor_cmd()
 		// Serial.print((uint8_t)config_defs::motor::MaxonMotor);
 		// Serial.print("  |  ==?: ");
 		// Serial.print(_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor);
-		if (!_joint_data->motor.enabled) {
+/* 		if (!_joint_data->motor.enabled) {
 			cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
 			cmd = 0;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
-		}
+		} */
 		
 		//Leaf spring stiffness measurement starts
 		if (_controller_data->SPV2_do_measure_stiffness1) {
@@ -2839,7 +2812,8 @@ float PJMC_PLUS::calc_motor_cmd()
 	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.5);
 	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.5);
 	float cmd_ff = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
-
+	cmd_ff = min(dorsi_setpoint, cmd_ff);//cap the dorsiflexion setpoint
+	
 	// if (!_joint_data->is_left){
 		// Serial.print("\nRunning pjmcPlus...");
 		// Serial.print(cmd_ff);
