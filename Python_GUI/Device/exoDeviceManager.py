@@ -1,6 +1,7 @@
 import asyncio
 import struct
 import sys
+from typing import Dict, List, Tuple, Optional, Callable
 
 import numpy as np
 from bleak import BleakClient, BleakScanner
@@ -13,11 +14,12 @@ from Device import realTimeProcessor
 
 class ExoDeviceManager:
 
-    def __init__(self, on_disconnect=None):
+    def __init__(self, on_disconnect: Optional[Callable] = None):
         self._realTimeProcessor = realTimeProcessor.RealTimeProcessor()
         self.on_disconnect = on_disconnect  # Store the callback
 
-        self.deviceAddress = None
+        self.device_addresses = []              # up to two
+        self.connections = {}
         self.available_devices = {}  # List to store available devices
         self.device = None
         self.client = None
@@ -64,6 +66,11 @@ class ExoDeviceManager:
     def set_deviceAddress(self, deviceAddress):
         self.device_mac_address = deviceAddress
 
+    def set_deviceAddresses(self, addrs):
+        if not isinstance(addrs, (list, tuple)) or not (1 <= len(addrs) <= 2):
+            raise ValueError("set_deviceAddresses expects 1–2 addresses")
+        self.device_addresses = list(addrs)
+        
     # Set the BLE client
     def set_client(self, clientVal):
         self.client = clientVal
@@ -94,8 +101,15 @@ class ExoDeviceManager:
                         await self.sendStiffness(0.5)
 
     # Get characteristic handle by UUID
-    def get_char_handle(self, char_UUID):
-        return self.services.get_service(self.UART_SERVICE_UUID).get_characteristic(char_UUID)
+    def get_char_handle(self, char_UUID, addr=None):
+        if addr is None:
+            # primary (keeps old behavior)
+            return self.services.get_service(self.UART_SERVICE_UUID).get_characteristic(char_UUID)
+        # per-connection services
+        conn = self.connections.get(addr)
+        if not conn or not conn.get("services"):
+            raise RuntimeError(f"No services cached for {addr}")
+        return conn["services"].get_service(self.UART_SERVICE_UUID).get_characteristic(char_UUID)
 
     # Filter devices based on advertising data
     def filterExo(self, device: BLEDevice, adv: AdvertisementData):
@@ -127,6 +141,43 @@ class ExoDeviceManager:
                 self.disconnecting_intentionally = False  # Reset the flag after disconnecting
         else:
             print("No device is currently connected.")
+
+    def _make_disconnect_cb(self, addr):
+        def _cb(_: BleakClient):
+            print(f"[{addr}] disconnected")
+            if addr in self.connections:
+                self.connections[addr]["is_connected"] = False
+            # keep your existing UI callback
+            if not self.disconnecting_intentionally and self.on_disconnect:
+                self.on_disconnect()
+        return _cb
+    
+    async def disconnect_all(self):
+        self.disconnecting_intentionally = True
+        try:
+            for addr, conn in list(self.connections.items()):
+                try:
+                    if conn.get("client"):
+                        await conn["client"].disconnect()
+                except Exception as e:
+                    print(f"[{addr}] disconnect error:", e)
+                conn["is_connected"] = False
+        finally:
+            self.disconnecting_intentionally = False
+
+
+    async def motorOn_both(self):
+        tasks = []
+        for addr, conn in self.connections.items():
+            if conn.get("is_connected"):
+                try:
+                    char = self.get_char_handle(self.UART_TX_UUID, addr=addr)
+                    tasks.append(conn["client"].write_gatt_char(char, b"x", True))
+                except Exception as e:
+                    print(f"[{addr}] motorOn error:", e)
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
+
 
     # Start motors of the Exo
     async def startExoMotors(self):
@@ -276,6 +327,68 @@ class ExoDeviceManager:
 
         print("Max attempts reached. Could not connect.")
         return False  # Return False if all attempts fail
+
+    async def scanAndConnectMulti(self):
+        if len(self.device_addresses) != 2:
+            raise RuntimeError("scanAndConnectMulti requires exactly two addresses")
+        addrs = list(self.device_addresses)
+
+        # ensure clean slate
+        for a in addrs:
+            self.connections.pop(a, None)
+
+        connected = []
+        try:
+            for addr in addrs:
+                print(f"[{addr}] scanning…")
+                dev = await BleakScanner.find_device_by_address(addr, timeout=10.0)
+                if not dev:
+                    print(f"[{addr}] not found")
+                    raise RuntimeError(f"{addr} not found")
+                cli = BleakClient(dev, disconnected_callback=self._make_disconnect_cb(addr))
+                await cli.connect()
+                print(f"[{addr}] connected: {cli.is_connected}")
+                # cache services (bleak >= 0.21 exposes services after connect)
+                services = cli.services
+                # start notify with a small wrapper that tags the source addr
+                async def _notify(sender, data, _addr=addr):
+                    # optional: if you care about source, add a field to the processor
+                    # or just call the same DataIn; both devices share the same decoder
+                    await self.DataIn(sender, data)
+                await cli.start_notify(self.UART_RX_UUID, _notify)
+                print(f"[{addr}] notifications started")
+                print(f"[{addr}] services cached: {len(services.characteristics)} characteristics total"
+                    if hasattr(services, "characteristics") else f"[{addr}] services cached")
+                
+                self.connections[addr] = {
+                    "device": dev,
+                    "client": cli,
+                    "services": services,
+                    "is_connected": True,
+                }
+                connected.append(addr)
+
+            for a in connected:
+                try:
+                    char = self.get_char_handle(self.UART_TX_UUID, addr=a)
+                    await self.connections[a]["client"].write_gatt_char(char, b"?", False)  # harmless probe
+                    print(f"[{a}] probe write OK")
+                except Exception as e:
+                    print(f"[{a}] probe write failed:", e)
+
+            # success only if both connected
+            return len(connected) == 2
+
+        except Exception as e:
+            print("scanAndConnectMulti error:", e)
+            # rollback already connected ones
+            for addr in connected:
+                try:
+                    await self.connections[addr]["client"].disconnect()
+                except Exception:
+                    pass
+                self.connections[addr]["is_connected"] = False
+            return False
 
     # Send FSR values to Exo
     async def sendFsrValues(self, left_fsr, right_fsr):
