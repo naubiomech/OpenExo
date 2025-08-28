@@ -2912,9 +2912,9 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     limit_rate = 0.025;
     ewma_alpha = 0.0875; //I expect alpha should be between 0.08 and 0.1
     last_update_time = millis();
-    correction_factor[0] = 2.8870;
-    correction_factor[1] = 0.0519;
-    correction_factor[2] = -0.0133;
+    //correction_factor[0] = 2.8870;
+    //correction_factor[1] = 0.0519;
+    //correction_factor[2] = -0.0133;
     skip_intended_encoder_offset = false;
 
     first_loop = true;
@@ -2994,6 +2994,12 @@ float AngleBased::calc_motor_cmd()
         int recal_angle_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_angle_idx];
         float lower_toe_threshold = _controller_data->parameters[controller_defs::angle_based::lower_toe_threshold_idx];
         float upper_toe_threshold = _controller_data->parameters[controller_defs::angle_based::upper_toe_threshold_idx];
+        correction_factor[0] = _controller_data->parameters[controller_defs::angle_based::correction_factor_0_idx];
+        correction_factor[0] = correction_factor[0]/1000.0;
+        correction_factor[1] = _controller_data->parameters[controller_defs::angle_based::correction_factor_1_idx];
+        correction_factor[1] = correction_factor[1]/1000.0;
+        correction_factor[2] = _controller_data->parameters[controller_defs::angle_based::correction_factor_2_idx];
+        correction_factor[2] = correction_factor[2]/1000.0;
         //ewma_alpha = _controller_data->parameters[controller_defs::angle_based::ewma_alpha_idx];
         _controller_data->recal_flag = lower_toe_threshold;
 
@@ -3337,7 +3343,7 @@ float AngleBased::calc_motor_cmd()
         _controller_data->max_torque = (state == 1) && (prev_state == 3);
         if((state == 1) && (prev_state == 3))
         {
-            Serial.println("Skipping intended encoder offset");
+            //Serial.println("Skipping intended encoder offset");
             skip_intended_encoder_offset = false; // Reset the skip intended encoder offset flag for the next iteration
             encoder_offset = encoder_offset_0; // If we are skipping the intended encoder offset, we just use the initial encoder offset
         }

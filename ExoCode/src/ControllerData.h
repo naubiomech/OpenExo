@@ -226,7 +226,10 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t ewma_alpha_idx = 7;                       //value of EWMA alpha for angle offset (between 0 and 1)
         const uint8_t lower_toe_threshold_idx = 8;              //Toe FSR threshold to enter stance (0-1)
         const uint8_t upper_toe_threshold_idx = 9;              //Toe FSR threshold to enter swing (0-1)
-        const uint8_t num_parameter = 10;
+        const uint8_t correction_factor_0_idx = 10;             //Correction factor for angle offset
+        const uint8_t correction_factor_1_idx = 11;             //Correction factor for angle offset
+        const uint8_t correction_factor_2_idx = 12;             //Correction factor for angle offset
+        const uint8_t num_parameter = 13;
     }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
