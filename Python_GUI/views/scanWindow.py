@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import (BOTH, BOTTOM, DISABLED, StringVar, X, Y, ttk, font)
 from async_tkinter_loop import async_handler
 from PIL import ImageTk, Image, ImageEnhance
+import asyncio
 
 import os
 
@@ -98,14 +99,6 @@ class ScanWindow(tk.Frame):
         action_button_frame = ttk.Frame(self)
         action_button_frame.grid(row=6, column=0, columnspan=2, pady=10, sticky="n")  # Center action button frame
 
-        # TEMP: Dual Test button
-        self.dualTestButton = ttk.Button(
-            action_button_frame,
-            text="Dual Test",
-            command=async_handler(self.on_quick_dual_test_clicked),
-            state=DISABLED
-        )
-        self.dualTestButton.grid(row=0, column=4, padx=5)
 
         # Button to start the trial (initially disabled)
         self.startTrialButton = ttk.Button(action_button_frame, text="Start Trial",
@@ -210,6 +203,52 @@ class ScanWindow(tk.Frame):
         if ok and hasattr(dm, "motorOn_both"):
             await dm.motorOn_both()
             self.deviceNameText.set("Dual Test: motorOn sent to both")
+            self.testBothBtn.config(state=("normal" if ok else DISABLED))
+
+    async def on_test_both_clicked(self):
+        dm = self.controller.deviceManager
+        # sanity
+        if not dm.connections or not any(c.get("is_connected") for c in dm.connections.values()):
+            self.deviceNameText.set("Pair not connected")
+            return
+
+        self.testBothBtn.config(state=DISABLED)
+        try:
+            # 1) Motors ON (both)
+            self.deviceNameText.set("Test: Motors ON (both)…")
+            res_on = await dm.motorOn_both_status()
+            self._report_fanout("ON", res_on)
+
+            # small dwell so you can hear/feel ON
+            await asyncio.sleep(0.8)
+
+            # 2) Motors OFF (both)
+            self.deviceNameText.set("Test: Motors OFF (both)…")
+            res_off = await dm.motorOff_both_status()
+            self._report_fanout("OFF", res_off)
+
+            # 3) Disconnect both
+            self.deviceNameText.set("Test: Disconnecting both…")
+            await dm.disconnect_all()
+            self.deviceNameText.set("Test: Done — disconnected ✅")
+        finally:
+            self.testBothBtn.config(state="normal")
+
+    def _report_fanout(self, label: str, results: dict):
+        """Summarize per-device results in UI + console."""
+        oks = [a for a, v in results.items() if v is True]
+        errs = {a: v for a, v in results.items() if v is not True}
+        # brief UI summary
+        if errs:
+            self.deviceNameText.set(f"{label}: OK {len(oks)}, ERR {len(errs)} (see console)")
+        else:
+            self.deviceNameText.set(f"{label}: OK on {len(oks)} device(s)")
+        # detailed console log
+        for addr in oks:
+            print(f"{label} [{addr}] OK")
+        for addr, err in errs.items():
+            print(f"{label} [{addr}] ERROR: {err}")
+
         
     # Load saved device address from a file and connect to it
     async def on_load_device_button_clicked(self):

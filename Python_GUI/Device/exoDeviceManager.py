@@ -27,6 +27,9 @@ class ExoDeviceManager:
         self.scanResults = None
         self.disconnecting_intentionally = False  # Flag for intentional disconnect
 
+        self.verbose_ascii = False
+        self.verbose_writes = True
+
         self.characteristics = ""
 
         # Initialize FSR values
@@ -79,10 +82,44 @@ class ExoDeviceManager:
     def set_services(self, servicesVal):
         self.services = servicesVal
 
-    # Handle incoming data from BLE characteristic
-    async def DataIn(self, sender: BleakGATTCharacteristic, data: bytearray):
+    @staticmethod
+    def _looks_like_ascii(buf: bytes) -> bool:
+        # True if buffer appears to be printable ASCII (firmware chatter)
+        if not buf:
+            return False
+        return all(32 <= b <= 126 or b in (9, 10, 13) for b in buf)
+    
+    async def DataIn(self, sender: BleakGATTCharacteristic, data: bytearray, src_addr: Optional[str] = None):
+        if getattr(self, "debug_rx", False):
+            try:
+                s = data.decode('ascii', 'ignore')
+                print(f"[{src_addr}] RX ASCII:", s)
+            except Exception:
+                pass
         self._realTimeProcessor.processEvent(data)
         await self.MachineLearnerControl()
+    
+    async def _write(self, addr: str, char_uuid: str, data: bytes, response: bool = False):
+        conn = self.connections.get(addr)
+        if not conn or not conn.get("is_connected"):
+            return False
+        cli = conn["client"]
+        ch = self.get_char_handle(char_uuid, addr=addr)
+        lock = self._write_locks.setdefault(addr, asyncio.Lock())
+        async with lock:
+            await cli.write_gatt_char(ch, data, response)
+        return True
+
+    async def _fanout(self, char_uuid: str, data: bytes, response: bool = False):
+        tasks = []
+        for addr, conn in list(self.connections.items()):
+            if conn.get("is_connected"):
+                tasks.append(self._write(addr, char_uuid, data, response))
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
+
+    async def motorOn_both(self):  await self._fanout(self.UART_TX_UUID, b"x", True)
+    async def motorOff_both(self): await self._fanout(self.UART_TX_UUID, b"w", True)
 
     # Control the machine learning model based on incoming data
     async def MachineLearnerControl(self):
@@ -113,8 +150,9 @@ class ExoDeviceManager:
 
     # Filter devices based on advertising data
     def filterExo(self, device: BLEDevice, adv: AdvertisementData):
-        return self.UART_SERVICE_UUID.lower() in adv.service_uuids
-
+        uuids = adv.service_uuids or []
+        return any(u.lower() == self.UART_SERVICE_UUID.lower() for u in uuids)
+    
     # Handle disconnect callback
     def handleDisconnect(self, _: BleakClient):
         print("Disconnecting...")  # Check if this is reached
@@ -332,8 +370,6 @@ class ExoDeviceManager:
         if len(self.device_addresses) != 2:
             raise RuntimeError("scanAndConnectMulti requires exactly two addresses")
         addrs = list(self.device_addresses)
-
-        # ensure clean slate
         for a in addrs:
             self.connections.pop(a, None)
 
@@ -345,21 +381,20 @@ class ExoDeviceManager:
                 if not dev:
                     print(f"[{addr}] not found")
                     raise RuntimeError(f"{addr} not found")
+
                 cli = BleakClient(dev, disconnected_callback=self._make_disconnect_cb(addr))
                 await cli.connect()
                 print(f"[{addr}] connected: {cli.is_connected}")
-                # cache services (bleak >= 0.21 exposes services after connect)
                 services = cli.services
-                # start notify with a small wrapper that tags the source addr
+
                 async def _notify(sender, data, _addr=addr):
-                    # optional: if you care about source, add a field to the processor
-                    # or just call the same DataIn; both devices share the same decoder
-                    await self.DataIn(sender, data)
+                    await self.DataIn(sender, data, src_addr=_addr)
+
                 await cli.start_notify(self.UART_RX_UUID, _notify)
                 print(f"[{addr}] notifications started")
-                print(f"[{addr}] services cached: {len(services.characteristics)} characteristics total"
-                    if hasattr(services, "characteristics") else f"[{addr}] services cached")
-                
+                if hasattr(services, "characteristics"):
+                    print(f"[{addr}] services cached: {len(services.characteristics)} characteristics total")
+
                 self.connections[addr] = {
                     "device": dev,
                     "client": cli,
@@ -368,20 +403,10 @@ class ExoDeviceManager:
                 }
                 connected.append(addr)
 
-            for a in connected:
-                try:
-                    char = self.get_char_handle(self.UART_TX_UUID, addr=a)
-                    await self.connections[a]["client"].write_gatt_char(char, b"?", False)  # harmless probe
-                    print(f"[{a}] probe write OK")
-                except Exception as e:
-                    print(f"[{a}] probe write failed:", e)
-
-            # success only if both connected
             return len(connected) == 2
 
         except Exception as e:
             print("scanAndConnectMulti error:", e)
-            # rollback already connected ones
             for addr in connected:
                 try:
                     await self.connections[addr]["client"].disconnect()
@@ -389,6 +414,18 @@ class ExoDeviceManager:
                     pass
                 self.connections[addr]["is_connected"] = False
             return False
+
+    async def calibrateFSRs_both(self):
+        tasks = []
+        for addr, conn in self.connections.items():
+            if conn.get("is_connected"):
+                try:
+                    ch = self.get_char_handle(self.UART_TX_UUID, addr=addr)
+                    tasks.append(conn["client"].write_gatt_char(ch, b"L", False))
+                except Exception as e:
+                    print(f"[{addr}] calibrateFSRs error:", e)
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
 
     # Send FSR values to Exo
     async def sendFsrValues(self, left_fsr, right_fsr):
