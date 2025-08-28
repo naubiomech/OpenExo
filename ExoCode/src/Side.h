@@ -162,8 +162,9 @@ class Side
         ElbowJoint _elbow;  /**< Instance of an elbow joint */
         
         //FSR objects for the side. 
-        FSR _heel_fsr;                        /**< Heel force sensitive resistor, typically is a raw value */
-		FSR_Regressed _toe_fsr;               /**< Toe force sensitive resistor, typically is a regressed value */
+        FSR _heel_fsr;                      /**< Heel force sensitive resistor, raw value */
+		FSR _toe_fsr;                       /**< Toe force sensitive resistor, raw value */    
+        FSR_Regressed _toe_fsr_regressed;   /**< Toe force sensitive resistor, regression applied to make value proportional to ankle joint moment */
 
         //Inclination object for the side
         InclinationDetector* inclination_detector;

@@ -23,8 +23,11 @@ SideData::SideData(bool is_left, uint8_t* config_to_send)
     this->expected_stance_duration = -1;
     this->heel_fsr = -1; 
     this->toe_fsr = -1;
+    this->toe_fsr_regressed = -1;
     this->do_calibration_toe_fsr = false; 
-    this->do_calibration_refinement_toe_fsr = false; 
+    this->do_calibration_refinement_toe_fsr = false;
+    this->do_calibration_toe_fsr_regressed = false;
+    this->do_calibration_refinement_toe_fsr_regressed = false;
     this->do_calibration_heel_fsr = false; 
     this->do_calibration_refinement_heel_fsr = false; 
     this->ground_strike = false; 

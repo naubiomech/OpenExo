@@ -296,7 +296,7 @@ void TREC::_update_reference_angles(SideData* side_data, ControllerData* control
     //When the percent_grf passes the threshold, update the reference angle
     const float threshold = controller_data->parameters[controller_defs::trec::timing_threshold]/100;
     const bool should_update = (percent_grf > controller_data->toeFsrThreshold) && !controller_data->reference_angle_updated;
-    const bool should_capture_level_entrance = side_data->do_calibration_refinement_toe_fsr && !side_data->do_calibration_toe_fsr;
+    const bool should_capture_level_entrance = side_data->do_calibration_refinement_toe_fsr_regressed && !side_data->do_calibration_toe_fsr_regressed;
     const bool should_reset_level_entrance_angle = controller_data->prev_calibrate_level_entrance < should_capture_level_entrance;
 
     if (should_reset_level_entrance_angle)
@@ -431,7 +431,7 @@ float TREC::calc_motor_cmd()
 
 	const float dorsi_setpoint = -_controller_data->parameters[controller_defs::trec::dorsi_scaling];
     const float threshold = _controller_data->parameters[controller_defs::trec::timing_threshold]/100;
-    const float percent_grf = min(_side_data->toe_fsr, 1);
+    const float percent_grf = min(_side_data->toe_fsr_regressed, 1);
 	const float percent_grf_heel = min(_side_data->heel_fsr, 1);
     const float slope = (plantar_setpoint - dorsi_setpoint)/(1 - threshold);
     const float generic = max(((slope*(percent_grf - threshold)) + dorsi_setpoint), dorsi_setpoint);                    //Stateless "PJMC" stateless
@@ -509,10 +509,10 @@ ProportionalJointMoment::ProportionalJointMoment(config_defs::joint_id id, ExoDa
     #endif
 
     /* Set FSR thresholds to engage controller -> Tells it foot is on the ground*/
-    _stance_thresholds_left.first = exo_data->left_side.toe_fsr_lower_threshold;
-    _stance_thresholds_left.second = exo_data->left_side.toe_fsr_upper_threshold;
-    _stance_thresholds_right.first = exo_data->right_side.toe_fsr_lower_threshold;
-    _stance_thresholds_right.second = exo_data->right_side.toe_fsr_upper_threshold;
+    _stance_thresholds_left.first = exo_data->left_side.toe_fsr_regressed_lower_threshold;
+    _stance_thresholds_left.second = exo_data->left_side.toe_fsr_regressed_upper_threshold;
+    _stance_thresholds_right.first = exo_data->right_side.toe_fsr_regressed_lower_threshold;
+    _stance_thresholds_right.second = exo_data->right_side.toe_fsr_regressed_upper_threshold;
 }
 
 float ProportionalJointMoment::calc_motor_cmd()
@@ -528,8 +528,8 @@ float ProportionalJointMoment::calc_motor_cmd()
     if (_side_data->toe_stance) 
     {
         /* Scale the fsr values so the controller outputs zero feed forward when the FSR value is at the threshold */ 
-        float threshold = _side_data->toe_fsr_upper_threshold;       /* Get the upper threshold for the FSR to be considered in stance */
-        float fsr = min(_side_data->toe_fsr, 1.2);                   /* Stores a saturated FSR signal from the device, saturates in order to avoid producing a large torque. */
+        float threshold = _side_data->toe_fsr_regressed_upper_threshold;       /* Get the upper threshold for the FSR to be considered in stance */
+        float fsr = min(_side_data->toe_fsr_regressed, 1.2);                   /* Stores a saturated FSR signal from the device, saturates in order to avoid producing a large torque. */
         float scaled_fsr = (fsr - threshold) / (1 - threshold);      /* Re-scales FSR signal */
 
         /* Calculate FeedForward Command */
@@ -2268,7 +2268,7 @@ void SPV2::_update_reference_angles(SideData* side_data, ControllerData* control
     // const float threshold = controller_data->parameters[controller_defs::trec::timing_threshold]/100;
 	const float threshold = 35/100;
     const bool should_update = (percent_grf >  _controller_data->toeFsrThreshold) && !_controller_data->reference_angle_updated;
-    const bool should_capture_level_entrance = side_data->do_calibration_refinement_toe_fsr && !side_data->do_calibration_toe_fsr;
+    const bool should_capture_level_entrance = side_data->do_calibration_refinement_toe_fsr_regressed && !side_data->do_calibration_toe_fsr_regressed;
 	// Serial.print("\nshould_capture_level_entrance: ");
 	// Serial.print(should_capture_level_entrance);
     const bool should_reset_level_entrance_angle =  _controller_data->prev_calibrate_level_entrance < should_capture_level_entrance;
@@ -2420,7 +2420,7 @@ float SPV2::calc_motor_cmd()
 	float plantar_setpoint = _controller_data->parameters[controller_defs::spv2::plantar_scaling];
 	float dorsi_setpoint = _controller_data->parameters[controller_defs::spv2::dorsi_scaling];
 	float threshold = constrain(_controller_data->parameters[controller_defs::spv2::timing_threshold]/100, 0, 99);
-	float percent_grf = constrain(_side_data->toe_fsr, 0, 2.5);
+	float percent_grf = constrain(_side_data->toe_fsr_regressed, 0, 2.5);
 	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 2.5);
 	_controller_data->percent_grf2plot= percent_grf;
 	_controller_data->percent_grf_heel2plot= percent_grf_heel;
@@ -2809,7 +2809,7 @@ float PJMC_PLUS::calc_motor_cmd()
 	float plantar_setpoint = _controller_data->parameters[controller_defs::pjmc_plus::plantar_scaling];
 	float dorsi_setpoint = _controller_data->parameters[controller_defs::pjmc_plus::dorsi_scaling];
 	float threshold = constrain(_controller_data->parameters[controller_defs::pjmc_plus::timing_threshold]/100, 0, 99);
-	float percent_grf = constrain(_side_data->toe_fsr, 0, 1.5);
+	float percent_grf = constrain(_side_data->toe_fsr_regressed, 0, 1.5);
 	float percent_grf_heel = constrain(_side_data->heel_fsr, 0, 1.5);
 	float cmd_ff = _pjmc_generic(percent_grf, threshold, dorsi_setpoint, -plantar_setpoint);
 	cmd_ff = min(dorsi_setpoint, cmd_ff);//cap the dorsiflexion setpoint
