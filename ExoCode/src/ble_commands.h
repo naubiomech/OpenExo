@@ -59,6 +59,8 @@ namespace ble_names
     static const char send_trq_cal        = 'H';
     static const char send_step_count     = 's';
     static const char cal_fsr_finished    = 'n';
+    static const char send_param_recieved = 'i';
+    static const char send_param_not_recieved = 'o';
 
 };
 
@@ -83,6 +85,8 @@ namespace ble
         {ble_names::new_fsr,            2},
         {ble_names::new_trq,            4},
         {ble_names::update_param,       4},
+        {ble_names::send_param_recieved,0},
+        {ble_names::send_param_not_recieved,0},
         
         //Sending Commands
         {ble_names::send_batt,              1},
@@ -418,11 +422,14 @@ namespace ble_handlers
         tx_msg.joint_id = (uint8_t) msg->data[0];
         tx_msg.data[(uint8_t)UART_command_enums::controller_param::CONTROLLER_ID] = (uint8_t) msg->data[1];
         tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_INDEX] = (uint8_t) msg->data[2];
-        tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE] = (float) msg->data[3];
+        tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE] = (uint8_t) msg->data[3];
         tx_msg.len = 3;
         uart_handler->UART_msg(tx_msg);
     }
-
+    inline static void send_param_recieved(ExoData* data)
+    {
+        data->parameter_names_received = true;
+    }
 }
 
 #endif

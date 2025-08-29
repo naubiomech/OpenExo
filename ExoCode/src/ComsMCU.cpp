@@ -31,7 +31,7 @@ ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
     }
 
     _battery->init();
-    _exo_ble = new ExoBLE();
+    _exo_ble = new ExoBLE(_data, config_to_send[config_defs::exo_name_idx]);
     _exo_ble->setup();
 
     uint8_t rt_data_len = 0;
@@ -153,8 +153,37 @@ void ComsMCU::update_gui()
     const bool new_rt_data = real_time_i2c::poll(rt_floats);
     static float del_t_no_msg = millis();
 
-    if (new_rt_data || rt_data::new_rt_msg)
+    if(_data->first_message)
     {
+        Serial.println("Initial Send");
+        _exo_ble->sendInitialParameterNames();
+        _data->first_message = false;
+    }
+    else if(!_data->parameter_names_received)
+    {
+        Serial.println(_data->parameter_names_received); // Bottom Line, always false, need to fix
+        static unsigned long first_connect_start_time = 0;
+        static bool timer_started = false;
+        
+        // Start the timer on first call
+        if (!timer_started) {
+            first_connect_start_time = millis();
+            timer_started = true;
+            return; // Exit early, wait for timer
+        }
+        
+        // Check if enough time has passed (e.g., 2000ms = 2 seconds)
+        const unsigned long DELAY_MS = 1000; // Adjust this value as needed
+        if (millis() - first_connect_start_time < DELAY_MS) {
+            return; // Still waiting, exit early
+        }
+        _exo_ble->sendInitialParameterNames();
+        Serial.println("HIT param not recieved");
+    }
+    
+    else if ((new_rt_data || rt_data::new_rt_msg))
+    {
+        Serial.println("Now hitting data..");
         del_t_no_msg = millis();
 
         #if COMSMCU_DEBUG
@@ -306,6 +335,12 @@ void ComsMCU::_process_complete_gui_command(BleMessage* msg)
         break;
     case ble_names::update_param:
         ble_handlers::update_param(_data, msg);
+        break;
+    case ble_names::send_param_recieved:
+        ble_handlers::send_param_recieved(_data);
+        break;
+    case ble_names::send_param_not_recieved:
+        ble_handlers::send_param_not_recieved(_data);
         break;
     default:
         logger::println("ComsMCU::_process_complete_gui_command->No case for command!", LogLevel::Error);
