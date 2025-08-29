@@ -343,3 +343,8 @@ class ExoDeviceManager:
 
         await self.client.write_gatt_char(char, command, True)
 
+    async def sendParamRecieved(self):
+        command = bytearray(b"i")
+        char = self.get_char_handle(self.UART_TX_UUID)
+
+        await self.client.write_gatt_char(char, command, True)
