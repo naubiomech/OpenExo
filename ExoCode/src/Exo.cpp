@@ -76,7 +76,8 @@ bool Exo::run()
         bool trial_running = sync_led.get_is_blinking();
 
         //Check the estop
-        data->estop = digitalRead(logic_micro_pins::motor_stop_pin);
+        data->estop = 0;    // By default, the estop functionality is disabled. To enable it, comment this line out and uncomment the line below.
+        //data->estop = digitalRead(logic_micro_pins::motor_stop_pin);
 
         //If the estop is low, disable all of the motors
         if (data->estop)
