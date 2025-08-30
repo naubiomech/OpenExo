@@ -8,7 +8,7 @@
 */
 
 #ifndef Controllerdata_h
-#define ControllerData_h
+#define Controllerdata_h
 #include <stdint.h>
 
 #include "Arduino.h"
@@ -16,6 +16,30 @@
 #include "Board.h"
 #include "ParseIni.h"
 #include <stdint.h>
+#include <string> // ELLIOTT
+#include <vector> // ELLIOTT
+#include <unordered_map> // ELLIOTT
+
+#include "GattDb.h" // ELLIOTT
+
+#define REGISTER_NAMESPACE_VECTOR(ns) \
+    ns_registry[#ns] = &ns::control_param_names;
+
+// inline std::unordered_map<std::string, std::vector<std::string>*> controller_registry;     // A registry mapping namespace names to pointers to their vectors
+
+inline std::unordered_map<std::string, std::vector<std::string>*> controller_registry;     // A registry mapping namespace names to pointers to their vectors
+
+struct NamespaceRegistrar {
+    NamespaceRegistrar(const std::string& name, std::vector<std::string>* vec) {
+        controller_registry[name] = vec;
+    }
+};
+
+#define AUTO_REGISTER_NAMESPACE(ns) \
+    static NamespaceRegistrar ns##_registrar(#ns, &ns::control_param_names);
+
+#define GET_NUM_CONTROL_PARAMS(ns) \
+    ns::num_parameter;
 
 //Forward declaration
 class ExoData;
@@ -27,8 +51,22 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t use_pid_idx = 0;              //Flag to use PID control
         const uint8_t p_gain_idx = 1;               //Value of P Gain for PID control
         const uint8_t i_gain_idx = 2;               //Value of I Gain for PID control
-        const uint8_t d_gain_idx = 3;               //Value of D Gain for PID control 
+        const uint8_t d_gain_idx = 3;               //Value of D Gain for PID control
         const uint8_t num_parameter = 4;
+        static std::vector<std::string> control_param_names =
+        {
+            "use_pid",
+            "p_gain",
+            "i_gain",
+            "d_gain"
+        };
+        AUTO_REGISTER_NAMESPACE(zero_torque)
+        // ParameterEntry control_parameters[num_parameter] = {
+        //     Parameter_Entry(use_pid_idx = 0),              //Flag to use PID control
+        //     Parameter_Entry(p_gain_idx = 1),               //Value of P Gain for PID control
+        //     Parameter_Entry(i_gain_idx = 2),               //Value of I Gain for PID control
+        //     Parameter_Entry(d_gain_idx = 3),               //Value of D Gain for PID control 
+        // };
     }
     
     namespace proportional_joint_moment
@@ -40,8 +78,20 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t p_gain_idx = 4;                       //Value of P Gain for PID control
         const uint8_t i_gain_idx = 5;                       //Value of I Gain for PID control
         const uint8_t d_gain_idx = 6;                       //Value of D Gain for PID control 
-        const uint8_t torque_alpha_idx = 7;                 //Filtering term
+        const uint8_t torque_alpha_idx = 7;
         const uint8_t num_parameter = 8;
+        static std::vector<std::string> control_param_names =
+        {
+            "stance_max",
+            "swing_max",
+            "is_assitance",
+            "use_pid",
+            "p_gain",
+            "i_gain",
+            "d_gain",
+            "torque_alpha"
+        };
+        AUTO_REGISTER_NAMESPACE(proportional_joint_moment)
     }
 
     namespace zhang_collins
@@ -170,27 +220,23 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t plantar_scaling = 0;
         const uint8_t dorsi_scaling = 1;
         const uint8_t timing_threshold = 2;                     //Toe FSR threshold (unit: %)
-        const uint8_t spring_stiffness_adj_factor = 3;
-        const uint8_t neutral_angle = 4;
-		const uint8_t min_angle = 5;                            //Minimum Angle
-        const uint8_t max_angle = 6;                            //Maximum Angle 
+        const uint8_t spring_stiffness = 3;                     //Not currently used
+        const uint8_t damping = 5;                              //Not currently used
+        const uint8_t neutral_angle = 4;                        //Not currently used
+        const uint8_t propulsive_gain = 6;                      //Not currently used
         const uint8_t kp = 7;
-		const uint8_t kd = 8;
-		const uint8_t turn_on_peak_limiter = 9;
-		const uint8_t do_update_stiffness = 10;
+		const uint8_t turn_on_peak_limiter = 9;                 //Not currently used
+        const uint8_t kd = 8;
+		const uint8_t step_response_mode = 10;                  //Not currently used
 		const uint8_t ki = 11;
 		const uint8_t do_use_servo = 12;
 		const uint8_t fsr_servo_threshold = 13;
 		const uint8_t servo_origin = 14;
 		const uint8_t servo_terminal = 15;
-		const uint8_t motor_current_calc_win = 16;
-		const uint8_t spring_stiffness = 17;
-		const uint8_t damping = 18;
-		const uint8_t propulsive_gain = 19;
-		const uint8_t servo_angle_scanner = 20;
-		const uint8_t do_use_stiffness_ctrl = 21;
-        const uint8_t num_parameter = 22;
+		const uint8_t maxon_outOfOffice_itr = 16;               //Not currently used
+        const uint8_t num_parameter = 17;
     }
+
 	
 	namespace pjmc_plus 
     {
@@ -213,6 +259,12 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 		const uint8_t maxon_outOfOffice_itr = 16;               //Not currently used
         const uint8_t num_parameter = 17;
     }
+    const int num_controllers = 2;                      //Total number of controllers defined in the controller_defs namespace so we can iterate through them.
+    static std::vector<std::string> controller_names =
+    {
+        "zero_torque",
+        "proportional_joint_moment"
+    };
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
 }
@@ -238,7 +290,13 @@ class ControllerData {
          * @return uint8_t parameter length 
          */
         uint8_t get_parameter_length();
-        
+
+        /**
+         * @brief Write the parameter names to the GATT database - ELLIOTT
+         */
+         #if defined(ARDUINO_ARDUINO_NANO33BLE) || defined(ARDUINO_NANO_RP2040_CONNECT)
+         void write_parameter_names(GattDb gatt_db, std::string key_char);
+         #endif
         
         uint8_t controller;                                 /**< Id of the current controller */
         config_defs::JointType joint;                       /**< Id of the current joint */
@@ -261,7 +319,7 @@ class ControllerData {
 
         /* Controller Specific Variables That You Want To Plot. If you do not want to plot, than put variables in Controller.h under the controller of interest. */
 
-        //Variables for TREC Controller (MOVE NON-PLOTTED VARIABLES TO Controller.h WHEN FINISHED WITH CONTROLLER DEVELOPMENT)
+        //Variables for TREC Controller (MOVE TO Controller.h)
         float reference_angle = 0;                              /**< Reference angle for the spring term */
         float reference_angle_offset = 0;                       /**< Offset for the reference angle */
         bool reference_angle_updated = false;                   /**< Flag to indicate if the reference angle was updated this step */
@@ -310,92 +368,11 @@ class ControllerData {
 		//Variables for the Zhang-Collins Controller
 		float previous_cmd = 0;
 		
-        //TO DO:: MOVE NON - PLOTTED SPV2 VARIABLES TO CONTROLLER.h WHEN FINISHED WITH CONTROLLER DEVELOPMENT
-
-        //Variables for the SPV2 Controller
-		float cmd_ff2plot = 0;
+        //Variables for SPV2
 		int plotting_scalar = 1;                //Maxon servo interrupter
 		unsigned long servo_departure_time;
 		bool servo_did_go_down = true;
 		bool servo_get_ready = false;
-		float setpoint2use_spv2 = 0;			//Peak prescribed torque regulator
-		bool wasStance_spv2 = false;
-		float oldMaxPrescription = 0;
-		float currentMaxPrescription = 0;
-		long SPV2_motor_current = 0;
-		unsigned long SPV2_motor_current_count = 0;
-		bool SPV2_motor_current_ready = false;
-		unsigned long SPV2_oldCurrent = 0;
-		unsigned long SPV2_newCurrent = 0;
-		uint8_t SPV2_currentAngle = 90;
-		bool SPV2_do_count_steps = true;
-		uint16_t SPV2_step_count = 0;
-		//bool SPV2_servo1_counter_1stStage = false;
-		//unsigned long SPV2_servo1_stopWatch;
-		//bool SPV2_stiffness_adjustment_ready = false;
-		bool SPV2_do_calc_new_stiffness = false;
-		bool SPV2_iniAngle_imported = false;
-		int8_t do_adv_optimizer = 0;
-		uint8_t x1 = 90;
-		uint8_t x2 = 90;
-		bool SPV2_gs_is_ini_itr = true;
-		uint16_t x1_current = 0;
-		uint16_t x2_current = 0;
-		uint8_t x_l = 90;
-		uint8_t x_u = 90;
-		long SPV2_current_pwr = 0;//System-wide power in Milliwatts (power draw from the battery
-		long SPV2_filtered_pwr = 0;
-		uint32_t SPV2_current_voltage = 0;//battery voltage in Millivolts
-		unsigned long SPV2_current_voltage_timer = 0;
-		unsigned long motor_curr_stpWtch = 0;
-		unsigned long sys_pwr_30_timer_shrt = 0;
-		
-		long sys_pwr_30 = 0;
-		long sys_pwr_30_count = 0;
-		long sys_pwr_30_timer = 0;
-		int8_t cal_pwr_30_old_val = 0;
-		long sys_pwr_30_2_plot = 0;
-		bool do_cal_pwr_30 = false;
-		
-		//SPV2 Simulated Annealing Optimizer
-		float curr = 90;
-		float curr_eval = 0;
-		float candidate = 90;
-		float old_candidate;
-		float candidate_eval = 0;
-		uint16_t i_SA = 0;
-		float best = 90;
-		float best_eval = 10000;
-		float percent_grf2plot = 0;
-		float percent_grf_heel2plot = 0;
-		
-		
-		//SPV2 Cost Function
-		float SPV2_error_sum = 0;
-		unsigned long SPV2_error_count = 0;
-		float SPV2_RMSE = 0;
-		float SPV2_CF_output = 0;
-		
-		//SPV2 POWER SENSOR TROUBLESHOOTING
-		float ps_old_time = 0;
-		bool ps_connected = false;
-		
-		//SPV2 TREC troubleshooting
-		float cmd_ff_kb = 0;
-		float cmd_ff_pushOff = 0;
-		float cmd_ff_generic = 0;
-		bool SPV2_virtual_spring_ON = false;
-		float SPV2_virtual_spring_entry_angle = 50;
-		float filtered_propulsive_term = 0;           /**< Low pass on final propulsive output */
-		
-		//SPV2 leaf spring stiffness measurement
-		bool SPV2_do_measure_stiffness1 = false;
-		bool SPV2_do_measure_stiffness2 = false;
-		float SPV2_stiffness_angle1 = 0;
-		float SPV2_stiffness_angle2 = 0;
-		float SPV2_stiffness_torque1 = 0;
-		float SPV2_stiffness_torque2 = 0;
-		float SPV2_ls_val = 0;
 
         //Variables for the PHMC Controller
         float fs;

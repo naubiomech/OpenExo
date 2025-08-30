@@ -339,9 +339,6 @@ void ComsMCU::_process_complete_gui_command(BleMessage* msg)
     case ble_names::send_param_recieved:
         ble_handlers::send_param_recieved(_data);
         break;
-    case ble_names::send_param_not_recieved:
-        ble_handlers::send_param_not_recieved(_data);
-        break;
     default:
         logger::println("ComsMCU::_process_complete_gui_command->No case for command!", LogLevel::Error);
         break;
