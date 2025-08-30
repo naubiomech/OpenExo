@@ -77,7 +77,14 @@ class _Controller
         float _prev_input;                  /**< Prev error term for calculating derivative */
         float _prev_de_dt;                  /**< Prev error derivative used if the timestep is not good*/
         float _prev_pid_time;               /**< Prev time the PID was called */
-        		
+        
+        //Parameters for Servo Control (SPV2)
+		long pos;
+		unsigned long servoWatch;
+		int pos1;
+		int pos2;
+		bool _do_stop_servo = false;
+		
         /**
          * @brief Calculates the current PID contribution to the motor command. 
          * 
@@ -88,6 +95,16 @@ class _Controller
          * @param derivative gain
          */
         float _pid(float cmd, float measurement, float p_gain, float i_gain, float d_gain);
+		
+		/**
+         * @brief Actuate the servo motor (might need to move this out of the controller class) 
+         * 
+         * @param signal pin 
+         * @param not used
+         * @param start angle
+         * @param end angle
+         */
+		int _servo_runner(uint8_t servo_pin, uint8_t speed_level, long angle_initial, long angle_final);
 		
 		/**
          * @brief A function that returns cmd_ff for stateless PJMC. 
@@ -456,20 +473,7 @@ public:
     float calc_motor_cmd();
 
 private:
-	void SPV2::_plantar_setpoint_adjuster(SideData* side_data, ControllerData* controller_data, float currentPrescription);
-	void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerData* controller_data);
-	void SPV2::_calc_motor_current(ControllerData* controller_data);
-	void SPV2::_step_counter(uint16_t num_steps_threshold, SideData* side_data, ControllerData* controller_data);
-	void SPV2::_golden_search_advance();
-	void SPV2::optimizer_reset();
-	void SPV2::_SA_point_gen(float step_size, long bound_l, long bound_u, float temp);
-	void SPV2::_lab_OP_point_gen(float step_size, long bound_l, long bound_u);
-	
-	//from TREC
-	void _update_reference_angles(SideData* side_data, ControllerData* controller_data, float percent_grf, float percent_grf_heel);
-    void _capture_neutral_angle(SideData* side_data, ControllerData* controller_data);
-    void _grf_threshold_dynamic_tuner(SideData* side_data, ControllerData* controller_data, float threshold, float percent_grf_heel);
-    //void _plantar_setpoint_adjuster(SideData* side_data, ControllerData* controller_data, float pjmcSpringDamper);
+
 };
 
 /**

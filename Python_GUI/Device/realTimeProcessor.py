@@ -35,11 +35,7 @@ class RealTimeProcessor:
         dataUnpacked = event.decode("utf-8")
         print(dataUnpacked)
 
-        # I want to create a new delimiter for the start of the inital message
-        if(dataUnpacked == "I"):
-            
-
-        if(self.first_msg): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
+        if(self.first_msg): # If this is the first sxxet of messages, Then it is the parameter names and needs to be processed differently
             #Should change this to use special character to mark that these belong in plotting parameters (see regular data and controller parameters)
             print("First msg = ")
             print(dataUnpacked)

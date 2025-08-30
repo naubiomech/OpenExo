@@ -7,18 +7,13 @@
 #include "Config.h"
 #include "error_codes.h"
 #include "Logger.h"
-#include <cstring>
-#include "uart_commands.h"
-#include "UARTHandler.h"
-#include <vector>
 
 #define EXOBLE_DEBUG 0
 
 ExoBLE::ExoBLE(ExoData* data, uint8_t config_to_send)
 {
     _data = data;
-    config_to_send = config_to_send;
-    Serial.println("created ExoBLE object");
+    _config_to_send = config_to_send;  // Fix: was assigning to parameter instead of member
 }
 
 bool ExoBLE::setup()
@@ -113,8 +108,6 @@ void ExoBLE::advertising_onoff(bool onoff)
     {
         //Start Advertising
         // logger::println("Start Advertising");
-        Serial.println("Start Advertising");
-        first_connect = true; //Reset first connect flag
         BLE.advertise();
 
         //Turn the blue led off
@@ -166,7 +159,7 @@ bool ExoBLE::handle_updates()
         #endif
 
         BLE.poll();
-        int32_t current_status = BLE.connected(); //True if the device is connected, False if not
+        int32_t current_status = BLE.connected();
 
         if (_connected == current_status)
         {
@@ -210,19 +203,16 @@ bool ExoBLE::handle_updates()
     return ble_queue::size();
 }
 
-/**
- * @brief Send a BLE message using the Nordic UART Service. The data is serialized with the parser object. Called by the ComsMCU class
- */
 void ExoBLE::send_message(BleMessage &msg)
 {
     if (!this->_connected)
     {
         return; /* Don't bother sending anything if no one is listening */
     }
+
     #if EXOBLE_DEBUG
         BleMessage::print(msg);
     #endif
-
 
     static const int k_preamble_length = 3;
     int max_payload_length = ((k_preamble_length + msg.expecting) * (MAX_PARSER_CHARACTERS + 1));
@@ -231,33 +221,6 @@ void ExoBLE::send_message(BleMessage &msg)
     int bytes_to_send = _ble_parser.package_raw_data(buffer, msg);
 
     _gatt_db.TXChar.writeValue(buffer, bytes_to_send);
-}
-
-void ExoBLE::sendInitialParameterNames()
-{
-        Serial.println("first connect");
-        UART_msg_t msg; // make a message  so we can properly call get_real_time_data, this msg is currently blank
-        Serial.println("getting real time data");
-        UART_command_handlers::get_real_time_data(_uart_handler, _data, msg, _data->config);
-        static const int num_entries = UART_command_handlers::num_entries;
-        Serial.println("got param names arr");
-        //for each entry in the param_names_arr, send the name to the GUI individually
-        for (int i = 0; i < num_entries; i++)
-        {
-            Serial.print(i);
-            Serial.print(": ");
-            std::string param_name = UART_command_handlers::param_names_arr[i];
-            Serial.println(param_name.c_str());
-            int success = _gatt_db.TXChar.writeValue(param_name.c_str(), true);
-        }
-        std::string end_str = "END"; //marks the end of the parameter names list
-        _gatt_db.TXChar.writeValue(end_str.c_str(), true);
-
-        //Use controllerData class to send controller parameters
-        std::string key_char = "!";
-        _data->left_side.hip.controller.write_parameter_names(_gatt_db, key_char);
-        std::string end_key = "!END";
-        _gatt_db.TXChar.writeValue(end_key.c_str(), true);
 }
 
 void ExoBLE::send_message_w_string(BleMessage &msg, const char* msg_text)
@@ -277,6 +240,49 @@ void ExoBLE::send_message_w_string(BleMessage &msg, const char* msg_text)
     int bytes_to_send = _ble_parser.package_raw_data(buffer, msg);
 
     _gatt_db.TXChar.writeValue(msg_text, false);
+}
+
+void ExoBLE::sendInitialParameterNames()
+{
+        // Add timer logic here
+        static unsigned long first_connect_start_time = 0;
+    static bool timer_started = false;
+    
+    // Start the timer on first call
+    if (!timer_started) {
+        first_connect_start_time = millis();
+        timer_started = true;
+        return; // Exit early, wait for timer
+    }
+    
+    // Check if enough time has passed (e.g., 2000ms = 2 seconds)
+    const unsigned long DELAY_MS = 2000; // Adjust this value as needed
+    if (millis() - first_connect_start_time < DELAY_MS) {
+        return; // Still waiting, exit early
+    }
+    Serial.println("first connect");
+    UART_msg_t msg; // make a message  so we can properly call get_real_time_data, this msg is currently blank
+    Serial.println("getting real time data");
+    UART_command_handlers::get_real_time_data(nullptr, _data, msg, _data->config);
+    static const int num_entries = UART_command_handlers::num_entries;
+    Serial.println("got param names arr");
+    //for each entry in the param_names_arr, send the name to the GUI individually
+    for (int i = 0; i < num_entries; i++)
+    {
+        Serial.print(i);
+        Serial.print(": ");
+        std::string param_name = UART_command_handlers::param_names_arr[i];
+        Serial.println(param_name.c_str());
+        int success = _gatt_db.TXChar.writeValue(param_name.c_str(), true);
+    }
+    std::string end_str = "END"; //marks the end of the parameter names list
+    _gatt_db.TXChar.writeValue(end_str.c_str(), true);
+
+    //Use controllerData class to send controller parameters
+    std::string key_char = "!";
+    _data->left_side.hip.controller.write_parameter_names(_gatt_db, key_char);
+    std::string end_key = "!END";
+    _gatt_db.TXChar.writeValue(end_key.c_str(), true);
 }
 
 void ExoBLE::send_error(int error_code, int joint_id)
