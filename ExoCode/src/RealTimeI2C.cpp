@@ -32,7 +32,9 @@ static float* float_values = new float(rt_data::len);
 static uint8_t _packed_len(uint8_t len)
 {
     uint8_t packed_len = 0;
-    packed_len += (float)len * (sizeof(float)/sizeof(short int));
+    // Calculate bytes needed for data: len * sizeof(float) / sizeof(short int)
+    // Since sizeof(float) = 4 and sizeof(short int) = 2, this is len * 2
+    packed_len += len * 2;  // 2 bytes per float (converted to short int)
     packed_len += 2; //Preamble 
     return packed_len;
 }
@@ -41,7 +43,7 @@ static void _pack(uint8_t msg_id, uint8_t len, float *data, uint8_t *data_to_pac
 {
     //Pack metadata
     data_to_pack[0] = msg_id;
-    data_to_pack[1] = len + 2;
+    data_to_pack[1] = len; // Deleted +2 for preamble, moved to _packed_len
     
     //Convert float array to short int array
     uint8_t _num_bytes = sizeof(float)/sizeof(short int);
