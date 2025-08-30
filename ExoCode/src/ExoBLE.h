@@ -73,6 +73,13 @@ class ExoBLE
          */
         void send_error(int error_code, int joint_id);
 
+        /**
+         * @brief Send initial parameter names to the GUI (setup in controllerData.h)
+         * 
+         * 
+         */
+        void ExoBLE::sendInitialParameterNames()
+
     private:
 
         //BLE connection state
