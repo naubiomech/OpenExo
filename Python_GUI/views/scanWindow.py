@@ -348,6 +348,7 @@ class ScanWindow(tk.Frame):
         self.changeName()
         """Switches frame to ActiveTrial and begins the trial."""
         active_trial_frame = self.controller.frames["ActiveTrial"]
+        active_trial_frame.update_dropdown_values()
         active_trial_frame.disable_interactions()  # Disable buttons in ActiveTrial frame
         active_trial_frame.clear_both_plot()
 
