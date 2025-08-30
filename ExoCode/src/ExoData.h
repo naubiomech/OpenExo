@@ -143,6 +143,8 @@ class ExoData
         int ankle_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
         int elbow_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
 
+        bool parameter_names_received = false;
+
         private:
         uint16_t _status;           /**< Status of the system*/
 };
