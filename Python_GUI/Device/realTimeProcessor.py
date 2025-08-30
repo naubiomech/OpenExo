@@ -19,12 +19,76 @@ class RealTimeProcessor:
         self._data_length = None
         self.x_time = 0
         self._predictor= MLModel.MLModel() #create the machine learning model object
+        self.first_msg = True
+        self.plotting_param_names = []  # List to store parameter names
+        self.num_plotting_params = 0 # Number of parameters
+        self.param_values = [] # List to store parameter values
+        self.controllers = [] # List to store controller names
+        self.controller_parameters = [] # 2D list to store controller parameters
+        self.num_controllers = 0 # Number of controllers we have stored
+        self.num_control_parameters = 0 # Number of controller parameters in the most recently updated controller
+        self.temp_control_param_list = []
         
 
     def processEvent(self, event):
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
-        if "c" in dataUnpacked:  # 'c' acts as a delimiter for data
+        print(dataUnpacked)
+
+        # I want to create a new delimiter for the start of the inital message
+        if(dataUnpacked == "I"):
+            
+
+        if(self.first_msg): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
+            #Should change this to use special character to mark that these belong in plotting parameters (see regular data and controller parameters)
+            print("First msg = ")
+            print(dataUnpacked)
+            print((dataUnpacked == "END"))
+            if(dataUnpacked == "END"): # marks the end of the parameter names
+                self.first_msg = False  
+                for name in self.plotting_param_names:
+                    print(name)
+                # Once all the parameter names have been recieved we need to update the relevant data structures (chart_data and exoData)
+                self._chart_data.updateNames(
+                    self.plotting_param_names, 
+                    self.num_plotting_params
+                )
+                # Also update the exoData with parameter names
+                self._exo_data.setParameterNames(self.plotting_param_names)
+                self._exo_data.initializeParamValues()
+            else:
+                # If this is not the end of the parameter names, then we need to add the name to the list and increment the number of parameters
+                print(self.num_plotting_params)
+                self.plotting_param_names.append(dataUnpacked)
+                self.num_plotting_params += 1
+        elif "!" in dataUnpacked:   # process controllers and control parameters
+            data_split = dataUnpacked.split("!", 1)
+            if "!" in data_split[1]:
+                #this is a controller parameter
+                # print("control parameter")
+                data_split = data_split[1].split("!")
+                # print(data_split[1])
+                self.temp_control_param_list.append(data_split[1]) # add the parameter name to the 2D list of controller parameters
+                self.num_control_parameters += self.num_control_parameters
+            else:
+                if(len(self.temp_control_param_list) != 0):
+                    self.controller_parameters.append(self.temp_control_param_list)
+                    self.temp_control_param_list = []
+                if(data_split[1] == 'END'):
+                    for controller in self.controllers:
+                        print("Controller: ")
+                        print(controller)
+                        for parameter in self.controller_parameters:
+                            print("Parameter")
+                            print(parameter)
+                else:
+                    #this is a controller name
+                    # print("controller")
+                    # print(self.num_controllers)
+                    self.controllers.append(data_split[1])
+                    self.num_controllers += 1
+
+        elif "c" in dataUnpacked:  # 'c' acts as a delimiter for data
             data_split = dataUnpacked.split(
                 "c"
             )  # Split data into 2 messages using 'c' as divider
@@ -80,6 +144,7 @@ class RealTimeProcessor:
                     return
         else:
             print("Unkown command!\n")
+            print(dataUnpacked)
 
     def set_debug_event_listener(self, on_debug_event):
         self._on_debug_event = on_debug_event
@@ -119,9 +184,8 @@ class RealTimeProcessor:
         
         self._predictor.predictModel([minSV,maxSV,minSA,maxSA, maxFSR,stancetime,swingtime]) #predict results from model
 
-
-        self._exo_data.addDataPoints(
-            self.x_time,
+        # Create a list of parameter values to match the new method signature
+        param_values = [
             rightTorque,
             rightState,
             rightSet,
@@ -129,8 +193,15 @@ class RealTimeProcessor:
             leftState,
             leftSet,
             rightFsr,
-            leftFsr,
-            #store features
+            leftFsr
+        ]
+
+        # Update the chart data with the new parameter values for dropdown plotting
+        self._chart_data.updateParamValues(param_values)
+
+        self._exo_data.addDataPoints(
+            self.x_time,
+            param_values,
             minSV,
             maxSV,
             minSA,
@@ -138,10 +209,9 @@ class RealTimeProcessor:
             maxFSR,
             stancetime,
             swingtime,
-            self._predictor.prediction, #store prediction
+            self._predictor.prediction,  # Task
             battery
         )
-        
 
     def processMessage(
         self, command, payload, dataLength
