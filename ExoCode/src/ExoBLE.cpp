@@ -245,21 +245,9 @@ void ExoBLE::send_message_w_string(BleMessage &msg, const char* msg_text)
 void ExoBLE::sendInitialParameterNames()
 {
         // Add timer logic here
-        static unsigned long first_connect_start_time = 0;
+    static unsigned long first_connect_start_time = 0;
     static bool timer_started = false;
     
-    // Start the timer on first call
-    if (!timer_started) {
-        first_connect_start_time = millis();
-        timer_started = true;
-        return; // Exit early, wait for timer
-    }
-    
-    // Check if enough time has passed (e.g., 2000ms = 2 seconds)
-    const unsigned long DELAY_MS = 2000; // Adjust this value as needed
-    if (millis() - first_connect_start_time < DELAY_MS) {
-        return; // Still waiting, exit early
-    }
     Serial.println("first connect");
     UART_msg_t msg; // make a message  so we can properly call get_real_time_data, this msg is currently blank
     Serial.println("getting real time data");
@@ -277,12 +265,6 @@ void ExoBLE::sendInitialParameterNames()
     }
     std::string end_str = "END"; //marks the end of the parameter names list
     _gatt_db.TXChar.writeValue(end_str.c_str(), true);
-
-    //Use controllerData class to send controller parameters
-    std::string key_char = "!";
-    _data->left_side.hip.controller.write_parameter_names(_gatt_db, key_char);
-    std::string end_key = "!END";
-    _gatt_db.TXChar.writeValue(end_key.c_str(), true);
 }
 
 void ExoBLE::send_error(int error_code, int joint_id)

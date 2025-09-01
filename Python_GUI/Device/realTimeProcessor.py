@@ -1,10 +1,10 @@
 import re
-
+import asyncio
 from Device import chart_data, exoData, MLModel
 
 
 class RealTimeProcessor:
-    def __init__(self):
+    def __init__(self, device_manager=None):
         self._event_count_regex = re.compile(
             "[0-9]+"
         )  # Regular Expression to find any number 1-9
@@ -28,22 +28,25 @@ class RealTimeProcessor:
         self.num_controllers = 0 # Number of controllers we have stored
         self.num_control_parameters = 0 # Number of controller parameters in the most recently updated controller
         self.temp_control_param_list = []
+        self._device_manager = device_manager
+        self._param_timer = None
+        self._param_timeout_seconds = 0.5
+        self._param_names_received = False
         
 
-    def processEvent(self, event):
+    async def processEvent(self, event):
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
         print(dataUnpacked)
 
-        if(self.first_msg): # If this is the first sxxet of messages, Then it is the parameter names and needs to be processed differently
+        await self._start_param_timer()
+
+        if(self.first_msg): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
             #Should change this to use special character to mark that these belong in plotting parameters (see regular data and controller parameters)
             print("First msg = ")
             print(dataUnpacked)
             print((dataUnpacked == "END"))
             if(dataUnpacked == "END"): # marks the end of the parameter names
-                self.first_msg = False  
-                for name in self.plotting_param_names:
-                    print(name)
                 # Once all the parameter names have been recieved we need to update the relevant data structures (chart_data and exoData)
                 self._chart_data.updateNames(
                     self.plotting_param_names, 
@@ -57,7 +60,8 @@ class RealTimeProcessor:
                 print(self.num_plotting_params)
                 self.plotting_param_names.append(dataUnpacked)
                 self.num_plotting_params += 1
-        elif "!" in dataUnpacked:   # process controllers and control parameters
+        
+        if "!" in dataUnpacked:   # process controllers and control parameters
             data_split = dataUnpacked.split("!", 1)
             if "!" in data_split[1]:
                 #this is a controller parameter
@@ -71,6 +75,10 @@ class RealTimeProcessor:
                     self.controller_parameters.append(self.temp_control_param_list)
                     self.temp_control_param_list = []
                 if(data_split[1] == 'END'):
+                    
+                    if hasattr(self, '_device_manager') and self._device_manager:
+                        await self._device_manager.sendParamRecieved()
+
                     for controller in self.controllers:
                         print("Controller: ")
                         print(controller)
@@ -84,7 +92,7 @@ class RealTimeProcessor:
                     self.controllers.append(data_split[1])
                     self.num_controllers += 1
 
-        elif "c" in dataUnpacked:  # 'c' acts as a delimiter for data
+        elif "c" in dataUnpacked and self.first_msg == False:  # 'c' acts as a delimiter for data
             data_split = dataUnpacked.split(
                 "c"
             )  # Split data into 2 messages using 'c' as divider
@@ -144,6 +152,7 @@ class RealTimeProcessor:
 
     def set_debug_event_listener(self, on_debug_event):
         self._on_debug_event = on_debug_event
+    
 
     def processGeneralData(
         self, payload, datalength
@@ -226,6 +235,26 @@ class RealTimeProcessor:
     def UnkownDataCommand(self):
         return "Unkown Command!"
 
+    async def _start_param_timer(self):
+        if self._param_timer is None:
+            print("Starting parameter timer...")  # Debug print
+            self._param_timer = asyncio.create_task(self._param_timeout_handler())
+
+    async def _param_timeout_handler(self):
+        print("Timer started, waiting for timeout...")  # Debug print
+        await asyncio.sleep(self._param_timeout_seconds)
+        print("Timer timeout reached!")  # Debug print
+        if not self._param_names_received:
+            print("Parameters not received, sending notification...")  # Debug print
+            if hasattr(self, '_device_manager') and self._device_manager:
+                if self._device_manager.isConnected:  # Add this check
+                    try:
+                        await self._device_manager.sendParamNotReceived()
+                        print("Parameters not received, sending notification...DONE")
+                    except Exception as e:
+                        print(f"Error sending param not received: {e}")
+                else:
+                    print("Device manager not connected, cannot send param not received")
 
 def tryParseFloat(stringVal):  # Try to parse float data from String
     try:

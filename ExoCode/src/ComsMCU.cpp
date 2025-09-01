@@ -144,7 +144,7 @@ void ComsMCU::update_gui()
     #if COMSMCU_DEBUG
         logger::println("ComsMCU::update_gui->Start");
     #endif
-
+    
     static Time_Helper* t_helper = Time_Helper::get_instance();
     static float my_mark = _data->mark;
     static float* rt_floats = new float(rt_data::len);
@@ -152,36 +152,23 @@ void ComsMCU::update_gui()
     //Get real time data from ExoData and send to GUI
     const bool new_rt_data = real_time_i2c::poll(rt_floats);
     static float del_t_no_msg = millis();
-
+    /*
+    if(_data->parameter_names_received) {
+        Serial.println("Parameter names received");
+    }
+    if(!_data->parameter_names_received) {
+        Serial.println("Parameter names NOT received");
+    }
+    */
+   
     if(_data->first_message)
     {
         Serial.println("Initial Send");
         _exo_ble->sendInitialParameterNames();
         _data->first_message = false;
     }
-    else if(!_data->parameter_names_received)
-    {
-        Serial.println(_data->parameter_names_received); // Bottom Line, always false, need to fix
-        static unsigned long first_connect_start_time = 0;
-        static bool timer_started = false;
-        
-        // Start the timer on first call
-        if (!timer_started) {
-            first_connect_start_time = millis();
-            timer_started = true;
-            return; // Exit early, wait for timer
-        }
-        
-        // Check if enough time has passed (e.g., 2000ms = 2 seconds)
-        const unsigned long DELAY_MS = 1000; // Adjust this value as needed
-        if (millis() - first_connect_start_time < DELAY_MS) {
-            return; // Still waiting, exit early
-        }
-        _exo_ble->sendInitialParameterNames();
-        Serial.println("HIT param not recieved");
-    }
     
-    else if ((new_rt_data || rt_data::new_rt_msg))
+    if (_data->parameter_names_received && (new_rt_data || rt_data::new_rt_msg))
     {
         Serial.println("Now hitting data..");
         del_t_no_msg = millis();
@@ -247,12 +234,12 @@ void ComsMCU::update_gui()
     static float status_context = t_helper->generate_new_context(); 
     static float del_t_status = 0;
     del_t_status += t_helper->tick(status_context);
-    if (del_t_status > BLE_times::_status_msg_delay)
+    if (_data->parameter_names_received && del_t_status > BLE_times::_status_msg_delay)
     {
         #if COMSMCU_DEBUG
             logger::println("ComsMCU::update_gui->Sending status");
         #endif
-
+        Serial.println("Hit send message to BLE!");
         //Send status data
         BleMessage batt_msg = BleMessage();
         batt_msg.command = ble_names::send_batt;
@@ -338,6 +325,10 @@ void ComsMCU::_process_complete_gui_command(BleMessage* msg)
         break;
     case ble_names::send_param_recieved:
         ble_handlers::send_param_recieved(_data);
+        break;
+    case ble_names::send_param_not_recieved:
+        Serial.println("Resend parameter names");
+        _exo_ble->sendInitialParameterNames();
         break;
     default:
         logger::println("ComsMCU::_process_complete_gui_command->No case for command!", LogLevel::Error);

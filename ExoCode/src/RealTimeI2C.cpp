@@ -74,7 +74,7 @@ void real_time_i2c::msg(float* data, int len)
 //Also, any variables that are stored outside of its scope must be marked volatile and need to have their concurrency managed
 static void on_receive(int byte_len)
 {
-    if (byte_len != byte_buffer_len) 
+    if (byte_len < 2 || byte_len > byte_buffer_len) 
     {
         return;
     }

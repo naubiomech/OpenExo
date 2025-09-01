@@ -80,7 +80,7 @@ class TopPlot(BasePlot):
         super().__init__(master, "Left Torque")
     def animate(self, chartSelection):
         topController = None
-        title = " "
+        title = "No Data Selected"
         bottomLimit = -1
         topLimit = 1
         if chartSelection == "Data 0-3":
@@ -113,12 +113,12 @@ class TopPlot(BasePlot):
 
         self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit,topLimit,title)
 
-
 class BottomPlot(BasePlot):
     def __init__(self, master):
         super().__init__(master, "Right Torque")
 
     def animate(self, chartSelection):
+        title = "No Data Selected"
         topController = None
         bottomLimit = -1
         topLimit = 1

@@ -9,17 +9,16 @@
  #define BLE_COMMANDS_H
  
  #include "Arduino.h"
- #include "ExoData.h"        // ✅ Move this UP - needs full definition
- #include "ParseIni.h"       //For config_defs
- #include "StatusDefs.h"     //For ExoDataStatus
+ #include "ExoData.h"        
+ #include "ParseIni.h"      
+ #include "StatusDefs.h"     
  #include "BleMessage.h"
  #include "ParamsFromSD.h"
  
  #include "UARTHandler.h"
- #include "uart_commands.h"  // ✅ This comes AFTER ExoData.h
+ #include "uart_commands.h" 
  #include "UART_msg_t.h"
  #include "Logger.h"
- 
  
  /**
   * @brief Type to associate a command with an ammount of data
@@ -51,6 +50,7 @@
      static const char mark              = 'N';
      static const char update_param      = 'f';
      static const char send_param_recieved = 'i';
+     static const char send_param_not_recieved = 'o';
  
      //Sending Commands (Firmware->GUI)
      static const char send_real_time_data = '?';
@@ -85,7 +85,8 @@
          {ble_names::new_trq,            4},
          {ble_names::update_param,       4},
          {ble_names::send_param_recieved, 0},
-         
+         {ble_names::send_param_not_recieved, 0},
+
          //Sending Commands
          {ble_names::send_batt,              1},
          {ble_names::send_real_time_data,    9},

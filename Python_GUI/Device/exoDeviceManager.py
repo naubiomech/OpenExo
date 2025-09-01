@@ -14,7 +14,7 @@ from Device import realTimeProcessor
 class ExoDeviceManager:
 
     def __init__(self, on_disconnect=None):
-        self._realTimeProcessor = realTimeProcessor.RealTimeProcessor()
+        self._realTimeProcessor = realTimeProcessor.RealTimeProcessor(self)
         self.on_disconnect = on_disconnect  # Store the callback
 
         self.deviceAddress = None
@@ -74,7 +74,7 @@ class ExoDeviceManager:
 
     # Handle incoming data from BLE characteristic
     async def DataIn(self, sender: BleakGATTCharacteristic, data: bytearray):
-        self._realTimeProcessor.processEvent(data)
+        await self._realTimeProcessor.processEvent(data)
         await self.MachineLearnerControl()
 
     # Control the machine learning model based on incoming data
@@ -347,4 +347,11 @@ class ExoDeviceManager:
         command = bytearray(b"i")
         char = self.get_char_handle(self.UART_TX_UUID)
 
-        await self.client.write_gatt_char(char, command, True)
+        await self.client.write_gatt_char(char, command, False)
+
+    async def sendParamNotReceived(self):
+        print("Sending param not recieved")
+        command = bytearray(b"o")
+        char = self.get_char_handle(self.UART_TX_UUID)
+
+        await self.client.write_gatt_char(char, command, False)
