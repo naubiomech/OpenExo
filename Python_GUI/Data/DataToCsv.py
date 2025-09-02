@@ -4,8 +4,9 @@ from datetime import datetime
 
 
 class CsvWritter:
-    def writeToCsv(self, exoData, disconnected=False):
+    def writeToCsv(self, exoData, *,file_tag: str = "", disconnected=False):
         print("Creating filedata")
+        print(f"ExoData has {len(exoData.epochTime)} data points")
         # initialize array for output file
         fileData = []
 
@@ -102,46 +103,31 @@ class CsvWritter:
         fileDataTransposed = self.rotateArray(fileData)
         print("flipping array")
 
-        today = datetime.now()
-        base_file_name = today.strftime("%Y-%b-%d-%H-%M-%S")
-        
-        # Append disconnection notice to filename if applicable
+        base = datetime.now().strftime("%Y-%b-%d-%H-%M-%S")
+        if file_tag:
+            base += f"_{file_tag}"
         if disconnected:
-            fileName = f"{base_file_name}_disconnected.csv"
-        else:
-            fileName = f"{base_file_name}.csv"
-
+            base += "_disconnected"
+        fileName = f"{base}.csv"
 
         try:
-            with open(fileName, "w") as csvFile:  # Open file with file name
-                csvwriter = csv.writer(csvFile)  # Prep file for csv data
+            with open(fileName, "w", newline="") as csvFile:
+                csv.writer(csvFile).writerows(fileDataTransposed)
                 print("creating and opening file")
-
-                # Write flipped 2D array to file
-                csvwriter.writerows(fileDataTransposed)
-
-                csvFile.close  # Close file
-
         finally:
-            # ⇢  CLEAR THE BUFFER  ⇠
             self._clear_exo_data(exoData)
             print("ExoData lists emptied")
 
     def rotateArray(self, arrayToFlip):
-        return [
-            list(row) for row in zip(*arrayToFlip)
-        ]  # Roate array so labels on left are on top
+        return [list(row) for row in zip(*arrayToFlip)]
 
     def _clear_exo_data(self, exoData):
-        """Empty all list‑type attributes in exoData."""
         attrs = [
-            "tStep", "rTorque", "rSetP", "rState",
-            "lTorque", "lSetP", "lState",
-            "lFsr", "rFsr",
-             "MinShankVel", "MaxShankVel",
-            # "MinShankAng", "MaxShankAng",
-            # "MaxFSR", "StanceTime", "SwingTime","Task", 
-            "Mark", "epochTime"
+            "tStep","rTorque","rSetP","rState",
+            "lTorque","lSetP","lState",
+            "lFsr","rFsr",
+            "MinShankVel","MaxShankVel",
+            "Mark","epochTime"
         ]
         for name in attrs:
             getattr(exoData, name).clear()

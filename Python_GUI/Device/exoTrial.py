@@ -1,10 +1,11 @@
 import asyncio
 
 import Data.DataToCsv as DataToCsv
-import Data.SaveModelData as saveModelData
+import Data.SaveModelData as saveModelData  # (unused here but keeping your import)
 
-# Options during trial. Change torque settings or end trial
-
+# -------------------------
+# (Optional) CLI menus
+# -------------------------
 
 def trialMenu():
     while True:
@@ -15,17 +16,15 @@ def trialMenu():
 |2. End Trial          |
 ------------------------"""
         )
-        option = int(input())
-        if option == 1 or option == 2:
+        try:
+            option = int(input())
+        except Exception:
+            option = 0
+        if option in (1, 2):
             return option
         print("Choose a valid option")
 
-
-# Options for updating the torque settings
-
-
 def updateTorqueMenu():
-    # Choosing yes runs both exo joints with the same settings at once. No only updates selected joint
     print("Run in Bilateral Mode? (y/n): ")
     bilateralOption = input()
     while True:
@@ -40,8 +39,11 @@ def updateTorqueMenu():
 |6. Left Ankle   |
 ------------------"""
         )
-        joint = float(input())
-        if joint >= 1 and joint <= 6:
+        try:
+            joint = float(input())
+        except Exception:
+            joint = -1
+        if 1 <= joint <= 6:
             break
         print("Choose a valid option")
     print("Enter Controller Number: ")
@@ -51,89 +53,191 @@ def updateTorqueMenu():
     print("Enter Value: ")
     value = float(input())
 
-    # check for bilateral                         Type y, Y, or hit enter to select yes for bilateral
-    if bilateralOption == "y" or bilateralOption == "Y" or bilateralOption == "":
-        isBilateral = True
-    else:
-        isBilateral = False
-
+    isBilateral = (bilateralOption in ("y", "Y", ""))
     return [isBilateral, joint, controller, parameter, value]
 
+# -------------------------
+# Helpers
+# -------------------------
 
 def lbsToKilograms(pounds):
-    convertionConstant = 0.45359237  # Constant for converting lbs->kg
-    return float(pounds) * convertionConstant
+    return float(pounds) * 0.45359237
 
+# -------------------------
+# Dual-only Trial
+# -------------------------
 
 class ExoTrial:
+    """
+    Dual-only trial controller compatible with your ScanWindow calls:
+      await trial.calibrate(deviceManager)
+      await trial.beginTrial(deviceManager)
+      await trial.beginTrialDebug(deviceManager)
+      await trial.systemUpdate(deviceManager)    # optional CLI loop
+    """
+
     def __init__(self, isKilograms, weight, isAssist):
         self.csvWriter = DataToCsv.CsvWritter()
         self.isKilograms = isKilograms
-        if not isKilograms:  # Convert from lbs->kg if weight is in lbs
-            self.weight = lbsToKilograms(weight)
-        else:
-            self.weight = weight
-        self.isAssist = isAssist
+        self.weight = weight if isKilograms else lbsToKilograms(weight)
+        self.isAssist = isAssist  # True -> assist mode, False -> resist
 
-    # -----------------------------------------------------------------------------
+    # -----------------------------------------------------------------
 
-    async def calibrate(self, deviceManager):  # sends start motor command to Exo
+    async def calibrate(self, deviceManager):
+        """
+        Dual calibration: torque (and FSR if available).
+        """
+        # Torque calibration on both
+        try:
+            resT = await deviceManager.calibrateTorque_both()
+            print("CalibrateTorque (both):", resT)
+        except AttributeError:
+            # fallback if dual helper missing
+            print("Missing calibrateTorque_both; please add it to ExoDeviceManager.")
 
-        await deviceManager.calibrateTorque()
+        # FSR calibration on both (optional but typical)
+        try:
+            resF = await deviceManager.calibrateFSRs_both()
+            print("CalibrateFSRs (both):", resF)
+        except AttributeError:
+            print("Missing calibrateFSRs_both; please add it to ExoDeviceManager.")
 
-    # -----------------------------------------------------------------------------
+    # -----------------------------------------------------------------
 
-    # Start trial and send initial torque commands
     async def beginTrial(self, deviceManager):
-        print("Starting trial...")
-        await asyncio.sleep(1)
-        await deviceManager.startExoMotors()  # Sets Exo motors to receive commands
-        print("start motors\n")
+        """
+        Start the dual trial:
+          - set mode (assist/resist)
+          - start stream
+          - motors ON
+          - send current FSR preset (optional but matches your single flow)
+        """
+        print("Starting dual trial…")
+        await asyncio.sleep(0.5)
 
-        await deviceManager.calibrateFSRs()  # Begins Exo calibration
-        print("calibrate fsr\n")
-        # Send FSR value to Exo FSR
-        await deviceManager.sendPresetFsrValues()
+        # Mode
+        try:
+            if self.isAssist:
+                await deviceManager.switchToAssist_both()
+            else:
+                await deviceManager.switchToResist_both()
+        except AttributeError:
+            print("Missing switchToAssist_both/switchToResist_both in ExoDeviceManager.")
 
-    # -----------------------------------------------------------------------------
+        # Start stream + motors
+        try:
+            await deviceManager.start_stream_both()
+        except AttributeError:
+            print("Missing start_stream_both; please add it to ExoDeviceManager.")
 
-    # Start trial and send initial torque commands
+        try:
+            # Example in Trial begin flow (before motorOn_both)
+            await deviceManager.start_motors_both()
+            await asyncio.sleep(0.05)  # tiny dwell helps some stacks
+            await deviceManager.motorOn_both()
+            print("Motors ON (both)")
+        except AttributeError:
+            print("Missing motorOn_both in ExoDeviceManager.")
+
+        # FSR preset (header 'R' + two doubles) — mirrors your single sendPresetFsrValues()
+        try:
+            left = getattr(deviceManager, "curr_left_fsr_value", 0.25)
+            right = getattr(deviceManager, "curr_right_fsr_value", 0.25)
+            await deviceManager.sendFsrPreset_both(left, right)
+            print(f"FSR preset sent to both (L={left}, R={right})")
+        except AttributeError:
+            print("sendFsrPreset_both not found; you can add it or skip FSR preset.")
+
+    # -----------------------------------------------------------------
+
     async def beginTrialDebug(self, deviceManager):
-        print("Starting trial...")
-        await asyncio.sleep(1)
-        await deviceManager.startExoMotors()  # Sets Exo motors to receive commands
-        print("start motors\n")
+        """
+        Debug variant: stream ON, motors OFF — safe to watch data.
+        """
+        print("Starting dual trial (DEBUG)…")
+        await asyncio.sleep(0.5)
+        try:
+            await deviceManager.start_stream_both()
+        except AttributeError:
+            print("Missing start_stream_both.")
+        try:
+            await deviceManager.motorOff_both()
+            print("Motors OFF (debug)")
+        except AttributeError:
+            print("Missing motorOff_both.")
 
-        await deviceManager.calibrateFSRs()  # Begins Exo calibration
-        print("calibrate fsr\n")
-        # Send FSR value to Exo FSR
-        await deviceManager.sendPresetFsrValues()
+    # -----------------------------------------------------------------
 
-        await deviceManager.motorOff()
-
-    # -----------------------------------------------------------------------------
-
-    async def systemUpdate(self, deviceManager):  # Handles Next Steps After Baseline
-
-        # Ensure to enter loop at least once
+    async def systemUpdate(self, deviceManager):
+        """
+        Optional CLI loop to update torque values during the trial.
+        GUI users can ignore this and drive updates from buttons instead.
+        """
         menuSelection = int(trialMenu())
-        while menuSelection != 2:  # Keep getting torque values until end trial
-            parameter_list = updateTorqueMenu()  # Menu for updating torque
-
-            # Send torque values to Exo
-            await deviceManager.updateTorqueValues(parameter_list)
-
-            menuSelection = int(trialMenu())  # Get trial menu for loop
+        while menuSelection != 2:
+            parameter_list = updateTorqueMenu()
+            # Send torque updates to BOTH
+            try:
+                await deviceManager.updateTorqueValues_both(parameter_list)
+            except AttributeError:
+                print("Missing updateTorqueValues_both; add it to ExoDeviceManager.")
+            menuSelection = int(trialMenu())
 
         # End trial
-        await deviceManager.motorOff()  # Turn off motors
-        await deviceManager.stopTrial()  # Tell Exo to end trial
-        deviceManager.handleDisconnect(
-            deviceManager.client)  # Disconnect from Exo
-        self.loadDataToCSV(deviceManager)  # Load data from Exo into CSV
+        await self._shutdown_and_save(deviceManager)
 
-    # -----------------------------------------------------------------------------
+    # -----------------------------------------------------------------
 
-    # Loads exo data into csv
-    def loadDataToCSV(self, deviceManager,disconnect = False):
-        self.csvWriter.writeToCsv(deviceManager._realTimeProcessor._exo_data,disconnect)
+    async def _shutdown_and_save(self, deviceManager):
+        """
+        Shared shutdown: motors off → stop trial → disconnect → CSV.
+        """
+        try:
+            await deviceManager.motorOff_both()
+        except AttributeError:
+            print("Missing motorOff_both.")
+
+        try:
+            await deviceManager.stopTrial_both()
+        except AttributeError:
+            print("Missing stopTrial_both.")
+
+        # Proactively disconnect both
+        try:
+            await deviceManager.disconnect_all()
+        except Exception as e:
+            print("disconnect_all error:", e)
+
+        # Write CSV (current RealTimeProcessor aggregate)
+        self.loadDataToCSV(deviceManager, disconnect=True)
+
+    # -----------------------------------------------------------------
+
+    def loadDataToCSV(self, deviceManager, disconnect=False):
+        # Grab per-device buffers (if you created them)
+        exo_map = deviceManager.get_all_exo_data()
+        print(f"Found {len(exo_map)} devices with data")
+        
+        for addr, exo in exo_map.items():
+            print(f"Device {addr} has {len(exo.epochTime)} data points")
+
+        if exo_map:
+            # One CSV per connected device
+            for addr, exo in exo_map.items():
+                tag = addr.replace(":", "").replace("-", "")
+                print(f"Writing CSV for device {addr} with tag {tag}")
+                self.csvWriter.writeToCsv(
+                    exo,
+                    file_tag=tag,
+                    disconnected=disconnect,
+                )
+        else:
+            # Legacy single buffer fallback
+            print("No device-specific data found, using main processor")
+            print(f"Main processor has {len(deviceManager._realTimeProcessor._exo_data.epochTime)} data points")
+            self.csvWriter.writeToCsv(
+                deviceManager._realTimeProcessor._exo_data,
+                file_tag="SINGLE",
+                disconnected=disconnect,
+            )

@@ -17,7 +17,7 @@ class ExoDeviceManager:
     def __init__(self, on_disconnect: Optional[Callable] = None):
         self._realTimeProcessor = realTimeProcessor.RealTimeProcessor()
         self.on_disconnect = on_disconnect  # Store the callback
-
+        self.processors = {} 
         self.device_addresses = []              # up to two
         self.connections = {}
         self.available_devices = {}  # List to store available devices
@@ -26,6 +26,11 @@ class ExoDeviceManager:
         self.services = None
         self.scanResults = None
         self.disconnecting_intentionally = False  # Flag for intentional disconnect
+
+        self._write_locks = {}          # used by _write()
+        self.debug_rx = False           # print ASCII from each device while bringing up
+        self.raw_queues = {}            # addr -> asyncio.Queue[bytes]
+        self.parsed_queues = {}         # optional, if you expose parsed frames later
 
         self.verbose_ascii = False
         self.verbose_writes = True
@@ -70,8 +75,8 @@ class ExoDeviceManager:
         self.device_mac_address = deviceAddress
 
     def set_deviceAddresses(self, addrs):
-        if not isinstance(addrs, (list, tuple)) or not (1 <= len(addrs) <= 2):
-            raise ValueError("set_deviceAddresses expects 1–2 addresses")
+        if not isinstance(addrs, (list, tuple)) or len(addrs) != 2:
+            raise ValueError("Dual-only: expected exactly 2 addresses")
         self.device_addresses = list(addrs)
         
     # Set the BLE client
@@ -82,6 +87,19 @@ class ExoDeviceManager:
     def set_services(self, servicesVal):
         self.services = servicesVal
 
+    def _ensure_processor(self, addr: str):
+        if addr not in self.processors:
+            self.processors[addr] = realTimeProcessor.RealTimeProcessor()
+
+    def get_all_exo_data(self):
+        """Return dict: addr -> ExoData (from each device's RealTimeProcessor)."""
+        out = {}
+        for addr, proc in self.processors.items():
+            exo = getattr(proc, "_exo_data", None)
+            if exo is not None:
+                out[addr] = exo
+        return out
+
     @staticmethod
     def _looks_like_ascii(buf: bytes) -> bool:
         # True if buffer appears to be printable ASCII (firmware chatter)
@@ -90,26 +108,108 @@ class ExoDeviceManager:
         return all(32 <= b <= 126 or b in (9, 10, 13) for b in buf)
     
     async def DataIn(self, sender: BleakGATTCharacteristic, data: bytearray, src_addr: Optional[str] = None):
-        if getattr(self, "debug_rx", False):
+        # 0) optional console visibility
+        if self.debug_rx and src_addr:
             try:
-                s = data.decode('ascii', 'ignore')
-                print(f"[{src_addr}] RX ASCII:", s)
+                s = data.decode("ascii", "ignore").strip()
+                if s:
+                    print(f"[{src_addr}] RX:", s)
             except Exception:
                 pass
-        self._realTimeProcessor.processEvent(data)
+
+        # 1) stash raw bytes per-device
+        if src_addr and src_addr in self.raw_queues:
+            q = self.raw_queues[src_addr]
+            if not q.full():
+                q.put_nowait(bytes(data))
+
+        # 2) ensure processor exists for this device
+        if src_addr:
+            self._ensure_processor(src_addr)
+        
+        # 3) always parse with the correct processor (your protocol is ASCII)
+        try:
+            proc = self.processors.get(src_addr) or self._realTimeProcessor
+            proc.processEvent(bytes(data))
+        except Exception as e:
+            if self.verbose_ascii:
+                print(f"[{src_addr}] parser error:", e)
+
         await self.MachineLearnerControl()
-    
+
+    async def capture_raw_for(self, seconds: float = 5.0):
+        """Return dict: addr -> list[bytes] captured over 'seconds'."""
+        snapshot_addrs = [a for a, c in self.connections.items() if c.get("is_connected")]
+        out = {a: [] for a in snapshot_addrs}
+        if not out:
+            return out
+
+        loop = asyncio.get_event_loop()
+        t0 = loop.time()
+        while loop.time() - t0 < seconds:
+            for addr in snapshot_addrs:
+                q = self.raw_queues.get(addr)
+                if not q:
+                    continue
+                try:
+                    pkt = await asyncio.wait_for(q.get(), timeout=0.05)
+                    out[addr].append(pkt)
+                except asyncio.TimeoutError:
+                    pass
+        return out
+
     async def _write(self, addr: str, char_uuid: str, data: bytes, response: bool = False):
         conn = self.connections.get(addr)
         if not conn or not conn.get("is_connected"):
+            print(f"[{addr}] Device not connected in _write")
             return False
         cli = conn["client"]
-        ch = self.get_char_handle(char_uuid, addr=addr)
-        lock = self._write_locks.setdefault(addr, asyncio.Lock())
-        async with lock:
-            await cli.write_gatt_char(ch, data, response)
-        return True
+        try:
+            ch = self.get_char_handle(char_uuid, addr=addr)
+            lock = self._write_locks.setdefault(addr, asyncio.Lock())
+            async with lock:
+                await cli.write_gatt_char(ch, data, response)
+            return True
+        except Exception as e:
+            print(f"[{addr}] Write error: {e}")
+            # Check if device disconnected
+            if not cli.is_connected:
+                print(f"[{addr}] Device disconnected during write")
+                conn["is_connected"] = False
+            return False
 
+    async def _fanout_results(self, char_uuid: str, data: bytes, response: bool = False):
+        """
+        Send the same command to all connected devices.
+        Returns: dict[address] -> True on success, or Exception on error.
+        """
+        results = {}
+        tasks = []
+
+        # queue tasks for all currently-connected devices
+        for addr, conn in list(self.connections.items()):
+            if conn.get("is_connected"):
+                tasks.append(asyncio.create_task(self._write(addr, char_uuid, data, response)))
+                results[addr] = None  # placeholder
+
+        if not tasks:
+            return results  # empty dict when nothing is connected
+
+        # gather results while preserving order
+        outs = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # map back to addresses in the same order we queued them
+        i = 0
+        for addr in list(results.keys()):
+            out = outs[i]
+            if isinstance(out, Exception):
+                print(f"[{addr}] fanout error:", out)
+                results[addr] = out                      # keep the exception for the UI
+            else:
+                results[addr] = (out is True) or True    # normalize success to True
+            i += 1
+
+        return results
     async def _fanout(self, char_uuid: str, data: bytes, response: bool = False):
         tasks = []
         for addr, conn in list(self.connections.items()):
@@ -118,8 +218,15 @@ class ExoDeviceManager:
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)
 
+    async def start_motors_both(self):
+        # 'E' — same as your single-device startExoMotors(), but fanned out
+        return await self._fanout_results(self.UART_TX_UUID, b"E", False)
+
     async def motorOn_both(self):  await self._fanout(self.UART_TX_UUID, b"x", True)
     async def motorOff_both(self): await self._fanout(self.UART_TX_UUID, b"w", True)
+    async def calibrateTorque_both(self):   return await self._fanout_results(self.UART_TX_UUID, b"H", False)
+    async def calibrateFSRs_both(self):     return await self._fanout_results(self.UART_TX_UUID, b"L", False)
+    async def start_stream_both(self):      await self._fanout_results(self.UART_TX_UUID, b"X", True)
 
     # Control the machine learning model based on incoming data
     async def MachineLearnerControl(self):
@@ -147,6 +254,12 @@ class ExoDeviceManager:
         if not conn or not conn.get("services"):
             raise RuntimeError(f"No services cached for {addr}")
         return conn["services"].get_service(self.UART_SERVICE_UUID).get_characteristic(char_UUID)
+
+    def _ensure_queues(self, addr: str):
+        if addr not in self.raw_queues:
+            self.raw_queues[addr] = asyncio.Queue(maxsize=2000)
+        if addr not in self.parsed_queues:
+            self.parsed_queues[addr] = asyncio.Queue(maxsize=2000)
 
     # Filter devices based on advertising data
     def filterExo(self, device: BLEDevice, adv: AdvertisementData):
@@ -259,6 +372,72 @@ class ExoDeviceManager:
 
         await self.client.write_gatt_char(char, command, True)
 
+    # In ExoDeviceManager
+    async def updateTorqueValues_both(self, parameter_list):
+        """
+        Dual-only mirror of your single-device updateTorqueValues():
+        Sends: 'f' + <double fields> to both devices, respecting your bilateral logic.
+        parameter_list = [isBilateral(bool), joint(float 1..6), controller(float), parameter(float), value(float)]
+        """
+        float_values = parameter_list
+        print(f"Updating torque values for both devices: {float_values}")
+        
+        # Check connection status first
+        connected_devices = [addr for addr, conn in self.connections.items() if conn.get("is_connected")]
+        print(f"Connected devices: {connected_devices}")
+        
+        if len(connected_devices) == 0:
+            print("No devices connected, cannot update parameters")
+            return
+        
+        # Send header 'f' to both devices with delay
+        try:
+            await self._fanout_results(self.UART_TX_UUID, b"f", False)
+            await asyncio.sleep(0.1)  # Small delay after header
+        except Exception as e:
+            print(f"Error sending header to devices: {e}")
+            return
+
+        # We must send the same *sequence* of doubles to each device.
+        # Do it per-device to preserve your joint +/- 32 logic.
+        for addr, conn in list(self.connections.items()):
+            if not conn.get("is_connected"): 
+                print(f"[{addr}] Device not connected, skipping")
+                continue
+            try:
+                ch = self.get_char_handle(self.UART_TX_UUID, addr=addr)
+                print(f"[{addr}] Sending parameter data...")
+
+                # loop the same way your single version does
+                totalLoops = 2 if float_values[0] is True else 1
+                for loopCount in range(totalLoops):
+                    for i in range(1, len(float_values)):
+                        if i == 1:
+                            joint = float_values[1]
+                            # +/- 32 when bilateral on second loop
+                            if loopCount == 1 and joint % 2 == 0:
+                                val = self.jointDictionary[joint] - 32
+                            elif loopCount == 1 and joint % 2 != 0:
+                                val = self.jointDictionary[joint] + 32
+                            else:
+                                val = self.jointDictionary[joint]
+                            fb = struct.pack("<d", val)
+                        else:
+                            fb = struct.pack("<d", float_values[i])
+                        
+                        # Send with small delay between writes
+                        await conn["client"].write_gatt_char(ch, fb, False)
+                        await asyncio.sleep(0.05)  # Small delay between parameter writes
+                        
+                print(f"[{addr}] Parameter update completed successfully")
+                await asyncio.sleep(0.1)  # Delay after each device
+                
+            except Exception as e:
+                print(f"[{addr}] updateTorqueValues_both error:", e)
+                # Check if device is still connected
+                if not conn.get("is_connected"):
+                    print(f"[{addr}] Device disconnected during parameter update")
+
     # Update torque values based on the parameters
     async def updateTorqueValues(self, parameter_list):
         totalLoops = 1
@@ -322,50 +501,84 @@ class ExoDeviceManager:
     
     # Scan for BLE devices and attempt to connect
     async def scanAndConnect(self):
-        print("Using Bleak scan...")
-        print("Scanning...")
+        raise RuntimeError("Dual-only mode: use scanAndConnectMulti()")
+        # print("Using Bleak scan...")
+        # print("Scanning...")
 
-        attempts = 4
-        for attempt in range(attempts):
-            print(f"Attempt {attempt + 1} of {attempts}")
+        # attempts = 4
+        # for attempt in range(attempts):
+        #     print(f"Attempt {attempt + 1} of {attempts}")
 
-            # Scan for devices using the filter
-            device = await BleakScanner.find_device_by_filter(self.filterExo)
+        #     # Scan for devices using the filter
+        #     device = await BleakScanner.find_device_by_filter(self.filterExo)
 
-            if device:
-                print(f"Found device: {device.name} - {device.address}")
+        #     if device:
+        #         print(f"Found device: {device.name} - {device.address}")
                 
-                # Check if the found device's address matches the specified address
-                if device.address == self.device_mac_address:
-                    print("Matching device found. Connecting...")
+        #         # Check if the found device's address matches the specified address
+        #         if device.address == self.device_mac_address:
+        #             print("Matching device found. Connecting...")
                     
-                    self.set_device(device)  # Set the device
-                    self.set_client(BleakClient(device, disconnected_callback=self.handleDisconnect))
+        #             self.set_device(device)  # Set the device
+        #             self.set_client(BleakClient(device, disconnected_callback=self.handleDisconnect))
                     
-                    # Try to connect to the Exo
-                    try:
-                        await self.client.connect()
-                        self.isConnected = True
-                        print("Is Exo connected: " + str(self.isConnected))
-                        print(self.client)
+        #             # Try to connect to the Exo
+        #             try:
+        #                 await self.client.connect()
+        #                 self.isConnected = True
+        #                 print("Is Exo connected: " + str(self.isConnected))
+        #                 print(self.client)
 
-                        # Get list of services from Exo
-                        self.set_services(self.client.services) #Get_Services Not Supported in v1.0 and beyond of bleak library, previously was [await self.client.get_services()] instead of [self.client.services].
+        #                 # Get list of services from Exo
+        #                 self.set_services(self.client.services) #Get_Services Not Supported in v1.0 and beyond of bleak library, previously was [await self.client.get_services()] instead of [self.client.services].
                         
-                        # Start incoming data stream
-                        await self.client.start_notify(self.UART_RX_UUID, self.DataIn)
-                        return True  # Successful connection
-                    except Exception as e:
-                        print(f"Failed to connect: {e}")
-                        return False  # Connection failed
-                else:
-                    print("Found device does not match the specified address.")
-            else:
-                print("No device found.")
+        #                 # Start incoming data stream
+        #                 await self.client.start_notify(self.UART_RX_UUID, self.DataIn)
+        #                 return True  # Successful connection
+        #             except Exception as e:
+        #                 print(f"Failed to connect: {e}")
+        #                 return False  # Connection failed
+        #         else:
+        #             print("Found device does not match the specified address.")
+        #     else:
+        #         print("No device found.")
 
-        print("Max attempts reached. Could not connect.")
-        return False  # Return False if all attempts fail
+        # print("Max attempts reached. Could not connect.")
+        # return False  # Return False if all attempts fail
 
+    # ---- Dual-only helpers for trial flow ----
+    async def stopTrial_both(self):
+        # 'G' = stop trial (your single-device version exists)
+        return await self._fanout_results(self.UART_TX_UUID, b"G", False)
+
+    async def switchToAssist_both(self):
+        # 'c' = assist mode
+        return await self._fanout_results(self.UART_TX_UUID, b"c", False)
+
+    async def switchToResist_both(self):
+        # 'S' = resist mode
+        return await self._fanout_results(self.UART_TX_UUID, b"S", False)
+
+    async def sendFsrPreset_both(self, left: float, right: float):
+        """
+        Mirror of your single-device sendFsrValues() but dual-only:
+        header 'R' then two doubles (left,right) to both devices.
+        """
+        # header
+        hdr = await self._fanout_results(self.UART_TX_UUID, b"R", False)
+        # payload (send twice: left then right)
+        lb = struct.pack("<d", left)
+        rb = struct.pack("<d", right)
+        payL = await self._fanout_results(self.UART_TX_UUID, lb, False)
+        payR = await self._fanout_results(self.UART_TX_UUID, rb, False)
+        return {"header": hdr, "left": payL, "right": payR}
+
+    async def sendStiffness_both(self, stiffness: float):
+        # header 'A' + <double>
+        hdr = await self._fanout_results(self.UART_TX_UUID, b"A", False)
+        pay = await self._fanout_results(self.UART_TX_UUID, struct.pack("<d", float(stiffness)), False)
+        return {"header": hdr, "payload": pay}
+    
     async def scanAndConnectMulti(self):
         if len(self.device_addresses) != 2:
             raise RuntimeError("scanAndConnectMulti requires exactly two addresses")
@@ -401,6 +614,9 @@ class ExoDeviceManager:
                     "services": services,
                     "is_connected": True,
                 }
+                self._ensure_queues(addr)
+                self._ensure_processor(addr)
+
                 connected.append(addr)
 
             return len(connected) == 2

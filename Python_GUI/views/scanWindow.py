@@ -69,7 +69,7 @@ class ScanWindow(tk.Frame):
         style.configure('TListbox', font=(self.fontstyle, 14))
 
         # Title label on top of the image
-        titleLabel = ttk.Label(self, text="OpenExo GUI V1.05", font=(self.fontstyle, 30))
+        titleLabel = ttk.Label(self, text="OpenExo GUI DUAL", font=(self.fontstyle, 30))
         titleLabel.grid(row=1, column=0, columnspan=2, pady=0, sticky="n")  # Center instructions
         
         # Initial device name display
@@ -98,6 +98,13 @@ class ScanWindow(tk.Frame):
         # Action buttons
         action_button_frame = ttk.Frame(self)
         action_button_frame.grid(row=6, column=0, columnspan=2, pady=10, sticky="n")  # Center action button frame
+
+        self.captureBtn = ttk.Button(
+            action_button_frame, text="Capture 5s",
+            command=async_handler(self.on_capture_clicked),
+            state=DISABLED
+        )
+        self.captureBtn.grid(row=0, column=6, padx=5)
 
 
         # Button to start the trial (initially disabled)
@@ -128,7 +135,7 @@ class ScanWindow(tk.Frame):
         self.saveDeviceButton = ttk.Button(action_button_frame, text="Save & Connect",
                                             command=async_handler(self.on_save_device_button_clicked),
                                             state=DISABLED)  # Initially disabled
-        self.saveDeviceButton.grid(row=0, column=3, padx=5)
+        # self.saveDeviceButton.grid(row=0, column=3, padx=5)
 
         # Configure grid weights for centering
         for i in range(8):  # Assuming there are 7 rows
@@ -143,50 +150,44 @@ class ScanWindow(tk.Frame):
         self.stop_scanning_animation()  # Stop animation on disconnect
         self.reset_elements()
 
-    # Save the selected device address to a file
     async def on_save_device_button_clicked(self):
-        """Saves the currently selected device to a file."""
-        await self.controller.deviceManager.disconnect()  # Disconnects from any devices
-        self.startScanButton.config(state=DISABLED)
-        self.connectButton.config(state=DISABLED)
-        self.saveDeviceButton.config(state=DISABLED)
-        self.loadDeviceButton.config(state=DISABLED)
-        if self.selected_device_address:
-            with open(self.SETTINGS_FILE, "w") as file:
-                file.write(self.selected_device_address)
-            print(f"Saved device: {self.selected_device_name} - {self.selected_device_address}")
-            
-        connect_message = f"Connecting to: {self.selected_device_name} {self.selected_device_address}"
-        self.deviceNameText.set(connect_message)
-        self.controller.deviceManager.set_deviceAddress(self.selected_device_address)  # Set the device address
-        self.saved_address = self.selected_device_address
-        # Attempt to connect to the device
-        success = await self.controller.deviceManager.scanAndConnect()
-        
-        if success:
-            self.startTrialButton.config(state="normal")  # Enable Start Trial button
-            self.debugButton.config(state="normal")  # Enable Start Trial button
-            self.calTorqueButton.config(state="normal")   # Enable Calibrate Torque button
-            self.connectButton.config(state=DISABLED)
-            self.saveDeviceButton.config(state=DISABLED)
-            self.loadDeviceButton.config(state=DISABLED)
-            self.deviceNameText.set(f"Connected: {self.selected_device_name} {self.selected_device_address}")
+        # ... (disable buttons, disconnect, etc.)
+        if len(self.selected_devices) == 2:
+            (_, addr1), (_, addr2) = self.selected_devices
+            os.makedirs(os.path.dirname(self.SETTINGS_FILE), exist_ok=True)
+            with open(self.SETTINGS_FILE, "w") as f:
+                f.write(addr1.strip() + "\n" + addr2.strip() + "\n")
+            self.saved_address = (addr1.strip(), addr2.strip())
+            self.deviceNameText.set(f"Saved pair:\n{addr1}\n{addr2}")
         else:
-            self.deviceNameText.set("Connection Failed, Please Restart Device")  # Update text if connection fails
-            self.reset_elements()
-        self.startScanButton.config(state="normal")
+            self.deviceNameText.set("Select exactly 2 devices to Save")
+            return
+
+        # Auto-connect after save (optional)
+        self.controller.deviceManager.set_deviceAddresses(list(self.saved_address))
+        self.deviceNameText.set(f"Connecting to saved pair…")
+        ok = await self.controller.deviceManager.scanAndConnectMulti()
+        if ok:
+            self.startTrialButton.config(state="normal")
+            self.debugButton.config(state="normal")
+            self.calTorqueButton.config(state="normal")
+            self.deviceNameText.set(f"Connected:\n{self.saved_address[0]}\n{self.saved_address[1]}")
+        else:
+            self.deviceNameText.set("Connection Failed, Please Restart Devices")
 
     def load_device_available(self):
         if os.path.exists(self.SETTINGS_FILE):
-            with open(self.SETTINGS_FILE, "r") as file:
-                self.saved_address = file.read().strip()
-                if self.saved_address:  # Check if the file is not empty
-                    self.deviceNameText.set(f"Loading saved device: {self.saved_address}")
-                    self.controller.deviceManager.set_deviceAddress(self.saved_address)
-                    self.loadDeviceButton.config(state="normal")
+            with open(self.SETTINGS_FILE, "r") as f:
+                lines = [ln.strip() for ln in f.readlines() if ln.strip()]
+            if len(lines) >= 2:
+                self.saved_address = (lines[0], lines[1])
+                self.deviceNameText.set(f"Saved pair:\n{lines[0]}\n{lines[1]}")
+                self.loadDeviceButton.config(state="normal")
+            else:
+                self.loadDeviceButton.config(state=DISABLED)
         else:
             self.loadDeviceButton.config(state=DISABLED)
-    
+
     async def on_quick_dual_test_clicked(self):
         if len(self.selected_devices) != 2:
             self.deviceNameText.set("Select exactly 2 devices for Dual Test")
@@ -248,37 +249,71 @@ class ScanWindow(tk.Frame):
             print(f"{label} [{addr}] OK")
         for addr, err in errs.items():
             print(f"{label} [{addr}] ERROR: {err}")
+    
+    async def on_capture_clicked(self):
+        dm = self.controller.deviceManager
+        if not dm.connections or not any(c.get("is_connected") for c in dm.connections.values()):
+            self.deviceNameText.set("Capture: pair not connected")
+            return
+
+        self.captureBtn.config(state=DISABLED)
+        try:
+            # optional: explicitly start stream on both before capture
+            if hasattr(dm, "start_stream_both"):
+                await dm.start_stream_both()
+
+            self.deviceNameText.set("Capture: collecting 5s of data…")
+            data = await dm.capture_raw_for(seconds=5.0)
+
+            # quick summary to UI and console
+            lines = []
+            for addr, pkts in data.items():
+                count = len(pkts)
+                preview = []
+                for p in pkts[:3]:
+                    try:
+                        preview.append(p.decode("ascii", "ignore").strip() or f"{len(p)} bytes")
+                    except Exception:
+                        preview.append(f"{len(p)} bytes")
+                print(f"[{addr}] captured {count} packets; preview: {preview}")
+                lines.append(f"{addr}: {count} pkt(s)")
+            self.deviceNameText.set("Capture done — " + " | ".join(lines))
+        except Exception as e:
+            self.deviceNameText.set(f"Capture error: {e}")
+        finally:
+            self.captureBtn.config(state="normal")
 
         
-    # Load saved device address from a file and connect to it
     async def on_load_device_button_clicked(self):
-        """Loads the saved device from a file and connects to it."""
+        if not self.saved_address or len(self.saved_address) != 2:
+            self.deviceNameText.set("No saved pair")
+            return
         self.loadDeviceButton.config(state=DISABLED)
         self.startScanButton.config(state=DISABLED)
-        self.startTrialButton.config(state=DISABLED)
-        self.debugButton.config(state=DISABLED)
-        self.calTorqueButton.config(state=DISABLED)
-        await self.controller.deviceManager.disconnect()  # Disconnects from any devices
+        await self.controller.deviceManager.disconnect_all()
         self.deviceListbox.delete(0, tk.END)
-        self.deviceNameText.set(f"Loading saved device: {self.saved_address}")
-        success = await self.controller.deviceManager.scanAndConnect()
-
-        if success:
-            self.deviceNameText.set(f"Connected: {self.selected_device_name} {self.saved_address}")
+        self.deviceNameText.set(f"Connecting to saved pair…")
+        dm = self.controller.deviceManager
+        dm.set_deviceAddresses(list(self.saved_address))
+        ok = await dm.scanAndConnectMulti()
+        if ok:
+            self.deviceNameText.set(f"Connected:\n{self.saved_address[0]}\n{self.saved_address[1]}")
             self.startTrialButton.config(state="normal")
             self.debugButton.config(state="normal")
             self.calTorqueButton.config(state="normal")
-            self.loadDeviceButton.config(state=DISABLED)
-            self.saveDeviceButton.config(state=DISABLED)
+            if hasattr(self, "captureBtn"): self.captureBtn.config(state="normal")
+            if hasattr(self, "testBothBtn"): self.testBothBtn.config(state="normal")
         else:
-            self.deviceNameText.set("Connection Failed, Please Restart Device")
+            self.deviceNameText.set("Connection Failed, Please Restart Devices")
             self.loadDeviceButton.config(state="normal")
-        
         self.startScanButton.config(state="normal")
 
     async def on_calibrate_torque_button_clicked(self):
-        """Handles the Calibrate Torque button click."""
-        await self.controller.trial.calibrate(self.controller.deviceManager)
+        self.deviceNameText.set("Calibrating torque on both devices…")
+        res = await self.controller.deviceManager.calibrateTorque_both()
+        ok = sum(1 for v in res.values() if v)
+        self.deviceNameText.set(f"Calibrate Torque: OK {ok}, ERR {len(res)-ok}")
+
 
     async def on_connect_button_clicked(self):
         self.startScanButton.config(state=DISABLED)
@@ -286,69 +321,34 @@ class ScanWindow(tk.Frame):
         self.saveDeviceButton.config(state=DISABLED)
         self.loadDeviceButton.config(state=DISABLED)
 
-        if not self.selected_devices:
-            self.deviceNameText.set("No device selected")
+        if len(self.selected_devices) != 2:
+            self.deviceNameText.set("Select exactly 2 devices")
             self.startScanButton.config(state="normal")
-            if self.saved_address is not None:
-                self.loadDeviceButton.config(state="normal")
             return
 
-        use_two = (len(self.selected_devices) == 2)
+        (name1, addr1), (name2, addr2) = self.selected_devices
+        self.deviceNameText.set(f"Connecting to: {name1} {addr1}  +  {name2} {addr2}")
 
-        if use_two:
-            (name1, addr1), (name2, addr2) = self.selected_devices
-            self.deviceNameText.set(f"Connecting to: {name1} {addr1}  +  {name2} {addr2}")
+        dm = self.controller.deviceManager
+        try:
+            dm.set_deviceAddresses([addr1, addr2])
+            ok = await dm.scanAndConnectMulti()
+        except Exception as e:
+            print("Dual connect error:", e)
+            ok = False
 
-            success = False
-            try:
-                if hasattr(self.controller.deviceManager, "set_deviceAddresses"):
-                    self.controller.deviceManager.set_deviceAddresses([addr1, addr2])
-                else:
-                    self.controller.deviceManager.set_deviceAddress(addr1)
-                    if hasattr(self.controller.deviceManager, "second_device_address"):
-                        self.controller.deviceManager.second_device_address = addr2
-
-                if hasattr(self.controller.deviceManager, "scanAndConnectMulti"):
-                    success = await self.controller.deviceManager.scanAndConnectMulti()
-                else:
-                    success = await self.controller.deviceManager.scanAndConnect()
-            except Exception as e:
-                print("Multi-connect error:", e)
-                success = False
-
-            if success:
-                self.startTrialButton.config(state="normal")
-                self.debugButton.config(state="normal")
-                self.calTorqueButton.config(state="normal")
-                # Only show both if true multi-connect occurred
-                self.deviceNameText.set(
-                    f"Connected: {name1} {addr1}" + (
-                        f"  +  {name2} {addr2}"
-                        if hasattr(self.controller.deviceManager, "scanAndConnectMulti")
-                        else ""
-                    )
-                )
-            else:
-                self.deviceNameText.set("Connection Failed, Please Restart Devices")
-                self.connectButton.config(state="normal")
-
+        if ok:
+            self.deviceNameText.set(f"Connected: {name1} {addr1}  +  {name2} {addr2}")
+            self.startTrialButton.config(state="normal")
+            self.debugButton.config(state="normal")
+            self.calTorqueButton.config(state="normal")
+            if hasattr(self, "captureBtn"): self.captureBtn.config(state="normal")
+            if hasattr(self, "testBothBtn"): self.testBothBtn.config(state="normal")
         else:
-            name, addr = self.selected_devices[0]
-            self.deviceNameText.set(f"Connecting to: {name} {addr}")
-            self.controller.deviceManager.set_deviceAddress(addr)
-            success = await self.controller.deviceManager.scanAndConnect()
-            if success:
-                self.startTrialButton.config(state="normal")
-                self.debugButton.config(state="normal")
-                self.calTorqueButton.config(state="normal")
-                self.deviceNameText.set(f"Connected: {name} {addr}")
-            else:
-                self.deviceNameText.set("Connection Failed, Please Restart Device")
-                self.connectButton.config(state="normal")
+            self.deviceNameText.set("Connection Failed, Please Restart Devices")
+            self.connectButton.config(state="normal")
 
         self.startScanButton.config(state="normal")
-        if self.saved_address is not None:
-            self.loadDeviceButton.config(state="normal")
 
     async def on_start_trial_button_clicked(self):
         """Handles the Start Trial button click."""
@@ -413,44 +413,30 @@ class ScanWindow(tk.Frame):
             self.deviceNameText.set("BlueTooth Error")
             self.startScanButton.config(state="normal")
         
-        # Handle device selection from the Listbox
-    def on_device_selected(self, event):
-        """Handles selection of one or two devices from the Listbox."""
-        indices = list(self.deviceListbox.curselection())
 
-        # Enforce max two selections
+    def on_device_selected(self, event):
+        indices = list(self.deviceListbox.curselection())
+        # Enforce exactly two
         if len(indices) > 2:
-            # Deselect extras, keep the first two picked
             for idx in indices[2:]:
                 self.deviceListbox.selection_clear(idx)
             indices = indices[:2]
 
         self.selected_devices = []
         for idx in indices:
-            item = self.deviceListbox.get(idx)
-            name, addr = self._parse_listbox_item(item)
+            name, addr = self._parse_listbox_item(self.deviceListbox.get(idx))
             if addr:
                 self.selected_devices.append((name, addr))
 
-        # Keep backward-compatible single-selection fields
-        if self.selected_devices:
-            self.selected_device_name, self.selected_device_address = self.selected_devices[0]
-        else:
-            self.selected_device_name = None
-            self.selected_device_address = None
+        # Dual-only: enable connect ONLY when exactly two
+        ready = (len(self.selected_devices) == 2)
+        self.connectButton.config(state=("normal" if ready else DISABLED))
+        self.saveDeviceButton.config(state=("normal" if ready else DISABLED))
 
-        # Enable/disable buttons
-        if self.selected_devices:
-            self.connectButton.config(state="normal")
-            self.saveDeviceButton.config(state="normal")
-        else:
-            self.connectButton.config(state=DISABLED)
-            self.saveDeviceButton.config(state=DISABLED)
-
-        # Enable Dual Test only when two are selected
+        # Dual test button (optional)
         if hasattr(self, "dualTestButton"):
-            self.dualTestButton.config(state="normal" if len(self.selected_devices) == 2 else DISABLED)
-    
+            self.dualTestButton.config(state=("normal" if ready else DISABLED))
+
     def start_scanning_animation(self):
         """Starts the scanning animation."""
         self.scanning_animation_running = True

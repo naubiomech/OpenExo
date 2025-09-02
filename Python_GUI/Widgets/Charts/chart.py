@@ -77,28 +77,44 @@ class BasePlot:
 
 class TopPlot(BasePlot):
     def __init__(self, master):
-        super().__init__(master, "Left Torque")
+        super().__init__(master, "Device 1 Data")
+        self.device_index = 0  # Which device to show (0 or 1)
+        
+    def set_device_index(self, index):
+        """Set which device to display (0 for first device, 1 for second device)"""
+        self.device_index = index
+        
+    def get_device_data(self):
+        """Get chart data from the specified device"""
+        device_manager = self.master.controller.deviceManager
+        device_addresses = list(device_manager.processors.keys())
+        
+        if len(device_addresses) > self.device_index:
+            device_addr = device_addresses[self.device_index]
+            return device_manager.processors[device_addr]._chart_data
+        else:
+            # Fallback to main processor if device not available
+            return device_manager._realTimeProcessor._chart_data
+            
     def animate(self, chartSelection):
+        chart_data = self.get_device_data()
+        device_addresses = list(self.master.controller.deviceManager.processors.keys())
+        device_name = f"Device {self.device_index + 1}"
+        if len(device_addresses) > self.device_index:
+            device_name = f"Device {device_addresses[self.device_index][-5:]}"  # Show last 5 chars of MAC
+            
         topController = None
         title = " "
         bottomLimit = -1
         topLimit = 1
         if chartSelection == "Data 0-3":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightTorque
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightState
-            )
-            title = "Data 0 and 1"
+            topController = chart_data.rightTorque
+            topMeasure = chart_data.rightState
+            title = f"{device_name} - Data 0 and 1"
         elif chartSelection == "Data 4-7":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftState
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
-            )
-            title = "Data 4 and 5"
+            topController = chart_data.leftState
+            topMeasure = chart_data.leftSet
+            title = f"{device_name} - Data 4 and 5"
             bottomLimit = 0
             topLimit = 1.1
 
@@ -116,30 +132,45 @@ class TopPlot(BasePlot):
 
 class BottomPlot(BasePlot):
     def __init__(self, master):
-        super().__init__(master, "Right Torque")
+        super().__init__(master, "Device 2 Data")
+        self.device_index = 1  # Which device to show (0 or 1)
+        
+    def set_device_index(self, index):
+        """Set which device to display (0 for first device, 1 for second device)"""
+        self.device_index = index
+        
+    def get_device_data(self):
+        """Get chart data from the specified device"""
+        device_manager = self.master.controller.deviceManager
+        device_addresses = list(device_manager.processors.keys())
+        
+        if len(device_addresses) > self.device_index:
+            device_addr = device_addresses[self.device_index]
+            return device_manager.processors[device_addr]._chart_data
+        else:
+            # Fallback to main processor if device not available
+            return device_manager._realTimeProcessor._chart_data
 
     def animate(self, chartSelection):
+        chart_data = self.get_device_data()
+        device_addresses = list(self.master.controller.deviceManager.processors.keys())
+        device_name = f"Device {self.device_index + 1}"
+        if len(device_addresses) > self.device_index:
+            device_name = f"Device {device_addresses[self.device_index][-5:]}"  # Show last 5 chars of MAC
+            
         topController = None
         bottomLimit = -1
         topLimit = 1
         if chartSelection == "Data 0-3":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightSet
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftTorque
-            )
-            title = "Data 2 and 3"
+            topController = chart_data.rightSet
+            topMeasure = chart_data.leftTorque
+            title = f"{device_name} - Data 2 and 3"
         elif chartSelection == "Data 4-7":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightFsr
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
-            )
+            topController = chart_data.rightFsr
+            topMeasure = chart_data.leftFsr
             bottomLimit = 0
             topLimit = 1.1
-            title = "Data 6 and 7"
+            title = f"{device_name} - Data 6 and 7"
 
         if topController is None or topMeasure is None:
             topController = 0

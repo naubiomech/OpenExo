@@ -125,6 +125,15 @@ class ActiveTrial(tk.Frame):
         )
         self.bottomGraphButton.pack(side = LEFT)
 
+        # Device swap button
+        self.swapDevicesButton = ttk.Button(
+            graph_button_frame,
+            text="Swap Devices",
+            command=self.swap_devices,
+            style="Custom.TButton",
+        )
+        self.swapDevicesButton.pack(side = LEFT, padx=(10,0))
+
         self.currentPlots = [self.topPlot, self.bottomPlot]
         self.plot_update_job = None  # Store the job reference
 
@@ -162,17 +171,17 @@ class ActiveTrial(tk.Frame):
         )
         updateTorqueButton.pack(side=TOP, pady=5)
 
-        BioFeedbackButton = ttk.Button(
-            button_frame,
-            text="Bio Feedback",
-            command=self.handle_BioFeedbackButton_button)
-        BioFeedbackButton.pack(side=TOP, pady=5)
+        # BioFeedbackButton = ttk.Button(
+        #     button_frame,
+        #     text="Bio Feedback",
+        #     command=self.handle_BioFeedbackButton_button)
+        # BioFeedbackButton.pack(side=TOP, pady=5)
 
-        MachineLearningButton = ttk.Button(
-            button_frame,
-            text="Machine Learning",
-            command=self.handle_MachineLearning_button)
-        MachineLearningButton.pack(side=TOP, pady=5)
+        # MachineLearningButton = ttk.Button(
+        #     button_frame,
+        #     text="Machine Learning",
+        #     command=self.handle_MachineLearning_button)
+        # MachineLearningButton.pack(side=TOP, pady=5)
         
         # Recalibrate FSRs Button
         self.recalibrateFSRButton = ttk.Button(
@@ -218,6 +227,18 @@ class ActiveTrial(tk.Frame):
     def set_graph(self, selection):
         """Set the graph display based on the button clicked."""
         self.graphVar.set(selection)
+        self.newSelection()
+        
+    def swap_devices(self):
+        """Swap which device is shown on which graph."""
+        # Swap the device indices
+        top_index = self.topPlot.device_index
+        bottom_index = self.bottomPlot.device_index
+        
+        self.topPlot.set_device_index(bottom_index)
+        self.bottomPlot.set_device_index(top_index)
+        
+        # Update the plots to reflect the change
         self.newSelection()
 
     def create_fsr_input_dialog(self):
@@ -437,9 +458,9 @@ class ActiveTrial(tk.Frame):
         
     async def ShutdownExo(self):
         # End trial
-        await self.controller.deviceManager.motorOff()  # Turn off motors
-        await self.controller.deviceManager.stopTrial()  # End trial
-        await self.controller.deviceManager.disconnect()
+        await self.controller.deviceManager.motorOff_both()  # Turn off motors
+        await self.controller.deviceManager.stopTrial_both()  # End trial
+        await self.controller.deviceManager.disconnect_all()
         # Disconnect from Exo
         self.controller.trial.loadDataToCSV(
             self.controller.deviceManager

@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.messagebox as messagebox
 from tkinter import (BOTTOM, CENTER, LEFT, RIGHT, TOP, E, N, S, StringVar, W,
                      X, Y, ttk)
 
@@ -204,8 +205,8 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         print(f"paramter: {parameterVal}")
         print(f"value: {valueVal}")
 
-        # Set Torque
-        await self.controller.deviceManager.updateTorqueValues(
+        # Set Torque for both devices
+        await self.controller.deviceManager.updateTorqueValues_both(
             [isBilateral, joint, controllerVal, parameterVal, valueVal]
         )
 
