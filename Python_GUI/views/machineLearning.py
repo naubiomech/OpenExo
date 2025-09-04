@@ -380,7 +380,11 @@ class MachineLearning(tk.Frame):
 
     # Recalibrate FSRs
     async def recalibrateFSR(self):
-        await self.controller.deviceManager.calibrateFSRs()
+        # Check if we're in dual-device mode (multiple connections)
+        if len(self.controller.deviceManager.connections) > 1:
+            await self.controller.deviceManager.calibrateFSRs_both()
+        else:
+            await self.controller.deviceManager.calibrateFSRs()
 
     # Handle End Trial Button click
     async def on_end_trial_button_clicked(self):
@@ -390,6 +394,10 @@ class MachineLearning(tk.Frame):
     async def endTrialButtonClicked(self):
         await self.ShutdownExo()
         self.controller.show_frame("ScanWindow")
+        
+        # Reset mark counter to prevent carryover to next trial
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkVal = 0
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkLabel.set("Mark: 0")
 
     # Update plots based on selection
     def update_plots(self, selection):
@@ -465,8 +473,13 @@ class MachineLearning(tk.Frame):
 
     # Shutdown the exoskeleton
     async def ShutdownExo(self):
-        await self.controller.deviceManager.motorOff()  # Turn off motors
-        await self.controller.deviceManager.stopTrial()  # End trial
+        # Check if we're in dual-device mode (multiple connections)
+        if len(self.controller.deviceManager.connections) > 1:
+            await self.controller.deviceManager.motorOff_both()  # Turn off motors for both devices
+            await self.controller.deviceManager.stopTrial_both()  # End trial for both devices
+        else:
+            await self.controller.deviceManager.motorOff()  # Turn off motors for single device
+            await self.controller.deviceManager.stopTrial()  # End trial for single device
         # Load data from Exo into CSV
         self.controller.trial.loadDataToCSV(self.controller.deviceManager)
 
@@ -478,4 +491,8 @@ class MachineLearning(tk.Frame):
         )  # Load data from Exo into CSV
         self.controller.show_frame("ScanWindow")# Navigate back to the scan page
         self.controller.frames["ScanWindow"].show()  # Call show method to reset elements
+        
+        # Reset mark counter to prevent carryover to next trial
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkVal = 0
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkLabel.set("Mark: 0")
             

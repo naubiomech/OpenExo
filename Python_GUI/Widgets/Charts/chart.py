@@ -104,19 +104,30 @@ class TopPlot(BasePlot):
             device_name = f"Device {device_addresses[self.device_index][-5:]}"  # Show last 5 chars of MAC
             
         topController = None
+        topMeasure = None
         title = " "
         bottomLimit = -1
         topLimit = 1
-        if chartSelection == "Data 0-3":
+        
+        # Show different data ranges based on selection
+        if chartSelection == "Data 0-1":
             topController = chart_data.rightTorque
             topMeasure = chart_data.rightState
             title = f"{device_name} - Data 0 and 1"
-        elif chartSelection == "Data 4-7":
+        elif chartSelection == "Data 2-3":
+            topController = chart_data.rightSet
+            topMeasure = chart_data.leftTorque
+            title = f"{device_name} - Data 2 and 3"
+        elif chartSelection == "Data 4-5":
+            # Show data 4-5 (leftState and leftSet)
             topController = chart_data.leftState
             topMeasure = chart_data.leftSet
             title = f"{device_name} - Data 4 and 5"
-            bottomLimit = 0
-            topLimit = 1.1
+        elif chartSelection == "Data 6-7":
+            # Show data 6-7 (rightFsr and leftFsr)
+            topController = chart_data.rightFsr
+            topMeasure = chart_data.leftFsr
+            title = f"{device_name} - Data 6 and 7"
 
         if topController is None or topMeasure is None:
             topController = 0
@@ -159,17 +170,29 @@ class BottomPlot(BasePlot):
             device_name = f"Device {device_addresses[self.device_index][-5:]}"  # Show last 5 chars of MAC
             
         topController = None
+        topMeasure = None
+        title = " "
         bottomLimit = -1
         topLimit = 1
-        if chartSelection == "Data 0-3":
+        
+        # Show different data ranges based on selection
+        if chartSelection == "Data 0-1":
+            topController = chart_data.rightTorque
+            topMeasure = chart_data.rightState
+            title = f"{device_name} - Data 0 and 1"
+        elif chartSelection == "Data 2-3":
             topController = chart_data.rightSet
             topMeasure = chart_data.leftTorque
             title = f"{device_name} - Data 2 and 3"
-        elif chartSelection == "Data 4-7":
+        elif chartSelection == "Data 4-5":
+            # Show data 4-5 (leftState and leftSet)
+            topController = chart_data.leftState
+            topMeasure = chart_data.leftSet
+            title = f"{device_name} - Data 4 and 5"
+        elif chartSelection == "Data 6-7":
+            # Show data 6-7 (rightFsr and leftFsr)
             topController = chart_data.rightFsr
             topMeasure = chart_data.leftFsr
-            bottomLimit = 0
-            topLimit = 1.1
             title = f"{device_name} - Data 6 and 7"
 
         if topController is None or topMeasure is None:

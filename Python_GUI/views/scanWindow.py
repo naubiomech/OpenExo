@@ -99,12 +99,7 @@ class ScanWindow(tk.Frame):
         action_button_frame = ttk.Frame(self)
         action_button_frame.grid(row=6, column=0, columnspan=2, pady=10, sticky="n")  # Center action button frame
 
-        self.captureBtn = ttk.Button(
-            action_button_frame, text="Capture 5s",
-            command=async_handler(self.on_capture_clicked),
-            state=DISABLED
-        )
-        self.captureBtn.grid(row=0, column=6, padx=5)
+        # Removed Capture 5s button
 
 
         # Button to start the trial (initially disabled)
@@ -135,7 +130,7 @@ class ScanWindow(tk.Frame):
         self.saveDeviceButton = ttk.Button(action_button_frame, text="Save & Connect",
                                             command=async_handler(self.on_save_device_button_clicked),
                                             state=DISABLED)  # Initially disabled
-        # self.saveDeviceButton.grid(row=0, column=3, padx=5)
+        self.saveDeviceButton.grid(row=0, column=4, padx=5)
 
         # Configure grid weights for centering
         for i in range(8):  # Assuming there are 7 rows
@@ -250,39 +245,7 @@ class ScanWindow(tk.Frame):
         for addr, err in errs.items():
             print(f"{label} [{addr}] ERROR: {err}")
     
-    async def on_capture_clicked(self):
-        dm = self.controller.deviceManager
-        if not dm.connections or not any(c.get("is_connected") for c in dm.connections.values()):
-            self.deviceNameText.set("Capture: pair not connected")
-            return
-
-        self.captureBtn.config(state=DISABLED)
-        try:
-            # optional: explicitly start stream on both before capture
-            if hasattr(dm, "start_stream_both"):
-                await dm.start_stream_both()
-
-            self.deviceNameText.set("Capture: collecting 5s of data…")
-            data = await dm.capture_raw_for(seconds=5.0)
-
-            # quick summary to UI and console
-            lines = []
-            for addr, pkts in data.items():
-                count = len(pkts)
-                preview = []
-                for p in pkts[:3]:
-                    try:
-                        preview.append(p.decode("ascii", "ignore").strip() or f"{len(p)} bytes")
-                    except Exception:
-                        preview.append(f"{len(p)} bytes")
-                print(f"[{addr}] captured {count} packets; preview: {preview}")
-                lines.append(f"{addr}: {count} pkt(s)")
-            self.deviceNameText.set("Capture done — " + " | ".join(lines))
-        except Exception as e:
-            self.deviceNameText.set(f"Capture error: {e}")
-        finally:
-            self.captureBtn.config(state="normal")
-
+    # Removed on_capture_clicked method
         
     async def on_load_device_button_clicked(self):
         if not self.saved_address or len(self.saved_address) != 2:
@@ -301,7 +264,7 @@ class ScanWindow(tk.Frame):
             self.startTrialButton.config(state="normal")
             self.debugButton.config(state="normal")
             self.calTorqueButton.config(state="normal")
-            if hasattr(self, "captureBtn"): self.captureBtn.config(state="normal")
+            # Removed captureBtn reference
             if hasattr(self, "testBothBtn"): self.testBothBtn.config(state="normal")
         else:
             self.deviceNameText.set("Connection Failed, Please Restart Devices")
@@ -342,7 +305,7 @@ class ScanWindow(tk.Frame):
             self.startTrialButton.config(state="normal")
             self.debugButton.config(state="normal")
             self.calTorqueButton.config(state="normal")
-            if hasattr(self, "captureBtn"): self.captureBtn.config(state="normal")
+            # Removed captureBtn reference
             if hasattr(self, "testBothBtn"): self.testBothBtn.config(state="normal")
         else:
             self.deviceNameText.set("Connection Failed, Please Restart Devices")
@@ -507,12 +470,6 @@ class ScanWindow(tk.Frame):
         active_trial_frame.pauseMotorButton()
         active_trial_frame.startClock()
 
-    def loadDeviceAvailible(self):
-        if self.saved_address is not None:
-            self.loadDeviceButton.config(state="normal")
-        else:
-            self.loadDeviceButton.config(state=DISABLED)
-        
     def reset_elements(self):
         """Resets the UI elements to their initial state."""
         self.deviceNameText.set("Not Connected")
@@ -525,7 +482,7 @@ class ScanWindow(tk.Frame):
         self.calTorqueButton.config(state=DISABLED)
         self.connectButton.config(state=DISABLED)
         self.saveDeviceButton.config(state=DISABLED)
-        self.loadDeviceAvailible()
+        self.load_device_available()
         if hasattr(self, "dualTestButton"):
             self.dualTestButton.config(state=DISABLED)
 

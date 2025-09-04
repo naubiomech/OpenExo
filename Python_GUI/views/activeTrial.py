@@ -43,7 +43,7 @@ class ActiveTrial(tk.Frame):
 
         self.var = IntVar()
         self.chartVar = StringVar()
-        self.chartVar.set("Data 0-3")
+        self.chartVar.set("Data 0-1")
         self.graphVar = StringVar()
         self.graphVar.set("Both Graphs")  # Default to "Both Graphs"
 
@@ -79,18 +79,20 @@ class ActiveTrial(tk.Frame):
         # batteryPercentLabel.pack(side=TOP, anchor=E, pady=0, padx=0)
         batteryPercentLabel.grid(row=0, column=4,padx=(0,0), pady=(10,0),sticky ="e")
 
-        # Create and place the top plot
+        # Create and place the top plot (Device 0)
         self.topPlot = TopPlot(self)
+        self.topPlot.set_device_index(0)  # Set to show device 0
         self.topPlot.canvas.get_tk_widget().grid(row=1, column=1, columnspan=5, sticky="NSEW", pady=5, padx=5)
 
-        # Create and place the bottom plot
+        # Create and place the bottom plot (Device 1)
         self.bottomPlot = BottomPlot(self)
+        self.bottomPlot.set_device_index(1)  # Set to show device 1
         self.bottomPlot.canvas.get_tk_widget().grid(row=2, column=1, columnspan=5, sticky="NSEW", pady=5, padx=5)
             
         # Chart selection button
         self.chartButton = ttk.Button(
             self,
-            text="Data 0-3",
+            text="Data 0-1",
             command=self.toggle_chart,
             style="Custom.TButton",
         )
@@ -125,14 +127,7 @@ class ActiveTrial(tk.Frame):
         )
         self.bottomGraphButton.pack(side = LEFT)
 
-        # Device swap button
-        self.swapDevicesButton = ttk.Button(
-            graph_button_frame,
-            text="Swap Devices",
-            command=self.swap_devices,
-            style="Custom.TButton",
-        )
-        self.swapDevicesButton.pack(side = LEFT, padx=(10,0))
+        # Remove swap devices button - now showing both devices simultaneously
 
         self.currentPlots = [self.topPlot, self.bottomPlot]
         self.plot_update_job = None  # Store the job reference
@@ -214,14 +209,20 @@ class ActiveTrial(tk.Frame):
             self.grid_columnconfigure(j, weight=1)
             
     def toggle_chart(self):
-        """Toggle between 'Controller' and 'Sensor' for the chart."""
+        """Cycle through all data ranges: 0-1, 2-3, 4-5, 6-7."""
         current = self.chartVar.get()
-        if current == "Data 0-3":
-            self.chartVar.set("Data 4-7")
-            self.chartButton.config(text="Data 4-7")
-        else:
-            self.chartVar.set("Data 0-3")
-            self.chartButton.config(text="Data 0-3")
+        if current == "Data 0-1":
+            self.chartVar.set("Data 2-3")
+            self.chartButton.config(text="Data 2-3")
+        elif current == "Data 2-3":
+            self.chartVar.set("Data 4-5")
+            self.chartButton.config(text="Data 4-5")
+        elif current == "Data 4-5":
+            self.chartVar.set("Data 6-7")
+            self.chartButton.config(text="Data 6-7")
+        else:  # Data 6-7
+            self.chartVar.set("Data 0-1")
+            self.chartButton.config(text="Data 0-1")
         self.newSelection()
 
     def set_graph(self, selection):
@@ -229,17 +230,7 @@ class ActiveTrial(tk.Frame):
         self.graphVar.set(selection)
         self.newSelection()
         
-    def swap_devices(self):
-        """Swap which device is shown on which graph."""
-        # Swap the device indices
-        top_index = self.topPlot.device_index
-        bottom_index = self.bottomPlot.device_index
-        
-        self.topPlot.set_device_index(bottom_index)
-        self.bottomPlot.set_device_index(top_index)
-        
-        # Update the plots to reflect the change
-        self.newSelection()
+    # Removed swap_devices method - now showing both devices simultaneously
 
     def create_fsr_input_dialog(self):
         # Create a new Toplevel window for input
@@ -290,7 +281,11 @@ class ActiveTrial(tk.Frame):
             left_value = max(0.1, min(left_value, 0.5))
             right_value = max(0.1, min(right_value, 0.5))
 
-            await self.controller.deviceManager.sendFsrValues(left_value, right_value)
+            # Check if we're in dual-device mode (multiple connections)
+            if len(self.controller.deviceManager.connections) > 1:
+                await self.controller.deviceManager.sendFsrPreset_both(left_value, right_value)
+            else:
+                await self.controller.deviceManager.sendFsrValues(left_value, right_value)
             
             dialog.destroy()
 
@@ -331,6 +326,15 @@ class ActiveTrial(tk.Frame):
         )  # Load data from Exo into CSV
         self.controller.show_frame("ScanWindow")# Navigate back to the scan page
         self.controller.frames["ScanWindow"].show()  # Call show method to reset elements
+        
+        # Reset mark counter to prevent carryover to next trial
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkVal = 0
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkLabel.set("Mark: 0")
+        
+        # Reset mark counter in all device processors for dual-device mode
+        for processor in self.controller.deviceManager.processors.values():
+            processor._exo_data.MarkVal = 0
+            processor._exo_data.MarkLabel.set("Mark: 0")
 
     def enable_interactions(self):
         try:
@@ -426,7 +430,11 @@ class ActiveTrial(tk.Frame):
 
     # Recalibrate FSRs
     async def recalibrateFSR(self):
-        await self.controller.deviceManager.calibrateFSRs()
+        # Check if we're in dual-device mode (multiple connections)
+        if len(self.controller.deviceManager.connections) > 1:
+            await self.controller.deviceManager.calibrateFSRs_both()
+        else:
+            await self.controller.deviceManager.calibrateFSRs()
 
     async def on_end_trial_button_clicked(self):
         await self.endTrialButtonClicked()
@@ -434,13 +442,21 @@ class ActiveTrial(tk.Frame):
     async def on_pause_button_clicked(self):
         if not self.paused_flag:
             # Pause the system
-            await self.controller.deviceManager.motorOff()  # Turn off motors
+            # Check if we're in dual-device mode (multiple connections)
+            if len(self.controller.deviceManager.connections) > 1:
+                await self.controller.deviceManager.motorOff_both()  # Turn off motors for both devices
+            else:
+                await self.controller.deviceManager.motorOff()  # Turn off motors for single device
             self.paused_flag = True
             # Update the label to show the "play" icon (for resuming)
             self.pauseIconLabel.config(image=self.play_icon)
         else:
             # Resume the system
-            await self.controller.deviceManager.motorOn()  # Enable motors
+            # Check if we're in dual-device mode (multiple connections)
+            if len(self.controller.deviceManager.connections) > 1:
+                await self.controller.deviceManager.motorOn_both()  # Enable motors for both devices
+            else:
+                await self.controller.deviceManager.motorOn()  # Enable motors for single device
             self.paused_flag = False
             # Update the label to show the "pause" icon (for pausing again)
             self.pauseIconLabel.config(image=self.pause_icon)
@@ -456,6 +472,15 @@ class ActiveTrial(tk.Frame):
         self.paused_flag = False
         self.pauseIconLabel.config(image=self.pause_icon)
         
+        # Reset mark counter to prevent carryover to next trial
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkVal = 0
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkLabel.set("Mark: 0")
+        
+        # Reset mark counter in all device processors for dual-device mode
+        for processor in self.controller.deviceManager.processors.values():
+            processor._exo_data.MarkVal = 0
+            processor._exo_data.MarkLabel.set("Mark: 0")
+        
     async def ShutdownExo(self):
         # End trial
         await self.controller.deviceManager.motorOff_both()  # Turn off motors
@@ -467,10 +492,17 @@ class ActiveTrial(tk.Frame):
         )  # Load data from Exo into CSV
 
     async def on_mark_button_clicked(self):
+        # Update mark value in main processor
         self.controller.deviceManager._realTimeProcessor._exo_data.MarkVal += 1
-        self.controller.deviceManager._realTimeProcessor._exo_data.MarkLabel.set(
-            "Mark: " + str(self.controller.
-                deviceManager._realTimeProcessor._exo_data.MarkVal))
+        mark_val = self.controller.deviceManager._realTimeProcessor._exo_data.MarkVal
+        
+        # Update mark value in all device processors for dual-device mode
+        for processor in self.controller.deviceManager.processors.values():
+            processor._exo_data.MarkVal = mark_val
+            processor._exo_data.MarkLabel.set("Mark: " + str(mark_val))
+        
+        # Update the main processor label
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkLabel.set("Mark: " + str(mark_val))
 
     def pauseMotorButton(self):
         self.paused_flag = True

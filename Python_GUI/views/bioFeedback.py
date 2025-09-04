@@ -192,13 +192,21 @@ class BioFeedback(tk.Frame):
     async def on_pause_button_clicked(self):
         if not self.paused_flag:
             # Pause the system
-            await self.controller.deviceManager.motorOff()  # Turn off motors
+            # Check if we're in dual-device mode (multiple connections)
+            if len(self.controller.deviceManager.connections) > 1:
+                await self.controller.deviceManager.motorOff_both()  # Turn off motors for both devices
+            else:
+                await self.controller.deviceManager.motorOff()  # Turn off motors for single device
             self.paused_flag = True
             # Update the label to show the "play" icon (for resuming)
             self.pauseIconLabel.config(image=self.play_icon)
         else:
             # Resume the system
-            await self.controller.deviceManager.startExoMotors()  # Enable motors
+            # Check if we're in dual-device mode (multiple connections)
+            if len(self.controller.deviceManager.connections) > 1:
+                await self.controller.deviceManager.motorOn_both()  # Enable motors for both devices
+            else:
+                await self.controller.deviceManager.motorOn()  # Enable motors for single device
             self.paused_flag = False
             # Update the label to show the "pause" icon (for pausing again)
             self.pauseIconLabel.config(image=self.pause_icon)
@@ -295,7 +303,11 @@ class BioFeedback(tk.Frame):
 
     # Recalibrate FSRs
     async def recalibrateFSR(self):
-        await self.controller.deviceManager.calibrateFSRs()
+        # Check if we're in dual-device mode (multiple connections)
+        if len(self.controller.deviceManager.connections) > 1:
+            await self.controller.deviceManager.calibrateFSRs_both()
+        else:
+            await self.controller.deviceManager.calibrateFSRs()
 
     def BioFeedback_on_device_disconnected(self):
         tk.messagebox.showwarning("Device Disconnected", "Please Reconnect")
@@ -305,3 +317,7 @@ class BioFeedback(tk.Frame):
         )  # Load data from Exo into CSV
         self.controller.show_frame("ScanWindow")# Navigate back to the scan page
         self.controller.frames["ScanWindow"].show()  # Call show method to reset elements
+        
+        # Reset mark counter to prevent carryover to next trial
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkVal = 0
+        self.controller.deviceManager._realTimeProcessor._exo_data.MarkLabel.set("Mark: 0")
