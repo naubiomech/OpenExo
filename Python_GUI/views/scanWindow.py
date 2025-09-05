@@ -66,7 +66,7 @@ class ScanWindow(tk.Frame):
         style.configure('TListbox', font=(self.fontstyle, 14))
 
         # Title label on top of the image
-        titleLabel = ttk.Label(self, text="OpenExo GUI V1.05", font=(self.fontstyle, 30))
+        titleLabel = ttk.Label(self, text="OpenExo GUI V1.06", font=(self.fontstyle, 30))
         titleLabel.grid(row=1, column=0, columnspan=2, pady=0, sticky="n")  # Center instructions
         
         # Initial device name display
