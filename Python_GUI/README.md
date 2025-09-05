@@ -193,8 +193,8 @@ The Biofeedback frame provides visual and auditory feedback to users during trai
 
     `self.master.controller.deviceManager._realTimeProcessor._chart_data`
 
-3. To switch between left and right leg signals, the variable updates dynamically based on the user’s selection 
-    `._chart_data.leftFsr` or `._chart_data.rightFsr`
+3. To switch between left and right leg signals, the variable updates dynamically based on the user's selection 
+    `._chart_data.data7` (leftFsr) or `._chart_data.data6` (rightFsr)
 
 ### Modifying the Signal
 

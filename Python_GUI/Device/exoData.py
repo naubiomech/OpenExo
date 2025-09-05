@@ -33,43 +33,43 @@ class ExoData:
     def addDataPoints(
         self,
         x_Time,
-        rightToque,
-        rightState,
-        rightSet,
-        leftTorque,
-        leftState,
-        leftSet,
-        rightFsr,
-        leftFsr,
-        MinSV,
-        MaxSV,
-        MinSA,
-        MaxSA,
-        maxFSR,
-        stanceTime,
-        swingTime,
+        data0,  # rightTorque
+        data1,  # rightState
+        data2,  # rightSet
+        data3,  # leftTorque
+        data4,  # leftState
+        data5,  # leftSet
+        data6,  # rightFsr
+        data7,  # leftFsr
+        data8,  # MinSV
+        data9,  # MaxSV
+        data10,  # MinSA
+        data11,  # MaxSA
+        data13,  # maxFSR
+        data14,  # stanceTime
+        data15,  # swingTime
         Task,
-        Battery, 
+        data12,  # Battery
     ):
         timestamp = int(datetime.now().timestamp())  # Current epoch time
         self.epochTime.append(timestamp)  # New list for epoch time
         self.tStep.append(x_Time)
-        self.rTorque.append(rightToque)
-        self.rSetP.append(rightSet)
-        self.rState.append(rightState)
-        self.lTorque.append(leftTorque)
-        self.lSetP.append(leftSet)
-        self.lState.append(leftState)
-        self.lFsr.append(leftFsr)
-        self.rFsr.append(rightFsr)
-        self.MinShankVel.append(MinSV)
-        self.MaxShankVel.append(MaxSV)
-        self.MinShankAng.append(MinSA)
-        self.MaxShankAng.append(MaxSA)
-        self.MaxFSR.append(maxFSR)
-        self.StanceTime.append(stanceTime)
-        self.SwingTime.append(swingTime)
+        self.rTorque.append(data0)  # rightTorque
+        self.rSetP.append(data2)  # rightSet
+        self.rState.append(data1)  # rightState
+        self.lTorque.append(data3)  # leftTorque
+        self.lSetP.append(data5)  # leftSet
+        self.lState.append(data4)  # leftState
+        self.lFsr.append(data7)  # leftFsr
+        self.rFsr.append(data6)  # rightFsr
+        self.MinShankVel.append(data8)  # MinSV
+        self.MaxShankVel.append(data9)  # MaxSV
+        self.MinShankAng.append(data10)  # MinSA
+        self.MaxShankAng.append(data11)  # MaxSA
+        self.MaxFSR.append(data13)  # maxFSR
+        self.StanceTime.append(data14)  # stanceTime
+        self.SwingTime.append(data15)  # swingTime
         self.Task.append(Task)
-        self.BatteryPercent.set("Battery: " + str(round(Battery))+"%")
+        self.BatteryPercent.set("Battery: " + str(round(data12))+"%")  # Battery
         self.Mark.append(self.MarkVal)
         
