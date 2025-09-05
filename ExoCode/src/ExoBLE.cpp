@@ -251,9 +251,10 @@ void ExoBLE::sendInitialParameterNames()
     Serial.println("first connect");
     UART_msg_t msg; // make a message  so we can properly call get_real_time_data, this msg is currently blank
     Serial.println("getting real time data");
-    UART_command_handlers::get_real_time_data(nullptr, _data, msg, _data->config);
+    UART_command_handlers::initialize_parameter_names(_data, _data->config);
     static const int num_entries = UART_command_handlers::num_entries;
     Serial.println("got param names arr");
+
     //for each entry in the param_names_arr, send the name to the GUI individually
     for (int i = 0; i < num_entries; i++)
     {

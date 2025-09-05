@@ -357,6 +357,41 @@ namespace UART_command_handlers
     
     static int num_entries = 8; // Number of data entries (parameters) that will be sent to the GUI
     static std::vector<std::string> param_names_arr; // Vector of strings to hold the names of the parameters that will be sent to the GUI
+    inline static void initialize_parameter_names(ExoData *exo_data, uint8_t *config)
+    {
+        
+        switch (config[config_defs::exo_name_idx])
+        {
+            case (uint8_t)config_defs::exo_name::bilateral_ankle:
+                num_entries = 9;
+                break;
+            case (uint8_t)config_defs::exo_name::bilateral_hip:
+                num_entries = 8;
+                break;
+            case (uint8_t)config_defs::exo_name::bilateral_elbow:
+                num_entries = 8;
+                break;
+            case (uint8_t)config_defs::exo_name::bilateral_hip_ankle:
+                num_entries = 9;
+                break;
+            case (uint8_t)config_defs::exo_name::bilateral_hip_elbow:
+                num_entries = 10;
+                break;
+            case (uint8_t)config_defs::exo_name::bilateral_ankle_elbow:
+                num_entries = 10;
+                break;
+            default:
+                num_entries = 9;
+                break;
+        }
+        /*Set the length of the msg and copy the data into a vector to be accessed by ExoBLE*/
+        for (int i = 0; i < num_entries; i++) {
+            std::string param_name = data_entries[i].name;
+            param_names_arr.push_back(param_name);
+        }
+        exo_data->parameters_initialized = true;
+    }
+
     inline static void get_real_time_data(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg, uint8_t *config)
     {
         UART_msg_t rx_msg;
@@ -624,12 +659,6 @@ namespace UART_command_handlers
             break;
         }
 
-        /*Set the length of the msg and copy the data into a vector to be accessed by ExoBLE*/
-        for (int i = 0; i < num_entries; i++) {
-            std::string param_name = data_entries[i].name;
-            param_names_arr.push_back(param_name);
-        }
-
         for (int i = 0; i < num_entries; i++)
         {
             switch(data_entries[i].type)
@@ -645,13 +674,13 @@ namespace UART_command_handlers
                     break;
             }
         }
-        
 
         #if REAL_TIME_I2C
         real_time_i2c::msg(rx_msg.data, rx_msg.len);
         #else
         handler->UART_msg(rx_msg);
         #endif
+        
 
         //Serial.print("RX_Message: ");
         //UART_msg_t_utils::print_msg(rx_msg);

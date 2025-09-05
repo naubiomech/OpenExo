@@ -152,15 +152,7 @@ void ComsMCU::update_gui()
     //Get real time data from ExoData and send to GUI
     const bool new_rt_data = real_time_i2c::poll(rt_floats);
     static float del_t_no_msg = millis();
-    /*
-    if(_data->parameter_names_received) {
-        Serial.println("Parameter names received");
-    }
-    if(!_data->parameter_names_received) {
-        Serial.println("Parameter names NOT received");
-    }
-    */
-   
+    
     if(_data->first_message)
     {
         Serial.println("Initial Send");
@@ -168,7 +160,7 @@ void ComsMCU::update_gui()
         _data->first_message = false;
     }
     
-    if (_data->parameter_names_received && (new_rt_data || rt_data::new_rt_msg))
+    if ((new_rt_data || rt_data::new_rt_msg))
     {
         Serial.println("Now hitting data..");
         del_t_no_msg = millis();
@@ -234,7 +226,7 @@ void ComsMCU::update_gui()
     static float status_context = t_helper->generate_new_context(); 
     static float del_t_status = 0;
     del_t_status += t_helper->tick(status_context);
-    if (_data->parameter_names_received && del_t_status > BLE_times::_status_msg_delay)
+    if (del_t_status > BLE_times::_status_msg_delay)
     {
         #if COMSMCU_DEBUG
             logger::println("ComsMCU::update_gui->Sending status");

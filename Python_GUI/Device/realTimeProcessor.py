@@ -30,7 +30,7 @@ class RealTimeProcessor:
         self.temp_control_param_list = []
         self._device_manager = device_manager
         self._param_timer = None
-        self._param_timeout_seconds = 0.5
+        self._param_timeout_seconds = 2
         self._param_names_received = False
         
 
@@ -75,16 +75,15 @@ class RealTimeProcessor:
                     self.controller_parameters.append(self.temp_control_param_list)
                     self.temp_control_param_list = []
                 if(data_split[1] == 'END'):
-                    
                     if hasattr(self, '_device_manager') and self._device_manager:
                         await self._device_manager.sendParamRecieved()
-
                     for controller in self.controllers:
                         print("Controller: ")
                         print(controller)
                         for parameter in self.controller_parameters:
                             print("Parameter")
                             print(parameter)
+                        
                 else:
                     #this is a controller name
                     # print("controller")

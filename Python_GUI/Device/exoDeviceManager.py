@@ -265,6 +265,8 @@ class ExoDeviceManager:
                         
                         # Start incoming data stream
                         await self.client.start_notify(self.UART_RX_UUID, self.DataIn)
+
+                        await self._realTimeProcessor._start_param_timer()
                         return True  # Successful connection
                     except Exception as e:
                         print(f"Failed to connect: {e}")
