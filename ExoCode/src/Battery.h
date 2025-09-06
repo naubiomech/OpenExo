@@ -10,7 +10,15 @@
 #define RCBATTERY_H
 
 #include "I2CHandler.h"
+#include "Config.h"
+
 #if defined(ARDUINO_ARDUINO_NANO33BLE) | defined(ARDUINO_NANO_RP2040_CONNECT)
+
+	#if BATTERY_SENSOR == 219
+		#include <Adafruit_INA219.h>
+	#elif BATTERY_SENSOR == 260
+		#include <Adafruit_INA260.h>
+	#endif
 
 /**
  * @brief Abstract class that defines the battery interface
@@ -48,7 +56,13 @@ class RCBattery: public _Battery
     public:
         void init();
         float get_parameter();
-
+		
+		#if BATTERY_SENSOR == 219
+			Adafruit_INA219 ina219;
+		#elif BATTERY_SENSOR == 260
+			Adafruit_INA260 ina260 = Adafruit_INA260();
+		#endif
+		
     private:
         uint8_t data[i2c_cmds::rc::get_battery_voltage::len];
         const int BusLSB = 4; 

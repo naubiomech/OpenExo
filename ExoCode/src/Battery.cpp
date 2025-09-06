@@ -2,6 +2,7 @@
 #include "Arduino.h"
 #include <Wire.h>
 #include "Logger.h"
+
 #if defined(ARDUINO_ARDUINO_NANO33BLE) | defined(ARDUINO_NANO_RP2040_CONNECT)
 
 #define BATTERY_DEBUG 0
@@ -23,6 +24,21 @@ float SmartBattery::get_parameter()
 
 void RCBattery::init() 
 {
+	#if BATTERY_SENSOR == 219
+		if (!ina219.begin()) {
+			Serial.println("Failed to find INA219 chip");
+			while (1) { delay(10); }
+		}
+	#elif BATTERY_SENSOR == 260
+		if (!ina260.begin()) {
+				Serial.println("Couldn't find INA260 chip");
+				while (1);
+			}
+	#else
+
+	#endif
+	return;
+	
     #if REAL_TIME_I2C
     return;
     #endif
@@ -37,6 +53,14 @@ void RCBattery::init()
 }
 float RCBattery::get_parameter()
 {
+	#if BATTERY_SENSOR == 219
+		return ina219.getBusVoltage_V();
+	#elif BATTERY_SENSOR == 260
+		return ina260.readBusVoltage();
+	#else
+		return 0;
+	#endif
+	
     #if REAL_TIME_I2C
     return 0;
     #endif

@@ -29,7 +29,6 @@ ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
         _battery = new RCBattery();
         break;
     }
-
     _battery->init();
     _exo_ble = new ExoBLE();
     _exo_ble->setup();
@@ -92,13 +91,15 @@ void ComsMCU::local_sample()
     static const float context = t_helper->generate_new_context();
     static float del_t = 0;
     del_t += t_helper->tick(context);
-
+	
     if (del_t > (BLE_times::_status_msg_delay/2)) 
     {
-        static float filtered_value = _battery->get_parameter();
+        float filtered_value = _battery->get_parameter();
         float raw_battery_value = _battery->get_parameter();
         filtered_value = utils::ewma(raw_battery_value, filtered_value, k_battery_ewma_alpha);
         _data->battery_value = filtered_value;
+		Serial.print("\n_data->battery_value: ");
+		Serial.print(_data->battery_value);
         del_t = 0;
     }
 
@@ -230,7 +231,6 @@ void ComsMCU::update_gui()
         batt_msg.expecting = ble_command_helpers::get_length_for_command(batt_msg.command);
         batt_msg.data[0] = _data->battery_value;
         _exo_ble->send_message(batt_msg);
-
         del_t_status = 0;
 
         #if COMSMCU_DEBUG
