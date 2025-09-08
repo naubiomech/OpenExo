@@ -34,7 +34,7 @@ class ExoBLE
          * 
          * @param data A reference to the ExoData object
          */
-        ExoBLE();
+         ExoBLE(ExoData* data, uint8_t* config_to_send);
         
         /**
          * @brief Sets GATT DB, device name, and begins advertising. 
@@ -74,10 +74,14 @@ class ExoBLE
         void send_error(int error_code, int joint_id);
 
     private:
-
         //BLE connection state
         int _connected = 0;
+
+        // Testing
         
+        ExoData* _data;
+        uint8_t* _config_to_send;
+
         //The Gatt database which defines the services and characteristics
         GattDb _gatt_db = GattDb();
 

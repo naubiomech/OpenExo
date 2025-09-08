@@ -24,6 +24,7 @@ class RealTimeProcessor:
     def processEvent(self, event):
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
+
         if "c" in dataUnpacked:  # 'c' acts as a delimiter for data
             data_split = dataUnpacked.split(
                 "c"
@@ -150,7 +151,7 @@ class RealTimeProcessor:
             data12  # battery
         )
         
-
+    
     def processMessage(
         self, command, payload, dataLength
     ):  # Process message based on command. Only handles general data although other data is comming through

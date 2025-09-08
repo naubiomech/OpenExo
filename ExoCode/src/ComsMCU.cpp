@@ -31,7 +31,7 @@ ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
     }
 
     _battery->init();
-    _exo_ble = new ExoBLE();
+    _exo_ble = new ExoBLE(data, config_to_send);
     _exo_ble->setup();
 
     uint8_t rt_data_len = 0;
@@ -214,6 +214,7 @@ void ComsMCU::update_gui()
         }
     }
 
+    /*
     //Periodically send status information
     static float status_context = t_helper->generate_new_context(); 
     static float del_t_status = 0;
@@ -241,6 +242,7 @@ void ComsMCU::update_gui()
     #if COMSMCU_DEBUG
         logger::println("ComsMCU::update_gui->End");
     #endif
+    */
 }
 
 void ComsMCU::handle_errors()

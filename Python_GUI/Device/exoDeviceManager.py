@@ -92,6 +92,14 @@ class ExoDeviceManager:
                         await self.sendStiffness(0)
                     else:
                         await self.sendStiffness(0.5)
+    # Add this helper method:
+    def get_char_handle_device_info(self, char_UUID): # Elliott
+        return self.services.get_service("e0271458-8c6a-11ed-a1eb-0242ac120002").get_characteristic(char_UUID)
+
+    async def test_char(self): # Elliott
+        test_char = self.get_char_handle_device_info("e0271462-8c6a-11ed-a1eb-0242ac120002")
+        test_value = await self.client.read_gatt_char(test_char)
+        print(f"Test char value: {test_value}")
 
     # Get characteristic handle by UUID
     def get_char_handle(self, char_UUID):
@@ -262,7 +270,7 @@ class ExoDeviceManager:
 
                         # Get list of services from Exo
                         self.set_services(self.client.services) #Get_Services Not Supported in v1.0 and beyond of bleak library, previously was [await self.client.get_services()] instead of [self.client.services].
-                        
+                        await self.test_char()
                         # Start incoming data stream
                         await self.client.start_notify(self.UART_RX_UUID, self.DataIn)
                         return True  # Successful connection

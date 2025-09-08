@@ -10,9 +10,10 @@
 
 #define EXOBLE_DEBUG 0
 
-ExoBLE::ExoBLE()
+ExoBLE::ExoBLE(ExoData* data, uint8_t* config_to_send)
 {
-    ;
+    _data = data;
+    _config_to_send = config_to_send;  // Fix: was assigning to parameter instead of member
 }
 
 bool ExoBLE::setup()
@@ -69,10 +70,30 @@ bool ExoBLE::setup()
     BLE.setLocalName(k_name_pointer);
     BLE.setDeviceName(k_name_pointer);
 
+    // Initialize Parameter names
+    UART_command_handlers::initialize_plotting_parameters(nullptr, _data, UART_msg_t{}, _data->config);
+
+    static const int num_entries = UART_command_handlers::num_entries;
+
+    std::string all_param_names = "";
+    for (int i = 0; i < num_entries; i++)
+    {
+        std::string param_name = UART_command_handlers::param_names_arr[i];
+        all_param_names += param_name;
+        if (i < num_entries - 1)  // Add separator except for last item
+        {
+            all_param_names += ",";  // or "\n" for newlines
+        }
+    }
+
+    const char *test_char = all_param_names.c_str();
+
     //Initialize GATT DB
     _gatt_db.FirmwareChar.writeValue(firmware_char);
     _gatt_db.PCBChar.writeValue(pcb_char);
     _gatt_db.DeviceChar.writeValue(device_char);
+    _gatt_db.TestChar.writeValue(test_char); // TEST ELLIOTT
+
     send_error(0, 0);
 
     //Configure services and advertising data
@@ -86,6 +107,8 @@ bool ExoBLE::setup()
     _gatt_db.UARTServiceDeviceInfo.addCharacteristic(_gatt_db.PCBChar);
     _gatt_db.UARTServiceDeviceInfo.addCharacteristic(_gatt_db.FirmwareChar);
     _gatt_db.UARTServiceDeviceInfo.addCharacteristic(_gatt_db.DeviceChar);
+    _gatt_db.UARTServiceDeviceInfo.addCharacteristic(_gatt_db.TestChar); // TEST ELLIOTT
+
 
     //Error Char
     _gatt_db.ErrorService.addCharacteristic(_gatt_db.ErrorChar);

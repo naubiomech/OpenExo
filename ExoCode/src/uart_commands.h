@@ -327,6 +327,38 @@ namespace UART_command_handlers
     {
     }
 
+    static int num_entries = 8; // Number of data entries (parameters) that will be sent to the GUI
+    static std::vector<std::string> param_names_arr; // Vector of strings to hold the names of the parameters that will be sent to the GUI
+
+    inline static void initialize_plotting_parameters(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg, uint8_t *config)
+    {
+        const char *data_names[] = {
+            "exo_data->right_side.hip.controller.filtered_torque_reading",
+            "exo_data->right_side.hip.controller.ff_setpoint",
+            "exo_data->left_side.hip.controller.filtered_torque_reading",
+            "exo_data->left_side.hip.controller.ff_setpoint",
+            "exo_data->right_side.percent_gait",
+            "exo_data->right_side.toe_fsr",
+            "exo_data->left_side.percent_gait",
+            "exo_data->left_side.toe_fsr",
+            "exo_data->right_side.heel_fsr",
+            "exo_data->left_side.heel_fsr",
+        };
+        
+        switch (config[config_defs::exo_name_idx])
+        {
+        case (uint8_t)config_defs::exo_name::bilateral_hip:
+
+            for (int i = 0; i < num_entries; i++) {
+                std::string param_name = data_names[i];
+                param_names_arr.push_back(param_name);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
     inline static void get_real_time_data(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg, uint8_t *config)
     {
         UART_msg_t rx_msg;

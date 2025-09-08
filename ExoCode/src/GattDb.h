@@ -31,6 +31,7 @@ class GattDb
         BLECharacteristic PCBChar{"e0271459-8c6a-11ed-a1eb-0242ac120002", BLERead, BUFFER_SIZE, BUFFERS_FIXED_LENGTH};      //Characteristic for pcb
         BLECharacteristic FirmwareChar{"e0271460-8c6a-11ed-a1eb-0242ac120002", BLERead, BUFFER_SIZE, BUFFERS_FIXED_LENGTH}; //Characteristic for firmware
         BLECharacteristic DeviceChar{"e0271461-8c6a-11ed-a1eb-0242ac120002", BLERead, BUFFER_SIZE, BUFFERS_FIXED_LENGTH};   //Characteristic for device
+        BLECharacteristic TestChar{"e0271462-8c6a-11ed-a1eb-0242ac120002", BLERead, BUFFER_SIZE, BUFFERS_FIXED_LENGTH};   //Characteristic for device
 
         //Service and CHaracteristics for error reporting
         BLEService ErrorService{"33b65d42-611c-11ed-9b6a-0242ac120002"};                                                                //Service for error reporting
