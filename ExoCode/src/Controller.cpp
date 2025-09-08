@@ -11,9 +11,10 @@
 #include <math.h>
 #include <random>
 #include <cmath>
-#include <Adafruit_INA260.h>
-
-Adafruit_INA260 ina260 = Adafruit_INA260();
+//#include <Adafruit_INA260.h>
+//#include <Adafruit_INA219.h>
+//Adafruit_INA260 ina260 = Adafruit_INA260();
+//Adafruit_INA219 ina219;
 
 _Controller::_Controller(config_defs::joint_id id, ExoData* exo_data)
 {
@@ -2359,18 +2360,18 @@ float SPV2::calc_motor_cmd()
 		uint16_t exo_status = _data->get_status();
 		bool active_trial = (exo_status == status_defs::messages::trial_on) || (exo_status == status_defs::messages::fsr_calibration) || (exo_status == status_defs::messages::fsr_refinement);
 		
-		if (!_controller_data->ps_connected) {
-			if (!ina260.begin()) {
-				Serial.println("Couldn't find INA260 chip");
-				while (1);
-			}
-			else {
-				_controller_data->ps_connected = true;
-			}
-		}
+		// if (!_controller_data->ps_connected) {
+			// if (!ina260.begin()) {
+				// Serial.println("Couldn't find INA260 chip");
+				// while (1);
+			// }
+			// else {
+				// _controller_data->ps_connected = true;
+			// }
+		// }
 		
 		// Serial.print("  |  Power: ");
-		_controller_data->SPV2_current_pwr = ina260.readPower();
+		//_controller_data->SPV2_current_pwr = ina260.readPower();
 		_controller_data->SPV2_filtered_pwr = utils::ewma(_controller_data->SPV2_current_pwr, _controller_data->SPV2_filtered_pwr, 0.05);//0.05 returns a profile that matches the average Maxon motor current
 		//Serial.print(ina260.readPower());
 		// Serial.print(_controller_data->SPV2_current_pwr);
@@ -2381,10 +2382,11 @@ float SPV2::calc_motor_cmd()
 		
 		long millis_time = millis();
 		if (millis_time-_controller_data->SPV2_current_voltage_timer > 10000) {
-			_controller_data->SPV2_current_voltage = ina260.readBusVoltage();
+			//_controller_data->SPV2_current_voltage = ina260.readBusVoltage();
 			_controller_data->SPV2_current_voltage_timer = millis_time;
 		}
-		
+		//Serial.print("\n*********Teensy received battery voltage: ");
+		//Serial.print(ina219.getBusVoltage_V());
 		//Calculate system power usage during 30 seconds
 		uint8_t calc_pwr_30 = _controller_data->parameters[controller_defs::spv2::spring_stiffness_adj_factor];
 		if (calc_pwr_30 == 0) {
