@@ -396,6 +396,9 @@ class ControllerData {
 		float SPV2_stiffness_torque1 = 0;
 		float SPV2_stiffness_torque2 = 0;
 		float SPV2_ls_val = 0;
+		
+		//SPV2 Main motor off indicator
+		int16_t SPV2_motor_off = 20;
 
         //Variables for the PHMC Controller
         float fs;

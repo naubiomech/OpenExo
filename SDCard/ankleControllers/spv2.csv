@@ -1,11 +1,11 @@
-5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,,,,,,,,,,,
-17,"parameter number, the number of parameters to read per line",,,,,,,,,,,,,,,
-,Parameter list for the PJMC (proportional joint moment controller),,,,,,,,,,,,,,,
-,Parameter order : ,,,,,,,,,,,,,,,
-Plantar Scaling [Nm],Dorsi Scaling [Nm],Timing Theshold [%GRF],Spring Stiffness [Nm / %Plantar Extension],Neutral Angle [%Plantar Extension],Damping [Nm*s/%Angle],Propulsive Gain [Nm / (%Plantar Flexed Angular Velocity)],p gain,d gain,Turn on setpoint adjuster,step_response_mode,i gain,Do use servo,FSR servo threshold,Servo origin,Servo terminal,Maxon offline num of iterations
-0,0,5,0,10,0,0,20,15,0,0,13,0,20,32,26,5
-2,0,20,0,10,0,2,15,80,0,0,0,1,20,12,0,5
-8,2,20,10,10,0,2,15,80,0,0,0,1,20,12,0,5
-16,3,20,40,10,0,2,15,80,0,0,0,1,20,12,0,5
-24,3,20,60,10,0,2,15,80,0,0,0,1,20,12,0,5
-30,3,20,60,10,0,2,15,80,0,0,0,1,20,12,0,5
+5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,,,,,,,,,,,,,,,,
+22,"parameter number, the number of parameters to read per line",,,,,,,,,,,,,,,,,,,,
+,Parameter list for the PJMC (proportional joint moment controller),,,,,,,,,,,,,,,,,,,,
+,Parameter order : ,,,,,,,,,,,,,,,,,,,,
+Plantar Scaling [Nm],Dorsi Scaling [Nm],Timing Threshold [%GRF],Spring Stiffness Adjustment Factor [Degrees],Neutral Angle [Degrees],Stiffness servo bound_l (Degrees),Stiffness servo bound_u (Degrees),p gain,d gain,Turn on setpoint adjuster,Do update stiffness,i gain,Do use servo,FSR servo threshold,Pawl servo home,Pawl servo target,Motor current Calc window [Steps],TREC Spring,TREC Damper,TREC Propulsive,Do turn on the scanner,Do use stiffness control
+0,0,5,5,130,42,130,0,0,0,0,0,0,35,40,60,1,30,0,4,0,0
+2,0,10,5,98,20,120,15,80,0,0,0,1,35,13,3,1,314,0,0,0,0
+8,2,10,5,124,20,120,15,80,0,0,0,1,20,32,26,1,377,0,35,0,0
+16,3,10,5,90,60,120,15,80,0,0,0,1,20,32,26,1,80,0,0,0,0
+24,3,10,5,90,60,120,15,80,0,0,0,1,20,32,26,1,0,0,0,0,0
+30,3,10,5,90,60,120,15,80,0,0,0,1,20,32,26,1,0,0,0,0,0
