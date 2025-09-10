@@ -20,10 +20,30 @@ class RealTimeProcessor:
         self.x_time = 0
         self._predictor= MLModel.MLModel() #create the machine learning model object
         
+        # Packet size tracking for DLE detection
+        self._packet_sizes = []
+        self._max_packet_size = 0
+        self._packet_count = 0
+        
 
     def processEvent(self, event):
+        # Track packet size for DLE detection
+        packet_size = len(event)
+        self._packet_sizes.append(packet_size)
+        self._max_packet_size = max(self._max_packet_size, packet_size)
+        self._packet_count += 1
+        
+        # Print packet size info every 10 packets
+        if self._packet_count % 10 == 0:
+            print(f"BLE Packet Analysis: Count={self._packet_count}, Max Size={self._max_packet_size} bytes, Avg Size={sum(self._packet_sizes)/len(self._packet_sizes):.1f} bytes")
+            if self._max_packet_size > 20:
+                print("  ✅ DLE appears ENABLED (packets > 20 bytes)")
+            else:
+                print("  ❌ DLE appears DISABLED (packets ≤ 20 bytes)")
+        
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
+        # print(f"DEBUG: Raw BLE data received: {dataUnpacked}")  # Commented out for cleaner output
         if "c" in dataUnpacked:  # 'c' acts as a delimiter for data
             data_split = dataUnpacked.split(
                 "c"
@@ -96,14 +116,13 @@ class RealTimeProcessor:
         data5 = payload[5] if len(payload) > 5 else 0  # leftSet
         data6 = payload[6] if datalength >= 7 and len(payload) > 6 else 0  # rightFsr
         data7 = payload[7] if datalength >= 8 and len(payload) > 7 else 0  # leftFsr
-        data8 = payload[8] if datalength >= 9 and len(payload) > 8 else 0  # minSV
-        data9 = payload[9] if datalength >= 10 and len(payload) > 9 else 0  # maxSV
-        data10 = payload[10] if datalength >= 11 and len(payload) > 10 else 0  # minSA
-        data11 = payload[11] if datalength >= 12 and len(payload) > 11 else 0  # maxSA
-        data12 = payload[12] if datalength >= 13 and len(payload) > 12 else 0  # battery
-        data13 = payload[13] if datalength >= 14 and len(payload) > 13 else 0  # maxFSR
-        data14 = payload[14] if datalength >= 15 and len(payload) > 14 else 0  # stancetime
-        data15 = payload[15] if datalength >= 16 and len(payload) > 15 else 0  # swingtime
+        data8 = payload[8] if datalength >= 9 and len(payload) > 8 else 0  # rightHeelFsr
+        data9 = payload[9] if datalength >= 10 and len(payload) > 9 else 0  # leftHeelFsr
+        data10 = payload[10] if datalength >= 11 and len(payload) > 10 else 0  # rightMotorCurrent
+        data11 = payload[11] if datalength >= 12 and len(payload) > 11 else 0  # leftMotorCurrent
+
+        # DEBUG: Print 12 data points
+        print(f"12 Data Points: [0]{data0:.1f} [1]{data1:.1f} [2]{data2:.1f} [3]{data3:.1f} [4]{data4:.1f} [5]{data5:.1f} [6]{data6:.1f} [7]{data7:.1f} [8]{data8:.1f} [9]{data9:.1f} [10]{data10:.1f} [11]{data11:.1f}")
 
         self._chart_data.updateValues(
             data0,  # rightTorque
@@ -114,18 +133,18 @@ class RealTimeProcessor:
             data5,  # leftSet
             data6,  # rightFsr
             data7,  # leftFsr
-            data8,  # minSV
-            data9,  # maxSV
-            data10,  # minSA
-            data11,  # maxSA
-            data12,  # battery
-            data13,  # maxFSR
-            data14,  # stancetime
-            data15,  # swingtime
+            data8,  # rightHeelFsr
+            data9,  # leftHeelFsr
+            data10,  # rightMotorCurrent
+            data11,  # leftMotorCurrent
+            0,      # placeholder
+            0,      # placeholder
+            0,      # placeholder
+            0,      # placeholder
         )
-        self._predictor.addDataPoints([data8, data9, data10, data11, data13, data14, data15, self._predictor.state]) #add data to model, if recording data
+        self._predictor.addDataPoints([data8, data9, data10, data11, 0, 0, 0, self._predictor.state]) #add data to model, if recording data
         
-        self._predictor.predictModel([data8, data9, data10, data11, data13, data14, data15]) #predict results from model
+        self._predictor.predictModel([data8, data9, data10, data11, 0, 0, 0]) #predict results from model
 
 
         self._exo_data.addDataPoints(
@@ -139,21 +158,22 @@ class RealTimeProcessor:
             data6,  # rightFsr
             data7,  # leftFsr
             #store features
-            data8,  # minSV
-            data9,  # maxSV
-            data10,  # minSA
-            data11,  # maxSA
-            data13,  # maxFSR
-            data14,  # stancetime
-            data15,  # swingtime
+            data8,  # rightHeelFsr
+            data9,  # leftHeelFsr
+            data10,  # rightMotorCurrent
+            data11,  # leftMotorCurrent
+            0,      # placeholder
             self._predictor.prediction, #store prediction
-            data12  # battery
+            0,      # battery placeholder
+            "Task", # Task placeholder
+            0       # data12 placeholder
         )
         
 
     def processMessage(
         self, command, payload, dataLength
     ):  # Process message based on command. Only handles general data although other data is comming through
+        # print(f"DEBUG: Processing command '{command}' with {dataLength} data points")  # Commented out for cleaner output
         if command == "?":  # General command
             self.processGeneralData(payload, dataLength)
 
@@ -164,6 +184,22 @@ class RealTimeProcessor:
         self._num_count = 0
         self._payload.clear()
         self._buffer.clear()
+
+    def getPacketSizeStats(self):
+        """Get packet size statistics for DLE detection"""
+        if not self._packet_sizes:
+            return "No packets received yet"
+        
+        avg_size = sum(self._packet_sizes) / len(self._packet_sizes)
+        dle_status = "ENABLED" if self._max_packet_size > 20 else "DISABLED"
+        
+        return {
+            "packet_count": self._packet_count,
+            "max_packet_size": self._max_packet_size,
+            "avg_packet_size": avg_size,
+            "dle_status": dle_status,
+            "all_sizes": self._packet_sizes.copy()
+        }
 
     def UnkownDataCommand(self):
         return "Unkown Command!"
