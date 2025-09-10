@@ -367,6 +367,10 @@ namespace UART_command_handlers
             rx_msg.data[5] = exo_data->left_side.ankle.controller.ff_setpoint; 
             rx_msg.data[6] = exo_data->right_side.toe_fsr; 
             rx_msg.data[7] = exo_data->left_side.toe_fsr;
+            rx_msg.data[8] = 0;  // Placeholder
+            rx_msg.data[9] = 0;  // Placeholder
+            rx_msg.data[10] = 0;  // Placeholder
+            rx_msg.data[11] = 0;   // Placeholder
 			break;
 
         case (uint8_t)config_defs::exo_name::bilateral_hip:
@@ -381,6 +385,8 @@ namespace UART_command_handlers
             rx_msg.data[7] = exo_data->left_side.toe_fsr;
             rx_msg.data[8] = exo_data->right_side.heel_fsr;
             rx_msg.data[9] = exo_data->left_side.heel_fsr;
+            rx_msg.data[10] = 0;  // Placeholder
+            rx_msg.data[11] = 0;   // Placeholder
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_elbow:
@@ -393,6 +399,10 @@ namespace UART_command_handlers
             rx_msg.data[5] = exo_data->right_side.elbow.controller.ExtenseSense;
             rx_msg.data[6] = exo_data->left_side.elbow.controller.FlexSense;
             rx_msg.data[7] = exo_data->left_side.elbow.controller.ExtenseSense;
+            rx_msg.data[8] = 0;  // placeholder
+            rx_msg.data[9] = 0;  // placeholder
+            rx_msg.data[10] = 0;  // Placeholder
+            rx_msg.data[11] = 0;   // Placeholder
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_hip_ankle:
@@ -407,6 +417,8 @@ namespace UART_command_handlers
             rx_msg.data[7] = exo_data->left_side.percent_gait / 100;
             rx_msg.data[8] = exo_data->right_side.toe_fsr;
             rx_msg.data[9] = exo_data->left_side.toe_fsr;
+            rx_msg.data[10] = 0;  // Placeholder
+            rx_msg.data[11] = 0;   // Placeholder
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_hip_elbow:
@@ -421,6 +433,8 @@ namespace UART_command_handlers
             rx_msg.data[7] = exo_data->left_side.percent_gait / 100;
             rx_msg.data[8] = exo_data->right_side.elbow.controller.FlexSense;
             rx_msg.data[9] = exo_data->left_side.elbow.controller.FlexSense;
+            rx_msg.data[10] = 0;  // TEST VALUE
+            rx_msg.data[11] = 0;   // TEST VALUE
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_ankle_elbow:
@@ -435,6 +449,8 @@ namespace UART_command_handlers
             rx_msg.data[7] = exo_data->left_side.elbow.controller.filtered_setpoint;
             rx_msg.data[8] = exo_data->right_side.toe_fsr;
             rx_msg.data[9] = exo_data->left_side.toe_fsr;
+            rx_msg.data[10] = 0;  // TEST VALUE
+            rx_msg.data[11] = 0;   // TEST VALUE
             break;
 
         default:
@@ -449,6 +465,8 @@ namespace UART_command_handlers
             rx_msg.data[7] = exo_data->left_side.toe_fsr;                                               //Second Tab - Bottom Orange Line
             rx_msg.data[8] = exo_data->right_side.heel_fsr;                                             //Not Plotted, Saved
             rx_msg.data[9] = exo_data->left_side.heel_fsr;                                              //Not Plotted, Saved
+            rx_msg.data[10] = 0;                                                                    //TEST VALUE: Right ankle motor current
+            rx_msg.data[11] = 0;                                                                     //TEST VALUE: Left ankle motor current
             break;
         }
 
