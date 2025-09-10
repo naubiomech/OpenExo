@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <utility>  //std::pair
 #include <queue>    //std::queue
+#include <string>   //std::string
 
 #if defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)
 #include "Board.h"
@@ -305,6 +306,14 @@ namespace utils
      * @return false 
      */
     bool is_outside_range(float val, float min, float max);
+
+    /**
+     * @brief create a 8 char string that abbreviates a plotting parameter name
+     * 
+     * @param input std::string full parameter name
+     * @return std::string abbreviated parameter name
+     */
+    std::string trim_controller_name(const std::string& input) 
 	
 	/**
      * @brief Attach the servos

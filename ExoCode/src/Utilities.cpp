@@ -380,6 +380,35 @@ namespace utils
     {
         return (val < min || val > max);
     }
+
+    std::string trim_controller_name(const std::string& input) {
+        std::string newstr = "";
+        int numDots = 0;
+        size_t pos = input.find('>');
+        if (pos != std::string::npos && pos + 1 < input.size()) {
+            // Return the substring starting after the '>' character
+            newstr =  input.substr(pos + 1);
+        }
+        
+        //find how many '.' there are in the string
+        for(int i = 0; i < newstr.length(); i++) {
+            if(newstr[i] == '.') {
+                numDots++;
+            }
+        }
+
+        //create trimmed string based using numDots to tell us what info it holds
+        if(numDots == 1) // we have a side but not joint or controller (eg. right_side.toe_fsr)
+        {
+            newstr = newstr.substr(0, 1) /*side abbrev*/ + "0" /*no joint delimiter*/ + newstr.substr(newstr.find(".") + 1, 6); /*control param abbrev*/
+        }
+        else if(numDots == 3) // we have side, joint, controller parameter to abbreviate (eg. left_side.hip.step.ff_setpoint)
+        {
+            newstr.substr(0, 1) /*side abbrev*/ + newstr.substr(newstr.find(".") + 1, 1) /*joint abbrev*/ + newstr.substr(newstr.find(".", newstr.find(".") + 1) + 1, 6); /*control param abbrev*/
+        }
+
+        return newstr;
+    }
 	
 	#if defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)
 	void init_servos() {
