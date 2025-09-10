@@ -27,7 +27,6 @@ class ActiveTrial(tk.Frame):
         self.timer_label = None  # Label for displaying the time
         self.timer_job = None  # Store the timer update job reference
         self.paused_flag = False
-        self.update_dropdown_values()
 
         # Load pause and play icons
         pause_img = Image.open("Resources/Images/pause.png").convert("RGBA")
@@ -347,6 +346,9 @@ class ActiveTrial(tk.Frame):
         # Disable buttons and dropdown until process complete
         self.disable_interactions()
 
+        # Start plotting
+        self.is_plotting = True
+
         # Determine which plots to show based on plotting mode
         if self.plotting_mode == "indices_0_3" or self.plotting_mode == "indices_4_7":
             # In index modes, use the plotting mode directly
@@ -387,7 +389,6 @@ class ActiveTrial(tk.Frame):
         self.controller.show_frame("UpdateTorque")
 
     def update_plots(self, selection):
-        self.update_dropdown_values()
         # Cancel the previous update job if it exists
         if self.plot_update_job:
             self.after_cancel(self.plot_update_job)
@@ -485,6 +486,12 @@ class ActiveTrial(tk.Frame):
                 self.topRightDropdown2['values'] = cleaned_param_names
                 self.bottomRightDropdown1['values'] = cleaned_param_names
                 self.bottomRightDropdown2['values'] = cleaned_param_names
+                
+                # Invalidate parameter index caches in plots to force rebuild
+                if hasattr(self, 'topPlot') and hasattr(self.topPlot, '_param_index_cache'):
+                    self.topPlot._param_index_cache = None
+                if hasattr(self, 'bottomPlot') and hasattr(self.bottomPlot, '_param_index_cache'):
+                    self.bottomPlot._param_index_cache = None
                 
                 # Set default selections if they're still "Select Parameter"
                 if self.topRightDropdown1.get() == "Select Parameter" and len(cleaned_param_names) > 0:

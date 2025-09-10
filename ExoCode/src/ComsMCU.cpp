@@ -152,7 +152,7 @@ void ComsMCU::update_gui()
     //Get real time data from ExoData and send to GUI
     const bool new_rt_data = real_time_i2c::poll(rt_floats);
     static float del_t_no_msg = millis();
-    
+
     if(_data->first_message)
     {
         Serial.println("Initial Send");
@@ -160,7 +160,7 @@ void ComsMCU::update_gui()
         _data->first_message = false;
     }
     
-    if ((new_rt_data || rt_data::new_rt_msg))
+    if ( _data->parameter_names_received && (new_rt_data || rt_data::new_rt_msg))
     {
         Serial.println("Now hitting data..");
         del_t_no_msg = millis();
@@ -193,6 +193,8 @@ void ComsMCU::update_gui()
 
         _exo_ble->send_message(rt_data_msg);
 
+        Serial.println("Sending real time data..");
+
         #if COMSMCU_DEBUG
             logger::println("ComsMCU::update_gui->sent message");
         #endif
@@ -221,30 +223,29 @@ void ComsMCU::update_gui()
             // }
         }
     }
-
     //Periodically send status information
     static float status_context = t_helper->generate_new_context(); 
     static float del_t_status = 0;
     del_t_status += t_helper->tick(status_context);
-    if (del_t_status > BLE_times::_status_msg_delay)
+    if (_data->parameter_names_received && (del_t_status > BLE_times::_status_msg_delay))
     {
+        Serial.println("Sending battery status..");
         #if COMSMCU_DEBUG
             logger::println("ComsMCU::update_gui->Sending status");
         #endif
-        Serial.println("Hit send message to BLE!");
         //Send status data
         BleMessage batt_msg = BleMessage();
         batt_msg.command = ble_names::send_batt;
         batt_msg.expecting = ble_command_helpers::get_length_for_command(batt_msg.command);
         batt_msg.data[0] = _data->battery_value;
         _exo_ble->send_message(batt_msg);
-
         del_t_status = 0;
 
         #if COMSMCU_DEBUG
             logger::println("ComsMCU::update_gui->sent message");
         #endif
     }
+    
 
     #if COMSMCU_DEBUG
         logger::println("ComsMCU::update_gui->End");

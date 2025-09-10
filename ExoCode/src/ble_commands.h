@@ -428,6 +428,7 @@
      }
      inline static void send_param_recieved(ExoData* data)
      {
+        Serial.println("Parameters recieved!");
         data->parameter_names_received = true;
      }
  }

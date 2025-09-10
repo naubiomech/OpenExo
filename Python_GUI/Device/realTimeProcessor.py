@@ -4,7 +4,7 @@ from Device import chart_data, exoData, MLModel
 
 
 class RealTimeProcessor:
-    def __init__(self, device_manager=None):
+    def __init__(self, device_manager=None, active_trial=None):
         self._event_count_regex = re.compile(
             "[0-9]+"
         )  # Regular Expression to find any number 1-9
@@ -29,10 +29,10 @@ class RealTimeProcessor:
         self.num_control_parameters = 0 # Number of controller parameters in the most recently updated controller
         self.temp_control_param_list = []
         self._device_manager = device_manager
+        self._active_trial = active_trial 
         self._param_timer = None
-        self._param_timeout_seconds = 2
+        self._param_timeout_seconds = 1
         self._param_names_received = False
-        
 
     async def processEvent(self, event):
         # Decode data from bytearry->String
@@ -52,6 +52,7 @@ class RealTimeProcessor:
                     self.plotting_param_names, 
                     self.num_plotting_params
                 )
+                self.first_msg = False
                 # Also update the exoData with parameter names
                 self._exo_data.setParameterNames(self.plotting_param_names)
                 self._exo_data.initializeParamValues()
@@ -61,7 +62,7 @@ class RealTimeProcessor:
                 self.plotting_param_names.append(dataUnpacked)
                 self.num_plotting_params += 1
         
-        if "!" in dataUnpacked:   # process controllers and control parameters
+        elif "!" in dataUnpacked:   # process controllers and control parameters
             data_split = dataUnpacked.split("!", 1)
             if "!" in data_split[1]:
                 #this is a controller parameter
@@ -77,6 +78,10 @@ class RealTimeProcessor:
                 if(data_split[1] == 'END'):
                     if hasattr(self, '_device_manager') and self._device_manager:
                         await self._device_manager.sendParamRecieved()
+                    self._param_names_received = True
+                    if self._active_trial:
+                        self._active_trial.update_dropdown_values()
+
                     for controller in self.controllers:
                         print("Controller: ")
                         print(controller)
@@ -188,20 +193,19 @@ class RealTimeProcessor:
         
         self._predictor.predictModel([minSV,maxSV,minSA,maxSA, maxFSR,stancetime,swingtime]) #predict results from model
 
-        # Create a list of parameter values to match the new method signature
-        param_values = [
-            rightTorque,
-            rightState,
-            rightSet,
-            leftTorque,
-            leftState,
-            leftSet,
-            rightFsr,
-            leftFsr
-        ]
+        # Create a list of parameter values using ALL the payload data
+        # This ensures we have values for all parameters that come from the firmware
+        param_values = list(payload) if payload else []
+        
+        # Pad with zeros if we don't have enough values for all parameter names
+        while len(param_values) < self.num_plotting_params:
+            param_values.append(0.0)
 
         # Update the chart data with the new parameter values for dropdown plotting
         self._chart_data.updateParamValues(param_values)
+        
+        # Store the parameter values for access by plotting system
+        self.param_values = param_values
 
         self._exo_data.addDataPoints(
             self.x_time,

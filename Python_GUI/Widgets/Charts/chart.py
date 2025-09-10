@@ -77,80 +77,293 @@ class BasePlot:
 
 class TopPlot(BasePlot):
     def __init__(self, master):
-        super().__init__(master, "Left Torque")
+        super().__init__(master, "Top Plot")
+        
     def animate(self, chartSelection):
-        topController = None
-        title = "No Data Selected"
-        bottomLimit = -1
-        topLimit = 1
-        if chartSelection == "Data 0-3":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightTorque
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightState
-            )
-            title = "Data 0 and 1"
-        elif chartSelection == "Data 4-7":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftState
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
-            )
-            title = "Data 4 and 5"
-            bottomLimit = 0
-            topLimit = 1.1
+        # Check the plotting mode from the master frame
+        plotting_mode = getattr(self.master, 'plotting_mode', 'dropdowns')
+        
+        if plotting_mode == "indices_0_3":
+            # Use the traditional index-based plotting for Data 0-3
+            self._animate_indices_0_3_mode(chartSelection)
+        elif plotting_mode == "indices_4_7":
+            # Use the traditional index-based plotting for Data 4-7
+            self._animate_indices_4_7_mode(chartSelection)
+        else:
+            # Use the new dropdown-based plotting
+            self._animate_dropdown_mode()
+    
+    def _animate_indices_0_3_mode(self, chartSelection):
+        """Traditional index-based plotting mode for Controller data (indices 0-3)"""
+        try:
+            # Get the parameter values from the real-time data
+            param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            
+            # Controller mode (indices 0-3)
+            blue_value = param_values[0] if len(param_values) > 0 else 0.0      # Index 0
+            orange_value = param_values[1] if len(param_values) > 1 else 0.0   # Index 1
+            title = "Controller Mode"
+            
+            bottomLimit = -1
+            topLimit = 1
+            
+        except (AttributeError, IndexError, ValueError):
+            blue_value = 0.0
+            orange_value = 0.0
+            title = "Top Plot - Controller Mode"
+            bottomLimit = -1
+            topLimit = 1
 
-        if topController is None or topMeasure is None:
-            topController = 0
-            topMeasure = 0
-
+        # Update the plot data
         self.xValues.append(dt.datetime.now())
-        self.yValues.append(topController)
-        self.secondY.append(topMeasure)
+        self.yValues.append(blue_value)
+        self.secondY.append(orange_value)
         self.ax.set_title(title)
 
-        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit,topLimit,title)
+        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
+    
+    def _animate_indices_4_7_mode(self, chartSelection):
+        """Traditional index-based plotting mode for Sensor data (indices 4-7)"""
+        try:
+            # Get the parameter values from the real-time data
+            param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            
+            # Sensor mode (indices 4-7)
+            blue_value = param_values[4] if len(param_values) > 4 else 0.0      # Index 4
+            orange_value = param_values[5] if len(param_values) > 5 else 0.0   # Index 5
+            title = "Sensor Mode"
+            
+            bottomLimit = -1
+            topLimit = 1
+            
+        except (AttributeError, IndexError, ValueError):
+            blue_value = 0.0
+            orange_value = 0.0
+            title = "Top Plot - Sensor Mode"
+            bottomLimit = -1
+            topLimit = 1
+
+        # Update the plot data
+        self.xValues.append(dt.datetime.now())
+        self.yValues.append(blue_value)
+        self.secondY.append(orange_value)
+        self.ax.set_title(title)
+
+        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
+
+    def _animate_dropdown_mode(self):
+        """Dropdown-based plotting mode"""
+        # Get the selected parameter indices from the dropdowns
+        # Top right dropdown 1 controls blue line (line1)
+        # Top right dropdown 2 controls orange line (line2)
+        
+        try:
+            # Get the selected parameter names from the dropdowns (these are cleaned names)
+            blue_param_name_clean = self.master.topRightDropdown1.get()
+            orange_param_name_clean = self.master.topRightDropdown2.get()
+            
+            # Use cached indices if available, otherwise calculate them
+            if not hasattr(self, '_param_index_cache') or self._param_index_cache is None:
+                self._build_param_index_cache()
+            
+            # Get cached indices
+            blue_index = self._param_index_cache.get(blue_param_name_clean, 0)
+            orange_index = self._param_index_cache.get(orange_param_name_clean, 1)
+            
+            # Get the parameter values from the real-time data
+            param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            
+            # Extract the values for the selected parameters
+            blue_value = param_values[blue_index] if blue_index < len(param_values) else 0.0
+            orange_value = param_values[orange_index] if orange_index < len(param_values) else 0.0
+            
+            # Set appropriate limits based on the data type
+            bottomLimit = -1
+            topLimit = 1
+            
+            # Update the plot title to show what's being plotted (using cleaned names)
+            title = f"Blue: {blue_param_name_clean}, Orange: {orange_param_name_clean}"
+            
+        except (AttributeError, IndexError, ValueError):
+            # Fallback to default values if there's an error
+            blue_value = 0.0
+            orange_value = 0.0
+            title = "Top Plot - Select Parameters"
+            bottomLimit = -1
+            topLimit = 1
+
+        # Update the plot data
+        self.xValues.append(dt.datetime.now())
+        self.yValues.append(blue_value)      # Blue line (line1)
+        self.secondY.append(orange_value)   # Orange line (line2)
+        self.ax.set_title(title)
+
+        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
+    
+    def _build_param_index_cache(self):
+        """Build a cache of parameter name to index mappings for fast lookup"""
+        try:
+            param_names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            self._param_index_cache = {}
+            
+            for i, original_name in enumerate(param_names):
+                # Create cleaned version of original name for comparison
+                if original_name.startswith("exo_data->"):
+                    cleaned_original = original_name[10:]
+                else:
+                    cleaned_original = original_name
+                
+                # Store the mapping
+                self._param_index_cache[cleaned_original] = i
+        except (AttributeError, IndexError, ValueError):
+            self._param_index_cache = {}
+
 
 class BottomPlot(BasePlot):
     def __init__(self, master):
-        super().__init__(master, "Right Torque")
+        super().__init__(master, "Bottom Plot")
 
     def animate(self, chartSelection):
-        title = "No Data Selected"
-        topController = None
-        bottomLimit = -1
-        topLimit = 1
-        if chartSelection == "Data 0-3":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightSet
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftTorque
-            )
-            title = "Data 2 and 3"
-        elif chartSelection == "Data 4-7":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightFsr
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
-            )
-            bottomLimit = 0
-            topLimit = 1.1
-            title = "Data 6 and 7"
+        # Check the plotting mode from the master frame
+        plotting_mode = getattr(self.master, 'plotting_mode', 'dropdowns')
+        
+        if plotting_mode == "indices_0_3":
+            # Use the traditional index-based plotting for Data 0-3
+            self._animate_indices_0_3_mode(chartSelection)
+        elif plotting_mode == "indices_4_7":
+            # Use the traditional index-based plotting for Data 4-7
+            self._animate_indices_4_7_mode(chartSelection)
+        else:
+            # Use the new dropdown-based plotting
+            self._animate_dropdown_mode()
+    
+    def _animate_indices_0_3_mode(self, chartSelection):
+        """Traditional index-based plotting mode for Controller data (indices 0-3)"""
+        try:
+            # Get the parameter values from the real-time data
+            param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            
+            # Controller mode (indices 0-3)
+            blue_value = param_values[2] if len(param_values) > 2 else 0.0      # Index 2
+            orange_value = param_values[3] if len(param_values) > 3 else 0.0   # Index 3
+            title = "Controller Mode"
+            
+            bottomLimit = -1
+            topLimit = 1
+            
+        except (AttributeError, IndexError, ValueError):
+            blue_value = 0.0
+            orange_value = 0.0
+            title = "Bottom Plot - Controller Mode"
+            bottomLimit = -1
+            topLimit = 1
 
-        if topController is None or topMeasure is None:
-            topController = 0
-            topMeasure = 0
-
+        # Update the plot data
         self.xValues.append(dt.datetime.now())
-        self.yValues.append(topController)
-        self.secondY.append(topMeasure)
+        self.yValues.append(blue_value)
+        self.secondY.append(orange_value)
         self.ax.set_title(title)
 
-        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit,topLimit,title)
+        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
+    
+    def _animate_indices_4_7_mode(self, chartSelection):
+        """Traditional index-based plotting mode for Sensor data (indices 4-7)"""
+        try:
+            # Get the parameter values from the real-time data
+            param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            
+            # Sensor mode (indices 4-7)
+            blue_value = param_values[6] if len(param_values) > 6 else 0.0      # Index 6
+            orange_value = param_values[7] if len(param_values) > 7 else 0.0   # Index 7
+            title = "Sensor Mode"
+            
+            bottomLimit = -1
+            topLimit = 1
+            
+        except (AttributeError, IndexError, ValueError):
+            blue_value = 0.0
+            orange_value = 0.0
+            title = "Bottom Plot - Sensor Mode"
+            bottomLimit = -1
+            topLimit = 1
+
+        # Update the plot data
+        self.xValues.append(dt.datetime.now())
+        self.yValues.append(blue_value)
+        self.secondY.append(orange_value)
+        self.ax.set_title(title)
+
+        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
+
+    def _animate_dropdown_mode(self):
+        """Dropdown-based plotting mode"""
+        # Get the selected parameter indices from the dropdowns
+        # Bottom right dropdown 1 controls blue line (line1)
+        # Bottom right dropdown 2 controls orange line (line2)
+        
+        try:
+            # Get the selected parameter names from the dropdowns (these are cleaned names)
+            blue_param_name_clean = self.master.bottomRightDropdown1.get()
+            orange_param_name_clean = self.master.bottomRightDropdown2.get()
+            
+            # Get the original parameter names list to find the indices
+            param_names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            
+            # Use cached indices if available, otherwise calculate them
+            if not hasattr(self, '_param_index_cache') or self._param_index_cache is None:
+                self._build_param_index_cache()
+            
+            # Get cached indices
+            blue_index = self._param_index_cache.get(blue_param_name_clean, 0)
+            orange_index = self._param_index_cache.get(orange_param_name_clean, 1)
+            
+            # Get the parameter values from the real-time data
+            param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            
+            # Extract the values for the selected parameters
+            blue_value = param_values[blue_index] if blue_index < len(param_values) else 0.0
+            orange_value = param_values[orange_index] if orange_index < len(param_values) else 0.0
+            
+            # Set appropriate limits based on the data type
+            bottomLimit = -1
+            topLimit = 1
+            
+            # Update the plot title to show what's being plotted (using cleaned names)
+            title = f"Blue: {blue_param_name_clean}, Orange: {orange_param_name_clean}"
+            
+        except (AttributeError, IndexError, ValueError):
+            # Fallback to default values if there's an error
+            blue_value = 0.0
+            orange_value = 0.0
+            title = "Bottom Plot - Select Parameters"
+            bottomLimit = -1
+            topLimit = 1
+
+        # Update the plot data
+        self.xValues.append(dt.datetime.now())
+        self.yValues.append(blue_value)      # Blue line (line1)
+        self.secondY.append(orange_value)   # Orange line (line2)
+        self.ax.set_title(title)
+
+        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
+    
+    def _build_param_index_cache(self):
+        """Build a cache of parameter name to index mappings for fast lookup"""
+        try:
+            param_names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            self._param_index_cache = {}
+            
+            for i, original_name in enumerate(param_names):
+                # Create cleaned version of original name for comparison
+                if original_name.startswith("exo_data->"):
+                    cleaned_original = original_name[10:]
+                else:
+                    cleaned_original = original_name
+                
+                # Store the mapping
+                self._param_index_cache[cleaned_original] = i
+        except (AttributeError, IndexError, ValueError):
+            self._param_index_cache = {}
 
 class FSRPlot(BasePlot):
     def __init__(self, master, goal=None):
