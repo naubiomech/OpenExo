@@ -25,6 +25,9 @@
 #include "GattDb.h"
 #include "BleMessage.h"
 #include "BleMessageQueue.h"
+#include "ExoData.h"
+#include "ParseIni.h"
+#include "UARTHandler.h"
 
 class ExoBLE 
 {
@@ -79,8 +82,10 @@ class ExoBLE
 
         // Testing
         
+        //objects required to populate the plotting and controller parameters lists
         ExoData* _data;
         uint8_t* _config_to_send;
+        UARTHandler* _uart_handler = UARTHandler::get_instance();
 
         //The Gatt database which defines the services and characteristics
         GattDb _gatt_db = GattDb();

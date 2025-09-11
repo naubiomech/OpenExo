@@ -404,11 +404,12 @@ namespace utils
         }
         else if(numDots == 3) // we have side, joint, controller parameter to abbreviate (eg. left_side.hip.step.ff_setpoint)
         {
-            newstr.substr(0, 1) /*side abbrev*/ + newstr.substr(newstr.find(".") + 1, 1) /*joint abbrev*/ + newstr.substr(newstr.find(".", newstr.find(".") + 1) + 1, 6); /*control param abbrev*/
+            newstr = newstr.substr(0, 1) /*side abbrev*/ + newstr.substr(newstr.find(".") + 1, 1) /*joint abbrev*/ + newstr.substr(newstr.find(".", newstr.find(".", newstr.find(".") + 1) + 1) + 1, 6); /*control param abbrev*/
         }
 
         return newstr;
     }
+
 	
 	#if defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)
 	void init_servos() {

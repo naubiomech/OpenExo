@@ -313,7 +313,7 @@ namespace utils
      * @param input std::string full parameter name
      * @return std::string abbreviated parameter name
      */
-    std::string trim_controller_name(const std::string& input) 
+    std::string trim_controller_name(const std::string& input);
 	
 	/**
      * @brief Attach the servos

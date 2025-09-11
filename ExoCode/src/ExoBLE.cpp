@@ -14,6 +14,9 @@ ExoBLE::ExoBLE(ExoData* data, uint8_t* config_to_send)
 {
     _data = data;
     _config_to_send = config_to_send;  // Fix: was assigning to parameter instead of member
+    
+    UART_msg_t msg; // make a message  so we can properly call get_real_time_data, this msg is currently blank
+    UART_command_handlers::get_real_time_data(_uart_handler, _data, msg, _data->config);
 }
 
 bool ExoBLE::setup()
@@ -79,12 +82,14 @@ bool ExoBLE::setup()
     for (int i = 0; i < num_entries; i++)
     {
         std::string param_name = UART_command_handlers::param_names_arr[i];
-        all_param_names += param_name;
+        all_param_names += utils::trim_controller_name(param_name);
+        logger::print(all_param_names.c_str());
         if (i < num_entries - 1)  // Add separator except for last item
         {
             all_param_names += ",";  // or "\n" for newlines
         }
     }
+    //Serial.println(all_param_names.c_str());
 
     const char *test_char = all_param_names.c_str();
 

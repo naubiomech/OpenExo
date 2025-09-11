@@ -682,11 +682,11 @@ namespace UART_command_utils
         float start_time = millis();
         while (true)
         {
-            logger::println("UART_command_utils::wait_for_config->Polling for config");
+            //logger::println("UART_command_utils::wait_for_config->Polling for config");
             rx_msg = handler->poll(100000);
             if (rx_msg.command == UART_command_names::get_config)
             {
-                logger::println("UART_command_utils::wait_for_config->Got config request");
+                //logger::println("UART_command_utils::wait_for_config->Got config request");
                 UART_command_handlers::get_config(handler, data, rx_msg);
                 break;
             }
@@ -694,11 +694,11 @@ namespace UART_command_utils
 
             if ((millis() - start_time) > timeout)
             {
-                logger::println("UART_command_utils::wait_for_config->Timed out");
+                //logger::println("UART_command_utils::wait_for_config->Timed out");
                 return;
             }
         }
-        logger::println("UART_command_utils::wait_for_config->Sent config");
+        //logger::println("UART_command_utils::wait_for_config->Sent config");
     }
 
     static void handle_msg(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
