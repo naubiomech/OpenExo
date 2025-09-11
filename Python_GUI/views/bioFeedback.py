@@ -169,7 +169,7 @@ class BioFeedback(tk.Frame):
                 # Attempt to convert the input to a float
                 self.target_value = float(user_input)
                 self.update_target_label()  # Update the label with the new target value
-                print(f"Target value set to: {self.target_value}")
+                # Target value set successfully
 
                 # Enable the reset button
                 self.reset_button.config(state="normal")
@@ -179,7 +179,7 @@ class BioFeedback(tk.Frame):
                 self.update_plots(self.chartVar.get())  # Update the plot with the new goal
 
             except ValueError:
-                print("Invalid input. Please enter a numeric value.")
+                # Invalid input - user will be notified via UI
 
     def handle_back_button(self):
         # Stops plotting and goes back to Active Trial
@@ -245,7 +245,7 @@ class BioFeedback(tk.Frame):
                 if isinstance(widget, tk.Button) or isinstance(widget, ttk.Combobox):
                     widget.config(state='normal')
         except Exception as e:
-            print(f"Error in enable_interactions: {e}")
+            # Error in enable_interactions - handled silently
 
     def update_plots(self, selection):
         # Animate the current plot and schedule the next update

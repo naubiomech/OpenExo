@@ -33,13 +33,7 @@ class RealTimeProcessor:
         self._max_packet_size = max(self._max_packet_size, packet_size)
         self._packet_count += 1
         
-        # Print packet size info every 10 packets
-        if self._packet_count % 10 == 0:
-            print(f"BLE Packet Analysis: Count={self._packet_count}, Max Size={self._max_packet_size} bytes, Avg Size={sum(self._packet_sizes)/len(self._packet_sizes):.1f} bytes")
-            if self._max_packet_size > 20:
-                print("  ✅ DLE appears ENABLED (packets > 20 bytes)")
-            else:
-                print("  ❌ DLE appears DISABLED (packets ≤ 20 bytes)")
+        # Track packet size info for DLE detection (removed frequent prints for performance)
         
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
@@ -99,7 +93,8 @@ class RealTimeProcessor:
                 else:
                     return
         else:
-            print("Unkown command!\n")
+            # Unknown command - silently continue for performance
+            pass
 
     def set_debug_event_listener(self, on_debug_event):
         self._on_debug_event = on_debug_event
@@ -121,8 +116,7 @@ class RealTimeProcessor:
         data10 = payload[10] if datalength >= 11 and len(payload) > 10 else 0  # rightMotorCurrent
         data11 = payload[11] if datalength >= 12 and len(payload) > 11 else 0  # leftMotorCurrent
 
-        # DEBUG: Print 12 data points
-        print(f"12 Data Points: [0]{data0:.1f} [1]{data1:.1f} [2]{data2:.1f} [3]{data3:.1f} [4]{data4:.1f} [5]{data5:.1f} [6]{data6:.1f} [7]{data7:.1f} [8]{data8:.1f} [9]{data9:.1f} [10]{data10:.1f} [11]{data11:.1f}")
+        # DEBUG: Data points processing (print statement removed for performance)
 
         self._chart_data.updateValues(
             data0,  # rightTorque

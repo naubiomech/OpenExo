@@ -150,7 +150,7 @@ class ScanWindow(tk.Frame):
         if self.selected_device_address:
             with open(self.SETTINGS_FILE, "w") as file:
                 file.write(self.selected_device_address)
-            print(f"Saved device: {self.selected_device_name} - {self.selected_device_address}")
+            # Device saved successfully
             
         connect_message = f"Connecting to: {self.selected_device_name} {self.selected_device_address}"
         self.deviceNameText.set(connect_message)
@@ -312,7 +312,7 @@ class ScanWindow(tk.Frame):
             self.selected_device_name, self.selected_device_address = selected_device_info.split(" - ")
             self.connectButton.config(state="normal")  # Enable Connect button
             self.saveDeviceButton.config(state="normal")  # Enable Save & Connect button
-            print(self.selected_device_name)  # Debug output
+            # Device selected
         else:
             self.connectButton.config(state=DISABLED)  # Disable Connect button if no selection
             self.saveDeviceButton.config(state=DISABLED)  # Disable Save & Connect button if no selection

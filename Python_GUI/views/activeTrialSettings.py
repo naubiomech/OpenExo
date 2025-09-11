@@ -198,11 +198,7 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         parameterVal = float(parameterInput.get())
         valueVal = float(valueInput.get())
 
-        print(f"bilateral: {isBilateral}")
-        print(f"joint: {joint}")
-        print(f"controller: {controllerVal}")
-        print(f"paramter: {parameterVal}")
-        print(f"value: {valueVal}")
+        # Debug info removed for performance
 
         # Set Torque
         await self.controller.deviceManager.updateTorqueValues(
@@ -229,7 +225,7 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         }
         with open(self.SETTINGS_FILE, "w") as f:
             json.dump(settings, f, indent=4)
-        print(f"Settings saved: {settings}")
+        # Settings saved successfully
 
     # Load the last saved settings.
     def load_settings(self):
@@ -244,7 +240,7 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
                 self.bilateralButtonVar.set(
                     "Bilateral Mode On" if self.isBilateral else "Bilateral Mode Off"
                 )
-            print(f"Loaded settings: {settings}")
+            # Settings loaded successfully
 
     def newSelection(self, event):
         self.jointVar.set(self.jointSelector.get())

@@ -34,7 +34,7 @@
 
     namespace logging
     {
-        const LogLevel level = LogLevel::Debug; //Release or Debug (Note: Enter Debug to have Logger print to serial monitor)
+        const LogLevel level = LogLevel::Release; //Release or Debug (Note: Enter Debug to have Logger print to serial monitor)
         const int baud_rate = 115200;
     }
     
