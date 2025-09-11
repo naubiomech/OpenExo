@@ -368,9 +368,10 @@ namespace UART_command_handlers
             rx_msg.data[5] = exo_data->left_side.ankle.controller.ff_setpoint; 
             rx_msg.data[6] = exo_data->right_side.toe_fsr; 
             rx_msg.data[7] = exo_data->left_side.toe_fsr;
+			rx_msg.data[7] = exo_data->get_batt_info(1);
             rx_msg.data[8] = 0;  // Placeholder
             rx_msg.data[9] = 0;  // Placeholder
-            rx_msg.data[10] = 0;  // Placeholder
+            rx_msg.data[10] = exo_data->get_batt_info(0);  // Placeholder
             rx_msg.data[11] = 0;   // Placeholder
 			break;
 			}

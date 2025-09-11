@@ -11,10 +11,10 @@
 #include <math.h>
 #include <random>
 #include <cmath>
-#include <Adafruit_INA260.h>
+/* #include <Adafruit_INA260.h>
 //#include <Adafruit_INA219.h>
 Adafruit_INA260 ina260 = Adafruit_INA260();
-//Adafruit_INA219 ina219;
+//Adafruit_INA219 ina219; */
 
 _Controller::_Controller(config_defs::joint_id id, ExoData* exo_data)
 {
@@ -2371,7 +2371,7 @@ float SPV2::calc_motor_cmd()
 		uint16_t exo_status = _data->get_status();
 		bool active_trial = (exo_status == status_defs::messages::trial_on) || (exo_status == status_defs::messages::fsr_calibration) || (exo_status == status_defs::messages::fsr_refinement);
 		
-		if (!_controller_data->ps_connected) {
+		/* if (!_controller_data->ps_connected) {
 			if (!ina260.begin()) {
 				Serial.println("Couldn't find INA260 chip");
 				while (1);
@@ -2395,7 +2395,7 @@ float SPV2::calc_motor_cmd()
 		if (millis_time-_controller_data->SPV2_current_voltage_timer > 10000) {
 			_controller_data->SPV2_current_voltage = ina260.readBusVoltage();// bus voltage returned in millis volts
 			_controller_data->SPV2_current_voltage_timer = millis_time;
-		}
+		} */
 		//Serial.print("\n*********Teensy received battery voltage: ");
 		//Serial.print(ina219.getBusVoltage_V());
 		//Calculate system power usage during 30 seconds

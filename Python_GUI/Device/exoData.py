@@ -70,6 +70,6 @@ class ExoData:
         self.StanceTime.append(data14)  # stanceTime
         self.SwingTime.append(data15)  # swingTime
         self.Task.append(Task)
-        self.BatteryPercent.set("Battery: " + str(round(data12))+"%")  # Battery
+        self.BatteryPercent.set("Battery: " + str(round(data10))+"V")  # Battery
         self.Mark.append(self.MarkVal)
         
