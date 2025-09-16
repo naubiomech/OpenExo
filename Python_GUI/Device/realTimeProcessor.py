@@ -1,3 +1,4 @@
+
 import re
 import asyncio
 from Device import chart_data, exoData, MLModel
@@ -30,16 +31,13 @@ class RealTimeProcessor:
         self.temp_control_param_list = []
         self._device_manager = device_manager
         self._active_trial = active_trial 
-        self._param_timer = None
-        self._param_timeout_seconds = 1
         self._param_names_received = False
 
-    async def processEvent(self, event):
+    def processEvent(self, event):
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
         #print(dataUnpacked)
 
-        await self._start_param_timer()
 
         if(self.first_msg): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
             #Should change this to use special character to mark that these belong in plotting parameters (see regular data and controller parameters)
@@ -79,7 +77,13 @@ class RealTimeProcessor:
                     self.temp_control_param_list = []
                 if(data_split[1] == 'END'):
                     if hasattr(self, '_device_manager') and self._device_manager:
-                        await self._device_manager.sendParamRecieved()
+                        # Fire and forget - don't block data processing
+                        import asyncio
+                        try:
+                            loop = asyncio.get_event_loop()
+                            loop.create_task(self._device_manager.sendParamRecieved())
+                        except Exception as e:
+                            print(f"Error scheduling sendParamRecieved: {e}")
                     self._param_names_received = True
                     if self._active_trial:
                         self._active_trial.update_dropdown_values()
@@ -240,26 +244,6 @@ class RealTimeProcessor:
     def UnkownDataCommand(self):
         return "Unkown Command!"
 
-    async def _start_param_timer(self):
-        if self._param_timer is None:
-            print("Starting parameter timer...")  # Debug print
-            self._param_timer = asyncio.create_task(self._param_timeout_handler())
-
-    async def _param_timeout_handler(self):
-        print("Timer started, waiting for timeout...")  # Debug print
-        await asyncio.sleep(self._param_timeout_seconds)
-        print("Timer timeout reached!")  # Debug print
-        if not self._param_names_received:
-            print("Parameters not received, sending notification...")  # Debug print
-            if hasattr(self, '_device_manager') and self._device_manager:
-                if self._device_manager.isConnected:  # Add this check
-                    try:
-                        await self._device_manager.sendParamNotReceived()
-                        print("Parameters not received, sending notification...DONE")
-                    except Exception as e:
-                        print(f"Error sending param not received: {e}")
-                else:
-                    print("Device manager not connected, cannot send param not received")
 
 def tryParseFloat(stringVal):  # Try to parse float data from String
     try:

@@ -74,7 +74,7 @@ class ExoDeviceManager:
 
     # Handle incoming data from BLE characteristic
     async def DataIn(self, sender: BleakGATTCharacteristic, data: bytearray):
-        await self._realTimeProcessor.processEvent(data)
+        self._realTimeProcessor.processEvent(data)
         await self.MachineLearnerControl()
 
     # Control the machine learning model based on incoming data
@@ -266,7 +266,6 @@ class ExoDeviceManager:
                         # Start incoming data stream
                         await self.client.start_notify(self.UART_RX_UUID, self.DataIn)
 
-                        await self._realTimeProcessor._start_param_timer()
                         return True  # Successful connection
                     except Exception as e:
                         print(f"Failed to connect: {e}")

@@ -91,13 +91,9 @@ class TopPlot(BasePlot):
             blue_param_name_clean = self.master.topRightDropdown1.get()
             orange_param_name_clean = self.master.topRightDropdown2.get()
             
-            # Use cached indices if available, otherwise calculate them
-            if not hasattr(self, '_param_index_cache') or self._param_index_cache is None:
-                self._build_param_index_cache()
-            
-            # Get cached indices
-            blue_index = self._param_index_cache.get(blue_param_name_clean, 0)
-            orange_index = self._param_index_cache.get(orange_param_name_clean, 1)
+            # Get indices directly from dropdown selection (much faster)
+            blue_index = self._get_param_index(blue_param_name_clean)
+            orange_index = self._get_param_index(orange_param_name_clean)
             
             # Access data the same way as the original code using _chart_data
             chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
@@ -132,23 +128,16 @@ class TopPlot(BasePlot):
 
         self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
     
-    def _build_param_index_cache(self):
-        """Build a cache of parameter name to index mappings for fast lookup"""
+    def _get_param_index(self, param_name_clean):
+        """Get parameter index directly from dropdown selection - much faster than cache lookup"""
         try:
-            param_names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
-            self._param_index_cache = {}
-            
-            for i, original_name in enumerate(param_names):
-                # Create cleaned version of original name for comparison
-                if original_name.startswith("exo_data->"):
-                    cleaned_original = original_name[10:]
-                else:
-                    cleaned_original = original_name
-                
-                # Store the mapping
-                self._param_index_cache[cleaned_original] = i
-        except (AttributeError, IndexError, ValueError):
-            self._param_index_cache = {}
+            # Get the current dropdown values to find the index
+            dropdown_values = self.master.topRightDropdown1['values']
+            if param_name_clean in dropdown_values:
+                return dropdown_values.index(param_name_clean)
+            return 0  # Default to first parameter
+        except (AttributeError, ValueError):
+            return 0
 
 
 class BottomPlot(BasePlot):
@@ -165,13 +154,9 @@ class BottomPlot(BasePlot):
             blue_param_name_clean = self.master.bottomRightDropdown1.get()
             orange_param_name_clean = self.master.bottomRightDropdown2.get()
             
-            # Use cached indices if available, otherwise calculate them
-            if not hasattr(self, '_param_index_cache') or self._param_index_cache is None:
-                self._build_param_index_cache()
-            
-            # Get cached indices
-            blue_index = self._param_index_cache.get(blue_param_name_clean, 0)
-            orange_index = self._param_index_cache.get(orange_param_name_clean, 1)
+            # Get indices directly from dropdown selection (much faster)
+            blue_index = self._get_param_index(blue_param_name_clean)
+            orange_index = self._get_param_index(orange_param_name_clean)
             
             # Access data the same way as the original code using _chart_data
             chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
@@ -206,23 +191,16 @@ class BottomPlot(BasePlot):
 
         self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
     
-    def _build_param_index_cache(self):
-        """Build a cache of parameter name to index mappings for fast lookup"""
+    def _get_param_index(self, param_name_clean):
+        """Get parameter index directly from dropdown selection - much faster than cache lookup"""
         try:
-            param_names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
-            self._param_index_cache = {}
-            
-            for i, original_name in enumerate(param_names):
-                # Create cleaned version of original name for comparison
-                if original_name.startswith("exo_data->"):
-                    cleaned_original = original_name[10:]
-                else:
-                    cleaned_original = original_name
-                
-                # Store the mapping
-                self._param_index_cache[cleaned_original] = i
-        except (AttributeError, IndexError, ValueError):
-            self._param_index_cache = {}
+            # Get the current dropdown values to find the index
+            dropdown_values = self.master.bottomRightDropdown1['values']
+            if param_name_clean in dropdown_values:
+                return dropdown_values.index(param_name_clean)
+            return 0  # Default to first parameter
+        except (AttributeError, ValueError):
+            return 0
 
 class FSRPlot(BasePlot):
     def __init__(self, master, goal=None):
