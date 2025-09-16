@@ -17,7 +17,7 @@
 // These time vaiables are used to delay until actual connection is established - Elliott
 static unsigned long connection_timer_start = 0;
 static bool connection_timer_active = false;
-static const unsigned long CONNECTION_DELAY = 800; 
+static const unsigned long CONNECTION_DELAY = 1000; 
 
 ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
 {

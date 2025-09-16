@@ -21,10 +21,8 @@ class RealTimeProcessor:
         self._predictor= MLModel.MLModel() #create the machine learning model object
         self.first_msg = True
         self.plotting_param_names = []  # List to store parameter names
-        self.cleaned_param_names = []  # Pre-cleaned parameter names for UI
         self.num_plotting_params = 0 # Number of parameters
         self.param_values = [] # List to store parameter values
-        self.param_index_cache = {}  # Shared cache for parameter name to index mapping
         self.controllers = [] # List to store controller names
         self.controller_parameters = [] # 2D list to store controller parameters
         self.num_controllers = 0 # Number of controllers we have stored
@@ -39,7 +37,7 @@ class RealTimeProcessor:
     async def processEvent(self, event):
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
-        print(dataUnpacked)
+        #print(dataUnpacked)
 
         await self._start_param_timer()
 
@@ -49,7 +47,7 @@ class RealTimeProcessor:
             print(dataUnpacked)
             print((dataUnpacked == "END"))
             if(dataUnpacked == "END"): # marks the end of the parameter names
-                self._build_param_cache()
+                # Once all the parameter names have been recieved we need to update the relevant data structures (chart_data and exoData)
                 self._chart_data.updateNames(
                     self.plotting_param_names, 
                     self.num_plotting_params
@@ -58,9 +56,11 @@ class RealTimeProcessor:
                 # Also update the exoData with parameter names
                 self._exo_data.setParameterNames(self.plotting_param_names)
                 self._exo_data.initializeParamValues()
+                # Update dropdown values when parameter names are received
+                if self._active_trial:
+                    self._active_trial.update_dropdown_values()
             else:
                 # If this is not the end of the parameter names, then we need to add the name to the list and increment the number of parameters
-                print(self.num_plotting_params)
                 self.plotting_param_names.append(dataUnpacked)
                 self.num_plotting_params += 1
         
@@ -260,18 +260,6 @@ class RealTimeProcessor:
                         print(f"Error sending param not received: {e}")
                 else:
                     print("Device manager not connected, cannot send param not received")
-
-    def _build_param_cache(self):
-        self.cleaned_param_names = []
-        self.param_index_cache = {}
-        
-        for i, name in enumerate(self.plotting_param_names):
-            if name.startswith("exo_data->"):
-                cleaned_name = name[10:]
-            else:
-                cleaned_name = name
-            self.cleaned_param_names.append(cleaned_name)
-            self.param_index_cache[cleaned_name] = i
 
 def tryParseFloat(stringVal):  # Try to parse float data from String
     try:

@@ -271,12 +271,12 @@ void ExoBLE::sendInitialParameterNames()
         Serial.println(param_name.c_str());
         int success = _gatt_db.TXChar.writeValue(param_name.c_str(), true);
         // CRITICAL: Add delay between messages
-        delay(20); // 50ms delay between each parameter name
+        delay(50); // 50ms delay between each parameter name
 
         // Optional: Add BLE.poll() to process the transmission
         BLE.poll();
     }
-    delay(10); // Extra delay before END marker
+    delay(100); // Extra delay before END marker
     std::string end_str = "END"; //marks the end of the parameter names list
     _gatt_db.TXChar.writeValue(end_str.c_str(), true);
 
