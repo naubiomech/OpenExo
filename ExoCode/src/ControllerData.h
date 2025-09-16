@@ -186,9 +186,9 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 		const uint8_t motor_current_calc_win = 16;
 		const uint8_t spring_stiffness = 17;
 		const uint8_t damping = 18;
-		const uint8_t propulsive_gain = 19;
-		const uint8_t servo_angle_scanner = 20;
-		const uint8_t do_use_stiffness_ctrl = 21;
+		const uint8_t soft_or_stiff = 19;
+		const uint8_t servo_angle_soft = 20;
+		const uint8_t servo_angle_stiff = 21;
         const uint8_t num_parameter = 22;
     }
 	

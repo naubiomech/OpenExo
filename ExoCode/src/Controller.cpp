@@ -2079,8 +2079,9 @@ void SPV2::_stiffness_adjustment(uint8_t minAngle, uint8_t maxAngle, ControllerD
 			break;
 		}
 		_controller_data->SPV2_do_calc_new_stiffness = false;
-		_controller_data->SPV2_currentAngle = min(maxAngle, _controller_data->SPV2_currentAngle);
-		_controller_data->SPV2_currentAngle = max(minAngle, _controller_data->SPV2_currentAngle);
+		// _controller_data->SPV2_currentAngle = min(maxAngle, _controller_data->SPV2_currentAngle);
+		// _controller_data->SPV2_currentAngle = max(minAngle, _controller_data->SPV2_currentAngle);
+		_controller_data->SPV2_currentAngle = constrain(_controller_data->SPV2_currentAngle, minAngle, maxAngle);
 	
 	}
 }
@@ -2362,6 +2363,15 @@ float SPV2::calc_motor_cmd()
 		uint8_t servo_target = _controller_data->parameters[controller_defs::spv2::servo_terminal];
 		bool optimizer_switch = _controller_data->parameters[controller_defs::spv2::do_update_stiffness];
 		bool SD_content_imported = (((servo_home == 0)&&(servo_target == 0)&&(servo_fsr_threshold == 0))?false: true);
+		uint8_t neutral_stiffness = _controller_data->parameters[controller_defs::spv2::neutral_angle];
+		if (_controller_data->parameters[controller_defs::spv2::soft_or_stiff] == 1) {
+			neutral_stiffness = _controller_data->parameters[controller_defs::spv2::servo_angle_soft];
+		}
+		else if (_controller_data->parameters[controller_defs::spv2::soft_or_stiff] == 2) {
+			neutral_stiffness = _controller_data->parameters[controller_defs::spv2::servo_angle_stiff];
+		}
+		
+		
 
 		if (!SD_content_imported) {
 			return 0;
@@ -2553,12 +2563,11 @@ float SPV2::calc_motor_cmd()
 				}
 				if (!_side_data->toe_stance) {
 					
-					if (!_controller_data->parameters[controller_defs::spv2::servo_angle_scanner]) {
-					
 						//Pull the initial stiffness angle from the SD card
 						if ((_controller_data->SPV2_oldCurrent == 0) && (_controller_data->SPV2_newCurrent == 0)) {
 						// if (_controller_data->SPV2_oldCurrent == 0)  {
-							_controller_data->SPV2_currentAngle = _controller_data->parameters[controller_defs::spv2::neutral_angle];
+							// _controller_data->SPV2_currentAngle = _controller_data->parameters[controller_defs::spv2::neutral_angle];
+							_controller_data->SPV2_currentAngle = neutral_stiffness;
 							_controller_data->SPV2_currentAngle = constrain(_controller_data->SPV2_currentAngle, _controller_data->parameters[controller_defs::spv2::min_angle], _controller_data->parameters[controller_defs::spv2::max_angle]);
 							
 							_controller_data->x1 = _controller_data->parameters[controller_defs::spv2::min_angle];
@@ -2566,7 +2575,6 @@ float SPV2::calc_motor_cmd()
 							// Serial.print("\n\n----- OG x1 x2 pulled from SD -----\n\n");
 						}
 					
-					}
 					
 				Serial.print("\n******Stiffness servo angle: ");
 				Serial.print(_controller_data->SPV2_currentAngle);
