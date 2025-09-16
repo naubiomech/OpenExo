@@ -27,7 +27,6 @@ class ActiveTrial(tk.Frame):
         self.timer_label = None  # Label for displaying the time
         self.timer_job = None  # Store the timer update job reference
         self.paused_flag = False
-        self.update_dropdown_values()
 
         # Load pause and play icons
         pause_img = Image.open("Resources/Images/pause.png").convert("RGBA")
@@ -315,8 +314,19 @@ class ActiveTrial(tk.Frame):
 
     def newSelection(self, event=None):
         self.disable_interactions()
+
+        # Start plotting
         self.is_plotting = True
-        self.update_plots("dropdown_mode")
+
+        # Determine which plots to show based on plotting mode
+        if self.plotting_mode == "indices_0_3" or self.plotting_mode == "indices_4_7":
+            # In index modes, use the plotting mode directly
+            selection = self.plotting_mode
+        else:
+            # In dropdown mode, use a default selection since dropdowns control the plotting
+            selection = "dropdown_mode"
+        
+        self.update_plots(selection)
 
     def disable_interactions(self):
         # Disable all interactive elements
@@ -425,6 +435,13 @@ class ActiveTrial(tk.Frame):
                 self.bottomRightDropdown1['values'] = cleaned_param_names
                 self.bottomRightDropdown2['values'] = cleaned_param_names
                 
+                # Invalidate parameter index caches in plots to force rebuild
+                if hasattr(self, 'topPlot') and hasattr(self.topPlot, '_param_index_cache'):
+                    self.topPlot._param_index_cache = None
+                if hasattr(self, 'bottomPlot') and hasattr(self.bottomPlot, '_param_index_cache'):
+                    self.bottomPlot._param_index_cache = None
+                
+                # Set default selections if they're still "Select Parameter"
                 if self.topRightDropdown1.get() == "Select Parameter" and len(cleaned_param_names) > 0:
                     self.topRightDropdown1.set(cleaned_param_names[0])
                 if self.topRightDropdown2.get() == "Select Parameter" and len(cleaned_param_names) > 1:

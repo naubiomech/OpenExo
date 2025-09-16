@@ -55,6 +55,7 @@ class RealTimeProcessor:
                     self.num_plotting_params
                 )
                 self.first_msg = False
+                # Also update the exoData with parameter names
                 self._exo_data.setParameterNames(self.plotting_param_names)
                 self._exo_data.initializeParamValues()
             else:
