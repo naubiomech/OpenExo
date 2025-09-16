@@ -207,25 +207,14 @@ class RealTimeProcessor:
         
         self._predictor.predictModel([minSV,maxSV,minSA,maxSA, maxFSR,stancetime,swingtime]) #predict results from model
 
-        # Create a list of parameter values using ALL the payload data
-        # This ensures we have values for all parameters that come from the firmware
-        param_values = list(payload) if payload else []
-        
-        # Pad with zeros if we don't have enough values for all parameter names
-        while len(param_values) < self.num_plotting_params:
-            param_values.append(0.0)
-
-        # Update the chart data with the new parameter values for dropdown plotting
-        self._chart_data.updateParamValues(param_values)
-        
-        # Store the parameter values for access by plotting system
-        self.param_values = param_values
+        # Store the parameter values for access by plotting system (like old system)
+        self.param_values = list(payload) if payload else []
         
         
 
         self._exo_data.addDataPoints(
             self.x_time,
-            param_values,
+            self.param_values,
             minSV,
             maxSV,
             minSA,

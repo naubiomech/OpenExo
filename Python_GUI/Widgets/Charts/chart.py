@@ -83,26 +83,6 @@ class TopPlot(BasePlot):
     def __init__(self, master):
         super().__init__(master, "Top Plot")
         
-    def _get_data_value(self, index, chart_data):
-        """Get data value by index - optimized like old system"""
-        if index == 0: return chart_data.data0
-        elif index == 1: return chart_data.data1
-        elif index == 2: return chart_data.data2
-        elif index == 3: return chart_data.data3
-        elif index == 4: return chart_data.data4
-        elif index == 5: return chart_data.data5
-        elif index == 6: return chart_data.data6
-        elif index == 7: return chart_data.data7
-        elif index == 8: return chart_data.data8
-        elif index == 9: return chart_data.data9
-        elif index == 10: return chart_data.data10
-        elif index == 11: return chart_data.data11
-        elif index == 12: return chart_data.data12
-        elif index == 13: return chart_data.data13
-        elif index == 14: return chart_data.data14
-        elif index == 15: return chart_data.data15
-        else: return 0
-        
     def animate(self, chart_selection):
         top_controller = None
         top_measure = None
@@ -110,12 +90,45 @@ class TopPlot(BasePlot):
         top_limit = 1
         title = " "
         
-        # Use EXACT same pattern as old system - direct property access
+        # Use EXACT same pattern as old system - direct property access with NO function calls
         chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
         
-        # Direct property access like old system - NO array creation overhead
-        top_controller = self._get_data_value(self.blue_index, chart_data)
-        top_measure = self._get_data_value(self.orange_index, chart_data)
+        # Direct property access like old system - NO function call overhead
+        if self.blue_index == 0: top_controller = chart_data.data0
+        elif self.blue_index == 1: top_controller = chart_data.data1
+        elif self.blue_index == 2: top_controller = chart_data.data2
+        elif self.blue_index == 3: top_controller = chart_data.data3
+        elif self.blue_index == 4: top_controller = chart_data.data4
+        elif self.blue_index == 5: top_controller = chart_data.data5
+        elif self.blue_index == 6: top_controller = chart_data.data6
+        elif self.blue_index == 7: top_controller = chart_data.data7
+        elif self.blue_index == 8: top_controller = chart_data.data8
+        elif self.blue_index == 9: top_controller = chart_data.data9
+        elif self.blue_index == 10: top_controller = chart_data.data10
+        elif self.blue_index == 11: top_controller = chart_data.data11
+        elif self.blue_index == 12: top_controller = chart_data.data12
+        elif self.blue_index == 13: top_controller = chart_data.data13
+        elif self.blue_index == 14: top_controller = chart_data.data14
+        elif self.blue_index == 15: top_controller = chart_data.data15
+        else: top_controller = 0
+            
+        if self.orange_index == 0: top_measure = chart_data.data0
+        elif self.orange_index == 1: top_measure = chart_data.data1
+        elif self.orange_index == 2: top_measure = chart_data.data2
+        elif self.orange_index == 3: top_measure = chart_data.data3
+        elif self.orange_index == 4: top_measure = chart_data.data4
+        elif self.orange_index == 5: top_measure = chart_data.data5
+        elif self.orange_index == 6: top_measure = chart_data.data6
+        elif self.orange_index == 7: top_measure = chart_data.data7
+        elif self.orange_index == 8: top_measure = chart_data.data8
+        elif self.orange_index == 9: top_measure = chart_data.data9
+        elif self.orange_index == 10: top_measure = chart_data.data10
+        elif self.orange_index == 11: top_measure = chart_data.data11
+        elif self.orange_index == 12: top_measure = chart_data.data12
+        elif self.orange_index == 13: top_measure = chart_data.data13
+        elif self.orange_index == 14: top_measure = chart_data.data14
+        elif self.orange_index == 15: top_measure = chart_data.data15
+        else: top_measure = 0
 
         if top_controller is None or top_measure is None:
             top_controller = 0
@@ -146,26 +159,6 @@ class BottomPlot(BasePlot):
     def __init__(self, master):
         super().__init__(master, "Bottom Plot")
 
-    def _get_data_value(self, index, chart_data):
-        """Get data value by index - optimized like old system"""
-        if index == 0: return chart_data.data0
-        elif index == 1: return chart_data.data1
-        elif index == 2: return chart_data.data2
-        elif index == 3: return chart_data.data3
-        elif index == 4: return chart_data.data4
-        elif index == 5: return chart_data.data5
-        elif index == 6: return chart_data.data6
-        elif index == 7: return chart_data.data7
-        elif index == 8: return chart_data.data8
-        elif index == 9: return chart_data.data9
-        elif index == 10: return chart_data.data10
-        elif index == 11: return chart_data.data11
-        elif index == 12: return chart_data.data12
-        elif index == 13: return chart_data.data13
-        elif index == 14: return chart_data.data14
-        elif index == 15: return chart_data.data15
-        else: return 0
-
     def animate(self, chart_selection):
         top_controller = None
         top_measure = None
@@ -173,12 +166,45 @@ class BottomPlot(BasePlot):
         top_limit = 1
         title = " "
         
-        # Use EXACT same pattern as old system - direct property access
+        # Use EXACT same pattern as old system - direct property access with NO function calls
         chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
         
-        # Direct property access like old system - NO array creation overhead
-        top_controller = self._get_data_value(self.blue_index, chart_data)
-        top_measure = self._get_data_value(self.orange_index, chart_data)
+        # Direct property access like old system - NO function call overhead
+        if self.blue_index == 0: top_controller = chart_data.data0
+        elif self.blue_index == 1: top_controller = chart_data.data1
+        elif self.blue_index == 2: top_controller = chart_data.data2
+        elif self.blue_index == 3: top_controller = chart_data.data3
+        elif self.blue_index == 4: top_controller = chart_data.data4
+        elif self.blue_index == 5: top_controller = chart_data.data5
+        elif self.blue_index == 6: top_controller = chart_data.data6
+        elif self.blue_index == 7: top_controller = chart_data.data7
+        elif self.blue_index == 8: top_controller = chart_data.data8
+        elif self.blue_index == 9: top_controller = chart_data.data9
+        elif self.blue_index == 10: top_controller = chart_data.data10
+        elif self.blue_index == 11: top_controller = chart_data.data11
+        elif self.blue_index == 12: top_controller = chart_data.data12
+        elif self.blue_index == 13: top_controller = chart_data.data13
+        elif self.blue_index == 14: top_controller = chart_data.data14
+        elif self.blue_index == 15: top_controller = chart_data.data15
+        else: top_controller = 0
+            
+        if self.orange_index == 0: top_measure = chart_data.data0
+        elif self.orange_index == 1: top_measure = chart_data.data1
+        elif self.orange_index == 2: top_measure = chart_data.data2
+        elif self.orange_index == 3: top_measure = chart_data.data3
+        elif self.orange_index == 4: top_measure = chart_data.data4
+        elif self.orange_index == 5: top_measure = chart_data.data5
+        elif self.orange_index == 6: top_measure = chart_data.data6
+        elif self.orange_index == 7: top_measure = chart_data.data7
+        elif self.orange_index == 8: top_measure = chart_data.data8
+        elif self.orange_index == 9: top_measure = chart_data.data9
+        elif self.orange_index == 10: top_measure = chart_data.data10
+        elif self.orange_index == 11: top_measure = chart_data.data11
+        elif self.orange_index == 12: top_measure = chart_data.data12
+        elif self.orange_index == 13: top_measure = chart_data.data13
+        elif self.orange_index == 14: top_measure = chart_data.data14
+        elif self.orange_index == 15: top_measure = chart_data.data15
+        else: top_measure = 0
 
         if top_controller is None or top_measure is None:
             top_controller = 0
