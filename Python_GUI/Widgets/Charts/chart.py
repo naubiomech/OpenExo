@@ -18,6 +18,8 @@ class BasePlot:
         self.xValues = []
         self.yValues = []
         self.secondY = []
+        self.blue_index = 0
+        self.orange_index = 1
         
 
         # Plot initialization
@@ -82,62 +84,43 @@ class TopPlot(BasePlot):
         super().__init__(master, "Top Plot")
         
     def animate(self, chartSelection):
-        # Get the selected parameter indices from the dropdowns
-        # Top right dropdown 1 controls blue line (line1)
-        # Top right dropdown 2 controls orange line (line2)
-        
         try:
-            # Get the selected parameter names from the dropdowns (these are cleaned names)
-            blue_param_name_clean = self.master.topRightDropdown1.get()
-            orange_param_name_clean = self.master.topRightDropdown2.get()
-            
-            # Get indices directly from dropdown selection (much faster)
-            blue_index = self._get_param_index(blue_param_name_clean)
-            orange_index = self._get_param_index(orange_param_name_clean)
-            
-            # Access data the same way as the original code using _chart_data
             chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
-            
-            # Get the parameter values array
             param_values = chart_data.param_values if hasattr(chart_data, 'param_values') else []
             
-            # Extract the values for the selected parameters
-            blue_value = param_values[blue_index] if blue_index < len(param_values) else 0.0
-            orange_value = param_values[orange_index] if orange_index < len(param_values) else 0.0
-
-            # Set appropriate limits based on the data type
+            blue_value = param_values[self.blue_index] if self.blue_index < len(param_values) else 0.0
+            orange_value = param_values[self.orange_index] if self.orange_index < len(param_values) else 0.0
+            
             bottomLimit = -1
             topLimit = 1
-            
-            # Update the plot title to show what's being plotted (using cleaned names)
-            title = f"Blue: {blue_param_name_clean}, Orange: {orange_param_name_clean}"
+            title = f"Blue: {self.blue_index}, Orange: {self.orange_index}"
             
         except (AttributeError, IndexError, ValueError):
-            # Fallback to default values if there's an error
             blue_value = 0.0
             orange_value = 0.0
             title = "Top Plot - Select Parameters"
             bottomLimit = -1
             topLimit = 1
 
-        # Update the plot data
         self.xValues.append(dt.datetime.now())
-        self.yValues.append(blue_value)      # Blue line (line1)
-        self.secondY.append(orange_value)   # Orange line (line2)
+        self.yValues.append(blue_value)
+        self.secondY.append(orange_value)
         self.ax.set_title(title)
 
         self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
     
-    def _get_param_index(self, param_name_clean):
-        """Get parameter index directly from dropdown selection - much faster than cache lookup"""
+    def update_indices(self):
         try:
-            # Get the current dropdown values to find the index
             dropdown_values = self.master.topRightDropdown1['values']
-            if param_name_clean in dropdown_values:
-                return dropdown_values.index(param_name_clean)
-            return 0  # Default to first parameter
+            blue_name = self.master.topRightDropdown1.get()
+            orange_name = self.master.topRightDropdown2.get()
+            
+            if blue_name in dropdown_values:
+                self.blue_index = dropdown_values.index(blue_name)
+            if orange_name in dropdown_values:
+                self.orange_index = dropdown_values.index(orange_name)
         except (AttributeError, ValueError):
-            return 0
+            pass
 
 
 class BottomPlot(BasePlot):
@@ -145,62 +128,43 @@ class BottomPlot(BasePlot):
         super().__init__(master, "Bottom Plot")
 
     def animate(self, chartSelection):
-        # Get the selected parameter indices from the dropdowns
-        # Bottom right dropdown 1 controls blue line (line1)
-        # Bottom right dropdown 2 controls orange line (line2)
-        
         try:
-            # Get the selected parameter names from the dropdowns (these are cleaned names)
-            blue_param_name_clean = self.master.bottomRightDropdown1.get()
-            orange_param_name_clean = self.master.bottomRightDropdown2.get()
-            
-            # Get indices directly from dropdown selection (much faster)
-            blue_index = self._get_param_index(blue_param_name_clean)
-            orange_index = self._get_param_index(orange_param_name_clean)
-            
-            # Access data the same way as the original code using _chart_data
             chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
-            
-            # Get the parameter values array
             param_values = chart_data.param_values if hasattr(chart_data, 'param_values') else []
             
-            # Extract the values for the selected parameters
-            blue_value = param_values[blue_index] if blue_index < len(param_values) else 0.0
-            orange_value = param_values[orange_index] if orange_index < len(param_values) else 0.0
-
-            # Set appropriate limits based on the data type
+            blue_value = param_values[self.blue_index] if self.blue_index < len(param_values) else 0.0
+            orange_value = param_values[self.orange_index] if self.orange_index < len(param_values) else 0.0
+            
             bottomLimit = -1
             topLimit = 1
-            
-            # Update the plot title to show what's being plotted (using cleaned names)
-            title = f"Blue: {blue_param_name_clean}, Orange: {orange_param_name_clean}"
+            title = f"Blue: {self.blue_index}, Orange: {self.orange_index}"
             
         except (AttributeError, IndexError, ValueError):
-            # Fallback to default values if there's an error
             blue_value = 0.0
             orange_value = 0.0
             title = "Bottom Plot - Select Parameters"
             bottomLimit = -1
             topLimit = 1
 
-        # Update the plot data
         self.xValues.append(dt.datetime.now())
-        self.yValues.append(blue_value)      # Blue line (line1)
-        self.secondY.append(orange_value)   # Orange line (line2)
+        self.yValues.append(blue_value)
+        self.secondY.append(orange_value)
         self.ax.set_title(title)
 
         self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
     
-    def _get_param_index(self, param_name_clean):
-        """Get parameter index directly from dropdown selection - much faster than cache lookup"""
+    def update_indices(self):
         try:
-            # Get the current dropdown values to find the index
             dropdown_values = self.master.bottomRightDropdown1['values']
-            if param_name_clean in dropdown_values:
-                return dropdown_values.index(param_name_clean)
-            return 0  # Default to first parameter
+            blue_name = self.master.bottomRightDropdown1.get()
+            orange_name = self.master.bottomRightDropdown2.get()
+            
+            if blue_name in dropdown_values:
+                self.blue_index = dropdown_values.index(blue_name)
+            if orange_name in dropdown_values:
+                self.orange_index = dropdown_values.index(orange_name)
         except (AttributeError, ValueError):
-            return 0
+            pass
 
 class FSRPlot(BasePlot):
     def __init__(self, master, goal=None):

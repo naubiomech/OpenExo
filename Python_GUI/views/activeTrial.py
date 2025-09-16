@@ -464,8 +464,9 @@ class ActiveTrial(tk.Frame):
 
     def on_dropdown_change(self, event=None):
         """Handle dropdown selection changes and update plots"""
-        # Force a plot update when dropdown selections change
         if self.is_plotting:
+            self.topPlot.update_indices()
+            self.bottomPlot.update_indices()
             self.newSelection()
 
 
@@ -493,11 +494,8 @@ class ActiveTrial(tk.Frame):
                 self.bottomRightDropdown1['values'] = cleaned_param_names
                 self.bottomRightDropdown2['values'] = cleaned_param_names
                 
-                # Invalidate parameter index caches in plots to force rebuild
-                if hasattr(self, 'topPlot') and hasattr(self.topPlot, '_param_index_cache'):
-                    self.topPlot._param_index_cache = None
-                if hasattr(self, 'bottomPlot') and hasattr(self.bottomPlot, '_param_index_cache'):
-                    self.bottomPlot._param_index_cache = None
+                self.topPlot.update_indices()
+                self.bottomPlot.update_indices()
                 
                 # Set default selections if they're still "Select Parameter"
                 if self.topRightDropdown1.get() == "Select Parameter" and len(cleaned_param_names) > 0:

@@ -269,7 +269,7 @@ void ExoBLE::sendInitialParameterNames()
         Serial.print(": ");
         std::string param_name = UART_command_handlers::param_names_arr[i];
         Serial.println(param_name.c_str());
-        int success = _gatt_db.TXChar.writeValue(param_name.c_str(), true);
+        int success = _gatt_db.TXChar.writeValue(param_name.c_str());
         // CRITICAL: Add delay between messages
         delay(50); // 50ms delay between each parameter name
 
@@ -278,13 +278,13 @@ void ExoBLE::sendInitialParameterNames()
     }
     delay(100); // Extra delay before END marker
     std::string end_str = "END"; //marks the end of the parameter names list
-    _gatt_db.TXChar.writeValue(end_str.c_str(), true);
+    _gatt_db.TXChar.writeValue(end_str.c_str());
 
     //Use controllerData class to send controller parameters
     std::string key_char = "!";
     _data->left_side.hip.controller.write_parameter_names(_gatt_db, key_char);
     std::string end_key = "!END";
-    _gatt_db.TXChar.writeValue(end_key.c_str(), true);
+    _gatt_db.TXChar.writeValue(end_key.c_str());
 }
 
 void ExoBLE::send_error(int error_code, int joint_id)
