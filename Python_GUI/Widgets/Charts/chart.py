@@ -18,6 +18,8 @@ class BasePlot:
         self.xValues = []
         self.yValues = []
         self.secondY = []
+        self.param_values = []  # Direct reference to parameter values
+        self.param_index_cache = {}  # Direct reference to parameter cache
 
         # Plot initialization
         self.line1, = self.ax.plot([], [], label='Controller Value', color='blue')
@@ -77,80 +79,79 @@ class BasePlot:
 
 class TopPlot(BasePlot):
     def __init__(self, master):
-        super().__init__(master, "Left Torque")
+        super().__init__(master, "Top Plot")
+        
     def animate(self, chartSelection):
-        topController = None
-        title = "No Data Selected"
-        bottomLimit = -1
-        topLimit = 1
-        if chartSelection == "Data 0-3":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightTorque
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightState
-            )
-            title = "Data 0 and 1"
-        elif chartSelection == "Data 4-7":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftState
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
-            )
-            title = "Data 4 and 5"
-            bottomLimit = 0
-            topLimit = 1.1
+        self._animate_dropdown_mode()
+    
 
-        if topController is None or topMeasure is None:
-            topController = 0
-            topMeasure = 0
+    def _animate_dropdown_mode(self):
+        try:
+            blue_param_name_clean = self.master.topRightDropdown1.get()
+            orange_param_name_clean = self.master.topRightDropdown2.get()
+            
+            blue_index = self.param_index_cache.get(blue_param_name_clean, 0)
+            orange_index = self.param_index_cache.get(orange_param_name_clean, 1)
+            
+            blue_value = self.param_values[blue_index] if blue_index < len(self.param_values) else 0.0
+            orange_value = self.param_values[orange_index] if orange_index < len(self.param_values) else 0.0
+            
+            bottomLimit = -1
+            topLimit = 1
+            title = f"Blue: {blue_param_name_clean}, Orange: {orange_param_name_clean}"
+            
+        except (AttributeError, IndexError, ValueError):
+            blue_value = 0.0
+            orange_value = 0.0
+            title = "Top Plot - Select Parameters"
+            bottomLimit = -1
+            topLimit = 1
 
         self.xValues.append(dt.datetime.now())
-        self.yValues.append(topController)
-        self.secondY.append(topMeasure)
+        self.yValues.append(blue_value)
+        self.secondY.append(orange_value)
         self.ax.set_title(title)
 
-        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit,topLimit,title)
+        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
+    
+
 
 class BottomPlot(BasePlot):
     def __init__(self, master):
-        super().__init__(master, "Right Torque")
+        super().__init__(master, "Bottom Plot")
 
     def animate(self, chartSelection):
-        title = "No Data Selected"
-        topController = None
-        bottomLimit = -1
-        topLimit = 1
-        if chartSelection == "Data 0-3":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightSet
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftTorque
-            )
-            title = "Data 2 and 3"
-        elif chartSelection == "Data 4-7":
-            topController = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.rightFsr
-            )
-            topMeasure = (
-                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
-            )
-            bottomLimit = 0
-            topLimit = 1.1
-            title = "Data 6 and 7"
+        self._animate_dropdown_mode()
 
-        if topController is None or topMeasure is None:
-            topController = 0
-            topMeasure = 0
+    def _animate_dropdown_mode(self):
+        try:
+            blue_param_name_clean = self.master.bottomRightDropdown1.get()
+            orange_param_name_clean = self.master.bottomRightDropdown2.get()
+            
+            blue_index = self.param_index_cache.get(blue_param_name_clean, 0)
+            orange_index = self.param_index_cache.get(orange_param_name_clean, 1)
+            
+            blue_value = self.param_values[blue_index] if blue_index < len(self.param_values) else 0.0
+            orange_value = self.param_values[orange_index] if orange_index < len(self.param_values) else 0.0
+            
+            bottomLimit = -1
+            topLimit = 1
+            title = f"Blue: {blue_param_name_clean}, Orange: {orange_param_name_clean}"
+            
+        except (AttributeError, IndexError, ValueError):
+            blue_value = 0.0
+            orange_value = 0.0
+            title = "Bottom Plot - Select Parameters"
+            bottomLimit = -1
+            topLimit = 1
 
         self.xValues.append(dt.datetime.now())
-        self.yValues.append(topController)
-        self.secondY.append(topMeasure)
+        self.yValues.append(blue_value)
+        self.secondY.append(orange_value)
         self.ax.set_title(title)
 
-        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit,topLimit,title)
+        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
+    
 
 class FSRPlot(BasePlot):
     def __init__(self, master, goal=None):

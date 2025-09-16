@@ -127,8 +127,7 @@ class ActiveTrial(tk.Frame):
         )
         self.chartButton.grid(row=3, column=3, padx=10, pady=10, sticky="E")
         
-        # Add a mode variable to track whether we're using dropdowns or indices
-        self.plotting_mode = "dropdowns"  # "indices_0_3", "indices_4_7", or "dropdowns"
+        self.plotting_mode = "dropdowns"
 
         # Buttons at the bottom
         graph_button_frame = ttk.Frame(self)
@@ -239,36 +238,7 @@ class ActiveTrial(tk.Frame):
             self.grid_columnconfigure(j, weight=1)
             
     def toggle_chart(self):
-        """Toggle between 'Controller', 'Sensor', and 'Dropdown Mode' plotting modes."""
-        if self.plotting_mode == "dropdowns":
-            self.plotting_mode = "indices_0_3"
-            self.chartVar.set("Controller")
-            self.chartButton.config(text="Controller")
-            # Disable dropdowns in index mode
-            self.topRightDropdown1.config(state="disabled")
-            self.topRightDropdown2.config(state="disabled")
-            self.bottomRightDropdown1.config(state="disabled")
-            self.bottomRightDropdown2.config(state="disabled")
-        elif self.plotting_mode == "indices_0_3":
-            self.plotting_mode = "indices_4_7"
-            self.chartVar.set("Sensor")
-            self.chartButton.config(text="Sensor")
-            # Keep dropdowns disabled in index mode
-            self.topRightDropdown1.config(state="disabled")
-            self.topRightDropdown2.config(state="disabled")
-            self.bottomRightDropdown1.config(state="disabled")
-            self.bottomRightDropdown2.config(state="disabled")
-        else:  # indices_4_7
-            self.plotting_mode = "dropdowns"
-            self.chartVar.set("Dropdown Mode")
-            self.chartButton.config(text="Dropdown Mode")
-            # Enable dropdowns for user interaction
-            self.topRightDropdown1.config(state="readonly")
-            self.topRightDropdown2.config(state="readonly")
-            self.bottomRightDropdown1.config(state="readonly")
-            self.bottomRightDropdown2.config(state="readonly")
-        
-        self.newSelection()
+        pass
 
     def set_graph(self, selection):
         """Set the graph display based on the button clicked."""
@@ -344,18 +314,9 @@ class ActiveTrial(tk.Frame):
         self.controller.show_frame("MachineLearning")
 
     def newSelection(self, event=None):
-        # Disable buttons and dropdown until process complete
         self.disable_interactions()
-
-        # Determine which plots to show based on plotting mode
-        if self.plotting_mode == "indices_0_3" or self.plotting_mode == "indices_4_7":
-            # In index modes, use the plotting mode directly
-            selection = self.plotting_mode
-        else:
-            # In dropdown mode, use a default selection since dropdowns control the plotting
-            selection = "dropdown_mode"
-        
-        self.update_plots(selection)
+        self.is_plotting = True
+        self.update_plots("dropdown_mode")
 
     def disable_interactions(self):
         # Disable all interactive elements
@@ -387,7 +348,6 @@ class ActiveTrial(tk.Frame):
         self.controller.show_frame("UpdateTorque")
 
     def update_plots(self, selection):
-        self.update_dropdown_values()
         # Cancel the previous update job if it exists
         if self.plot_update_job:
             self.after_cancel(self.plot_update_job)
@@ -442,19 +402,10 @@ class ActiveTrial(tk.Frame):
         self.is_plotting = True
         self.update_dropdown_values()  # Update dropdown values with parameter names
         self.controller.frames["UpdateTorque"].update_dropdowns()
-        # Set initial dropdown states based on plotting mode
-        if self.plotting_mode == "indices_0_3" or self.plotting_mode == "indices_4_7":
-            # Disable dropdowns in index modes
-            self.topRightDropdown1.config(state="disabled")
-            self.topRightDropdown2.config(state="disabled")
-            self.bottomRightDropdown1.config(state="disabled")
-            self.bottomRightDropdown2.config(state="disabled")
-        else:
-            # Enable dropdowns in dropdown mode (default)
-            self.topRightDropdown1.config(state="readonly")
-            self.topRightDropdown2.config(state="readonly")
-            self.bottomRightDropdown1.config(state="readonly")
-            self.bottomRightDropdown2.config(state="readonly")
+        self.topRightDropdown1.config(state="readonly")
+        self.topRightDropdown2.config(state="readonly")
+        self.bottomRightDropdown1.config(state="readonly")
+        self.bottomRightDropdown2.config(state="readonly")
         
         self.newSelection()
 
@@ -465,28 +416,15 @@ class ActiveTrial(tk.Frame):
             self.newSelection()
 
     def update_dropdown_values(self):
-        """Update the dropdown values with the current parameter names"""
         try:
-            # Get parameter names from the real-time processor
-            param_names = self.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            cleaned_param_names = self.controller.deviceManager._realTimeProcessor.cleaned_param_names
             
-            if param_names:
-                # Clean up parameter names by removing "exo_data->" prefix
-                cleaned_param_names = []
-                for name in param_names:
-                    if name.startswith("exo_data->"):
-                        cleaned_name = name[10:]  # Remove "exo_data->" prefix
-                    else:
-                        cleaned_name = name
-                    cleaned_param_names.append(cleaned_name)
-                
-                # Update all dropdowns with the cleaned parameter names
+            if cleaned_param_names:
                 self.topRightDropdown1['values'] = cleaned_param_names
                 self.topRightDropdown2['values'] = cleaned_param_names
                 self.bottomRightDropdown1['values'] = cleaned_param_names
                 self.bottomRightDropdown2['values'] = cleaned_param_names
                 
-                # Set default selections if they're still "Select Parameter"
                 if self.topRightDropdown1.get() == "Select Parameter" and len(cleaned_param_names) > 0:
                     self.topRightDropdown1.set(cleaned_param_names[0])
                 if self.topRightDropdown2.get() == "Select Parameter" and len(cleaned_param_names) > 1:
@@ -496,8 +434,19 @@ class ActiveTrial(tk.Frame):
                 if self.bottomRightDropdown2.get() == "Select Parameter" and len(cleaned_param_names) > 1:
                     self.bottomRightDropdown2.set(cleaned_param_names[1])
                     
+                self._update_plot_references()
         except Exception as e:
             print(f"Error updating dropdown values: {e}")
+    
+    def _update_plot_references(self):
+        try:
+            processor = self.controller.deviceManager._realTimeProcessor
+            self.topPlot.param_values = processor.param_values
+            self.topPlot.param_index_cache = processor.param_index_cache
+            self.bottomPlot.param_values = processor.param_values
+            self.bottomPlot.param_index_cache = processor.param_index_cache
+        except Exception as e:
+            print(f"Error updating plot references: {e}")
 
     def startClock(self):
         self.start_time = time.time()  # Record the start time

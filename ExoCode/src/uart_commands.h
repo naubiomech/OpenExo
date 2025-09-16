@@ -354,78 +354,13 @@ namespace UART_command_handlers
     inline static void update_motor_zero(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
     {
     }
-    
-    static int num_entries = 8; // Number of data entries (parameters) that will be sent to the GUI
-    static std::vector<std::string> param_names_arr; // Vector of strings to hold the names of the parameters that will be sent to the GUI
-    inline static void initialize_parameter_names(ExoData *exo_data, uint8_t *config)
+
+    // ELLIOTT: This is a helper function to populat the data entries
+    inline static void populate_data_entries(ExoData *exo_data, uint8_t *config, DataEntry* data_entries, int& num_entries)
     {
-        
-        switch (config[config_defs::exo_name_idx])
-        {
-            case (uint8_t)config_defs::exo_name::bilateral_ankle:
-                num_entries = 9;
-                break;
-            case (uint8_t)config_defs::exo_name::bilateral_hip:
-                num_entries = 8;
-                break;
-            case (uint8_t)config_defs::exo_name::bilateral_elbow:
-                num_entries = 8;
-                break;
-            case (uint8_t)config_defs::exo_name::bilateral_hip_ankle:
-                num_entries = 9;
-                break;
-            case (uint8_t)config_defs::exo_name::bilateral_hip_elbow:
-                num_entries = 10;
-                break;
-            case (uint8_t)config_defs::exo_name::bilateral_ankle_elbow:
-                num_entries = 10;
-                break;
-            default:
-                num_entries = 9;
-                break;
-        }
-        /*Set the length of the msg and copy the data into a vector to be accessed by ExoBLE*/
-        for (int i = 0; i < num_entries; i++) {
-            std::string param_name = data_entries[i].name;
-            param_names_arr.push_back(param_name);
-        }
-        exo_data->parameters_initialized = true;
-    }
-
-    inline static void get_real_time_data(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg, uint8_t *config)
-    {
-        UART_msg_t rx_msg;
-        rx_msg.command = UART_command_names::update_real_time_data;
-        rx_msg.joint_id = 0;
-        rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN; 
-
-        // logger::println("config[config_defs::exo_name_idx] :: "); //Uncomment if you want to check that system is receiving correct config info
-        // logger::println(config[config_defs::exo_name_idx]);
-
-        //Plotting Guide [Mapping data value (o,1,2,etc.) to the color and tab of the Python GUI; Rule of Thumb: Even = Blue, Odd = Orange). 
-        //Tab One
-        //0 = Top Blue Line
-        //1 = Top Orange Line
-        //2 = Bottom Blue Line
-        //3 = Bottom Orange Line
-        
-        //Tab 2
-        //4 = Top Blue Line
-        //5 = Top Orange Line
-        //6 = Bottom Blue Line
-        //7 = Bottom Orange Line
-        
-        //8 = Not Plotted, Will Save
-        //9 = Not Plotted, Will Save
-
-        //Note: Ankle and Hip are Configured for Step Controller, Elbow for the ElbowMinMax Controller, Multi-joint for their primary control schemes
-                // Declare the list of structs - ELLIOTTS CODE
-        DataEntry data_entries[10];
         float right_gait;
         float left_gait;
         
-        // Clear the parameter names array at the start of each call
-        param_names_arr.clear();
 
         switch (config[config_defs::exo_name_idx])
         {
@@ -445,7 +380,6 @@ namespace UART_command_handlers
             data_entries[8] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
 
             num_entries = 9;  // Fixed: Set to actual number of entries filled
-            rx_msg.len = num_entries;
 
             // END OF ELLIOTTS CODE
 
@@ -478,7 +412,6 @@ namespace UART_command_handlers
             data_entries[6] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
             data_entries[7] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
             num_entries = 8;  // Fixed: Set to actual number of entries filled
-            rx_msg.len = num_entries;
             // END OF ELLIOTTS CODE
 
             /*
@@ -509,7 +442,6 @@ namespace UART_command_handlers
             data_entries[6] = Data_Entry(exo_data->left_side.elbow.controller.FlexSense, TYPE_FLOAT);
             data_entries[7] = Data_Entry(exo_data->left_side.elbow.controller.ExtenseSense, TYPE_FLOAT);
             num_entries = 8;  // Fixed: Set to actual number of entries filled
-            rx_msg.len = num_entries;
 
             // END OF ELLIOTTS CODE
 
@@ -542,7 +474,7 @@ namespace UART_command_handlers
             data_entries[7] = Data_Entry(left_gait, TYPE_FLOAT);
             data_entries[8] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
             num_entries = 9;  // Fixed: Set to actual number of entries filled
-            rx_msg.len = num_entries;
+
             // END OF ELLIOTTS CODE
 
             /*
@@ -577,7 +509,6 @@ namespace UART_command_handlers
             data_entries[8] = Data_Entry(exo_data->right_side.elbow.controller.FlexSense, TYPE_FLOAT);
             data_entries[9] = Data_Entry(exo_data->left_side.elbow.controller.FlexSense, TYPE_FLOAT);
             num_entries = 10;  // Fixed: Set to actual number of entries filled
-            rx_msg.len = num_entries;
             // END OF ELLIOTTS CODE
 
             /*
@@ -609,7 +540,6 @@ namespace UART_command_handlers
             data_entries[8] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
             data_entries[9] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
             num_entries = 10;  // Fixed: Set to actual number of entries filled
-            rx_msg.len = num_entries;
             // END OF ELLIOTTS CODE
 
             /*
@@ -640,7 +570,6 @@ namespace UART_command_handlers
             data_entries[7] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
             data_entries[8] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
             num_entries = 9;  // Fixed: Set to actual number of entries filled
-            rx_msg.len = num_entries;
             // END OF ELLIOTTS CODE
 
             /*
@@ -658,6 +587,56 @@ namespace UART_command_handlers
             */                                         //Not Plotted, Saved
             break;
         }
+    }
+
+    static int num_entries = 8; // Number of data entries (parameters) that will be sent to the GUI
+    static std::vector<std::string> param_names_arr; // Vector of strings to hold the names of the parameters that will be sent to the GUI
+    inline static void initialize_parameter_names(ExoData *exo_data, uint8_t *config)
+    {
+        DataEntry data_entries[10];
+        populate_data_entries(exo_data, config, data_entries, num_entries);
+
+        // Clear the parameter names array at the start of each call
+        param_names_arr.clear();
+
+        /*Set the length of the msg and copy the data into a vector to be accessed by ExoBLE*/
+        for (int i = 0; i < num_entries; i++) {
+            std::string param_name = data_entries[i].name;
+            param_names_arr.push_back(param_name);
+        }
+    }
+
+    inline static void get_real_time_data(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg, uint8_t *config)
+    {
+        UART_msg_t rx_msg;
+        rx_msg.command = UART_command_names::update_real_time_data;
+        rx_msg.joint_id = 0;
+        rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN; 
+
+        // logger::println("config[config_defs::exo_name_idx] :: "); //Uncomment if you want to check that system is receiving correct config info
+        // logger::println(config[config_defs::exo_name_idx]);
+
+        //Plotting Guide [Mapping data value (o,1,2,etc.) to the color and tab of the Python GUI; Rule of Thumb: Even = Blue, Odd = Orange). 
+        //Tab One
+        //0 = Top Blue Line
+        //1 = Top Orange Line
+        //2 = Bottom Blue Line
+        //3 = Bottom Orange Line
+         
+        //Tab 2
+        //4 = Top Blue Line
+        //5 = Top Orange Line
+        //6 = Bottom Blue Line
+        //7 = Bottom Orange Line
+        
+        //8 = Not Plotted, Will Save
+        //9 = Not Plotted, Will Save
+
+        //Note: Ankle and Hip are Configured for Step Controller, Elbow for the ElbowMinMax Controller, Multi-joint for their primary control schemes
+                // Declare the list of structs - ELLIOTTS CODE
+        DataEntry data_entries[10];
+        populate_data_entries(exo_data, config, data_entries, num_entries);
+        rx_msg.len = num_entries;
 
         for (int i = 0; i < num_entries; i++)
         {

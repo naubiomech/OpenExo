@@ -14,6 +14,11 @@
 
 #define COMSMCU_DEBUG 0
 
+// These time vaiables are used to delay until actual connection is established - Elliott
+static unsigned long connection_timer_start = 0;
+static bool connection_timer_active = false;
+static const unsigned long CONNECTION_DELAY = 800; 
+
 ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
 {
     switch (config_to_send[config_defs::battery_idx])
@@ -152,15 +157,33 @@ void ComsMCU::update_gui()
     //Get real time data from ExoData and send to GUI
     const bool new_rt_data = real_time_i2c::poll(rt_floats);
     static float del_t_no_msg = millis();
-    
-    if(_data->first_message)
+
+    // Start timer when first message is true (connection detected)
+    if(_data->connected && _data->first_message && !connection_timer_active)
     {
-        Serial.println("Initial Send");
+        connection_timer_start = millis();
+        connection_timer_active = true;
+        Serial.println("Connection detected - starting delay timer");
+        return; // Don't send parameters yet
+    }
+
+    // attempt to send parameters after connection, only on first message, and after delay
+    if(_data->connected && _data->first_message && connection_timer_active) 
+    {
+        if (millis() - connection_timer_start >= CONNECTION_DELAY)
+        {
+        Serial.println("Initial SendRTESTEST");
         _exo_ble->sendInitialParameterNames();
         _data->first_message = false;
+        }
+        // if delay not met, return
+        else
+        {
+            return;
+        }
     }
     
-    if ((new_rt_data || rt_data::new_rt_msg))
+    if ( _data->parameter_names_received && (new_rt_data || rt_data::new_rt_msg))
     {
         Serial.println("Now hitting data..");
         del_t_no_msg = millis();
@@ -193,6 +216,8 @@ void ComsMCU::update_gui()
 
         _exo_ble->send_message(rt_data_msg);
 
+        Serial.println("Sending real time data..");
+
         #if COMSMCU_DEBUG
             logger::println("ComsMCU::update_gui->sent message");
         #endif
@@ -221,30 +246,29 @@ void ComsMCU::update_gui()
             // }
         }
     }
-
     //Periodically send status information
     static float status_context = t_helper->generate_new_context(); 
     static float del_t_status = 0;
     del_t_status += t_helper->tick(status_context);
-    if (del_t_status > BLE_times::_status_msg_delay)
+    if (_data->parameter_names_received && (del_t_status > BLE_times::_status_msg_delay))
     {
+        Serial.println("Sending battery status..");
         #if COMSMCU_DEBUG
             logger::println("ComsMCU::update_gui->Sending status");
         #endif
-        Serial.println("Hit send message to BLE!");
         //Send status data
         BleMessage batt_msg = BleMessage();
         batt_msg.command = ble_names::send_batt;
         batt_msg.expecting = ble_command_helpers::get_length_for_command(batt_msg.command);
         batt_msg.data[0] = _data->battery_value;
         _exo_ble->send_message(batt_msg);
-
         del_t_status = 0;
 
         #if COMSMCU_DEBUG
             logger::println("ComsMCU::update_gui->sent message");
         #endif
     }
+    
 
     #if COMSMCU_DEBUG
         logger::println("ComsMCU::update_gui->End");

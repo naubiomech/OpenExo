@@ -101,18 +101,20 @@ bool Exo::run()
         UART_msg_t msg = handler->poll(UART_times::CONT_MCU_TIMEOUT);       //UART_times::CONT_MCU_TIMEOUT is in Config.h
         UART_command_utils::handle_msg(handler, data, msg);
 
-        // add logic initialize parameter names NEW ELLIOTT
+        // add logic initialize parameter names NEW ELLIOTT MAY NOT NEED THIS
+        /*
         if(!data->parameters_initialized)
         {
             UART_command_utils::initialize_parameter_names(handler, data, msg, data->config); // NEW ELLIOTT
         }
+        */
 
         //Send the coms mcu the real time data every _real_time_msg_delay microseconds
         rt_delta_t += t_helper->tick(rt_context);
         uint16_t exo_status = data->get_status();
         const bool correct_status = (exo_status == status_defs::messages::trial_on) || (exo_status == status_defs::messages::fsr_calibration) || (exo_status == status_defs::messages::fsr_refinement) || (exo_status == status_defs::messages::error);
         
-        if ((rt_delta_t >= BLE_times::_real_time_msg_delay) && (correct_status) && (data->parameters_initialized))
+        if ((rt_delta_t >= BLE_times::_real_time_msg_delay) && (correct_status))
         {
             #ifdef EXO_DEBUG
                 logger::print("Exo::run->Sending Real Time Message: ");

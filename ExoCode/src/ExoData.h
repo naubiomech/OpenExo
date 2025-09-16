@@ -143,7 +143,8 @@ class ExoData
         int ankle_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
         int elbow_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
         bool parameter_names_received = false; /**< Once the parameter names are received, this is set to true */
-        bool first_message = true;     /**< Once one message is sent, this is set to false */
+        bool first_message = true;
+        bool connected = false;
         bool parameters_initialized = false; /**< Once the parameter names are initialized, this is set to true */
 
         private:
