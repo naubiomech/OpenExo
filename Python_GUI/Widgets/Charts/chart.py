@@ -91,6 +91,7 @@ class TopPlot(BasePlot):
         
         try:
             param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            
             if self.blue_index < len(param_values):
                 top_controller = param_values[self.blue_index]
             if self.orange_index < len(param_values):
@@ -103,8 +104,7 @@ class TopPlot(BasePlot):
             top_controller = 0
             top_measure = 0
 
-        x_time = self.master.controller.deviceManager._realTimeProcessor.x_time
-        self.xValues.append(x_time)
+        self.xValues.append(dt.datetime.now())
         self.yValues.append(top_controller)
         self.secondY.append(top_measure)
         self.ax.set_title(title)
@@ -137,6 +137,7 @@ class BottomPlot(BasePlot):
         
         try:
             param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            
             if self.blue_index < len(param_values):
                 top_controller = param_values[self.blue_index]
             if self.orange_index < len(param_values):
@@ -149,8 +150,7 @@ class BottomPlot(BasePlot):
             top_controller = 0
             top_measure = 0
 
-        x_time = self.master.controller.deviceManager._realTimeProcessor.x_time
-        self.xValues.append(x_time)
+        self.xValues.append(dt.datetime.now())
         self.yValues.append(top_controller)
         self.secondY.append(top_measure)
         self.ax.set_title(title)
@@ -203,8 +203,7 @@ class FSRPlot(BasePlot):
         if topMeasure is None:
             topMeasure = 0
 
-        x_time = self.master.controller.deviceManager._realTimeProcessor.x_time
-        self.xValues.append(x_time)
+        self.xValues.append(dt.datetime.now())
         self.yValues.append(self.goal)
         self.secondY.append(topMeasure)
         self.ax.set_title(title)
