@@ -21,9 +21,6 @@ class BasePlot:
         self.blue_index = 0
         self.orange_index = 1
         
-        # CACHE the chart_data reference to eliminate deep object traversal every frame
-        self.chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
-        
 
         # Plot initialization
         self.line1, = self.ax.plot([], [], label='Controller Value', color='blue')
@@ -93,43 +90,16 @@ class TopPlot(BasePlot):
         top_limit = 1
         title = " "
         
-        # Use CACHED chart_data reference - NO deep object traversal every frame!
-        # Direct property access like old system - NO function call overhead
-        if self.blue_index == 0: top_controller = self.chart_data.data0
-        elif self.blue_index == 1: top_controller = self.chart_data.data1
-        elif self.blue_index == 2: top_controller = self.chart_data.data2
-        elif self.blue_index == 3: top_controller = self.chart_data.data3
-        elif self.blue_index == 4: top_controller = self.chart_data.data4
-        elif self.blue_index == 5: top_controller = self.chart_data.data5
-        elif self.blue_index == 6: top_controller = self.chart_data.data6
-        elif self.blue_index == 7: top_controller = self.chart_data.data7
-        elif self.blue_index == 8: top_controller = self.chart_data.data8
-        elif self.blue_index == 9: top_controller = self.chart_data.data9
-        elif self.blue_index == 10: top_controller = self.chart_data.data10
-        elif self.blue_index == 11: top_controller = self.chart_data.data11
-        elif self.blue_index == 12: top_controller = self.chart_data.data12
-        elif self.blue_index == 13: top_controller = self.chart_data.data13
-        elif self.blue_index == 14: top_controller = self.chart_data.data14
-        elif self.blue_index == 15: top_controller = self.chart_data.data15
-        else: top_controller = 0
-            
-        if self.orange_index == 0: top_measure = self.chart_data.data0
-        elif self.orange_index == 1: top_measure = self.chart_data.data1
-        elif self.orange_index == 2: top_measure = self.chart_data.data2
-        elif self.orange_index == 3: top_measure = self.chart_data.data3
-        elif self.orange_index == 4: top_measure = self.chart_data.data4
-        elif self.orange_index == 5: top_measure = self.chart_data.data5
-        elif self.orange_index == 6: top_measure = self.chart_data.data6
-        elif self.orange_index == 7: top_measure = self.chart_data.data7
-        elif self.orange_index == 8: top_measure = self.chart_data.data8
-        elif self.orange_index == 9: top_measure = self.chart_data.data9
-        elif self.orange_index == 10: top_measure = self.chart_data.data10
-        elif self.orange_index == 11: top_measure = self.chart_data.data11
-        elif self.orange_index == 12: top_measure = self.chart_data.data12
-        elif self.orange_index == 13: top_measure = self.chart_data.data13
-        elif self.orange_index == 14: top_measure = self.chart_data.data14
-        elif self.orange_index == 15: top_measure = self.chart_data.data15
-        else: top_measure = 0
+        # ULTRA FAST: Direct property access like old system - NO array creation
+        chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
+        
+        # Use getattr for fastest possible property access - like old system
+        try:
+            top_controller = getattr(chart_data, f'data{self.blue_index}', 0)
+            top_measure = getattr(chart_data, f'data{self.orange_index}', 0)
+        except:
+            top_controller = 0
+            top_measure = 0
 
         if top_controller is None or top_measure is None:
             top_controller = 0
@@ -167,43 +137,16 @@ class BottomPlot(BasePlot):
         top_limit = 1
         title = " "
         
-        # Use CACHED chart_data reference - NO deep object traversal every frame!
-        # Direct property access like old system - NO function call overhead
-        if self.blue_index == 0: top_controller = self.chart_data.data0
-        elif self.blue_index == 1: top_controller = self.chart_data.data1
-        elif self.blue_index == 2: top_controller = self.chart_data.data2
-        elif self.blue_index == 3: top_controller = self.chart_data.data3
-        elif self.blue_index == 4: top_controller = self.chart_data.data4
-        elif self.blue_index == 5: top_controller = self.chart_data.data5
-        elif self.blue_index == 6: top_controller = self.chart_data.data6
-        elif self.blue_index == 7: top_controller = self.chart_data.data7
-        elif self.blue_index == 8: top_controller = self.chart_data.data8
-        elif self.blue_index == 9: top_controller = self.chart_data.data9
-        elif self.blue_index == 10: top_controller = self.chart_data.data10
-        elif self.blue_index == 11: top_controller = self.chart_data.data11
-        elif self.blue_index == 12: top_controller = self.chart_data.data12
-        elif self.blue_index == 13: top_controller = self.chart_data.data13
-        elif self.blue_index == 14: top_controller = self.chart_data.data14
-        elif self.blue_index == 15: top_controller = self.chart_data.data15
-        else: top_controller = 0
-            
-        if self.orange_index == 0: top_measure = self.chart_data.data0
-        elif self.orange_index == 1: top_measure = self.chart_data.data1
-        elif self.orange_index == 2: top_measure = self.chart_data.data2
-        elif self.orange_index == 3: top_measure = self.chart_data.data3
-        elif self.orange_index == 4: top_measure = self.chart_data.data4
-        elif self.orange_index == 5: top_measure = self.chart_data.data5
-        elif self.orange_index == 6: top_measure = self.chart_data.data6
-        elif self.orange_index == 7: top_measure = self.chart_data.data7
-        elif self.orange_index == 8: top_measure = self.chart_data.data8
-        elif self.orange_index == 9: top_measure = self.chart_data.data9
-        elif self.orange_index == 10: top_measure = self.chart_data.data10
-        elif self.orange_index == 11: top_measure = self.chart_data.data11
-        elif self.orange_index == 12: top_measure = self.chart_data.data12
-        elif self.orange_index == 13: top_measure = self.chart_data.data13
-        elif self.orange_index == 14: top_measure = self.chart_data.data14
-        elif self.orange_index == 15: top_measure = self.chart_data.data15
-        else: top_measure = 0
+        # ULTRA FAST: Direct property access like old system - NO array creation
+        chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
+        
+        # Use getattr for fastest possible property access - like old system
+        try:
+            top_controller = getattr(chart_data, f'data{self.blue_index}', 0)
+            top_measure = getattr(chart_data, f'data{self.orange_index}', 0)
+        except:
+            top_controller = 0
+            top_measure = 0
 
         if top_controller is None or top_measure is None:
             top_controller = 0
@@ -249,10 +192,14 @@ class FSRPlot(BasePlot):
         bottomLimit = 0
         topLimit = 1.1
         if chartSelection == "Right Leg":
-            topMeasure = self.chart_data.leftSet
+            topMeasure = (
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftSet
+            )
             title = "Right Leg"
         elif chartSelection == "Left Leg":
-            topMeasure = self.chart_data.leftFsr
+            topMeasure = (
+                self.master.controller.deviceManager._realTimeProcessor._chart_data.leftFsr
+            )
             title = "Left Leg"
 
         if topMeasure is None:

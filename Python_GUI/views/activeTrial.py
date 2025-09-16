@@ -129,6 +129,8 @@ class ActiveTrial(tk.Frame):
         )
         self.chartButton.grid(row=3, column=3, padx=10, pady=10, sticky="E")
         
+        # Add a mode variable to track whether we're using dropdowns or indices
+        self.plotting_mode = "dropdowns"  # "indices_0_3", "indices_4_7", or "dropdowns"
 
         # Buttons at the bottom
         graph_button_frame = ttk.Frame(self)
@@ -239,14 +241,35 @@ class ActiveTrial(tk.Frame):
             self.grid_columnconfigure(j, weight=1)
             
     def toggle_chart(self):
-        """Toggle between 'Controller' and 'Sensor' for the chart."""
-        current = self.chartVar.get()
-        if current == "Data 0-3":
-            self.chartVar.set("Data 4-7")
-            self.chartButton.config(text="Data 4-7")
-        else:
-            self.chartVar.set("Data 0-3")
-            self.chartButton.config(text="Data 0-3")
+        """Toggle between 'Controller', 'Sensor', and 'Dropdown Mode' plotting modes."""
+        if self.plotting_mode == "dropdowns":
+            self.plotting_mode = "indices_0_3"
+            self.chartVar.set("Controller")
+            self.chartButton.config(text="Controller")
+            # Disable dropdowns in index mode
+            self.topRightDropdown1.config(state="disabled")
+            self.topRightDropdown2.config(state="disabled")
+            self.bottomRightDropdown1.config(state="disabled")
+            self.bottomRightDropdown2.config(state="disabled")
+        elif self.plotting_mode == "indices_0_3":
+            self.plotting_mode = "indices_4_7"
+            self.chartVar.set("Sensor")
+            self.chartButton.config(text="Sensor")
+            # Keep dropdowns disabled in index mode
+            self.topRightDropdown1.config(state="disabled")
+            self.topRightDropdown2.config(state="disabled")
+            self.bottomRightDropdown1.config(state="disabled")
+            self.bottomRightDropdown2.config(state="disabled")
+        else:  # indices_4_7
+            self.plotting_mode = "dropdowns"
+            self.chartVar.set("Dropdown Mode")
+            self.chartButton.config(text="Dropdown Mode")
+            # Enable dropdowns for user interaction
+            self.topRightDropdown1.config(state="readonly")
+            self.topRightDropdown2.config(state="readonly")
+            self.bottomRightDropdown1.config(state="readonly")
+            self.bottomRightDropdown2.config(state="readonly")
+        
         self.newSelection()
 
     def set_graph(self, selection):
@@ -329,8 +352,14 @@ class ActiveTrial(tk.Frame):
         # Start plotting
         self.is_plotting = True
 
-        # Determine which plots to show
-        selection = self.chartVar.get()
+        # Determine which plots to show based on plotting mode
+        if self.plotting_mode == "indices_0_3" or self.plotting_mode == "indices_4_7":
+            # In index modes, use the plotting mode directly
+            selection = self.plotting_mode
+        else:
+            # In dropdown mode, use a default selection since dropdowns control the plotting
+            selection = "dropdown_mode"
+        
         self.update_plots(selection)
 
     def disable_interactions(self):
@@ -415,6 +444,22 @@ class ActiveTrial(tk.Frame):
     def show(self):
         # Show the frame and update plots
         self.is_plotting = True
+        self.update_dropdown_values()  # Update dropdown values with parameter names
+        self.controller.frames["UpdateTorque"].update_dropdowns()
+        # Set initial dropdown states based on plotting mode
+        if self.plotting_mode == "indices_0_3" or self.plotting_mode == "indices_4_7":
+            # Disable dropdowns in index modes
+            self.topRightDropdown1.config(state="disabled")
+            self.topRightDropdown2.config(state="disabled")
+            self.bottomRightDropdown1.config(state="disabled")
+            self.bottomRightDropdown2.config(state="disabled")
+        else:
+            # Enable dropdowns in dropdown mode (default)
+            self.topRightDropdown1.config(state="readonly")
+            self.topRightDropdown2.config(state="readonly")
+            self.bottomRightDropdown1.config(state="readonly")
+            self.bottomRightDropdown2.config(state="readonly")
+        
         self.newSelection()
 
     def on_dropdown_change(self, event=None):
