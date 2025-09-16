@@ -212,6 +212,7 @@ class RealTimeProcessor:
         
         # Store the parameter values for access by plotting system
         self.param_values = param_values
+        
 
         self._exo_data.addDataPoints(
             self.x_time,

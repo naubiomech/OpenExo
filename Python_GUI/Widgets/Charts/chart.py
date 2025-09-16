@@ -83,31 +83,33 @@ class TopPlot(BasePlot):
     def __init__(self, master):
         super().__init__(master, "Top Plot")
         
-    def animate(self, chartSelection):
+    def animate(self, chart_selection):
+        top_controller = None
+        top_measure = None
+        bottom_limit = -1
+        top_limit = 1
+        
         try:
-            chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
-            param_values = chart_data.param_values if hasattr(chart_data, 'param_values') else []
-            
-            blue_value = param_values[self.blue_index] if self.blue_index < len(param_values) else 0.0
-            orange_value = param_values[self.orange_index] if self.orange_index < len(param_values) else 0.0
-            
-            bottomLimit = -1
-            topLimit = 1
+            param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            if self.blue_index < len(param_values):
+                top_controller = param_values[self.blue_index]
+            if self.orange_index < len(param_values):
+                top_measure = param_values[self.orange_index]
             title = f"Blue: {self.blue_index}, Orange: {self.orange_index}"
-            
         except (AttributeError, IndexError, ValueError):
-            blue_value = 0.0
-            orange_value = 0.0
-            title = "Top Plot - Select Parameters"
-            bottomLimit = -1
-            topLimit = 1
+            pass
 
-        self.xValues.append(dt.datetime.now())
-        self.yValues.append(blue_value)
-        self.secondY.append(orange_value)
+        if top_controller is None or top_measure is None:
+            top_controller = 0
+            top_measure = 0
+
+        x_time = self.master.controller.deviceManager._realTimeProcessor.x_time
+        self.xValues.append(x_time)
+        self.yValues.append(top_controller)
+        self.secondY.append(top_measure)
         self.ax.set_title(title)
 
-        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
+        self.update_plot(self.xValues, self.yValues, self.secondY, bottom_limit, top_limit, title)
     
     def update_indices(self):
         try:
@@ -127,31 +129,33 @@ class BottomPlot(BasePlot):
     def __init__(self, master):
         super().__init__(master, "Bottom Plot")
 
-    def animate(self, chartSelection):
+    def animate(self, chart_selection):
+        top_controller = None
+        top_measure = None
+        bottom_limit = -1
+        top_limit = 1
+        
         try:
-            chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
-            param_values = chart_data.param_values if hasattr(chart_data, 'param_values') else []
-            
-            blue_value = param_values[self.blue_index] if self.blue_index < len(param_values) else 0.0
-            orange_value = param_values[self.orange_index] if self.orange_index < len(param_values) else 0.0
-            
-            bottomLimit = -1
-            topLimit = 1
+            param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            if self.blue_index < len(param_values):
+                top_controller = param_values[self.blue_index]
+            if self.orange_index < len(param_values):
+                top_measure = param_values[self.orange_index]
             title = f"Blue: {self.blue_index}, Orange: {self.orange_index}"
-            
         except (AttributeError, IndexError, ValueError):
-            blue_value = 0.0
-            orange_value = 0.0
-            title = "Bottom Plot - Select Parameters"
-            bottomLimit = -1
-            topLimit = 1
+            pass
 
-        self.xValues.append(dt.datetime.now())
-        self.yValues.append(blue_value)
-        self.secondY.append(orange_value)
+        if top_controller is None or top_measure is None:
+            top_controller = 0
+            top_measure = 0
+
+        x_time = self.master.controller.deviceManager._realTimeProcessor.x_time
+        self.xValues.append(x_time)
+        self.yValues.append(top_controller)
+        self.secondY.append(top_measure)
         self.ax.set_title(title)
 
-        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit, topLimit, title)
+        self.update_plot(self.xValues, self.yValues, self.secondY, bottom_limit, top_limit, title)
     
     def update_indices(self):
         try:
@@ -199,7 +203,8 @@ class FSRPlot(BasePlot):
         if topMeasure is None:
             topMeasure = 0
 
-        self.xValues.append(dt.datetime.now())
+        x_time = self.master.controller.deviceManager._realTimeProcessor.x_time
+        self.xValues.append(x_time)
         self.yValues.append(self.goal)
         self.secondY.append(topMeasure)
         self.ax.set_title(title)
