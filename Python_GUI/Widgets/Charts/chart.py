@@ -83,29 +83,39 @@ class TopPlot(BasePlot):
     def __init__(self, master):
         super().__init__(master, "Top Plot")
         
+    def _get_data_value(self, index, chart_data):
+        """Get data value by index - optimized like old system"""
+        if index == 0: return chart_data.data0
+        elif index == 1: return chart_data.data1
+        elif index == 2: return chart_data.data2
+        elif index == 3: return chart_data.data3
+        elif index == 4: return chart_data.data4
+        elif index == 5: return chart_data.data5
+        elif index == 6: return chart_data.data6
+        elif index == 7: return chart_data.data7
+        elif index == 8: return chart_data.data8
+        elif index == 9: return chart_data.data9
+        elif index == 10: return chart_data.data10
+        elif index == 11: return chart_data.data11
+        elif index == 12: return chart_data.data12
+        elif index == 13: return chart_data.data13
+        elif index == 14: return chart_data.data14
+        elif index == 15: return chart_data.data15
+        else: return 0
+        
     def animate(self, chart_selection):
         top_controller = None
         top_measure = None
         bottom_limit = -1
         top_limit = 1
-        title = " "  # Initialize title with default value
+        title = " "
         
-        try:
-            chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
-            
-            # Use direct property access like the old system for maximum speed
-            data_properties = [chart_data.data0, chart_data.data1, chart_data.data2, chart_data.data3,
-                             chart_data.data4, chart_data.data5, chart_data.data6, chart_data.data7,
-                             chart_data.data8, chart_data.data9, chart_data.data10, chart_data.data11,
-                             chart_data.data12, chart_data.data13, chart_data.data14, chart_data.data15]
-            
-            if self.blue_index < len(data_properties):
-                top_controller = data_properties[self.blue_index]
-            if self.orange_index < len(data_properties):
-                top_measure = data_properties[self.orange_index]
-            title = f"Blue: {self.blue_index}, Orange: {self.orange_index}"
-        except (AttributeError, IndexError, ValueError):
-            pass
+        # Use EXACT same pattern as old system - direct property access
+        chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
+        
+        # Direct property access like old system - NO array creation overhead
+        top_controller = self._get_data_value(self.blue_index, chart_data)
+        top_measure = self._get_data_value(self.orange_index, chart_data)
 
         if top_controller is None or top_measure is None:
             top_controller = 0
@@ -136,29 +146,39 @@ class BottomPlot(BasePlot):
     def __init__(self, master):
         super().__init__(master, "Bottom Plot")
 
+    def _get_data_value(self, index, chart_data):
+        """Get data value by index - optimized like old system"""
+        if index == 0: return chart_data.data0
+        elif index == 1: return chart_data.data1
+        elif index == 2: return chart_data.data2
+        elif index == 3: return chart_data.data3
+        elif index == 4: return chart_data.data4
+        elif index == 5: return chart_data.data5
+        elif index == 6: return chart_data.data6
+        elif index == 7: return chart_data.data7
+        elif index == 8: return chart_data.data8
+        elif index == 9: return chart_data.data9
+        elif index == 10: return chart_data.data10
+        elif index == 11: return chart_data.data11
+        elif index == 12: return chart_data.data12
+        elif index == 13: return chart_data.data13
+        elif index == 14: return chart_data.data14
+        elif index == 15: return chart_data.data15
+        else: return 0
+
     def animate(self, chart_selection):
         top_controller = None
         top_measure = None
         bottom_limit = -1
         top_limit = 1
-        title = " "  # Initialize title with default value
+        title = " "
         
-        try:
-            chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
-            
-            # Use direct property access like the old system for maximum speed
-            data_properties = [chart_data.data0, chart_data.data1, chart_data.data2, chart_data.data3,
-                             chart_data.data4, chart_data.data5, chart_data.data6, chart_data.data7,
-                             chart_data.data8, chart_data.data9, chart_data.data10, chart_data.data11,
-                             chart_data.data12, chart_data.data13, chart_data.data14, chart_data.data15]
-            
-            if self.blue_index < len(data_properties):
-                top_controller = data_properties[self.blue_index]
-            if self.orange_index < len(data_properties):
-                top_measure = data_properties[self.orange_index]
-            title = f"Blue: {self.blue_index}, Orange: {self.orange_index}"
-        except (AttributeError, IndexError, ValueError):
-            pass
+        # Use EXACT same pattern as old system - direct property access
+        chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
+        
+        # Direct property access like old system - NO array creation overhead
+        top_controller = self._get_data_value(self.blue_index, chart_data)
+        top_measure = self._get_data_value(self.orange_index, chart_data)
 
         if top_controller is None or top_measure is None:
             top_controller = 0
