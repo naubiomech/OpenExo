@@ -15,9 +15,9 @@ class BasePlot:
         self.title = title
         self.figure = plt.Figure(figsize=BasePlot.figure_size)
         self.ax = self.figure.add_subplot(1, 1, 1)
-        self.xValues = []
-        self.yValues = []
-        self.secondY = []
+        self.x_values = []
+        self.y_values = []
+        self.second_y = []
         self.blue_index = 0
         self.orange_index = 1
         
@@ -41,15 +41,15 @@ class BasePlot:
         """Set the figure size for all plots."""
         cls.figure_size = size
 
-    def update_plot(self, xValues, yValues, secondY, bottomLim, topLim, title):
+    def update_plot(self, x_values, y_values, second_y, bottom_lim, top_lim, title):
         max_points = 20  # Keep only the last 20 points
-        if len(xValues) > max_points:
-            xValues = xValues[-max_points:]
-            yValues = yValues[-max_points:]
-            secondY = secondY[-max_points:]
+        if len(x_values) > max_points:
+            x_values = x_values[-max_points:]
+            y_values = y_values[-max_points:]
+            second_y = second_y[-max_points:]
         # Update line data
-        self.line1.set_data(xValues, yValues)
-        self.line2.set_data(xValues, secondY)
+        self.line1.set_data(x_values, y_values)
+        self.line2.set_data(x_values, second_y)
 
         # Efficiently redraw only the updated parts
         self.ax.relim()  # Recalculate limits based on new data
@@ -66,9 +66,9 @@ class BasePlot:
         
     def clear_plot(self):
         """Clear the plot data and refresh the display."""
-        self.xValues = []
-        self.yValues = []
-        self.secondY = []
+        self.x_values = []
+        self.y_values = []
+        self.second_y = []
         # Optionally clear the axes if you want to remove any lingering data
         self.ax.cla()
         self.ax.set_title(None)
@@ -88,14 +88,21 @@ class TopPlot(BasePlot):
         top_measure = None
         bottom_limit = -1
         top_limit = 1
+        title = " "  # Initialize title with default value
         
         try:
-            param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
             
-            if self.blue_index < len(param_values):
-                top_controller = param_values[self.blue_index]
-            if self.orange_index < len(param_values):
-                top_measure = param_values[self.orange_index]
+            # Use direct property access like the old system for maximum speed
+            data_properties = [chart_data.data0, chart_data.data1, chart_data.data2, chart_data.data3,
+                             chart_data.data4, chart_data.data5, chart_data.data6, chart_data.data7,
+                             chart_data.data8, chart_data.data9, chart_data.data10, chart_data.data11,
+                             chart_data.data12, chart_data.data13, chart_data.data14, chart_data.data15]
+            
+            if self.blue_index < len(data_properties):
+                top_controller = data_properties[self.blue_index]
+            if self.orange_index < len(data_properties):
+                top_measure = data_properties[self.orange_index]
             title = f"Blue: {self.blue_index}, Orange: {self.orange_index}"
         except (AttributeError, IndexError, ValueError):
             pass
@@ -104,12 +111,12 @@ class TopPlot(BasePlot):
             top_controller = 0
             top_measure = 0
 
-        self.xValues.append(dt.datetime.now())
-        self.yValues.append(top_controller)
-        self.secondY.append(top_measure)
+        self.x_values.append(dt.datetime.now())
+        self.y_values.append(top_controller)
+        self.second_y.append(top_measure)
         self.ax.set_title(title)
 
-        self.update_plot(self.xValues, self.yValues, self.secondY, bottom_limit, top_limit, title)
+        self.update_plot(self.x_values, self.y_values, self.second_y, bottom_limit, top_limit, title)
     
     def update_indices(self):
         try:
@@ -134,14 +141,21 @@ class BottomPlot(BasePlot):
         top_measure = None
         bottom_limit = -1
         top_limit = 1
+        title = " "  # Initialize title with default value
         
         try:
-            param_values = self.master.controller.deviceManager._realTimeProcessor.param_values
+            chart_data = self.master.controller.deviceManager._realTimeProcessor._chart_data
             
-            if self.blue_index < len(param_values):
-                top_controller = param_values[self.blue_index]
-            if self.orange_index < len(param_values):
-                top_measure = param_values[self.orange_index]
+            # Use direct property access like the old system for maximum speed
+            data_properties = [chart_data.data0, chart_data.data1, chart_data.data2, chart_data.data3,
+                             chart_data.data4, chart_data.data5, chart_data.data6, chart_data.data7,
+                             chart_data.data8, chart_data.data9, chart_data.data10, chart_data.data11,
+                             chart_data.data12, chart_data.data13, chart_data.data14, chart_data.data15]
+            
+            if self.blue_index < len(data_properties):
+                top_controller = data_properties[self.blue_index]
+            if self.orange_index < len(data_properties):
+                top_measure = data_properties[self.orange_index]
             title = f"Blue: {self.blue_index}, Orange: {self.orange_index}"
         except (AttributeError, IndexError, ValueError):
             pass
@@ -150,12 +164,12 @@ class BottomPlot(BasePlot):
             top_controller = 0
             top_measure = 0
 
-        self.xValues.append(dt.datetime.now())
-        self.yValues.append(top_controller)
-        self.secondY.append(top_measure)
+        self.x_values.append(dt.datetime.now())
+        self.y_values.append(top_controller)
+        self.second_y.append(top_measure)
         self.ax.set_title(title)
 
-        self.update_plot(self.xValues, self.yValues, self.secondY, bottom_limit, top_limit, title)
+        self.update_plot(self.x_values, self.y_values, self.second_y, bottom_limit, top_limit, title)
     
     def update_indices(self):
         try:
@@ -203,9 +217,9 @@ class FSRPlot(BasePlot):
         if topMeasure is None:
             topMeasure = 0
 
-        self.xValues.append(dt.datetime.now())
-        self.yValues.append(self.goal)
-        self.secondY.append(topMeasure)
+        self.x_values.append(dt.datetime.now())
+        self.y_values.append(self.goal)
+        self.second_y.append(topMeasure)
         self.ax.set_title(title)
 
         # Check if topMeasure crosses the goal
@@ -217,4 +231,4 @@ class FSRPlot(BasePlot):
             elif topMeasure <= self.goal:
                 self.above_goal = False  # Reset the flag when it goes below or equal to the goal
 
-        self.update_plot(self.xValues, self.yValues, self.secondY, bottomLimit , topLimit, title)
+        self.update_plot(self.x_values, self.y_values, self.second_y, bottomLimit , topLimit, title)

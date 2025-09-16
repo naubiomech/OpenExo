@@ -186,14 +186,22 @@ class RealTimeProcessor:
         swingtime = payload[15] if datalength >= 16 and len(payload) > 15 else 0
 
         self._chart_data.updateValues(
-            rightTorque,
-            rightState,
-            leftTorque,
-            leftState,
-            rightSet,
-            leftSet,
-            rightFsr,
-            leftFsr,
+            rightTorque,  # data0
+            rightState,   # data1
+            rightSet,     # data2
+            leftTorque,   # data3
+            leftState,    # data4
+            leftSet,      # data5
+            rightFsr,     # data6
+            leftFsr,      # data7
+            minSV,        # data8
+            maxSV,        # data9
+            minSA,        # data10
+            maxSA,        # data11
+            battery,      # data12
+            maxFSR,       # data13
+            stancetime,   # data14
+            swingtime,    # data15
         )
         self._predictor.addDataPoints([minSV,maxSV,minSA,maxSA,maxFSR,stancetime,swingtime,self._predictor.state]) #add data to model, if recording data
         
