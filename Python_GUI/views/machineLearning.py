@@ -275,7 +275,7 @@ class MachineLearning(tk.Frame):
                 # Call the async handler to update stiffness
                 await self.controller.deviceManager.newStiffness(stiffness_value)
             except ValueError:
-                # Invalid input - user will be notified via UI
+                print("Invalid input. Please enter a numeric value.")
 
         
     # Navigate to the Update Torque frame

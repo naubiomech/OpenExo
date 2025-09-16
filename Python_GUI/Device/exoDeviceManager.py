@@ -82,7 +82,7 @@ class ExoDeviceManager:
         if self._realTimeProcessor._predictor.modelExists:  # Check if the machine learning model exists
             if self._realTimeProcessor._predictor.controlMode == 1:  # If control is authorized
                 if self._realTimeProcessor._exo_data.Task[-2] != self._realTimeProcessor._predictor.prediction:
-                    # Prediction changed - adjusting stiffness 
+                    print("Prediction Changed") 
                     # Check current prediction and adjust stiffness accordingly
                     if self._realTimeProcessor._predictor.prediction == 1:  # Level
                         await self.sendStiffness(0.5)
@@ -103,9 +103,15 @@ class ExoDeviceManager:
 
     # Handle disconnect callback
     def handleDisconnect(self, _: BleakClient):
+        print("Disconnecting...")  # Check if this is reached
         if not self.disconnecting_intentionally:  # Only call if not an intentional disconnect
             if self.on_disconnect:
+                print("Calling disconnect callback...")
                 self.on_disconnect()
+            else:
+                print("No disconnect callback assigned.")
+        else:
+            print("Disconnect was intentional, skipping callback.")
 
     # Disconnect from the BLE device
     async def disconnect(self):
@@ -114,19 +120,18 @@ class ExoDeviceManager:
                 self.disconnecting_intentionally = True  # Set the flag before disconnecting
                 await self.client.disconnect()  # Disconnect from the client
                 self.isConnected = False  # Update connection status
-                pass  # Successfully disconnected
+                print("Successfully disconnected from the device.")
             except Exception as e:
-                pass  # Failed to disconnect
+                print(f"Failed to disconnect: {e}")
             finally:
                 self.disconnecting_intentionally = False  # Reset the flag after disconnecting
         else:
-            pass  # No device connected
+            print("No device is currently connected.")
 
     # Start motors of the Exo
     async def startExoMotors(self):
-        # Add extra delay for slower devices to ensure BLE connection is stable
-        await asyncio.sleep(2)
-        
+        await asyncio.sleep(1)
+        print("using bleak start\n")
         command = bytearray(b"E")
         char = self.get_char_handle(self.UART_TX_UUID)
 
@@ -137,9 +142,7 @@ class ExoDeviceManager:
 
     # Calibrate the torque of the Exo
     async def calibrateTorque(self):
-        # Small delay to ensure previous commands are processed
-        await asyncio.sleep(0.2)
-        
+        print("using bleak torque\n")
         command = bytearray(b"H")
         char = self.get_char_handle(self.UART_TX_UUID)
 
@@ -147,9 +150,7 @@ class ExoDeviceManager:
 
     # Calibrate the FSR sensors
     async def calibrateFSRs(self):
-        # Small delay to ensure previous commands are processed
-        await asyncio.sleep(0.2)
-        
+        print("using bleak FSR\n")
         command = bytearray(b"L")
         char = self.get_char_handle(self.UART_TX_UUID)
 
@@ -188,12 +189,16 @@ class ExoDeviceManager:
                 if i == 1:
                     # Adjust joint ID for bilateral mode
                     if loopCount == 1 and float_values[1] % 2 == 0:
+                        print(f"joint: {self.jointDictionary[float_values[i]] - 32}")
                         float_bytes = struct.pack("<d", self.jointDictionary[float_values[i]] - 32)
                     elif loopCount == 1 and float_values[1] % 2 != 0:
+                        print(f"joint: {self.jointDictionary[float_values[i]] + 32}")
                         float_bytes = struct.pack("<d", self.jointDictionary[float_values[i]] + 32)
                     else:
+                        print(f"joint: {self.jointDictionary[float_values[i]]}")
                         float_bytes = struct.pack("<d", self.jointDictionary[float_values[i]])
                 else:
+                    print(float_values[i])
                     float_bytes = struct.pack("<d", float_values[i])
                 char = self.get_char_handle(self.UART_TX_UUID)
                 await self.client.write_gatt_char(char, float_bytes, False)
@@ -202,7 +207,7 @@ class ExoDeviceManager:
 
     # Connect to a specific device
     async def connect(self, device):
-        pass  # Device connection handled elsewhere
+        print(device)
 
     # Search for available BLE devices
     async def searchDevices(self):
@@ -214,27 +219,36 @@ class ExoDeviceManager:
                 if device:
                     self.available_devices[device.address] = device.name  # Store name with address as key
 
-                # Available devices stored in self.available_devices
+                # Print all available devices every few seconds
+                print("Currently available devices:")
+                for address, name in self.available_devices.items():
+                    print(f"{name} - {address}")
 
                 await asyncio.sleep(1)  # Adjust the scan interval as needed
                 i += 1
             except Exception as e:
+                print(f"Error during device scan: {e}")
                 return "false"  # Return false if an error occurs
         return self.available_devices
     
     # Scan for BLE devices and attempt to connect
     async def scanAndConnect(self):
+        print("Using Bleak scan...")
+        print("Scanning...")
 
         attempts = 4
         for attempt in range(attempts):
+            print(f"Attempt {attempt + 1} of {attempts}")
 
             # Scan for devices using the filter
             device = await BleakScanner.find_device_by_filter(self.filterExo)
 
             if device:
+                print(f"Found device: {device.name} - {device.address}")
                 
                 # Check if the found device's address matches the specified address
                 if device.address == self.device_mac_address:
+                    print("Matching device found. Connecting...")
                     
                     self.set_device(device)  # Set the device
                     self.set_client(BleakClient(device, disconnected_callback=self.handleDisconnect))
@@ -243,27 +257,24 @@ class ExoDeviceManager:
                     try:
                         await self.client.connect()
                         self.isConnected = True
+                        print("Is Exo connected: " + str(self.isConnected))
+                        print(self.client)
 
                         # Get list of services from Exo
                         self.set_services(self.client.services) #Get_Services Not Supported in v1.0 and beyond of bleak library, previously was [await self.client.get_services()] instead of [self.client.services].
                         
-                        # Add stabilization delay for slower devices
-                        await asyncio.sleep(1)
-                        
                         # Start incoming data stream
                         await self.client.start_notify(self.UART_RX_UUID, self.DataIn)
-                        
-                        # Additional delay to ensure data stream is ready
-                        await asyncio.sleep(0.5)
-                        
                         return True  # Successful connection
                     except Exception as e:
+                        print(f"Failed to connect: {e}")
                         return False  # Connection failed
                 else:
-                    pass  # Device address mismatch
+                    print("Found device does not match the specified address.")
             else:
-                pass  # No device found
+                print("No device found.")
 
+        print("Max attempts reached. Could not connect.")
         return False  # Return False if all attempts fail
 
     # Send FSR values to Exo
@@ -285,8 +296,6 @@ class ExoDeviceManager:
 
     # Send preset FSR values to Exo
     async def sendPresetFsrValues(self):
-        # Small delay to ensure previous commands are processed
-        await asyncio.sleep(0.2)
         await self.sendFsrValues(self.curr_left_fsr_value, self.curr_right_fsr_value)
 
     # Send stop trial command to Exo
@@ -302,9 +311,11 @@ class ExoDeviceManager:
         char = self.get_char_handle(self.UART_TX_UUID)
 
         await self.client.write_gatt_char(char, command, False)
+        print("using bleak assist\n")
 
     # Switch to resist mode
     async def switchToResist(self):
+        print("using bleak resist\n")
         command = bytearray(b"S")
         char = self.get_char_handle(self.UART_TX_UUID)
 
@@ -318,6 +329,7 @@ class ExoDeviceManager:
 
         stiff_bytes = struct.pack("<d", stiffness)
         await self.client.write_gatt_char(char, stiff_bytes, False)  # Send the stiffness value
+        print(f"Stiffness is {stiffness}")
 
     # Helper function to send new stiffness values to Exo
     async def newStiffness(self, stiffnessInput):

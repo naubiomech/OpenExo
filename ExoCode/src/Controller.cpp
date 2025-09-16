@@ -2352,6 +2352,7 @@ void SPV2::_grf_threshold_dynamic_tuner(SideData* _side_data, ControllerData* co
 
 float SPV2::calc_motor_cmd()
 {
+	Serial.print("\nfloat SPV2::calc_motor_cmd()");
 
 	if (_joint_data->is_left) {
 		return 0;
@@ -2405,10 +2406,10 @@ float SPV2::calc_motor_cmd()
 		if (millis_time-_controller_data->SPV2_current_voltage_timer > 10000) {
 			_controller_data->SPV2_current_voltage = ina260.readBusVoltage();// bus voltage returned in millis volts
 			_controller_data->SPV2_current_voltage_timer = millis_time;
-		} */
+		}
 		//Serial.print("\n*********Teensy received battery voltage: ");
 		//Serial.print(ina219.getBusVoltage_V());
-		//Calculate system power usage during 30 seconds
+		//Calculate system power usage during 30 seconds */
 		
 		
 	//Calculate Generic Contribution

@@ -318,7 +318,7 @@ class ActiveTrial(tk.Frame):
                 if isinstance(widget, ttk.Button) or isinstance(widget, ttk.Combobox):
                     widget.config(state='normal')
         except Exception as e:
-            # Error in enable_interactions - handled silently
+            print(f"Error in enable_interactions: {e}")
 
     def go_to_update_torque(self):
         # Set the previous frame to this one

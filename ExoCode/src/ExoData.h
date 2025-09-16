@@ -19,17 +19,6 @@
 #include "Board.h"
 #include "StatusLed.h"
 #include "StatusDefs.h"
-#include "Config.h"
-#include "Utilities.h"
-
-#if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41)
-	#if BATTERY_SENSOR == 260
-		#include <Adafruit_INA260.h>
-	#elif BATTERY_SENSOR == 219
-		#include <Adafruit_INA219.h>
-	#endif
-#endif
-
 /* 
  * ExoData was broken out from the Exo class to have it mirrored on a second microcontroller that handles BLE.
  * It doesn't need to be done this way if we aren't, and is pretty cumbersome.
@@ -133,25 +122,10 @@ class ExoData
          * 
          */
         void start_pretrial_cal();
-		
-		#if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41)
-			#if BATTERY_SENSOR == 260
-				Adafruit_INA260 ina260 = Adafruit_INA260();
-			#elif BATTERY_SENSOR == 219
-				Adafruit_INA219 ina219;
-			#endif
-		#endif
-		
-		/**
-         * @brief Communicate with the power sensor and pull battery-related information such as voltage, current and power.
-         * 
-         */
-		float get_batt_info(uint8_t batt_info_type);
         
         bool sync_led_state;    /**< State of the sync led */
         bool estop;             /**< State of the estop */
         float battery_value;    /**< Could be Voltage or SOC, depending on the battery type*/
-		float filtered_batt_pwr = 0;/**< Filtered battery power*/
         SideData left_side;     /**< Data for the left side */
         SideData right_side;    /**< Data for the right side */
 
@@ -168,7 +142,7 @@ class ExoData
         int knee_torque_flag = 0;   /**< Flag to determine if we want to use torque sensor for that joint */
         int ankle_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
         int elbow_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
-		
+
         private:
         uint16_t _status;           /**< Status of the system*/
 };

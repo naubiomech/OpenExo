@@ -39,6 +39,7 @@ class ControllerApp(tk.Tk):
         for frame_name, frame in self.frames.items():
             if hasattr(frame, "hide"):
                 frame.stop_plot_updates()
+                print(f"Stopped plot updates for {frame_name}")
 
         # Get the frame to switch to
         frame = self.frames[page_name]
