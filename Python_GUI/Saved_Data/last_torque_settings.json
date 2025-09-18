@@ -1,7 +1,7 @@
 {
     "joint": "Left hip",
     "controller": "5",
-    "parameter": "0",
-    "value": "0.82827",
+    "parameter": "3",
+    "value": "2.5",
     "isBilateral": true
 }

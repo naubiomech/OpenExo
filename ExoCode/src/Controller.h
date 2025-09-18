@@ -517,8 +517,10 @@ public:
     float correction_factor[3];        /* Correction factor for the encoders when torque is being applied by the motor*/
     float limit_rate;               /* The max rate (in rads) at which the encode angle is allowed to change per ms*/
     int last_update_time;           /* Stores the last time the enocders were updated*/
-    float ewma_alpha;               /* The alpha value used in the exponential weighted moving average equation */
+    float offset_alpha;               /* The alpha value used in the exponential weighted moving average equation */
     float diff_cmd;                 /* Stores the difference in command values use to update the encoder offset */
+    float torque_alpha;             /* The alpha value used in the exponential weighted moving average equation for torque*/
+    float filt_cmd_ff;          /* Stores the filtered torque value */
 
     float encoder_offset;           /* Store the encoder offset from the calibarition phase at the initation of the trial. */
     float intended_encoder_offset;  /* Stores the goal encoder offset while the rate limit begins to chage the actual encoder offset */

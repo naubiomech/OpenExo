@@ -2910,7 +2910,7 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     encoder_offset = _joint_data->position;
     intended_encoder_offset = 0.0;
     limit_rate = 0.025;
-    ewma_alpha = 0.0875; //I expect alpha should be between 0.08 and 0.1
+    offset_alpha = 0.0875; //I expect alpha should be between 0.08 and 0.1
     last_update_time = millis();
     //correction_factor[0] = 2.8870;
     //correction_factor[1] = 0.0519;
@@ -2977,6 +2977,8 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     prev_time = 0.0;
 
     calibrating = true;
+
+    torque_alpha = 0.5;
 }
 
 float AngleBased::calc_motor_cmd()
@@ -3000,7 +3002,8 @@ float AngleBased::calc_motor_cmd()
         correction_factor[1] = correction_factor[1]/1000.0;
         correction_factor[2] = _controller_data->parameters[controller_defs::angle_based::correction_factor_2_idx];
         correction_factor[2] = correction_factor[2]/1000.0;
-        //ewma_alpha = _controller_data->parameters[controller_defs::angle_based::ewma_alpha_idx];
+        offset_alpha = _controller_data->parameters[controller_defs::angle_based::offset_alpha_idx];
+        offset_alpha = offset_alpha / 1000.0;
         _controller_data->recal_flag = lower_toe_threshold;
 
         // Pull in FSR values (double check that Toe FSR, located in Side.h, is not drawing from the FSR_Regressed Function)
@@ -3338,7 +3341,8 @@ float AngleBased::calc_motor_cmd()
         intended_encoder_offset = utils::degrees_to_radians(intended_encoder_offset_deg);
 
         // Filter the offset to prevent spikes and noise
-        encoder_offset = utils::ewma(intended_encoder_offset, encoder_offset, ewma_alpha); 
+        encoder_offset = utils::ewma(intended_encoder_offset, encoder_offset, offset_alpha); 
+        filt_cmd_ff = utils::ewma(cmd_ff, filt_cmd_ff, torque_alpha);
 
         _controller_data->max_torque = (state == 1) && (prev_state == 3);
         if((state == 1) && (prev_state == 3))
@@ -3357,8 +3361,11 @@ float AngleBased::calc_motor_cmd()
         // Store the feed-forward setpoint for plotting
         _controller_data->ff_setpoint = cmd_ff;
 
+        // Store the filtered command for plotting
+        _controller_data->filt_cmd_ff = filt_cmd_ff;
+
         // Set the motor command to be equal to the feed-foward setpoint (Note: if doing closed-loop control, this is where you would do PID)
-        float cmd = cmd_ff;
+        float cmd = filt_cmd_ff;
         
         // Store the current Toe FSR as the previous one for the next iteration.
         prev_toe_fsr = raw_toe_fsr;

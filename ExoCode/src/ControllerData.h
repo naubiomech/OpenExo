@@ -223,7 +223,7 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t max_torque_idx = 4;                       //Maximum Torque Limit (Nm)
         const uint8_t recalibrate_flag_idx = 5;                 //Flag to Recalibrate Normalized Moment (change value to recalibrate)
         const uint8_t recalibrate_angle_idx = 6;                //Flag to recalibrate normalized angle
-        const uint8_t ewma_alpha_idx = 7;                       //value of EWMA alpha for angle offset (between 0 and 1)
+        const uint8_t offset_alpha_idx = 7;                       //value of EWMA alpha for angle offset (between 0 and 1)
         const uint8_t lower_toe_threshold_idx = 8;              //Toe FSR threshold to enter stance (0-1)
         const uint8_t upper_toe_threshold_idx = 9;              //Toe FSR threshold to enter swing (0-1)
         const uint8_t correction_factor_0_idx = 10;             //Correction factor for angle offset
@@ -430,6 +430,7 @@ class ControllerData {
         float max_stance_moment;
         int recal_flag;
         int control_state;
+        float filt_cmd_ff;
 
         float normalized_angle;
         int recal_angle;
