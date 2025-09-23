@@ -49,8 +49,7 @@
      static const char motors_off        = 'w';
      static const char mark              = 'N';
      static const char update_param      = 'f';
-     static const char send_param_recieved = 'i';
-     static const char send_param_not_recieved = 'o';
+     static const char send_initial_handshake = '$';
  
      //Sending Commands (Firmware->GUI)
      static const char send_real_time_data = '?';
@@ -84,8 +83,7 @@
          {ble_names::new_fsr,            2},
          {ble_names::new_trq,            4},
          {ble_names::update_param,       4},
-         {ble_names::send_param_recieved, 0},
-         {ble_names::send_param_not_recieved, 0},
+         {ble_names::send_initial_handshake, 0},
 
          //Sending Commands
          {ble_names::send_batt,              1},
@@ -426,10 +424,12 @@
          tx_msg.len = 3;
          uart_handler->UART_msg(tx_msg);
      }
-     inline static void send_param_recieved(ExoData* data)
+
+     // This activates once we have recieved the message that we have recieved the handshake
+     inline static void send_initial_handshake(ExoData* data)
      {
-        Serial.println("Parameters recieved!");
-        data->parameter_names_received = true;
+        Serial.println("handshake recieved!");
+        data->initial_handshake = true;
      }
  }
  

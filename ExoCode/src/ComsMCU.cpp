@@ -158,33 +158,52 @@ void ComsMCU::update_gui()
     const bool new_rt_data = real_time_i2c::poll(rt_floats);
     static float del_t_no_msg = millis();
 
-    // Start timer when first message is true (connection detected)
-    if(_data->connected && _data->first_message && !connection_timer_active)
+    // START - Only start GUI interactions once we have begun connecting
+    if( _data->connected && _data->first_pass )
     {
+        // Start time out timer for handshake right away
         connection_timer_start = millis();
         connection_timer_active = true;
-        Serial.println("Connection detected - starting delay timer");
-        return; // Don't send parameters yet
+
+        // call the initial send handshake attempt
+        _exo_ble->send_initial_handshake();
+
+        // set first pass to false (now rely on timer to send)
+        _data->first_pass = false;
     }
 
-    // attempt to send parameters after connection, only on first message, and after delay
-    if(_data->connected && _data->first_message && connection_timer_active) 
+    // check if we have sent/recieved first handshake
+    // if not check to see our timer has run out
+    if( !_data->initial_handshake && 
+            (millis() - connection_timer_start >= CONNECTION_DELAY ) ) // This logic only send once
     {
-        if (millis() - connection_timer_start >= CONNECTION_DELAY)
-        {
-        Serial.println("Initial SendRTESTEST");
-        _exo_ble->sendInitialParameterNames();
-        _data->first_message = false;
-        }
-        // if delay not met, return
-        else
-        {
-            return;
-        }
+
+        // retry the initial handshake
+        _exo_ble->send_initial_handshake();
+
+        // reset the handshake timer
+        connection_timer_start = millis();
+
+        // No need to keep going in this function
+        return;
     }
-    
-    if ( _data->parameter_names_received && (new_rt_data || rt_data::new_rt_msg))
+
+    // once initial handshake has been achieved, send intitial parameters
+    if(  _data->initial_handshake && !_data->initial_parameters_sent )
     {
+        _exo_ble->send_initial_parameter_names();
+
+        _data->initial_parameters_sent = true;
+
+        // continue, may have to add a return buffer
+    }
+
+    // finally, once we have the initial parameters, start real time data
+    if (_data->initial_parameters_sent && (new_rt_data || rt_data::new_rt_msg))
+    {
+
+        _data->real_time_active = true;
+
         Serial.println("Now hitting data..");
         del_t_no_msg = millis();
 
@@ -246,11 +265,13 @@ void ComsMCU::update_gui()
             // }
         }
     }
+
+    // This is the hartbeat/lifepulse, I have it activate with the same logic as the real time..
     //Periodically send status information
     static float status_context = t_helper->generate_new_context(); 
     static float del_t_status = 0;
     del_t_status += t_helper->tick(status_context);
-    if (_data->parameter_names_received && (del_t_status > BLE_times::_status_msg_delay))
+    if (_data->real_time_active && _data->initial_parameters_sent && (del_t_status > BLE_times::_status_msg_delay))
     {
         Serial.println("Sending battery status..");
         #if COMSMCU_DEBUG
@@ -339,12 +360,8 @@ void ComsMCU::_process_complete_gui_command(BleMessage* msg)
     case ble_names::update_param:
         ble_handlers::update_param(_data, msg);
         break;
-    case ble_names::send_param_recieved:
-        ble_handlers::send_param_recieved(_data);
-        break;
-    case ble_names::send_param_not_recieved:
-        Serial.println("Resend parameter names");
-        _exo_ble->sendInitialParameterNames();
+    case ble_names::send_initial_handshake:
+        ble_handlers::send_initial_handshake(_data);
         break;
     default:
         logger::println("ComsMCU::_process_complete_gui_command->No case for command!", LogLevel::Error);

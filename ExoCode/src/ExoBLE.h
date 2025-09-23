@@ -75,7 +75,9 @@
 
          void send_message_w_string(BleMessage &msg, const char* msg_text);
 
-         void sendInitialParameterNames();
+         void send_initial_parameter_names();
+
+         void send_initial_handshake();
  
     private:
          //BLE connection state

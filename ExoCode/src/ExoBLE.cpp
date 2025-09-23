@@ -176,8 +176,9 @@ bool ExoBLE::handle_updates()
         if (current_status < _connected)
         {
             _data->connected = false;
-            _data->first_message = false;
-            _data->parameters_initialized = false;
+            _data->first_pass = false;
+            _data->initial_handshake = false;
+            _data->initial_parameters_sent = false;
 
             Serial.println("DISCONNECTION");
             //Disconnection
@@ -249,18 +250,18 @@ void ExoBLE::send_message_w_string(BleMessage &msg, const char* msg_text)
     _gatt_db.TXChar.writeValue(msg_text, false);
 }
 
-void ExoBLE::sendInitialParameterNames()
+void ExoBLE::send_initial_parameter_names()
 {
         // Add timer logic here
     static unsigned long first_connect_start_time = 0;
     static bool timer_started = false;
-
     
     UART_msg_t msg; // make a message  so we can properly call get_real_time_data, this msg is currently blank
     
     UART_command_handlers::initialize_parameter_names(_data, _data->config);
     static const int num_entries = UART_command_handlers::num_entries;
     Serial.println("Inside initial parameter send");
+    
 
     //for each entry in the param_names_arr, send the name to the GUI individually
     for (int i = 0; i < num_entries; i++)
@@ -271,12 +272,12 @@ void ExoBLE::sendInitialParameterNames()
         Serial.println(param_name.c_str());
         int success = _gatt_db.TXChar.writeValue(param_name.c_str());
         // CRITICAL: Add delay between messages
-        delay(50); // 50ms delay between each parameter name
+        delay(10); // 50ms delay between each parameter name
 
         // Optional: Add BLE.poll() to process the transmission
         BLE.poll();
     }
-    delay(100); // Extra delay before END marker
+    //delay(100); // Extra delay before END marker
     std::string end_str = "END"; //marks the end of the parameter names list
     _gatt_db.TXChar.writeValue(end_str.c_str());
 
@@ -285,6 +286,17 @@ void ExoBLE::sendInitialParameterNames()
     _data->left_side.hip.controller.write_parameter_names(_gatt_db, key_char);
     std::string end_key = "!END";
     _gatt_db.TXChar.writeValue(end_key.c_str());
+
+    // mark that we have sent the intial parameters
+    _data->initial_parameters_sent = true;
+}
+
+void ExoBLE::send_initial_handshake()
+{
+    std::string handshake_string = "handshake"; // Make global constant later, handshake delimiter
+    _gatt_db.TXChar.writeValue(handshake_string.c_str());
+
+    BLE.poll();
 }
 
 void ExoBLE::send_error(int error_code, int joint_id)

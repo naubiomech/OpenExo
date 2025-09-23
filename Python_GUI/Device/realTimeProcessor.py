@@ -31,15 +31,26 @@ class RealTimeProcessor:
         self.temp_control_param_list = []
         self._device_manager = device_manager
         self._active_trial = active_trial 
-        self._param_names_received = False
+        self.handshake = False
 
     def processEvent(self, event):
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
         #print(dataUnpacked)
 
+        # check for handshake
+        if not self.handshake and dataUnpacked == "handshake":
+            print("handshake recieved");
 
-        if(self.first_msg): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
+            # let the arduino we recieved the handshake
+            #if hasattr(self, '_device_manager') and self._device_manager:
+            asyncio.create_task(self._device_manager.send_handshake_recieved())
+
+            self.handshake = True;
+
+            return
+
+        if(self.handshake and self.first_msg): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
             #Should change this to use special character to mark that these belong in plotting parameters (see regular data and controller parameters)
             print("First msg = ")
             print(dataUnpacked)
@@ -76,15 +87,8 @@ class RealTimeProcessor:
                     self.controller_parameters.append(self.temp_control_param_list)
                     self.temp_control_param_list = []
                 if(data_split[1] == 'END'):
-                    if hasattr(self, '_device_manager') and self._device_manager:
-                        # Fire and forget - don't block data processing
-                        import asyncio
-                        try:
-                            loop = asyncio.get_event_loop()
-                            loop.create_task(self._device_manager.sendParamRecieved())
-                        except Exception as e:
-                            print(f"Error scheduling sendParamRecieved: {e}")
-                    self._param_names_received = True
+                    
+                    self.first_msg = False
                     if self._active_trial:
                         self._active_trial.update_dropdown_values()
 
