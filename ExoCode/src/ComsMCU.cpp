@@ -193,8 +193,10 @@ void ComsMCU::update_gui()
     {
         _exo_ble->send_initial_parameter_names();
 
-        _data->initial_parameters_sent = true;
-
+        if(_data->current_sent_index == UART_command_handlers::num_entries + 1)
+        {
+            _data->initial_parameters_sent = true;
+        }
         // continue, may have to add a return buffer
     }
 

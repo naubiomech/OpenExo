@@ -262,13 +262,25 @@ void ExoBLE::send_initial_parameter_names()
     static const int num_entries = UART_command_handlers::num_entries;
     Serial.println("Inside initial parameter send");
     
+    static unsigned int timer = 0;
+    static bool timerStarted = false;
+    static const int SEND_TIMER = 10;
+    static bool plotting_param_sent = false;
+
+    if(!timerStarted)
+    {
+        timerStarted = true;
+        timer = millis();
+    }
+
 
     //for each entry in the param_names_arr, send the name to the GUI individually
-    for (int i = 0; i < num_entries; i++)
+    if(!plotting_param_sent && millis() - timer >= SEND_TIMER)
     {
-        Serial.print(i);
+
+        Serial.print(_data->current_sent_index);
         Serial.print(": ");
-        std::string param_name = UART_command_handlers::param_names_arr[i];
+        std::string param_name = UART_command_handlers::param_names_arr[_data->current_sent_index];
         Serial.println(param_name.c_str());
         int success = _gatt_db.TXChar.writeValue(param_name.c_str());
         // CRITICAL: Add delay between messages
@@ -276,19 +288,33 @@ void ExoBLE::send_initial_parameter_names()
 
         // Optional: Add BLE.poll() to process the transmission
         BLE.poll();
+        
+        // reset timer
+        timer = millis();
+
+        _data->current_sent_index++;
     }
     //delay(100); // Extra delay before END marker
-    std::string end_str = "END"; //marks the end of the parameter names list
-    _gatt_db.TXChar.writeValue(end_str.c_str());
+    
+    if(_data->current_sent_index == UART_command_handlers::num_entries) {
 
-    //Use controllerData class to send controller parameters
-    std::string key_char = "!";
-    _data->left_side.hip.controller.write_parameter_names(_gatt_db, key_char);
-    std::string end_key = "!END";
-    _gatt_db.TXChar.writeValue(end_key.c_str());
+        plotting_param_sent = true;
+    }
+    
+    if(plotting_param_sent) 
+    {
+        std::string end_str = "END"; //marks the end of the parameter names list
+        _gatt_db.TXChar.writeValue(end_str.c_str());
 
-    // mark that we have sent the intial parameters
-    _data->initial_parameters_sent = true;
+        //Use controllerData class to send controller parameters
+        std::string key_char = "!";
+        _data->left_side.hip.controller.write_parameter_names(_gatt_db, key_char);
+        std::string end_key = "!END";
+        _gatt_db.TXChar.writeValue(end_key.c_str());
+
+        // mark that we have sent the intial parameters
+        _data->initial_parameters_sent = true;
+    }
 }
 
 void ExoBLE::send_initial_handshake()

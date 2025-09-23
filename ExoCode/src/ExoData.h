@@ -148,6 +148,7 @@ class ExoData
         bool initial_handshake = false;
         bool initial_parameters_sent = false;
         bool real_time_active = false;
+        int current_sent_index = 0;
 
         private:
         uint16_t _status;           /**< Status of the system*/
