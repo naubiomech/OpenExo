@@ -313,6 +313,7 @@ class ControllerData {
         //TO DO:: MOVE NON - PLOTTED SPV2 VARIABLES TO CONTROLLER.h WHEN FINISHED WITH CONTROLLER DEVELOPMENT
 
         //Variables for the SPV2 Controller
+		bool SPV2_fsr_calibrated_once = false;	//The flag will be set to TRUE once the FSR is calibrated for the first time
 		float cmd_ff2plot = 0;
 		int plotting_scalar = 1;                //Maxon servo interrupter
 		unsigned long servo_departure_time;
