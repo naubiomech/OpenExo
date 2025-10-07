@@ -25,10 +25,16 @@ class ExoData:
         self.Task=[]
         self.BatteryPercent=StringVar()
         self.BatteryPercent.set("Battery Percent: ?")
+        self.battery_is_low = False  # Flag to track if battery is low
         self.Mark=[] #mark our Trials
         self.MarkVal=0
         self.MarkLabel=StringVar()
         self.MarkLabel.set("Mark: " +str(self.MarkVal))
+
+    def resetMark(self):
+        """Reset the mark value when a trial ends"""
+        self.MarkVal = 0
+        self.MarkLabel.set("Mark: " + str(self.MarkVal))
 
     def addDataPoints(
         self,
@@ -43,13 +49,13 @@ class ExoData:
         data7,  # leftFsr
         data8,  # MinSV
         data9,  # MaxSV
-        data10,  # MinSA
+        data12,  # MinSA
         data11,  # MaxSA
         data13,  # maxFSR
         data14,  # stanceTime
         data15,  # swingTime
         Task,
-        data12,  # Battery
+        data10,  # Battery
     ):
         timestamp = int(datetime.now().timestamp())  # Current epoch time
         self.epochTime.append(timestamp)  # New list for epoch time
@@ -64,12 +70,18 @@ class ExoData:
         self.rFsr.append(data6)  # rightFsr
         self.MinShankVel.append(data8)  # MinSV
         self.MaxShankVel.append(data9)  # MaxSV
-        self.MinShankAng.append(data10)  # MinSA
+        self.MinShankAng.append(data12)  # MinSA
         self.MaxShankAng.append(data11)  # MaxSA
         self.MaxFSR.append(data13)  # maxFSR
         self.StanceTime.append(data14)  # stanceTime
         self.SwingTime.append(data15)  # swingTime
         self.Task.append(Task)
-        self.BatteryPercent.set("Battery: " + str(round(data12))+"%")  # Battery
+        # Check for low battery indicator (-1)
+        if data10 == -1:
+            self.BatteryPercent.set("Low Batt")  # Display low battery warning
+            self.battery_is_low = True
+        else:
+            self.BatteryPercent.set(f"Battery: {data10:.2f}%")  # Battery displayed as float with 2 decimal places
+            self.battery_is_low = False
         self.Mark.append(self.MarkVal)
         
