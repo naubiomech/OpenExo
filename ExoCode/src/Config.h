@@ -20,6 +20,8 @@
 	#define OpenExo_Board_V0_6_Maxon 5
 
     #define BOARD_VERSION AK_Board_V0_5_1
+	#define BATTERY_SENSOR 0 //Set it to 0 to disable, 219 to use INA219, and 260 to use INA260.
+	#define CRITICAL_BATT_VAL 18 //In volts. Battery voltage below this will trigger the low battery warning in the GUI.
     #define REAL_TIME_I2C 1
     #define LOOP_FREQ_HZ 500
     #define LOOP_TIME_TOLERANCE 0.1 

@@ -367,6 +367,9 @@ namespace UART_command_handlers
             rx_msg.data[5] = exo_data->left_side.ankle.controller.ff_setpoint; 
             rx_msg.data[6] = exo_data->right_side.toe_fsr; 
             rx_msg.data[7] = exo_data->left_side.toe_fsr;
+			rx_msg.data[8] = 8;
+			rx_msg.data[9] = 9;
+			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
 			break;
 
         case (uint8_t)config_defs::exo_name::bilateral_hip:
@@ -381,6 +384,7 @@ namespace UART_command_handlers
             rx_msg.data[7] = exo_data->left_side.toe_fsr;
             rx_msg.data[8] = exo_data->right_side.heel_fsr;
             rx_msg.data[9] = exo_data->left_side.heel_fsr;
+			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_elbow:
@@ -393,7 +397,10 @@ namespace UART_command_handlers
             rx_msg.data[5] = exo_data->right_side.elbow.controller.ExtenseSense;
             rx_msg.data[6] = exo_data->left_side.elbow.controller.FlexSense;
             rx_msg.data[7] = exo_data->left_side.elbow.controller.ExtenseSense;
-            break;
+            rx_msg.data[8] = 8;
+			rx_msg.data[9] = 9;
+			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
+			break;
 
         case (uint8_t)config_defs::exo_name::bilateral_hip_ankle:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_ANKLE_RT_LEN;
@@ -407,7 +414,8 @@ namespace UART_command_handlers
             rx_msg.data[7] = exo_data->left_side.percent_gait / 100;
             rx_msg.data[8] = exo_data->right_side.toe_fsr;
             rx_msg.data[9] = exo_data->left_side.toe_fsr;
-            break;
+			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
+			break;
 
         case (uint8_t)config_defs::exo_name::bilateral_hip_elbow:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_ELBOW_RT_LEN;
@@ -421,7 +429,8 @@ namespace UART_command_handlers
             rx_msg.data[7] = exo_data->left_side.percent_gait / 100;
             rx_msg.data[8] = exo_data->right_side.elbow.controller.FlexSense;
             rx_msg.data[9] = exo_data->left_side.elbow.controller.FlexSense;
-            break;
+			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
+			break;
 
         case (uint8_t)config_defs::exo_name::bilateral_ankle_elbow:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_ELBOW_RT_LEN;
@@ -435,7 +444,8 @@ namespace UART_command_handlers
             rx_msg.data[7] = exo_data->left_side.elbow.controller.filtered_setpoint;
             rx_msg.data[8] = exo_data->right_side.toe_fsr;
             rx_msg.data[9] = exo_data->left_side.toe_fsr;
-            break;
+			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
+			break;
 
         default:
             rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN;
@@ -449,7 +459,9 @@ namespace UART_command_handlers
             rx_msg.data[7] = exo_data->left_side.toe_fsr;                                               //Second Tab - Bottom Orange Line
             rx_msg.data[8] = exo_data->right_side.heel_fsr;                                             //Not Plotted, Saved
             rx_msg.data[9] = exo_data->left_side.heel_fsr;                                              //Not Plotted, Saved
-            break;
+
+			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
+			break;
         }
 
         #if REAL_TIME_I2C

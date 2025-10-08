@@ -56,7 +56,7 @@ class JointData {
         float joint_global_angle;                   /**< The angle of the joint relative to the ground */
         float prev_joint_position;                  /**< The previous position of the joint, after any transmission */
         float joint_velocity;                       /**< The velocity of the joint, after any transmission */
-        const float joint_position_alpha = 0.05f;
+        const float joint_position_alpha = 1;
         const float joint_velocity_alpha = 0.05f;
 		const float joint_RoM;                      /**< Joint Range of Motion */
 		bool do_flip_angle;                         /**< If true invert the angle */

@@ -86,7 +86,7 @@ namespace ble
         
         //Sending Commands
         {ble_names::send_batt,              1},
-        {ble_names::send_real_time_data,    9},
+        {ble_names::send_real_time_data,    11},
         {ble_names::send_error_count,       1},
         {ble_names::send_cal_done,          0},
         {ble_names::send_trq_cal,           2},

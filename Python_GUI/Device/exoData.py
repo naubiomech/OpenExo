@@ -24,7 +24,7 @@ class ExoData:
         #and the predicted task/state
         self.Task=[]
         self.BatteryPercent=StringVar()
-        self.BatteryPercent.set("Battery Percent: ?")
+        self.BatteryPercent.set("Battery Voltage: ?")
         self.battery_is_low = False  # Flag to track if battery is low
         self.Mark=[] #mark our Trials
         self.MarkVal=0
@@ -81,7 +81,7 @@ class ExoData:
             self.BatteryPercent.set("Low Batt")  # Display low battery warning
             self.battery_is_low = True
         else:
-            self.BatteryPercent.set(f"Battery: {data10:.2f}%")  # Battery displayed as float with 2 decimal places
+            self.BatteryPercent.set(f"Battery: {data10:.2f}V")  # Battery displayed as float with 2 decimal places
             self.battery_is_low = False
         self.Mark.append(self.MarkVal)
         
