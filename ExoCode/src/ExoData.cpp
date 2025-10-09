@@ -128,23 +128,6 @@ void ExoData::set_status(uint16_t status_to_set)
 
 uint16_t ExoData::get_status(void)
 {
-/* 	#if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41)
-	static bool ina_first_run = true;
-	if (ina_first_run) {
-		#if	BATTERY_SENSOR == 260
-			if (!ina260.begin()) {
-						Serial.println("Couldn't find INA260 chip");
-						while (1);
-					}
-		#elif BATTERY_SENSOR == 219
-		
-		#endif
-		ina_first_run = false;
-	}
-		#if	BATTERY_SENSOR == 260
-			battery_value = 0.001 * ina260.readBusVoltage();
-		#endif
-	#endif */
     return this->_status;
 }
 
@@ -200,6 +183,8 @@ float ExoData::get_batt_info(uint8_t batt_info_type)
 				Serial.println("Failed to find INA219 chip");
 				while (1) { delay(10); }
 			}
+		#elif BATTERY_SENSOR == 3
+		pinMode(logic_micro_pins::volt_sense, INPUT);
 		#endif
 		ina_first_run = false;
 	}
@@ -250,6 +235,10 @@ float ExoData::get_batt_info(uint8_t batt_info_type)
 				}
 				return battery_voltage;
 			}
+		#elif BATTERY_SENSOR == 3
+			float _sense_pin_volt = 3.3 * analogRead(logic_micro_pins::volt_sense) / 4095;
+			float battery_voltage = _sense_pin_volt * (RESISTOR_1 + RESISTOR_2) / RESISTOR_2;
+			return battery_voltage;
 		#else
 			return 0;
 		#endif

@@ -58,6 +58,9 @@
 				
 				//Servo motor pins
 				const unsigned int servo_pins[] = {};
+				
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
+				const unsigned int volt_sense = not_connected_pin;
             #endif
 
             const unsigned int sync_led_on_state = LOW;
@@ -154,6 +157,9 @@
 				
 				//Servo motor pins
 				const unsigned int servo_pins[] = {};
+				
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
+				const unsigned int volt_sense = not_connected_pin;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -266,6 +272,9 @@
 				
 				//Servo motor pins
 				const unsigned int servo_pins[] = {};
+				
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
+				const unsigned int volt_sense = not_connected_pin;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -381,6 +390,9 @@
 				
 				//Servo motor pins
 				const unsigned int servo_pins[] = {};
+				
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
+				const unsigned int volt_sense = not_connected_pin;//Set it to 27 to use the onboard voltage sensing. Refer to Config.h and modify RESISTOR_1 and RESISTOR_2 if needed.
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -466,6 +478,9 @@
 				
 				//Servo motor pins
 				const unsigned int servo_pins[] = {26,27};
+				
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
+				const unsigned int volt_sense = not_connected_pin;
 			 
 				//Serial Pins, NC
 				const unsigned int rx1_pin = not_connected_pin;
