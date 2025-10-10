@@ -3306,7 +3306,7 @@ float AngleBased::calc_motor_cmd()
                 }
                 startFlag = false;
             }
-            else if (swing_assist_endpoint >= _side_data->percent_gait) // If we are within the user defined assistive duration, provide swing assistance
+            else if (swing_assist_endpoint >= _side_data->percent_gait)  // If we are within the user defined assistive duration, provide swing assistance
             {
                 if(!calibrating)
                 {

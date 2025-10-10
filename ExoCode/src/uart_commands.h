@@ -377,7 +377,7 @@ namespace UART_command_handlers
             rx_msg.data[3] = exo_data->right_side.percent_gait/100.0;
             rx_msg.data[4] = utils::radians_to_degrees(exo_data->right_side.hip.controller.encoder_offset);
             rx_msg.data[5] = exo_data->right_side.hip.controller.normalized_stance_moment;
-            rx_msg.data[6] = exo_data->right_side.hip.controller.local_toe_stance;
+            rx_msg.data[6] = exo_data->right_side.heel_fsr;
             rx_msg.data[7] = exo_data->right_side.hip.controller.normalized_angle;
             rx_msg.data[8] = exo_data->right_side.hip.controller.encoder_angle;
             rx_msg.data[9] = exo_data->right_side.hip.controller.control_state;
