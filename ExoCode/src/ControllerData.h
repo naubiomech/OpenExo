@@ -107,6 +107,19 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t i_gain_idx = 7;                           //Value of I Gain for PID control
         const uint8_t d_gain_idx = 8;                           //Value of D Gain for PID control 
         const uint8_t num_parameter = 9;
+        static std::vector<std::string> control_param_names =
+        {
+            "torque",
+            "peak_time",
+            "rise_time",
+            "fall_time",
+            "direction",
+            "use_pid",
+            "p_gain",
+            "i_gain",
+            "d_gain"
+        };
+        AUTO_REGISTER_NAMESPACE(zhang_collins)
     }
 
     namespace franks_collins_hip
@@ -125,7 +138,25 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t p_gain_idx = 11;                          //Value of P Gain for PID control
         const uint8_t i_gain_idx = 12;                          //Value of I Gain for PID control
         const uint8_t d_gain_idx = 13;                          //Value of D Gain for PID control 
-        const uint8_t num_parameter = 14;                   
+        const uint8_t num_parameter = 14;  
+        static std::vector<std::string> control_param_names =
+        {
+            "mass",
+            "trough_normalized_torque_Nm_kg",
+            "peak_normalized_torque_Nm_kg",
+            "start_percent_gait",
+            "trough_onset_percent_gait",
+            "trough_percent_gait",
+            "mid_time",
+            "mid_duration",
+            "peak_percent_gait",
+            "peak_offset_percent_gait",
+            "use_pid",
+            "p_gain",
+            "i_gain",
+            "d_gain"
+        };
+        AUTO_REGISTER_NAMESPACE(franks_collins_hip)                 
     }
 
     namespace constant_torque
@@ -138,6 +169,17 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t i_gain_idx = 5;                   //Value of I Gain for PID control
         const uint8_t d_gain_idx = 6;                   //Value of D Gain for PID control 
         const uint8_t num_parameter = 7;
+        static std::vector<std::string> control_param_names =
+        {
+            "amplitude",
+            "direction",
+            "alpha",
+            "use_pid",
+            "p_gain",
+            "i_gain",
+            "d_gain"
+        };
+        AUTO_REGISTER_NAMESPACE(constant_torque)
     }
 
     namespace elbow_min_max
@@ -156,7 +198,25 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t SpringPkTorque_idx = 11;          // Sets the maximum spring torque (Nm)
         const uint8_t EXTamplitude_idx = 12;            // Extension Torque Setpoint in Nm
         const uint8_t FiltStrength_idx = 13;            // Setpoint Filter Strength
-        const uint8_t num_parameter = 14;               // Number of unique commands      
+        const uint8_t num_parameter = 14;               // Number of unique commands   
+        static std::vector<std::string> control_param_names =
+        {
+            "FLEXamplitude",
+            "DigitFSR_threshold",
+            "PalmFSR_threshold",
+            "DigitFSR_LOWthreshold",
+            "PalmFSR_LOWthreshold",
+            "CaliRequest",
+            "TrqProfile",
+            "P_gain",
+            "I_gain",
+            "D_gain",
+            "TorqueLimit",
+            "SpringPkTorque",
+            "EXTamplitude",
+            "FiltStrength"
+        };
+        AUTO_REGISTER_NAMESPACE(elbow_min_max)   
     }
 
     namespace trec 
@@ -172,12 +232,31 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t kd = 8;
 		const uint8_t turn_on_peak_limiter = 9;
         const uint8_t num_parameter = 10;
+        static std::vector<std::string> control_param_names =
+        {
+            "plantar_scaling",
+            "dorsi_scaling",
+            "timing_threshold",
+            "spring_stiffness",
+            "neutral_angle",
+            "damping",
+            "propulsive_gain",
+            "kp",
+            "kd",
+            "turn_on_peak_limiter"
+        };
+        AUTO_REGISTER_NAMESPACE(trec)
     }
 	
 	namespace calibr_manager
 	{
 		const uint8_t calibr_cmd = 0;					// Not being used
 		const uint8_t num_parameter = 1;
+        static std::vector<std::string> control_param_names =
+        {
+            "calibr_cmd"
+        };
+        AUTO_REGISTER_NAMESPACE(calibr_manager)
 	}
 
     namespace chirp                                                     //Parameters for Sine Wave Used in Chirp Testing
@@ -192,6 +271,19 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t i_gain_idx = 7;                           //Value of I Gain for PID control
         const uint8_t d_gain_idx = 8;                           //Value of D Gain for PID control
         const uint8_t num_parameter = 9;
+        static std::vector<std::string> control_param_names =
+        {
+            "amplitude",
+            "start_frequency",
+            "end_frequency",
+            "duration",
+            "yshift",
+            "pid_flag",
+            "p_gain",
+            "i_gain",
+            "d_gain"
+        };
+        AUTO_REGISTER_NAMESPACE(chirp)
     }
 
     namespace step                                              //Parameters for step torque used in max torque capacity testing
@@ -206,6 +298,19 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t d_gain_idx = 7;                           //Value of D Gain for PID control
         const uint8_t alpha_idx = 8;                            //Filtering term for exponentially wieghted moving average (EWMA) filter, used on torque sensor to cut down on noise.
         const uint8_t num_parameter = 9;
+        static std::vector<std::string> control_param_names =
+        {
+            "amplitude",
+            "duration",
+            "repetitions",
+            "spacing",
+            "pid_flag",
+            "p_gain",
+            "i_gain",
+            "d_gain",
+            "alpha"
+        };
+        AUTO_REGISTER_NAMESPACE(step)
     }
 
     namespace proportional_hip_moment
@@ -213,6 +318,12 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t extension_setpoint_idx = 0;               //Parameter for extension setpoint 
         const uint8_t flexion_setpoint_idx = 1;                 //Parameter for flexion setpoin
         const uint8_t num_parameter = 2;
+        static std::vector<std::string> control_param_names =
+        {
+            "extension_setpoint",
+            "flexion_setpoint"
+        };
+        AUTO_REGISTER_NAMESPACE(proportional_hip_moment)
     }
 
 	namespace spv2 
@@ -235,6 +346,27 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 		const uint8_t servo_terminal = 15;
 		const uint8_t maxon_outOfOffice_itr = 16;               //Not currently used
         const uint8_t num_parameter = 17;
+        static std::vector<std::string> control_param_names =
+        {
+            "plantar_scaling",
+            "dorsi_scaling",
+            "timing_threshold",
+            "spring_stiffness",
+            "damping",
+            "neutral_angle",
+            "propulsive_gain",
+            "kp",
+            "turn_on_peak_limiter",
+            "kd",
+            "step_response_mode",
+            "ki",
+            "do_use_servo",
+            "fsr_servo_threshold",
+            "servo_origin",
+            "servo_terminal",
+            "maxon_outOfOffice_itr"
+        };
+        AUTO_REGISTER_NAMESPACE(spv2)
     }
 
 	
@@ -258,12 +390,45 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
 		const uint8_t servo_terminal = 15;
 		const uint8_t maxon_outOfOffice_itr = 16;               //Not currently used
         const uint8_t num_parameter = 17;
+        static std::vector<std::string> control_param_names =
+        {
+            "plantar_scaling",
+            "dorsi_scaling",
+            "timing_threshold",
+            "spring_stiffness",
+            "damping",
+            "neutral_angle",
+            "propulsive_gain",
+            "kp",
+            "turn_on_peak_limiter",
+            "kd",
+            "step_response_mode",
+            "ki",
+            "do_use_servo",
+            "fsr_servo_threshold",
+            "servo_origin",
+            "servo_terminal",
+            "maxon_outOfOffice_itr"
+        };
+        AUTO_REGISTER_NAMESPACE(pjmc_plus)
     }
+    
     const int num_controllers = 2;                      //Total number of controllers defined in the controller_defs namespace so we can iterate through them.
     static std::vector<std::string> controller_names =
     {
         "zero_torque",
-        "proportional_joint_moment"
+        "proportional_joint_moment",
+        "zhang_collins",
+        "franks_collins_hip",
+        "constant_torque",
+        "elbow_min_max",
+        "trec",
+        "calibr_manager",
+        "chirp",
+        "step",
+        "proportional_hip_moment",
+        "spv2",
+        "pjmc_plus"
     };
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
