@@ -23,6 +23,7 @@
 #include "src/Exo.h"
 #include "src/Utilities.h"
 #include "src/StatusDefs.h"
+#include "src/Config.h"
 
 //Specific Libraries
 #include "src/ParseIni.h"
@@ -48,13 +49,21 @@ void setup()
     analogReadResolution(12);
     
     Serial.begin(115200);
-    delay(100);
+    delay(500);
+
+    #ifdef SIMPLE_DEBUG
+        Serial.print("\nIn SIMPLE_DEBUG mode, debugging statements are printed.");
+        Serial.print("\nProgrammed PCB version: ");
+        Serial.print(BOARD_VERSION);
+        Serial.print("\nFor a list of UART message index, check UART_command_names in uart_commands.h");
+        Serial.print("\nFor a list of the controller and joint ids, check the controller enum classes in Parseini.h (Lines 127-185)");
+    #endif
 
     //Get the config information from the SD card (calls function in ParseIni).
     ini_parser(config_info::config_to_send);              
     
     //Print to confirm config came through correctly (Should not contain zeros).
-    #ifdef MAIN_DEBUG
+    #if defined(MAIN_DEBUG) || defined(SIMPLE_DEBUG)
         for (int i = 0; i < ini_config::number_of_keys; i++)
         {
           logger::print("[" + String(i) + "] : " + String((int)config_info::config_to_send[i]) + "\n");

@@ -1281,53 +1281,52 @@ float CalibrManager::calc_motor_cmd()
 	// Serial.print(String(exo_status));
 	// Serial.print("  |  doToeRefinement: ");
 	// Serial.print(String(_side_data->do_calibration_refinement_toe_fsr));
+	#ifdef SIMPLE_DEBUG
+		return 0;
+	#endif
+	if (_joint_data->is_left)
+	{
+		Serial.print("\nLeft angle: ");
+		Serial.print(_side_data->ankle.joint_position);
+		Serial.print("  |  Left torque: ");
+		Serial.print(_joint_data->torque_reading);
+		cmd = 3.5;
+
+		//The range of PWM motor control signals differ from that of CAN motors
+		if (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor)
+		{
+			cmd = 100;
+		}
+
+		Serial.print("  |  Left cmd: ");
+		Serial.print(cmd);
+		Serial.print("  |  Left microSD TRQ: ");
+		Serial.print(_joint_data->torque_reading_microSD);
+		Serial.print("  |  Left TRQ offset: ");
+		Serial.print(_joint_data->torque_offset_reading);
+	}
+	else
+	{
+		Serial.print("  |  Right angle: ");
+		Serial.print(_side_data->ankle.joint_position);
+		Serial.print("  |  Right torque: ");
+		Serial.print(_joint_data->torque_reading);
+		cmd = 3.5;
+
+		//The range of PWM motor control signals differ from that of CAN motors
+		if (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor)
+		{
+			cmd = 100;
+		}
+
+		Serial.print("  |  Right cmd: ");
+		Serial.print(cmd);
+		Serial.print("  |  Right microSD TRQ: ");
+		Serial.print(_joint_data->torque_reading_microSD);
+		Serial.print("  |  Right TRQ offset: ");
+		Serial.print(_joint_data->torque_offset_reading);
+	}
 	
-    if (active_trial)
-    {
-        if (_joint_data->is_left)
-        {
-            Serial.print("  |  Left angle: ");
-            Serial.print(_side_data->ankle.joint_position);
-            Serial.print("  |  Left torque: ");
-            Serial.print(_joint_data->torque_reading);
-            cmd = 3.5;
-
-            //The range of PWM motor control signals differ from that of CAN motors
-			if (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor)
-            {
-				cmd = 100;
-			}
-
-            Serial.print("  |  Left cmd: ");
-            Serial.print(cmd);
-			Serial.print("  |  Left microSD TRQ: ");
-			Serial.print(_joint_data->torque_reading_microSD);
-			Serial.print("  |  Left TRQ offset: ");
-			Serial.print(_joint_data->torque_offset_reading);
-        }
-        else
-        {
-            Serial.print("  |  Right angle: ");
-            Serial.print(_side_data->ankle.joint_position);
-            Serial.print("  |  Right torque: ");
-            Serial.print(_joint_data->torque_reading);
-            cmd = 3.5;
-
-            //The range of PWM motor control signals differ from that of CAN motors
-			if (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor)
-            {
-				cmd = 100;
-			}
-
-            Serial.print("  |  Right cmd: ");
-            Serial.print(cmd);
-			Serial.print("  |  Right microSD TRQ: ");
-			Serial.print(_joint_data->torque_reading_microSD);
-			Serial.print("  |  Right TRQ offset: ");
-			Serial.print(_joint_data->torque_offset_reading);
-        }
-    }
-		
     return cmd;
 	
 }

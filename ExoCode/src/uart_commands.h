@@ -524,6 +524,19 @@ namespace UART_command_handlers
 
         //Set the parameter
         j_data->controller.parameters[(uint8_t)msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_INDEX]] = msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE];
+		
+		#ifdef SIMPLE_DEBUG
+		Serial.print("\nTeensy just updated a control parameter:");
+		Serial.print("\n***joint_id: ");
+		Serial.print(msg.joint_id);
+		Serial.print(", CONTROLLER_ID: ");
+		Serial.print(j_data->controller.controller);
+		Serial.print(", PARAM_INDEX: ");
+		Serial.print((uint8_t)msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_INDEX]);
+		Serial.print(", PARAM_VALUE: ");
+		Serial.print(j_data->controller.parameters[(uint8_t)msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_INDEX]]);
+		#endif
+		
         // Serial.println("Updating Controller Params: " + String(msg.joint_id) + ", "
         // + String((uint8_t)msg.data[(uint8_t)UART_command_enums::controller_param::CONTROLLER_ID]) + ", "
         // + String((uint8_t)msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_INDEX]) + ", "
@@ -690,7 +703,9 @@ namespace UART_command_utils
 
         //logger::println("UART_command_utils::handle_message->got message: ");
         //UART_msg_t_utils::print_msg(msg);
-
+		
+		Serial.print("\nmsg.command:");
+		Serial.print(msg.command);
         switch (msg.command)
         {
         case UART_command_names::empty_msg:
