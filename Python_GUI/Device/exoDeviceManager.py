@@ -120,6 +120,7 @@ class ExoDeviceManager:
                 self.disconnecting_intentionally = True  # Set the flag before disconnecting
                 await self.client.disconnect()  # Disconnect from the client
                 self.isConnected = False  # Update connection status
+                self._realTimeProcessor.handshake = False
                 print("Successfully disconnected from the device.")
             except Exception as e:
                 print(f"Failed to disconnect: {e}")

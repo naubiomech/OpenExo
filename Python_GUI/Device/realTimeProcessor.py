@@ -226,10 +226,17 @@ class RealTimeProcessor:
         self.param_values = param_values
         
         
-
         self._exo_data.addDataPoints(
             self.x_time,
-            param_values,
+            rightTorque,
+            rightState,
+            rightSet,
+            leftTorque,
+            leftState,
+            leftSet,
+            rightFsr,
+            leftFsr,
+            #store features
             minSV,
             maxSV,
             minSA,
@@ -237,7 +244,7 @@ class RealTimeProcessor:
             maxFSR,
             stancetime,
             swingtime,
-            self._predictor.prediction,  # Task
+            self._predictor.prediction, #store prediction
             battery
         )
 
