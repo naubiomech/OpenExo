@@ -11,7 +11,7 @@
 
 #include "Arduino.h"
 #include "ExoBLE.h"
-#include "Battery.h"
+// #include "Battery.h"
 #include "BleMessage.h"
 #include "ParseIni.h"
 #include "ExoData.h"
@@ -88,13 +88,13 @@ class ComsMCU
         ExoData* _data;
         
         //Battery
-        _Battery* _battery;
+        // _Battery* _battery;
 
         const int _mark_index = 1;
 
         //Alpha value for the exponentially weighted moving average on the battery data
-        const float k_battery_ewma_alpha = 0.1;
-        const float k_time_threshold = 5000; //microseconds
+        // const float k_battery_ewma_alpha = 0.1;
+        // const float k_time_threshold = 5000; //microseconds
         
 };
 #endif
