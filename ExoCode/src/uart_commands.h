@@ -358,21 +358,26 @@ namespace UART_command_handlers
         switch (config[config_defs::exo_name_idx])
         {
         case (uint8_t)config_defs::exo_name::bilateral_ankle:
+		{
             rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading; 
-            rx_msg.data[1] = exo_data->right_side.toe_stance;
-            rx_msg.data[2] = exo_data->right_side.ankle.controller.ff_setpoint;
-            rx_msg.data[3] = exo_data->left_side.ankle.controller.filtered_torque_reading; 
-            rx_msg.data[4] = exo_data->left_side.toe_stance;
-            rx_msg.data[5] = exo_data->left_side.ankle.controller.ff_setpoint; 
-            rx_msg.data[6] = exo_data->right_side.toe_fsr; 
-            rx_msg.data[7] = exo_data->left_side.toe_fsr;
+            rx_msg.data[0] = exo_data->left_side.ankle.controller.ff_setpoint;
+            rx_msg.data[1] = exo_data->left_side.ankle.controller.filtered_torque_reading;
+			rx_msg.data[2] = exo_data->right_side.ankle.controller.ff_setpoint;
+			rx_msg.data[3] = exo_data->right_side.ankle.controller.filtered_torque_reading;
+			rx_msg.data[4] = exo_data->left_side.toe_fsr;
+            rx_msg.data[5] = exo_data->left_side.toe_stance;
+			// rx_msg.data[5] = exo_data->left_side.heel_fsr;
+            rx_msg.data[6] = exo_data->right_side.toe_fsr;
+			rx_msg.data[7] = exo_data->right_side.toe_stance;
+			// rx_msg.data[7] = exo_data->right_side.heel_fsr;
 			rx_msg.data[8] = 8;
 			rx_msg.data[9] = 9;
 			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
 			break;
+		}
 
         case (uint8_t)config_defs::exo_name::bilateral_hip:
+		{
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_RT_LEN;
             rx_msg.data[0] = exo_data->right_side.hip.controller.filtered_torque_reading;
             rx_msg.data[1] = exo_data->right_side.hip.controller.ff_setpoint;
@@ -386,8 +391,10 @@ namespace UART_command_handlers
             rx_msg.data[9] = exo_data->left_side.heel_fsr;
 			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
             break;
+		}
 
         case (uint8_t)config_defs::exo_name::bilateral_elbow:
+		{
             rx_msg.len = (uint8_t)rt_data::BILATERAL_ELBOW_RT_LEN;
             rx_msg.data[0] = exo_data->right_side.elbow.controller.filtered_torque_reading; 
             rx_msg.data[1] = exo_data->right_side.elbow.controller.filtered_setpoint;
@@ -401,8 +408,10 @@ namespace UART_command_handlers
 			rx_msg.data[9] = 9;
 			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
 			break;
+		}
 
         case (uint8_t)config_defs::exo_name::bilateral_hip_ankle:
+		{
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_ANKLE_RT_LEN;
             rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading; 
             rx_msg.data[1] = exo_data->right_side.ankle.controller.ff_setpoint;
@@ -416,8 +425,10 @@ namespace UART_command_handlers
             rx_msg.data[9] = exo_data->left_side.toe_fsr;
 			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
 			break;
+		}
 
         case (uint8_t)config_defs::exo_name::bilateral_hip_elbow:
+		{
             rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_ELBOW_RT_LEN;
             rx_msg.data[0] = exo_data->right_side.elbow.controller.filtered_torque_reading;
             rx_msg.data[1] = exo_data->right_side.elbow.controller.filtered_setpoint;
@@ -431,8 +442,10 @@ namespace UART_command_handlers
             rx_msg.data[9] = exo_data->left_side.elbow.controller.FlexSense;
 			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
 			break;
+		}
 
         case (uint8_t)config_defs::exo_name::bilateral_ankle_elbow:
+		{
             rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_ELBOW_RT_LEN;
             rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading;
             rx_msg.data[1] = exo_data->right_side.ankle.controller.ff_setpoint;
@@ -446,8 +459,10 @@ namespace UART_command_handlers
             rx_msg.data[9] = exo_data->left_side.toe_fsr;
 			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
 			break;
+		}
 
         default:
+		{
             rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN;
             rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading;             //First Tab - Top Blue Line
             rx_msg.data[1] = exo_data->right_side.ankle.controller.ff_setpoint;                         //First Tab - Top Orange Line
@@ -462,6 +477,7 @@ namespace UART_command_handlers
 
 			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
 			break;
+		}
         }
 
         #if REAL_TIME_I2C

@@ -1270,63 +1270,78 @@ CalibrManager::CalibrManager(config_defs::joint_id id, ExoData* exo_data)
 //The calibration manager "controller" is a self-test tool designed for exo developers to verify the exoskeleton's status. By default, this controller does not use feedback torque control.
 float CalibrManager::calc_motor_cmd()
 {
+	unsigned long CM_clock_curr = millis();
 	float cmd;
-
+	
 	uint16_t exo_status = _data->get_status();
     bool active_trial = (exo_status == status_defs::messages::trial_on) || 
         (exo_status == status_defs::messages::fsr_calibration) ||
         (exo_status == status_defs::messages::fsr_refinement);
+	if ( active_trial && (!_data->user_paused)) {
+		
+		cmd = 3.5;
+
+		//Currently, for Maxon motors, the motor command isn’t divided by the motor torque constant or gear ratio. Adjust the command accordingly.
+		if (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor)
+		{
+			cmd = 100;
+		}
+	}
+	else {
+		cmd = 0;
+	}
 	
 	// Serial.print("\nExo status: ");
 	// Serial.print(String(exo_status));
 	// Serial.print("  |  doToeRefinement: ");
 	// Serial.print(String(_side_data->do_calibration_refinement_toe_fsr));
+	
 	#ifdef SIMPLE_DEBUG
-		return 0;
+		if ((CM_clock_curr - _controller_data->CM_clock) < 1000) {
+			_controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, 0.5);
+			
+			_controller_data->ff_setpoint = cmd;
+			return cmd;
+		}
 	#endif
-	if (_joint_data->is_left)
-	{
-		Serial.print("\nLeft angle: ");
-		Serial.print(_side_data->ankle.joint_position);
-		Serial.print("  |  Left torque: ");
-		Serial.print(_joint_data->torque_reading);
-		cmd = 3.5;
-
-		//The range of PWM motor control signals differ from that of CAN motors
-		if (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor)
+	if (_controller_data->CM_print_num > 0) {
+		if (_joint_data->is_left)
 		{
-			cmd = 100;
+			Serial.print("\nLeft angle: ");
+			Serial.print(_side_data->ankle.joint_position);
+			Serial.print("  |  Left torque: ");
+			Serial.print(_joint_data->torque_reading);
+			Serial.print("  |  Left cmd: ");
+			Serial.print(cmd);
+			// Serial.print("  |  Left microSD TRQ: ");
+			// Serial.print(_joint_data->torque_reading_microSD);
+			// Serial.print("  |  Left TRQ offset: ");
+			// Serial.print(_joint_data->torque_offset_reading);
+			
+			_controller_data->CM_print_num--;
 		}
-
-		Serial.print("  |  Left cmd: ");
-		Serial.print(cmd);
-		Serial.print("  |  Left microSD TRQ: ");
-		Serial.print(_joint_data->torque_reading_microSD);
-		Serial.print("  |  Left TRQ offset: ");
-		Serial.print(_joint_data->torque_offset_reading);
+		else
+		{
+			Serial.print("\nRight angle: ");
+			Serial.print(_side_data->ankle.joint_position);
+			Serial.print("  |  Right torque: ");
+			Serial.print(_joint_data->torque_reading);
+			Serial.print("  |  Right cmd: ");
+			Serial.print(cmd);
+			// Serial.print("  |  Right microSD TRQ: ");
+			// Serial.print(_joint_data->torque_reading_microSD);
+			// Serial.print("  |  Right TRQ offset: ");
+			// Serial.print(_joint_data->torque_offset_reading);
+			
+			_controller_data->CM_print_num--;
+		}
 	}
-	else
-	{
-		Serial.print("  |  Right angle: ");
-		Serial.print(_side_data->ankle.joint_position);
-		Serial.print("  |  Right torque: ");
-		Serial.print(_joint_data->torque_reading);
-		cmd = 3.5;
-
-		//The range of PWM motor control signals differ from that of CAN motors
-		if (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::MaxonMotor)
-		{
-			cmd = 100;
-		}
-
-		Serial.print("  |  Right cmd: ");
-		Serial.print(cmd);
-		Serial.print("  |  Right microSD TRQ: ");
-		Serial.print(_joint_data->torque_reading_microSD);
-		Serial.print("  |  Right TRQ offset: ");
-		Serial.print(_joint_data->torque_offset_reading);
+	else {
+		_controller_data->CM_clock = millis();
+		_controller_data->CM_print_num = 1;
 	}
 	
+	_controller_data->ff_setpoint = cmd;
     return cmd;
 	
 }

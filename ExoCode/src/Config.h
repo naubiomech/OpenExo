@@ -11,7 +11,7 @@
 
 #include "Arduino.h"
 #include "LogLevels.h"
-	//#define SIMPLE_DEBUG //Uncomment to enter SIMPLE_DEBUG mode. The exoskeleton’s operating status will be printed to the Serial Monitor.
+	#define SIMPLE_DEBUG //Uncomment to enter SIMPLE_DEBUG mode. The exoskeleton’s operating status will be printed to the Serial Monitor.
     #define FIRMWARE_VERSION 0_1_0
 
     #define AK_Board_V0_1 1

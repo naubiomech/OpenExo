@@ -306,6 +306,8 @@ class ControllerData {
 		int PIDMLTPLR = 0;
 		bool calibrStart = false;
 		float calibrSum = 0;
+		unsigned long CM_clock = 0;
+		uint8_t CM_print_num = 1;
 		
 		//Variables for the Zhang-Collins Controller
 		float previous_cmd = 0;
