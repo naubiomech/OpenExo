@@ -430,7 +430,6 @@
      {
         Serial.println("Info recieved from python");
         data->acknowledgedPacket = true;
-        data->ackIndex++;
 
         // determine which stage of acknowledged packets we are in
 
@@ -438,19 +437,29 @@
         if(data->ackIndex == 0)
         {
             data->initial_handshake_recieved = true;
+                    
+            // reset the packet acknowledge
+            data->acknowledgedPacket = false;
         }
 
         // second stage - plotting parameters
         else if(data->ackIndex == 1)
         {
             data->plotting_param_recieved = true;
+
+            // reset the packet acknowledge
+            data->acknowledgedPacket = false;
         }
 
         // third stage - controller parameters
         else if(data->ackIndex == 2)
         {
-            data->controller_param_recieved = true;
+            data->controller_param_recieved = true;\
+
+            // reset the packet acknowledge
+            data->acknowledgedPacket = false;
         }
+        data->ackIndex++;
      }
  }
  

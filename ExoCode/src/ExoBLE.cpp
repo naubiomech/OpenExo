@@ -275,7 +275,7 @@ void ExoBLE::send_initial_plotting_parameter_names()
     }
 
     //for each entry in the param_names_arr, send the name to the GUI individually
-    if(!plotting_param_sent && millis() - timer >= SEND_TIMER)
+    if(!plotting_param_sent) //millis() - timer >= SEND_TIMER)
     {
 
         Serial.print(_data->current_sent_index);
@@ -294,12 +294,16 @@ void ExoBLE::send_initial_plotting_parameter_names()
 
         _data->current_sent_index++;
     }
+
+    if(_data->current_sent_index == UART_command_handlers::num_entries)
+    {
+    std::string end_str = "END"; //marks the end of the parameter names list
+    _gatt_db.TXChar.writeValue(end_str.c_str());
+    }
 }
 
 void ExoBLE::send_initial_controller_parameters() 
 {
-    std::string end_str = "END"; //marks the end of the parameter names list
-    _gatt_db.TXChar.writeValue(end_str.c_str());
 
     //Use controllerData class to send controller parameters
     std::string key_char = "!";

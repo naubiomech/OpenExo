@@ -346,6 +346,7 @@ class ExoDeviceManager:
         await self.client.write_gatt_char(char, command, True)
 
     async def send_acknowledgement(self):
+        print("Sending ACk")
         command = bytearray(b"$")
         char = self.get_char_handle(self.UART_TX_UUID)
 
