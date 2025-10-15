@@ -121,7 +121,8 @@ class ExoDeviceManager:
 
                 # reset parameter variables
                 self._realTimeProcessor.handshake = False
-                self._realTimeProcessor.first_msg = True
+                self._realTimeProcessor.plotting_parameters = False
+                self._realTimeProcessor.parameters_recieved = False
                 self._realTimeProcessor.plotting_param_names = []  
                 self._realTimeProcessor.num_plotting_params = 0
                 self._realTimeProcessor.param_values = []
@@ -133,7 +134,6 @@ class ExoDeviceManager:
 
                 await self.client.disconnect()  # Disconnect from the client
                 self.isConnected = False  # Update connection status
-                self._realTimeProcessor.handshake = False
                 print("Successfully disconnected from the device.")
             except Exception as e:
                 print(f"Failed to disconnect: {e}")

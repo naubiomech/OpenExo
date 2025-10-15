@@ -20,7 +20,7 @@ class RealTimeProcessor:
         self._data_length = None
         self.x_time = 0
         self._predictor= MLModel.MLModel() #create the machine learning model object
-        self.first_msg = True
+        self.plotting_parameters = False
         self.plotting_param_names = []  # List to store parameter names
         self.num_plotting_params = 0 # Number of parameters
         self.param_values = [] # List to store parameter values
@@ -51,7 +51,7 @@ class RealTimeProcessor:
 
             return
 
-        if(self.handshake and self.first_msg): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
+        if(self.handshake and not self.plotting_parameters): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
             #Should change this to use special character to mark that these belong in plotting parameters (see regular data and controller parameters)
             print("First msg = ")
             print(dataUnpacked)
@@ -62,7 +62,7 @@ class RealTimeProcessor:
                     self.plotting_param_names, 
                     self.num_plotting_params
                 )
-                self.first_msg = False
+                self.plotting_parameters = True
                 
                 # Tell the arduino that we have recieved the plotting parameters (lets it keep moving forward)
                 asyncio.create_task(self._device_manager.send_acknowledgement())
