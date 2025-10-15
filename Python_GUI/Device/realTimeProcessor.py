@@ -45,7 +45,7 @@ class RealTimeProcessor:
 
             # let the arduino we recieved the handshake
             #if hasattr(self, '_device_manager') and self._device_manager:
-            asyncio.create_task(self._device_manager.send_handshake_recieved())
+            asyncio.create_task(self._device_manager.sendAcknowledgement())
 
             self.handshake = True;
 
@@ -63,6 +63,10 @@ class RealTimeProcessor:
                     self.num_plotting_params
                 )
                 self.first_msg = False
+                
+                # Tell the arduino that we have recieved the plotting parameters (lets it keep moving forward)
+                asyncio.create_task(self._device_manager.sendAcknowledgement())
+
                 # Also update the exoData with parameter names
                 self._exo_data.setParameterNames(self.plotting_param_names)
                 self._exo_data.initializeParamValues()
@@ -90,6 +94,10 @@ class RealTimeProcessor:
                 if(data_split[1] == 'END'):
                     
                     self.parameters_recieved = True
+                    
+                    # Let the arduino know we have the controller parameters
+                    asyncio.create_task(self._device_manager.sendAcknowledgement())
+
                     if self._active_trial:
                         self._active_trial.update_dropdown_values()
 
