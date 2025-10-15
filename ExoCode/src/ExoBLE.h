@@ -75,7 +75,9 @@
 
          void send_message_w_string(BleMessage &msg, const char* msg_text);
 
-         void send_initial_parameter_names();
+         void send_initial_plotting_parameter_names();
+
+         void send_initial_controller_parameters();
 
          void send_initial_handshake();
  

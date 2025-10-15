@@ -16,7 +16,9 @@
 
 // These time vaiables are used to delay until actual connection is established - Elliott
 static unsigned long connection_timer_start = 0;
-static bool connection_timer_active = false;
+static unsigned long plotting_param_timer_start = 0;
+static unsigned long controller_param_timer_start = 0;
+
 static const unsigned long CONNECTION_DELAY = 1000; 
 
 ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
@@ -158,12 +160,11 @@ void ComsMCU::update_gui()
     const bool new_rt_data = real_time_i2c::poll(rt_floats);
     static float del_t_no_msg = millis();
 
-    // START - Only start GUI interactions once we have begun connecting
+    // Just try to send out initial handshake (helps speed things up on fast systems)
     if( _data->connected && _data->first_pass )
     {
         // Start time out timer for handshake right away
         connection_timer_start = millis();
-        connection_timer_active = true;
 
         // call the initial send handshake attempt
         _exo_ble->send_initial_handshake();
@@ -175,7 +176,7 @@ void ComsMCU::update_gui()
     // check if we have sent/recieved first handshake
     // if not check to see our timer has run out
     // this will continue hitting until initial parameters picked up
-    if( !_data->initial_handshake && 
+    if( !_data->acknowledgedPacket && !_data->initial_handshake_recieved && 
             (millis() - connection_timer_start >= CONNECTION_DELAY ) )
     {
 
@@ -184,25 +185,41 @@ void ComsMCU::update_gui()
 
         // reset the handshake timer
         connection_timer_start = millis();
+        
+        // reset the packet acknowledge
+        _data->acknowledgedPacket = false;
 
         // No need to keep going in this function
         return;
     }
 
-    // once initial handshake has been achieved, send intitial parameters
-    if(  _data->initial_handshake && !_data->initial_parameters_sent )
+    // once initial handshake has been achieved, send intitial parameters TODO ADD TIMER
+    else if(  !_data->acknowledgedPacket && _data->initial_handshake_recieved && !_data->plotting_param_recieved  
+                    && (millis() - plotting_param_timer_start >= CONNECTION_DELAY ) )
     {
-        _exo_ble->send_initial_parameter_names();
+        _exo_ble->send_initial_plotting_parameter_names();
+        
+        // start timeout timer
+        plotting_param_timer_start = millis();
 
-        if(_data->current_sent_index == UART_command_handlers::num_entries + 1)
-        {
-            _data->initial_parameters_sent = true;
-        }
+        _data->acknowledgedPacket = false;
+
         // continue, may have to add a return buffer
     }
 
+    // once the plotting parameters have been sent/recieved, send controller parameters TODO ADD TIMER
+    else if( !_data->acknowledgedPacket && _data->initial_handshake_recieved && 
+            _data->plotting_param_recieved && !_data->controller_param_recieved
+                    && (millis() - controller_param_timer_start >= CONNECTION_DELAY ) )
+    {
+        _exo_ble->send_initial_controller_parameters();
+
+        controller_param_timer_start = millis();
+    }
+
     // finally, once we have the initial parameters, start real time data
-    if (_data->initial_parameters_sent && (new_rt_data || rt_data::new_rt_msg))
+    if (_data->initial_handshake_recieved && _data->plotting_param_recieved 
+        && !_data->controller_param_recieved && (new_rt_data || rt_data::new_rt_msg))
     {
 
         _data->real_time_active = true;
@@ -274,7 +291,7 @@ void ComsMCU::update_gui()
     static float status_context = t_helper->generate_new_context(); 
     static float del_t_status = 0;
     del_t_status += t_helper->tick(status_context);
-    if (_data->real_time_active && _data->initial_parameters_sent && (del_t_status > BLE_times::_status_msg_delay))
+    if (_data->real_time_active && _data->plotting_param_recieved && (del_t_status > BLE_times::_status_msg_delay))
     {
         Serial.println("Sending battery status..");
         #if COMSMCU_DEBUG

@@ -428,8 +428,29 @@
      // This activates once we have recieved the message that we have recieved the handshake
      inline static void send_initial_handshake(ExoData* data)
      {
-        Serial.println("handshake recieved!");
-        data->initial_handshake = true;
+        Serial.println("Info recieved from python");
+        data->acknowledgedPacket = true;
+        data->ackIndex++;
+
+        // determine which stage of acknowledged packets we are in
+
+        // first stage - handshake
+        if(data->ackIndex == 0)
+        {
+            data->initial_handshake_recieved = true;
+        }
+
+        // second stage - plotting parameters
+        else if(data->ackIndex == 1)
+        {
+            data->plotting_param_recieved = true;
+        }
+
+        // third stage - controller parameters
+        else if(data->ackIndex == 2)
+        {
+            data->controller_param_recieved = true;
+        }
      }
  }
  
