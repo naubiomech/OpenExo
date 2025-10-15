@@ -40,14 +40,14 @@ class RealTimeProcessor:
         #print(dataUnpacked)
 
         # check for handshake
-        if not self.handshake and dataUnpacked == "handshake":
-            print("handshake recieved");
+        if dataUnpacked == "handshake":
+            print("handshake recieved")
 
             # let the arduino we recieved the handshake
             #if hasattr(self, '_device_manager') and self._device_manager:
             asyncio.create_task(self._device_manager.send_acknowledgement())
 
-            self.handshake = True;
+            self.handshake = True
 
             return
 

@@ -497,9 +497,9 @@ namespace UART_command_handlers
 
     static int num_entries = 8; // Number of data entries (parameters) that will be sent to the GUI
     static std::vector<std::string> param_names_arr; // Vector of strings to hold the names of the parameters that will be sent to the GUI
-    inline static void initialize_parameter_names(ExoData *exo_data, uint8_t *config)
+    inline static void initialize_parameter_names(ExoData *exo_data, uint8_t *config, UARTHandler *handler, UART_msg_t msg)
     {
-        //update_config(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
+        update_config(handler, exo_data, msg);
         DataEntry data_entries[10];
         populate_data_entries(exo_data, config, data_entries, num_entries);
 
@@ -539,7 +539,7 @@ namespace UART_command_handlers
         //8 = Not Plotted, Will Save
         //9 = Not Plotted, Will Save
 
-        //update_config(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
+        update_config(handler, exo_data, msg);
         DataEntry data_entries[10];
         populate_data_entries(exo_data, config, data_entries, num_entries);
         rx_msg.len = num_entries;
@@ -787,6 +787,15 @@ namespace UART_command_utils
 
         //logger::println("UART_command_utils::handle_message->got message: ");
         //UART_msg_t_utils::print_msg(msg);
+
+        Serial.print("Teensy Received Message: ");
+        Serial.println(msg.command);
+        for(int i = 0; i < msg.len; i++)
+        {
+            Serial.print(msg.data[i]);
+            Serial.print(", ");
+        }
+        Serial.print("\n");
 
         switch (msg.command)
         {

@@ -262,8 +262,9 @@ void ExoBLE::send_initial_plotting_parameter_names()
     static bool timer_started = false;
     
     UART_msg_t msg; // make a message  so we can properly call get_real_time_data, this msg is currently blank
-    
-    UART_command_handlers::initialize_parameter_names(_data, _data->config);
+    UARTHandler* handler = UARTHandler::get_instance();
+
+    UART_command_handlers::initialize_parameter_names(_data, _data->config, handler, msg);
     static const int num_entries = UART_command_handlers::num_entries;
     Serial.println("Inside initial parameter send");
     

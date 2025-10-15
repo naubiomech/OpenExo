@@ -176,6 +176,7 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         """When a controller is selected, update the parameter dropdown with only its parameters"""
         try:
             selected_controller = self.controllerVar.get()
+            self.controllerInput.set(selected_controller)  # Ensure the selected controller is set
             controllers = self.controller.deviceManager._realTimeProcessor.controllers
             controller_parameters = self.controller.deviceManager._realTimeProcessor.controller_parameters
             
@@ -183,6 +184,7 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
             
             # Find the index of the selected controller
             if selected_controller in controllers:
+                self.controller_index = controllers.index(selected_controller)
                 controller_index = controllers.index(selected_controller)
                 print(f"DEBUG: Controller index: {controller_index}")
                 
@@ -206,6 +208,10 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
                 self.parameterInput['values'] = []
                 self.parameterVar.set("")
                 print(f"DEBUG: Selected controller '{selected_controller}' not found in controllers list")
+            self.parameter_index = parameters.index(self.parameterInput.get())
+            print(f"DEBUG: Current parameter value: {self.parameter_index}")
+            print(f"DEBUG: Current parameter input: {self.parameterInput.get()}")
+            print(f"DEBUG: Current controller input: {self.controllerInput.get()}")
                 
         except Exception as e:
             print(f"Error updating parameter dropdown: {e}")
@@ -272,26 +278,50 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
             self.controller.show_frame("ActiveTrial")
             active_trial_frame = self.controller.frames["ActiveTrial"]
             active_trial_frame.newSelection(self)
+
+
+
+
+
+
+
+
+
+
+# HEY CONNOR THIS IS WHERE WE HANDLE THE UPDATE BUTTON BEING CLICKED
+
+
+
+
+
+
+
+
+
+
+
         
     async def on_update_button_clicked(
-        self, controllerInput, parameterInput, valueInput,
+        self, #controllerInput, parameterInput, valueInput,
     ):
         selected_joint = self.jointVar.get()  # Get the selected joint
         joint_id = jointMap[selected_joint]
 
-        await self.UpdateButtonClicked(
-            self.isBilateral,
-            joint_id,
-            controllerInput,
-            parameterInput,
-            valueInput,
-        )
+        print("Update Button Clicked")
+        print(f"Selected Joint: {selected_joint} (ID: {joint_id})")
+        #print(f"Controller Input: {self.controllerInput.get()}")
+        #print(f"Parameter Input: {self.parameterInput.get()}")
+        #print(f"Value Input: {self.valueInput.get()}")
+
+        await self.UpdateButtonClicked(self.isBilateral, joint_id, self.controller_index, self.parameterInput, self.valueInput, )
 
     async def UpdateButtonClicked(
         self, isBilateral, joint, controllerInput, parameterInput, valueInput,
     ):
-        controllerVal = self.controllerVar.get()
-        parameterVal = self.parameterVar.get()
+        controllerVal = self.controller_index
+        print(f"controllerVal: {controllerVal}")
+        parameterVal = self.parameter_index
+        print(f"parameterVal: {parameterVal}")
         valueVal = valueInput.get()
 
         print(f"bilateral: {isBilateral}")
@@ -302,7 +332,7 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
 
         # Set Torque
         await self.controller.deviceManager.updateTorqueValues(
-            [isBilateral, joint, controllerVal, parameterVal, valueVal]
+            [isBilateral, joint, float(controllerVal), float(parameterVal), float(valueVal)]
         )
 
         if self.previous_frame:
