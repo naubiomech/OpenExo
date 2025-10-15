@@ -176,10 +176,14 @@ bool ExoBLE::handle_updates()
         if (current_status < _connected)
         {
             _data->connected = false;
-            _data->first_pass = false;
-            _data->initial_handshake_recieved = false;
+            _data->first_pass = true;
+            _data->acknowledgedPacket = false;
             _data->plotting_param_recieved = false;
-            _data->controller_param_recieved = false;
+            _data->real_time_active = false;
+            _data->current_sent_index = 0;
+            _data->controller_param_recieved =  false;
+            _data->initial_handshake_recieved = false;
+            _data->ackIndex = 0;
 
             Serial.println("DISCONNECTION");
             //Disconnection

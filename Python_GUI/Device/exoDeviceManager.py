@@ -118,6 +118,12 @@ class ExoDeviceManager:
         if self.client is not None and self.isConnected:
             try:
                 self.disconnecting_intentionally = True  # Set the flag before disconnecting
+
+                # reset parameter variables
+                self._realTimeProcessor.handshake = False
+                self._realTimeProcessor.first_msg = True
+
+
                 await self.client.disconnect()  # Disconnect from the client
                 self.isConnected = False  # Update connection status
                 self._realTimeProcessor.handshake = False
