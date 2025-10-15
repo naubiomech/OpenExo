@@ -413,7 +413,7 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         AUTO_REGISTER_NAMESPACE(pjmc_plus)
     }
     
-    const int num_controllers = 2;                      //Total number of controllers defined in the controller_defs namespace so we can iterate through them.
+    const int num_controllers = 11;                      //Total number of controllers defined in the controller_defs namespace so we can iterate through them.
     static std::vector<std::string> controller_names =
     {
         "zero_torque",

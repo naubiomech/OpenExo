@@ -360,6 +360,7 @@ namespace UART_command_handlers
     {
         float right_gait;
         float left_gait;
+        Serial.println(config[config_defs::exo_name_idx]);
 
         //Note: Ankle and Hip are Configured for Step Controller, Elbow for the ElbowMinMax Controller, Multi-joint for their primary control schemes
         switch (config[config_defs::exo_name_idx])
@@ -466,6 +467,7 @@ namespace UART_command_handlers
 
         default: // Bilateral Ankle
 
+            /*
             data_entries[0] = Data_Entry(exo_data->right_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
             data_entries[1] = Data_Entry(exo_data->right_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
             data_entries[2] = Data_Entry(exo_data->left_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
@@ -476,6 +478,18 @@ namespace UART_command_handlers
             data_entries[7] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
             data_entries[8] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
             num_entries = 9;  // Fixed: Set to actual number of entries filled
+            */
+            right_gait = exo_data->right_side.percent_gait / 100;
+            left_gait = exo_data->left_side.percent_gait / 100;
+            data_entries[0] = Data_Entry(exo_data->right_side.toe_stance, TYPE_BOOL);
+            data_entries[1] = Data_Entry(exo_data->left_side.hip.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[2] = Data_Entry(exo_data->left_side.hip.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[3] = Data_Entry(right_gait, TYPE_FLOAT);
+            data_entries[4] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
+            data_entries[5] = Data_Entry(left_gait, TYPE_FLOAT);
+            data_entries[6] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
+            data_entries[7] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
+            num_entries = 8;  // Fixed: Set to actual number of entries filled
             
             break;
         }
@@ -485,6 +499,7 @@ namespace UART_command_handlers
     static std::vector<std::string> param_names_arr; // Vector of strings to hold the names of the parameters that will be sent to the GUI
     inline static void initialize_parameter_names(ExoData *exo_data, uint8_t *config)
     {
+        //update_config(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
         DataEntry data_entries[10];
         populate_data_entries(exo_data, config, data_entries, num_entries);
 
@@ -524,6 +539,7 @@ namespace UART_command_handlers
         //8 = Not Plotted, Will Save
         //9 = Not Plotted, Will Save
 
+        //update_config(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
         DataEntry data_entries[10];
         populate_data_entries(exo_data, config, data_entries, num_entries);
         rx_msg.len = num_entries;
