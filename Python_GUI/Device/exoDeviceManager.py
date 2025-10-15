@@ -122,7 +122,14 @@ class ExoDeviceManager:
                 # reset parameter variables
                 self._realTimeProcessor.handshake = False
                 self._realTimeProcessor.first_msg = True
-
+                self._realTimeProcessor.plotting_param_names = []  
+                self._realTimeProcessor.num_plotting_params = 0
+                self._realTimeProcessor.param_values = []
+                self._realTimeProcessor.controllers = [] 
+                self._realTimeProcessor.controller_parameters = []
+                self._realTimeProcessor.num_controllers = 0 
+                self._realTimeProcessor.num_control_parameters = 0 
+                self._realTimeProcessor.temp_control_param_list = []
 
                 await self.client.disconnect()  # Disconnect from the client
                 self.isConnected = False  # Update connection status
