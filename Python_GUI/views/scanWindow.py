@@ -29,6 +29,9 @@ class ScanWindow(tk.Frame):
         self.create_widgets()  # Create UI elements
         self.load_device_available() #Check if loaded devices avalible
 
+        # track which stage of parameter pick up we are in
+        self.currentStage = 0;
+
     # Create all UI elements
     def create_widgets(self):
 
@@ -57,7 +60,6 @@ class ScanWindow(tk.Frame):
         small_canvas = tk.Canvas(self, width=int(1736*.075), height=int(336*.075), highlightthickness=0)
         small_canvas.create_image(0, 0, image=self.small_bg_image, anchor="nw")
         small_canvas.grid(row=0, column=1, sticky="ne", padx=5, pady=10)  # Top-right corner
-
 
         # Style configuration
         style = ttk.Style()
@@ -132,30 +134,6 @@ class ScanWindow(tk.Frame):
         for j in range(2):  # Assuming 2 columns
             self.grid_columnconfigure(j, weight=1)
 
-        # Create overlay frame for parameter waiting popup (add this around line 128, before grid_rowconfigure)
-        self.parameter_waiting_frame = ttk.Frame(self, relief="raised", borderwidth=3)
-        self.parameter_waiting_frame.configure(style='Popup.TFrame')
-
-        # Configure a background style for the popup
-        style.configure('Popup.TFrame', background='#f0f0f0')
-
-        # Message label
-        waiting_message = ttk.Label(
-            self.parameter_waiting_frame, 
-            text="Waiting for parameters to be recieved..",
-            font=(self.fontstyle, 14),
-            justify="center"
-        )
-        waiting_message.grid(row=0, column=0, padx=40, pady=30)
-
-        # Back button
-        back_button = ttk.Button(
-            self.parameter_waiting_frame,
-            text="OK",
-            command=self.hide_waiting_popup
-        )
-        back_button.grid(row=1, column=0, pady=(0, 20))
-
     # Callback for device disconnection
     def ScanWindow_on_device_disconnected(self):
         """Handles disconnection of the device."""
@@ -184,17 +162,40 @@ class ScanWindow(tk.Frame):
         success = await self.controller.deviceManager.scanAndConnect()
         
         if success:
-            self.startTrialButton.config(state="normal")  # Enable Start Trial button
             self.debugButton.config(state="normal")  # Enable Start Trial button
             self.calTorqueButton.config(state="normal")   # Enable Calibrate Torque button
             self.connectButton.config(state=DISABLED)
             self.saveDeviceButton.config(state=DISABLED)
             self.loadDeviceButton.config(state=DISABLED)
-            self.deviceNameText.set(f"Connected: {self.selected_device_name} {self.selected_device_address}")
+            self.check_parameters_status()
         else:
             self.deviceNameText.set("Connection Failed, Please Restart Device")  # Update text if connection fails
             self.reset_elements()
         self.startScanButton.config(state="normal")
+
+    def check_parameters_status(self):
+        rtp = self.controller.deviceManager._realTimeProcessor
+        
+        # Check which stage we're at based on what's been received
+        if rtp.parameters_recieved and rtp.plotting_parameters and rtp.handshake:
+            # Stage 3 - all parameters recieved
+            self.startTrialButton.config(state="normal")
+            self.deviceNameText.set(f"Connected: {self.selected_device_name} {self.selected_device_address}")
+            # Stop checking - we're done!
+            return
+        elif rtp.plotting_parameters and rtp.handshake:
+            # Stage 2 - Waiting for controller parameters
+            self.deviceNameText.set(f"Connected: Waiting for controller parameters...")
+        elif rtp.handshake:
+            # Stage 1 - Waiting for plotting parameters
+            self.deviceNameText.set(f"Connected: Waiting for plotting parameters...")
+        else:
+            # Stage 0 - Waiting for handshake
+            self.deviceNameText.set(f"Connected: Initiating handshake...")
+        
+        # Schedule the next check in 100ms (0.1 seconds)
+        self.after(100, self.check_parameters_status)
+
 
     def load_device_available(self):
         if os.path.exists(self.SETTINGS_FILE):
@@ -270,8 +271,6 @@ class ScanWindow(tk.Frame):
         # Only allow the trial window to show if all parameters have been recieved
         if(self.controller.deviceManager._realTimeProcessor.parameters_recieved):
             await self.startTrialButtonClicked()  # Initiate the trial process
-        else:
-            self.show_waiting_popup()
 
     async def on_start_trial_debug_button_clicked(self):
         """Handles the Start Trial button click."""
@@ -440,16 +439,6 @@ class ScanWindow(tk.Frame):
         self.connectButton.config(state=DISABLED)
         self.saveDeviceButton.config(state=DISABLED)
         self.loadDeviceButton.config(state=DISABLED)
-    
-    def show_waiting_popup(self):
-        """Shows the parameter waiting popup overlay."""
-        # Raise it above other widgets and grid it to cover everything
-        self.parameter_waiting_frame.grid(row=0, column=0, rowspan=8, columnspan=2, sticky="nsew")
-        self.parameter_waiting_frame.tkraise()  # Bring to front
-
-    def hide_waiting_popup(self):
-        """Hides the parameter waiting popup overlay."""
-        self.parameter_waiting_frame.grid_remove()
         
     def show(self):
         """Resets elements and shows the frame."""
