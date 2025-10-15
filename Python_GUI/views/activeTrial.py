@@ -469,7 +469,6 @@ class ActiveTrial(tk.Frame):
             self.bottomPlot.update_indices()
             self.newSelection()
 
-
     def update_dropdown_values(self):
         """Update the dropdown values with the current parameter names"""
         try:

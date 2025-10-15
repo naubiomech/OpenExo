@@ -9,6 +9,9 @@
     - Create idx values that will be used to access the different parameters (remember this is 0 indexed)
     - Add a num_parameter value that stores the number of parameters the controller needs.
     - if this number is larger than the max_parameters at the bottom of controller_defs, change max_parameters to your value. 
+    - At the bottom of the new controller create a vector of strings of all the parameters in the controller. This must be in the same order as the parameters index (idx 1 must be the first, idx 2 must be the second). Follow the naming convention for the existing controllers.
+    - Call the defined macro function AUTO_REGISTER_NAMESPACE(controller) where controller is replaced by the name of the new controller.
+2. At the bottom of the controller_defs namespace add the name of the new controller to the end of the controller_names vector following the convention of the existing controllers.
 
 ## Controller.h
 1. Under Controller.h create a new controller that inherits the _Controller class.
@@ -53,14 +56,15 @@
 
 ## uart_commands.h
 1. This section is optional, if you want to plot or save one on of the variables you created in ControllerData.h:
-	- In get_real_time_data()
+	- In populate_data_entries()
 		- Find the case for the joint you are using the controller for (e.g., bilateral_hip)
-		- Assign the variable to one of the data spots in the rx.msg (e.g., rx_msg.data[0])
+		- Assign the variable to one of the data spots in the rx.msg (e.g., data_entries[#])
 			- If the variable is specific to the controller, use the following formatting:
 				- rx_msg.data[#] = exo_data->NAME_side.JOINT.controller.VARIABLENAME;
-					- Here: NAME_side should either be left_side or right_side, JOINT should be the joint you are working with, and VARIABLENAME is the name of the variable you want to plot.
+                - data_entries[#] = Data_Entry(exo_data->NAME_side.JOINT.controller.VARIABLENAME, TYPE_DATATYPE);
+					- Here: NAME_side should either be left_side or right_side, JOINT should be the joint you are working with, VARIABLENAME is the name of the variable you want to plot, and DATATYPE should be the type of the data you want to plot (currently accepts BOOL, FLOAT, and INT).
 			- You can also plot variables specific to a side (defined in SideData.h) using the following formatting:
-				- rx_msg.data[#] = exo_data->NAME_side.VARIABLENAME;
+				- data_entries[#] = Data_Entry(exo_data->NAME_side.VARIABLENAME, TYPE_DATATYPE);
 
 ## Done
 It should now be good to go.  You will need to change the controller and update the parameters.

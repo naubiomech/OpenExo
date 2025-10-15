@@ -145,10 +145,16 @@ class ExoData
 
         bool connected = false;
         bool first_pass = true;
-        bool initial_handshake = false;
-        bool initial_parameters_sent = false;
+        bool acknowledgedPacket = false;
+        bool plotting_param_recieved = false;
         bool real_time_active = false;
         int current_sent_index = 0;
+        bool controller_param_recieved =  false;
+        bool initial_handshake_recieved = false;
+
+        // This acknowledgement index keeps track of plotting parameter process
+        // function inside of ble_commands
+        int ackIndex = 0;
 
         private:
         uint16_t _status;           /**< Status of the system*/

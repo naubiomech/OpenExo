@@ -118,6 +118,20 @@ class ExoDeviceManager:
         if self.client is not None and self.isConnected:
             try:
                 self.disconnecting_intentionally = True  # Set the flag before disconnecting
+
+                # reset parameter variables
+                self._realTimeProcessor.handshake = False
+                self._realTimeProcessor.plotting_parameters = False
+                self._realTimeProcessor.parameters_recieved = False
+                self._realTimeProcessor.plotting_param_names = []  
+                self._realTimeProcessor.num_plotting_params = 0
+                self._realTimeProcessor.param_values = []
+                self._realTimeProcessor.controllers = [] 
+                self._realTimeProcessor.controller_parameters = []
+                self._realTimeProcessor.num_controllers = 0 
+                self._realTimeProcessor.num_control_parameters = 0 
+                self._realTimeProcessor.temp_control_param_list = []
+
                 await self.client.disconnect()  # Disconnect from the client
                 self.isConnected = False  # Update connection status
                 print("Successfully disconnected from the device.")
@@ -344,7 +358,8 @@ class ExoDeviceManager:
 
         await self.client.write_gatt_char(char, command, True)
 
-    async def send_handshake_recieved(self):
+    async def send_acknowledgement(self):
+        print("Sending ACk")
         command = bytearray(b"$")
         char = self.get_char_handle(self.UART_TX_UUID)
 

@@ -360,14 +360,13 @@ namespace UART_command_handlers
     {
         float right_gait;
         float left_gait;
-        
+        Serial.println(config[config_defs::exo_name_idx]);
 
+        //Note: Ankle and Hip are Configured for Step Controller, Elbow for the ElbowMinMax Controller, Multi-joint for their primary control schemes
         switch (config[config_defs::exo_name_idx])
         {
 
         case (uint8_t)config_defs::exo_name::bilateral_ankle:
-
-            // START OF ELLIOTTS CODE
 
             data_entries[0] = Data_Entry(exo_data->right_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
             data_entries[1] = Data_Entry(exo_data->right_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
@@ -381,25 +380,9 @@ namespace UART_command_handlers
 
             num_entries = 9;  // Fixed: Set to actual number of entries filled
 
-            // END OF ELLIOTTS CODE
-
-            /*
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading;             //First Tab - Top Blue Line
-            rx_msg.data[1] = exo_data->right_side.ankle.controller.ff_setpoint;                         //First Tab - Top Orange Line
-            rx_msg.data[2] = exo_data->left_side.ankle.controller.filtered_torque_reading;              //First Tab - Bottom Blue Line
-            rx_msg.data[3] = exo_data->left_side.ankle.controller.ff_setpoint;                          //First Tab - Bottom Orange Line
-            rx_msg.data[4] = exo_data->right_side.toe_stance;                                           //Second Tab - Top Blue Line
-            rx_msg.data[5] = exo_data->right_side.toe_fsr;                                              //Second Tab - Top Orange Line
-            rx_msg.data[6] = exo_data->left_side.toe_stance;                                            //Second Tab - Bottom Blue Line
-            rx_msg.data[7] = exo_data->left_side.toe_fsr;                                               //Second Tab - Bottom Orange Line
-            rx_msg.data[8] = exo_data->right_side.heel_fsr;                                             //Not Plotted, Saved
-            rx_msg.data[9] = exo_data->left_side.heel_fsr;          
-            */                                    //Not Plotted, Saved
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_hip:
-            // START OF ELLIOTTS CODE
 
             right_gait = exo_data->right_side.percent_gait / 100;
             left_gait = exo_data->left_side.percent_gait / 100;
@@ -412,26 +395,10 @@ namespace UART_command_handlers
             data_entries[6] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
             data_entries[7] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
             num_entries = 8;  // Fixed: Set to actual number of entries filled
-            // END OF ELLIOTTS CODE
-
-            /*
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.hip.controller.filtered_torque_reading;
-            rx_msg.data[1] = exo_data->right_side.hip.controller.ff_setpoint;
-            rx_msg.data[2] = exo_data->left_side.hip.controller.filtered_torque_reading;
-            rx_msg.data[3] = exo_data->left_side.hip.controller.ff_setpoint;
-            rx_msg.data[4] = exo_data->right_side.percent_gait / 100;
-            rx_msg.data[5] = exo_data->right_side.toe_fsr;
-            rx_msg.data[6] = exo_data->left_side.percent_gait / 100;
-            rx_msg.data[7] = exo_data->left_side.toe_fsr;
-            rx_msg.data[8] = exo_data->right_side.heel_fsr;
-            rx_msg.data[9] = exo_data->left_side.heel_fsr;
-            */
+            
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_elbow:
-
-            // START OF ELLIOTTS CODE
 
             data_entries[0] = Data_Entry(exo_data->right_side.elbow.controller.filtered_torque_reading, TYPE_FLOAT);
             data_entries[1] = Data_Entry(exo_data->right_side.elbow.controller.filtered_setpoint, TYPE_FLOAT);
@@ -443,23 +410,9 @@ namespace UART_command_handlers
             data_entries[7] = Data_Entry(exo_data->left_side.elbow.controller.ExtenseSense, TYPE_FLOAT);
             num_entries = 8;  // Fixed: Set to actual number of entries filled
 
-            // END OF ELLIOTTS CODE
-
-            /*
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_ELBOW_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.elbow.controller.filtered_torque_reading; 
-            rx_msg.data[1] = exo_data->right_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[2] = exo_data->left_side.elbow.controller.filtered_torque_reading;
-            rx_msg.data[3] = exo_data->left_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[4] = exo_data->right_side.elbow.controller.FlexSense;
-            rx_msg.data[5] = exo_data->right_side.elbow.controller.ExtenseSense;
-            rx_msg.data[6] = exo_data->left_side.elbow.controller.FlexSense;
-            rx_msg.data[7] = exo_data->left_side.elbow.controller.ExtenseSense;
-            */
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_hip_ankle:
-            // START OF ELLIOTTS CODE
 
             right_gait = exo_data->right_side.percent_gait / 100;
             left_gait = exo_data->left_side.percent_gait / 100;
@@ -475,25 +428,9 @@ namespace UART_command_handlers
             data_entries[8] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
             num_entries = 9;  // Fixed: Set to actual number of entries filled
 
-            // END OF ELLIOTTS CODE
-
-            /*
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_ANKLE_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading; 
-            rx_msg.data[1] = exo_data->right_side.ankle.controller.ff_setpoint;
-            rx_msg.data[2] = exo_data->left_side.ankle.controller.filtered_torque_reading;
-            rx_msg.data[3] = exo_data->left_side.ankle.controller.ff_setpoint;
-            rx_msg.data[4] = exo_data->right_side.hip.controller.ff_setpoint;
-            rx_msg.data[5] = exo_data->right_side.percent_gait / 100;
-            rx_msg.data[6] = exo_data->left_side.hip.controller.ff_setpoint;
-            rx_msg.data[7] = exo_data->left_side.percent_gait / 100;
-            rx_msg.data[8] = exo_data->right_side.toe_fsr;
-            rx_msg.data[9] = exo_data->left_side.toe_fsr;
-            */
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_hip_elbow:
-            // START OF ELLIOTTS CODE
 
             right_gait = exo_data->right_side.percent_gait / 100;
             left_gait = exo_data->left_side.percent_gait / 100;
@@ -509,25 +446,10 @@ namespace UART_command_handlers
             data_entries[8] = Data_Entry(exo_data->right_side.elbow.controller.FlexSense, TYPE_FLOAT);
             data_entries[9] = Data_Entry(exo_data->left_side.elbow.controller.FlexSense, TYPE_FLOAT);
             num_entries = 10;  // Fixed: Set to actual number of entries filled
-            // END OF ELLIOTTS CODE
 
-            /*
-            //rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_ELBOW_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.elbow.controller.filtered_torque_reading;
-            rx_msg.data[1] = exo_data->right_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[2] = exo_data->left_side.elbow.controller.filtered_torque_reading;
-            rx_msg.data[3] = exo_data->left_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[4] = exo_data->right_side.hip.controller.ff_setpoint;
-            rx_msg.data[5] = exo_data->right_side.percent_gait / 100;
-            rx_msg.data[6] = exo_data->left_side.hip.controller.ff_setpoint;
-            rx_msg.data[7] = exo_data->left_side.percent_gait / 100;
-            rx_msg.data[8] = exo_data->right_side.elbow.controller.FlexSense;
-            rx_msg.data[9] = exo_data->left_side.elbow.controller.FlexSense;
-            */
             break;
 
         case (uint8_t)config_defs::exo_name::bilateral_ankle_elbow:
-            // START OF ELLIOTTS CODE
 
             data_entries[0] = Data_Entry(exo_data->right_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
             data_entries[1] = Data_Entry(exo_data->right_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
@@ -540,26 +462,12 @@ namespace UART_command_handlers
             data_entries[8] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
             data_entries[9] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
             num_entries = 10;  // Fixed: Set to actual number of entries filled
-            // END OF ELLIOTTS CODE
 
-            /*
-            //rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_ELBOW_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading;
-            rx_msg.data[1] = exo_data->right_side.ankle.controller.ff_setpoint;
-            rx_msg.data[2] = exo_data->left_side.ankle.controller.filtered_torque_reading;
-            rx_msg.data[3] = exo_data->left_side.ankle.controller.ff_setpoint;
-            rx_msg.data[4] = exo_data->right_side.elbow.controller.filtered_torque_reading;
-            rx_msg.data[5] = exo_data->right_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[6] = exo_data->left_side.elbow.controller.filtered_torque_reading;
-            rx_msg.data[7] = exo_data->left_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[8] = exo_data->right_side.toe_fsr;
-            rx_msg.data[9] = exo_data->left_side.toe_fsr;
-            */
             break;
 
         default: // Bilateral Ankle
-            // START OF ELLIOTTS CODE
 
+            /*
             data_entries[0] = Data_Entry(exo_data->right_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
             data_entries[1] = Data_Entry(exo_data->right_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
             data_entries[2] = Data_Entry(exo_data->left_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
@@ -570,29 +478,28 @@ namespace UART_command_handlers
             data_entries[7] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
             data_entries[8] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
             num_entries = 9;  // Fixed: Set to actual number of entries filled
-            // END OF ELLIOTTS CODE
-
-            /*
-            //rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading;             //First Tab - Top Blue Line
-            rx_msg.data[1] = exo_data->right_side.ankle.controller.ff_setpoint;                         //First Tab - Top Orange Line
-            rx_msg.data[2] = exo_data->left_side.ankle.controller.filtered_torque_reading;              //First Tab - Bottom Blue Line
-            rx_msg.data[3] = exo_data->left_side.ankle.controller.ff_setpoint;                          //First Tab - Bottom Orange Line
-            rx_msg.data[4] = exo_data->right_side.toe_stance;                                           //Second Tab - Top Blue Line
-            rx_msg.data[5] = exo_data->right_side.toe_fsr;                                              //Second Tab - Top Orange Line
-            rx_msg.data[6] = exo_data->left_side.toe_stance;                                            //Second Tab - Bottom Blue Line
-            rx_msg.data[7] = exo_data->left_side.toe_fsr;                                               //Second Tab - Bottom Orange Line
-            rx_msg.data[8] = exo_data->right_side.heel_fsr;                                             //Not Plotted, Saved
-            rx_msg.data[9] = exo_data->left_side.heel_fsr;     
-            */                                         //Not Plotted, Saved
+            */
+            right_gait = exo_data->right_side.percent_gait / 100;
+            left_gait = exo_data->left_side.percent_gait / 100;
+            data_entries[0] = Data_Entry(exo_data->right_side.toe_stance, TYPE_BOOL);
+            data_entries[1] = Data_Entry(exo_data->left_side.hip.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[2] = Data_Entry(exo_data->left_side.hip.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[3] = Data_Entry(right_gait, TYPE_FLOAT);
+            data_entries[4] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
+            data_entries[5] = Data_Entry(left_gait, TYPE_FLOAT);
+            data_entries[6] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
+            data_entries[7] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
+            num_entries = 8;  // Fixed: Set to actual number of entries filled
+            
             break;
         }
     }
 
     static int num_entries = 8; // Number of data entries (parameters) that will be sent to the GUI
     static std::vector<std::string> param_names_arr; // Vector of strings to hold the names of the parameters that will be sent to the GUI
-    inline static void initialize_parameter_names(ExoData *exo_data, uint8_t *config)
+    inline static void initialize_parameter_names(ExoData *exo_data, uint8_t *config, UARTHandler *handler, UART_msg_t msg)
     {
+        update_config(handler, exo_data, msg);
         DataEntry data_entries[10];
         populate_data_entries(exo_data, config, data_entries, num_entries);
 
@@ -632,8 +539,7 @@ namespace UART_command_handlers
         //8 = Not Plotted, Will Save
         //9 = Not Plotted, Will Save
 
-        //Note: Ankle and Hip are Configured for Step Controller, Elbow for the ElbowMinMax Controller, Multi-joint for their primary control schemes
-                // Declare the list of structs - ELLIOTTS CODE
+        update_config(handler, exo_data, msg);
         DataEntry data_entries[10];
         populate_data_entries(exo_data, config, data_entries, num_entries);
         rx_msg.len = num_entries;
@@ -881,6 +787,15 @@ namespace UART_command_utils
 
         //logger::println("UART_command_utils::handle_message->got message: ");
         //UART_msg_t_utils::print_msg(msg);
+
+        Serial.print("Teensy Received Message: ");
+        Serial.println(msg.command);
+        for(int i = 0; i < msg.len; i++)
+        {
+            Serial.print(msg.data[i]);
+            Serial.print(", ");
+        }
+        Serial.print("\n");
 
         switch (msg.command)
         {

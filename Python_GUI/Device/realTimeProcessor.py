@@ -20,7 +20,7 @@ class RealTimeProcessor:
         self._data_length = None
         self.x_time = 0
         self._predictor= MLModel.MLModel() #create the machine learning model object
-        self.first_msg = True
+        self.plotting_parameters = False
         self.plotting_param_names = []  # List to store parameter names
         self.num_plotting_params = 0 # Number of parameters
         self.param_values = [] # List to store parameter values
@@ -32,6 +32,7 @@ class RealTimeProcessor:
         self._device_manager = device_manager
         self._active_trial = active_trial 
         self.handshake = False
+        self.parameters_recieved = False
 
     def processEvent(self, event):
         # Decode data from bytearry->String
@@ -41,16 +42,18 @@ class RealTimeProcessor:
         # check for handshake
         if dataUnpacked == "handshake":
             print("handshake recieved");
+        if dataUnpacked == "handshake":
+            print("handshake recieved")
 
             # let the arduino we recieved the handshake
             #if hasattr(self, '_device_manager') and self._device_manager:
-            asyncio.create_task(self._device_manager.send_handshake_recieved())
+            asyncio.create_task(self._device_manager.send_acknowledgement())
 
-            self.handshake = True;
+            self.handshake = True
 
             return
 
-        if(self.handshake and self.first_msg): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
+        if(self.handshake and not self.plotting_parameters): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
             #Should change this to use special character to mark that these belong in plotting parameters (see regular data and controller parameters)
             print("First msg = ")
             print(dataUnpacked)
@@ -61,7 +64,11 @@ class RealTimeProcessor:
                     self.plotting_param_names, 
                     self.num_plotting_params
                 )
-                self.first_msg = False
+                self.plotting_parameters = True
+                
+                # Tell the arduino that we have recieved the plotting parameters (lets it keep moving forward)
+                asyncio.create_task(self._device_manager.send_acknowledgement())
+
                 # Also update the exoData with parameter names
                 self._exo_data.setParameterNames(self.plotting_param_names)
                 self._exo_data.initializeParamValues()
@@ -73,7 +80,7 @@ class RealTimeProcessor:
                 self.plotting_param_names.append(dataUnpacked)
                 self.num_plotting_params += 1
         
-        elif "!" in dataUnpacked:   # process controllers and control parameters
+        elif self.handshake and "!" in dataUnpacked:   # process controllers and control parameters
             data_split = dataUnpacked.split("!", 1)
             if "!" in data_split[1]:
                 #this is a controller parameter
@@ -88,7 +95,11 @@ class RealTimeProcessor:
                     self.temp_control_param_list = []
                 if(data_split[1] == 'END'):
                     
-                    self.first_msg = False
+                    self.parameters_recieved = True
+                    
+                    # Let the arduino know we have the controller parameters
+                    asyncio.create_task(self._device_manager.send_acknowledgement())
+
                     if self._active_trial:
                         self._active_trial.update_dropdown_values()
 
@@ -106,7 +117,7 @@ class RealTimeProcessor:
                     self.controllers.append(data_split[1])
                     self.num_controllers += 1
 
-        elif "c" in dataUnpacked and self.first_msg == False:  # 'c' acts as a delimiter for data
+        elif self.handshake and "c" in dataUnpacked:  # 'c' acts as a delimiter for data
             data_split = dataUnpacked.split(
                 "c"
             )  # Split data into 2 messages using 'c' as divider
@@ -226,10 +237,17 @@ class RealTimeProcessor:
         self.param_values = param_values
         
         
-
         self._exo_data.addDataPoints(
             self.x_time,
-            param_values,
+            rightTorque,
+            rightState,
+            rightSet,
+            leftTorque,
+            leftState,
+            leftSet,
+            rightFsr,
+            leftFsr,
+            #store features
             minSV,
             maxSV,
             minSA,
@@ -237,7 +255,7 @@ class RealTimeProcessor:
             maxFSR,
             stancetime,
             swingtime,
-            self._predictor.prediction,  # Task
+            self._predictor.prediction, #store prediction
             battery
         )
 

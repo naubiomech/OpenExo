@@ -29,6 +29,9 @@ class ScanWindow(tk.Frame):
         self.create_widgets()  # Create UI elements
         self.load_device_available() #Check if loaded devices avalible
 
+        # track which stage of parameter pick up we are in
+        self.currentStage = 0;
+
     # Create all UI elements
     def create_widgets(self):
 
@@ -57,7 +60,6 @@ class ScanWindow(tk.Frame):
         small_canvas = tk.Canvas(self, width=int(1736*.075), height=int(336*.075), highlightthickness=0)
         small_canvas.create_image(0, 0, image=self.small_bg_image, anchor="nw")
         small_canvas.grid(row=0, column=1, sticky="ne", padx=5, pady=10)  # Top-right corner
-
 
         # Style configuration
         style = ttk.Style()
@@ -160,17 +162,40 @@ class ScanWindow(tk.Frame):
         success = await self.controller.deviceManager.scanAndConnect()
         
         if success:
-            self.startTrialButton.config(state="normal")  # Enable Start Trial button
             self.debugButton.config(state="normal")  # Enable Start Trial button
             self.calTorqueButton.config(state="normal")   # Enable Calibrate Torque button
             self.connectButton.config(state=DISABLED)
             self.saveDeviceButton.config(state=DISABLED)
             self.loadDeviceButton.config(state=DISABLED)
-            self.deviceNameText.set(f"Connected: {self.selected_device_name} {self.selected_device_address}")
+            self.check_parameters_status()
         else:
             self.deviceNameText.set("Connection Failed, Please Restart Device")  # Update text if connection fails
             self.reset_elements()
         self.startScanButton.config(state="normal")
+
+    def check_parameters_status(self):
+        rtp = self.controller.deviceManager._realTimeProcessor
+        
+        # Check which stage we're at based on what's been received
+        if rtp.parameters_recieved and rtp.plotting_parameters and rtp.handshake:
+            # Stage 3 - all parameters recieved
+            self.startTrialButton.config(state="normal")
+            self.deviceNameText.set(f"Connected: {self.selected_device_name} {self.selected_device_address}")
+            # Stop checking - we're done!
+            return
+        elif rtp.plotting_parameters and rtp.handshake:
+            # Stage 2 - Waiting for controller parameters
+            self.deviceNameText.set(f"Connected: Waiting for controller parameters...")
+        elif rtp.handshake:
+            # Stage 1 - Waiting for plotting parameters
+            self.deviceNameText.set(f"Connected: Waiting for plotting parameters...")
+        else:
+            # Stage 0 - Waiting for handshake
+            self.deviceNameText.set(f"Connected: Initiating handshake...")
+        
+        # Schedule the next check in 100ms (0.1 seconds)
+        self.after(100, self.check_parameters_status)
+
 
     def load_device_available(self):
         if os.path.exists(self.SETTINGS_FILE):
@@ -242,7 +267,10 @@ class ScanWindow(tk.Frame):
 
     async def on_start_trial_button_clicked(self):
         """Handles the Start Trial button click."""
-        await self.startTrialButtonClicked()  # Initiate the trial process
+
+        # Only allow the trial window to show if all parameters have been recieved
+        if(self.controller.deviceManager._realTimeProcessor.parameters_recieved):
+            await self.startTrialButtonClicked()  # Initiate the trial process
 
     async def on_start_trial_debug_button_clicked(self):
         """Handles the Start Trial button click."""
