@@ -108,6 +108,14 @@ class TopPlot(BasePlot):
         self.x_values.append(dt.datetime.now())
         self.y_values.append(top_controller)
         self.second_y.append(top_measure)
+        # Try to set dynamic title from parameter names using current indices
+        try:
+            names = chart_data.param_names
+            if isinstance(names, list):
+                if len(names) > self.blue_index and len(names) > self.orange_index:
+                    title = f"{names[self.blue_index]} vs {names[self.orange_index]}"
+        except Exception:
+            pass
         self.ax.set_title(title)
 
         self.update_plot(self.x_values, self.y_values, self.second_y, bottom_limit, top_limit, title)
@@ -155,6 +163,14 @@ class BottomPlot(BasePlot):
         self.x_values.append(dt.datetime.now())
         self.y_values.append(top_controller)
         self.second_y.append(top_measure)
+        # Try to set dynamic title from parameter names using current indices
+        try:
+            names = chart_data.param_names
+            if isinstance(names, list):
+                if len(names) > self.blue_index and len(names) > self.orange_index:
+                    title = f"{names[self.blue_index]} vs {names[self.orange_index]}"
+        except Exception:
+            pass
         self.ax.set_title(title)
 
         self.update_plot(self.x_values, self.y_values, self.second_y, bottom_limit, top_limit, title)

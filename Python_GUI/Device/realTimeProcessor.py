@@ -39,7 +39,7 @@ class RealTimeProcessor:
         #print(dataUnpacked)
 
         # check for handshake
-        if not self.handshake and dataUnpacked == "handshake":
+        if dataUnpacked == "handshake":
             print("handshake recieved");
 
             # let the arduino we recieved the handshake
