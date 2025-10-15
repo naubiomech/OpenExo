@@ -17,7 +17,7 @@
 // These time vaiables are used to delay until actual connection is established - Elliott
 static unsigned long connection_timer_start = 0;
 static bool connection_timer_active = false;
-static const unsigned long CONNECTION_DELAY = 2000; 
+static const unsigned long CONNECTION_DELAY = 1000; 
 
 ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
 {
@@ -174,11 +174,12 @@ void ComsMCU::update_gui()
 
     // check if we have sent/recieved first handshake
     // if not check to see our timer has run out
+    // this will continue hitting until initial parameters picked up
     if( !_data->initial_handshake && 
-            (millis() - connection_timer_start >= CONNECTION_DELAY ) ) // This logic only send once
+            (millis() - connection_timer_start >= CONNECTION_DELAY ) )
     {
 
-        // retry the initial handshake
+        // try the initial handshake
         _exo_ble->send_initial_handshake();
 
         // reset the handshake timer

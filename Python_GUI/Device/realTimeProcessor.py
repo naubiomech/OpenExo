@@ -32,6 +32,7 @@ class RealTimeProcessor:
         self._device_manager = device_manager
         self._active_trial = active_trial 
         self.handshake = False
+        self.parameters_recieved = False
 
     def processEvent(self, event):
         # Decode data from bytearry->String
@@ -73,7 +74,7 @@ class RealTimeProcessor:
                 self.plotting_param_names.append(dataUnpacked)
                 self.num_plotting_params += 1
         
-        elif "!" in dataUnpacked:   # process controllers and control parameters
+        elif self.handshake and "!" in dataUnpacked:   # process controllers and control parameters
             data_split = dataUnpacked.split("!", 1)
             if "!" in data_split[1]:
                 #this is a controller parameter
@@ -88,7 +89,7 @@ class RealTimeProcessor:
                     self.temp_control_param_list = []
                 if(data_split[1] == 'END'):
                     
-                    self.first_msg = False
+                    self.parameters_recieved = True
                     if self._active_trial:
                         self._active_trial.update_dropdown_values()
 
@@ -106,7 +107,7 @@ class RealTimeProcessor:
                     self.controllers.append(data_split[1])
                     self.num_controllers += 1
 
-        elif "c" in dataUnpacked and self.first_msg == False:  # 'c' acts as a delimiter for data
+        elif self.handshake and "c" in dataUnpacked:  # 'c' acts as a delimiter for data
             data_split = dataUnpacked.split(
                 "c"
             )  # Split data into 2 messages using 'c' as divider

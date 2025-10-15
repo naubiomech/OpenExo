@@ -132,6 +132,30 @@ class ScanWindow(tk.Frame):
         for j in range(2):  # Assuming 2 columns
             self.grid_columnconfigure(j, weight=1)
 
+        # Create overlay frame for parameter waiting popup (add this around line 128, before grid_rowconfigure)
+        self.parameter_waiting_frame = ttk.Frame(self, relief="raised", borderwidth=3)
+        self.parameter_waiting_frame.configure(style='Popup.TFrame')
+
+        # Configure a background style for the popup
+        style.configure('Popup.TFrame', background='#f0f0f0')
+
+        # Message label
+        waiting_message = ttk.Label(
+            self.parameter_waiting_frame, 
+            text="Waiting for parameters to be recieved..",
+            font=(self.fontstyle, 14),
+            justify="center"
+        )
+        waiting_message.grid(row=0, column=0, padx=40, pady=30)
+
+        # Back button
+        back_button = ttk.Button(
+            self.parameter_waiting_frame,
+            text="OK",
+            command=self.hide_waiting_popup
+        )
+        back_button.grid(row=1, column=0, pady=(0, 20))
+
     # Callback for device disconnection
     def ScanWindow_on_device_disconnected(self):
         """Handles disconnection of the device."""
@@ -242,7 +266,12 @@ class ScanWindow(tk.Frame):
 
     async def on_start_trial_button_clicked(self):
         """Handles the Start Trial button click."""
-        await self.startTrialButtonClicked()  # Initiate the trial process
+
+        # Only allow the trial window to show if all parameters have been recieved
+        if(self.controller.deviceManager._realTimeProcessor.parameters_recieved):
+            await self.startTrialButtonClicked()  # Initiate the trial process
+        else:
+            self.show_waiting_popup()
 
     async def on_start_trial_debug_button_clicked(self):
         """Handles the Start Trial button click."""
@@ -411,6 +440,16 @@ class ScanWindow(tk.Frame):
         self.connectButton.config(state=DISABLED)
         self.saveDeviceButton.config(state=DISABLED)
         self.loadDeviceButton.config(state=DISABLED)
+    
+    def show_waiting_popup(self):
+        """Shows the parameter waiting popup overlay."""
+        # Raise it above other widgets and grid it to cover everything
+        self.parameter_waiting_frame.grid(row=0, column=0, rowspan=8, columnspan=2, sticky="nsew")
+        self.parameter_waiting_frame.tkraise()  # Bring to front
+
+    def hide_waiting_popup(self):
+        """Hides the parameter waiting popup overlay."""
+        self.parameter_waiting_frame.grid_remove()
         
     def show(self):
         """Resets elements and shows the frame."""
