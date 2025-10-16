@@ -13,6 +13,11 @@ class ExoData:
         self.lState = []
         self.lFsr = []
         self.rFsr = []
+
+        self.paramNames =[] # List to store parameter names
+        self.paramValues = [[]]  # List to store parameter values this will be a 2D list
+        self.numParams = 0
+        
         #record our features
         self.MinShankVel=[]
         self.MaxShankVel=[]
@@ -85,3 +90,12 @@ class ExoData:
             self.battery_is_low = False
         self.Mark.append(self.MarkVal)
         
+    def setParameterNames(self, param_names):
+        """Set the parameter names for the data structure"""
+        self.paramNames = param_names
+        self.numParams = len(param_names)
+    
+    def initializeParamValues(self):
+        """Initialize the paramValues structure properly"""
+        if not self.paramValues or len(self.paramValues) == 0:
+            self.paramValues = [] 

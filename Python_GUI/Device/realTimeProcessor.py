@@ -1,10 +1,11 @@
-import re
 
+import re
+import asyncio
 from Device import chart_data, exoData, MLModel
 
 
 class RealTimeProcessor:
-    def __init__(self):
+    def __init__(self, device_manager=None, active_trial=None):
         self._event_count_regex = re.compile(
             "[0-9]+"
         )  # Regular Expression to find any number 1-9
@@ -19,12 +20,104 @@ class RealTimeProcessor:
         self._data_length = None
         self.x_time = 0
         self._predictor= MLModel.MLModel() #create the machine learning model object
-        
+        self.plotting_parameters = False
+        self.plotting_param_names = []  # List to store parameter names
+        self.num_plotting_params = 0 # Number of parameters
+        self.param_values = [] # List to store parameter values
+        self.controllers = [] # List to store controller names
+        self.controller_parameters = [] # 2D list to store controller parameters
+        self.num_controllers = 0 # Number of controllers we have stored
+        self.num_control_parameters = 0 # Number of controller parameters in the most recently updated controller
+        self.temp_control_param_list = []
+        self._device_manager = device_manager
+        self._active_trial = active_trial 
+        self.handshake = False
+        self.parameters_recieved = False
 
     def processEvent(self, event):
         # Decode data from bytearry->String
         dataUnpacked = event.decode("utf-8")
-        if "c" in dataUnpacked:  # 'c' acts as a delimiter for data
+        #print(dataUnpacked)
+
+        # check for handshake
+        if dataUnpacked == "handshake":
+            print("handshake recieved");
+        if dataUnpacked == "handshake":
+            print("handshake recieved")
+
+            # let the arduino we recieved the handshake
+            #if hasattr(self, '_device_manager') and self._device_manager:
+            asyncio.create_task(self._device_manager.send_acknowledgement())
+
+            self.handshake = True
+
+            return
+
+        if(self.handshake and not self.plotting_parameters): # If this is the first set of messages, Then it is the parameter names and needs to be processed differently
+            #Should change this to use special character to mark that these belong in plotting parameters (see regular data and controller parameters)
+            print("First msg = ")
+            print(dataUnpacked)
+            print((dataUnpacked == "END"))
+            if(dataUnpacked == "END"): # marks the end of the parameter names
+                # Once all the parameter names have been recieved we need to update the relevant data structures (chart_data and exoData)
+                self._chart_data.updateNames(
+                    self.plotting_param_names, 
+                    self.num_plotting_params
+                )
+                self.plotting_parameters = True
+                
+                # Tell the arduino that we have recieved the plotting parameters (lets it keep moving forward)
+                asyncio.create_task(self._device_manager.send_acknowledgement())
+
+                # Also update the exoData with parameter names
+                self._exo_data.setParameterNames(self.plotting_param_names)
+                self._exo_data.initializeParamValues()
+                # Update dropdown values when parameter names are received
+                if self._active_trial:
+                    self._active_trial.update_dropdown_values()
+            else:
+                # If this is not the end of the parameter names, then we need to add the name to the list and increment the number of parameters
+                self.plotting_param_names.append(self._shorten_param_name(dataUnpacked))
+                self.num_plotting_params += 1
+        
+        elif self.handshake and "!" in dataUnpacked:   # process controllers and control parameters
+            data_split = dataUnpacked.split("!", 1)
+            if "!" in data_split[1]:
+                #this is a controller parameter
+                # print("control parameter")
+                data_split = data_split[1].split("!")
+                # print(data_split[1])
+                self.temp_control_param_list.append(data_split[1]) # add the parameter name to the 2D list of controller parameters
+                self.num_control_parameters += self.num_control_parameters
+            else:
+                if(len(self.temp_control_param_list) != 0):
+                    self.controller_parameters.append(self.temp_control_param_list)
+                    self.temp_control_param_list = []
+                if(data_split[1] == 'END'):
+                    
+                    self.parameters_recieved = True
+                    
+                    # Let the arduino know we have the controller parameters
+                    asyncio.create_task(self._device_manager.send_acknowledgement())
+
+                    if self._active_trial:
+                        self._active_trial.update_dropdown_values()
+
+                    for controller in self.controllers:
+                        print("Controller: ")
+                        print(controller)
+                        for parameter in self.controller_parameters:
+                            print("Parameter")
+                            print(parameter)
+                        
+                else:
+                    #this is a controller name
+                    # print("controller")
+                    # print(self.num_controllers)
+                    self.controllers.append(data_split[1])
+                    self.num_controllers += 1
+
+        elif self.handshake and "c" in dataUnpacked:  # 'c' acts as a delimiter for data
             data_split = dataUnpacked.split(
                 "c"
             )  # Split data into 2 messages using 'c' as divider
@@ -80,76 +173,167 @@ class RealTimeProcessor:
                     return
         else:
             print("Unkown command!\n")
+            print(dataUnpacked)
+
+    def _shorten_param_name(self, raw_name: str) -> str:
+        """Convert a raw param path to a short display label.
+        Rules:
+        - left/right side -> l/r
+        - remove 'controller'
+        - keep 'ankle' if present
+        - abbreviate the attribute after 'controller' by initials of underscore parts
+          e.g., filtered_torque_reading -> ftr; filter_manual_reading -> fmr; filtered_manual -> fm
+        - if no 'controller' present, leave the last segment as-is (dynamic-safe)
+        """
+        try:
+            if not raw_name:
+                return ""
+            name = raw_name.strip().lower()
+            # split off any leading namespace like 'exo_data->'
+            if "->" in name:
+                _, name = name.split("->", 1)
+            # tokenise by '.'
+            parts = name.split('.')
+            side = ''
+            if any('right_side' == p for p in parts):
+                side = 'r'
+            elif any('left_side' == p for p in parts):
+                side = 'l'
+
+            # keep 'ankle' if present
+            joint = 'ankle' if any(p == 'ankle' for p in parts) else ''
+
+            # remove any 'controller' tokens
+            filtered_parts = [p for p in parts if p != 'controller']
+
+            # find attribute segment: prefer the segment immediately after where 'controller' was,
+            # otherwise use the last segment
+            attr_segment = ''
+            if 'controller' in parts:
+                idx = parts.index('controller')
+                # find next non-empty segment
+                for j in range(idx + 1, len(parts)):
+                    if parts[j]:
+                        attr_segment = parts[j]
+                        break
+            if not attr_segment and filtered_parts:
+                attr_segment = filtered_parts[-1]
+
+            # abbreviate attribute by initials of underscore-separated tokens
+            def abbreviate(seg: str) -> str:
+                if not seg:
+                    return ''
+                # if it's already a short known token like 'fsr', keep it
+                if seg in {'fsr', 'sv', 'sa'}:
+                    return seg
+                tokens = [t for t in seg.split('_') if t]
+                if len(tokens) == 1 and len(tokens[0]) <= 3:
+                    return tokens[0]
+                initials = ''.join(t[0] for t in tokens)
+                return initials
+
+            attr_abbrev = abbreviate(attr_segment)
+
+            label_parts = []
+            if side:
+                label_parts.append(side)
+            if joint:
+                label_parts.append(joint)
+            if attr_abbrev:
+                label_parts.append(attr_abbrev)
+
+            # fallback: if nothing constructed, return the raw tail
+            label = ' '.join(label_parts).strip()
+            if not label:
+                return filtered_parts[-1] if filtered_parts else raw_name
+            return label
+        except Exception:
+            # on any parsing error, return the original
+            return raw_name
 
     def set_debug_event_listener(self, on_debug_event):
         self._on_debug_event = on_debug_event
+    
 
     def processGeneralData(
         self, payload, datalength
     ):  # Place general data derived from message to Exo data
         self.x_time += 1
-        data0 = payload[0] if len(payload) > 0 else 0  # rightTorque
-        data1 = payload[1] if len(payload) > 1 else 0  # rightState
-        data2 = payload[2] if len(payload) > 2 else 0  # rightSet
-        data3 = payload[3] if len(payload) > 3 else 0  # leftTorque
-        data4 = payload[4] if len(payload) > 4 else 0  # leftState
-        data5 = payload[5] if len(payload) > 5 else 0  # leftSet
-        data6 = payload[6] if datalength >= 7 and len(payload) > 6 else 0  # rightFsr
-        data7 = payload[7] if datalength >= 8 and len(payload) > 7 else 0  # leftFsr
-        data8 = payload[8] if datalength >= 9 and len(payload) > 8 else 0  # minSV
-        data9 = payload[9] if datalength >= 10 and len(payload) > 9 else 0  # maxSV
-        data10 = payload[10] if datalength >= 11 and len(payload) > 10 else 0  # battery
-        data11 = payload[11] if datalength >= 12 and len(payload) > 11 else 0  # maxSA
-        data12 = payload[12] if datalength >= 13 and len(payload) > 12 else 0  # minSA
-        data13 = payload[13] if datalength >= 14 and len(payload) > 13 else 0  # maxFSR
-        data14 = payload[14] if datalength >= 15 and len(payload) > 14 else 0  # stancetime
-        data15 = payload[15] if datalength >= 16 and len(payload) > 15 else 0  # swingtime
+        rightTorque = payload[0] if len(payload) > 0 else 0
+        rightState = payload[1] if len(payload) > 1 else 0
+        rightSet = payload[2] if len(payload) > 2 else 0
+        leftTorque = payload[3] if len(payload) > 3 else 0
+        leftState = payload[4] if len(payload) > 4 else 0
+        leftSet = payload[5] if len(payload) > 5 else 0
+        rightFsr = payload[6] if datalength >= 7 and len(payload) > 6 else 0
+        leftFsr = payload[7] if datalength >= 8 and len(payload) > 7 else 0
+        minSV = payload[8] if datalength >= 9 and len(payload) > 8 else 0
+        maxSV = payload[9] if datalength >= 10 and len(payload) > 9 else 0
+        minSA = payload[10] if datalength >= 11 and len(payload) > 10 else 0
+        maxSA = payload[11] if datalength >= 12 and len(payload) > 11 else 0
+        battery = payload[12] if datalength >= 13 and len(payload) > 12 else 0
+        maxFSR = payload[13] if datalength >= 14 and len(payload) > 13 else 0
+        stancetime = payload[14] if datalength >= 15 and len(payload) > 14 else 0
+        swingtime = payload[15] if datalength >= 16 and len(payload) > 15 else 0
 
         self._chart_data.updateValues(
-            data0,  # rightTorque
-            data1,  # rightState
-            data2,  # rightSet
-            data3,  # leftTorque
-            data4,  # leftState
-            data5,  # leftSet
-            data6,  # rightFsr
-            data7,  # leftFsr
-            data8,  # minSV
-            data9,  # maxSV
-            data10,  # battery
-            data11,  # maxSA
-            data12,  # minSA
-            data13,  # maxFSR
-            data14,  # stancetime
-            data15,  # swingtime
+            rightTorque,  # data0
+            rightState,   # data1
+            rightSet,     # data2
+            leftTorque,   # data3
+            leftState,    # data4
+            leftSet,      # data5
+            rightFsr,     # data6
+            leftFsr,      # data7
+            minSV,        # data8
+            maxSV,        # data9
+            minSA,        # data10
+            maxSA,        # data11
+            battery,      # data12
+            maxFSR,       # data13
+            stancetime,   # data14
+            swingtime,    # data15
         )
-        self._predictor.addDataPoints([data8, data9, data12, data11, data13, data14, data15, self._predictor.state]) #add data to model, if recording data (using minSA=data12)
+        self._predictor.addDataPoints([minSV,maxSV,minSA,maxSA,maxFSR,stancetime,swingtime,self._predictor.state]) #add data to model, if recording data
         
-        self._predictor.predictModel([data8, data9, data12, data11, data13, data14, data15]) #predict results from model (using minSA=data12)
+        self._predictor.predictModel([minSV,maxSV,minSA,maxSA, maxFSR,stancetime,swingtime]) #predict results from model
 
+        # Create a list of parameter values using ALL the payload data
+        # This ensures we have values for all parameters that come from the firmware
+        param_values = list(payload) if payload else []
+        
+        # Pad with zeros if we don't have enough values for all parameter names
+        while len(param_values) < self.num_plotting_params:
+            param_values.append(0.0)
 
+        # Update the chart data with the new parameter values for dropdown plotting
+        self._chart_data.updateParamValues(param_values)
+        
+        # Store the parameter values for access by plotting system
+        self.param_values = param_values
+        
+        
         self._exo_data.addDataPoints(
             self.x_time,
-            data0,  # rightTorque
-            data1,  # rightState
-            data2,  # rightSet
-            data3,  # leftTorque
-            data4,  # leftState
-            data5,  # leftSet
-            data6,  # rightFsr
-            data7,  # leftFsr
+            rightTorque,
+            rightState,
+            rightSet,
+            leftTorque,
+            leftState,
+            leftSet,
+            rightFsr,
+            leftFsr,
             #store features
-            data8,  # minSV
-            data9,  # maxSV
-            data12,  # minSA
-            data11,  # maxSA
-            data13,  # maxFSR
-            data14,  # stancetime
-            data15,  # swingtime
+            minSV,
+            maxSV,
+            minSA,
+            maxSA,
+            maxFSR,
+            stancetime,
+            swingtime,
             self._predictor.prediction, #store prediction
-            data10  # battery
+            battery
         )
-        
 
     def processMessage(
         self, command, payload, dataLength

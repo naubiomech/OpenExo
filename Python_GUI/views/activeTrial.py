@@ -27,6 +27,11 @@ class ActiveTrial(tk.Frame):
         self.timer_label = None  # Label for displaying the time
         self.timer_job = None  # Store the timer update job reference
         self.paused_flag = False
+        # Adaptive plotting cadence for slower machines
+        self.update_interval_ms = 50
+        self.min_interval_ms = 30
+        self.max_interval_ms = 200
+        self._last_plot_tick = None
 
         # Load pause and play icons
         pause_img = Image.open("Resources/Images/pause.png").convert("RGBA")
@@ -41,6 +46,8 @@ class ActiveTrial(tk.Frame):
         # UI elements
         self.fontstyle = 'Segoe UI'
 
+        names = self.controller.deviceManager._realTimeProcessor._chart_data.param_names
+        print("names", names)
         self.var = IntVar()
         self.chartVar = StringVar()
         self.chartVar.set("Data 0-3")
@@ -363,13 +370,24 @@ class ActiveTrial(tk.Frame):
         for plot in plots_to_update:
             plot.animate(selection)
 
-        # Schedule the next update
+        # Adaptive interval: increase if we're lagging, decrease gently if we're keeping up
+        now = time.time()
+        if self._last_plot_tick is not None:
+            elapsed = (now - self._last_plot_tick)
+            target = self.update_interval_ms / 1000.0
+            if elapsed > target * 1.5:
+                self.update_interval_ms = min(self.max_interval_ms, int(self.update_interval_ms * 1.25 + 1))
+            else:
+                self.update_interval_ms = max(self.min_interval_ms, int(self.update_interval_ms * 0.9))
+        self._last_plot_tick = now
+
+        # Schedule the next update using the adaptive interval
         self.plot_update_job = self.after(
-            20, self.update_plots, selection
-        )  # Schedule with a delay
+            self.update_interval_ms, self.update_plots, selection
+        )
 
         # Enable interactions after the first plot update is complete
-        self.after(20, self.enable_interactions)
+        self.after(50, self.enable_interactions)
 
     def clear_top_plot(self):
         self.topPlot.clear_plot()

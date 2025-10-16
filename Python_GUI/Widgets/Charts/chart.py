@@ -20,8 +20,8 @@ class BasePlot:
         self.second_y = []
 
         # Plot initialization
-        self.line1, = self.ax.plot([], [], label='Controller Value', color='blue')
-        self.line2, = self.ax.plot([], [], label='Measurement Value', color='red')
+        self.line1, = self.ax.plot([], [], label='Controller Value', color='blue', antialiased=False, linewidth=1)
+        self.line2, = self.ax.plot([], [], label='Measurement Value', color='red', antialiased=False, linewidth=1)
 
         self.ax.set_xticks([])  # Hide x-ticks for simplicity
         self.ax.set_title(title)
@@ -39,7 +39,7 @@ class BasePlot:
         cls.figure_size = size
 
     def update_plot(self, x_values, y_values, second_y, bottom_lim, top_lim, title):
-        max_points = 20  # Keep only the last 20 points
+        max_points = 40  # Keep only the last N points
         if len(x_values) > max_points:
             x_values = x_values[-max_points:]
             y_values = y_values[-max_points:]
@@ -48,13 +48,14 @@ class BasePlot:
         self.line1.set_data(x_values, y_values)
         self.line2.set_data(x_values, second_y)
 
-        # Efficiently redraw only the updated parts
-        self.ax.relim()  # Recalculate limits based on new data
-        self.ax.autoscale(enable=True, axis='both', tight=False)
+        # Fixed limits for stability and performance on slow machines
+        if x_values:
+            self.ax.set_xlim(x_values[0], x_values[-1])
+        if bottom_lim is not None and top_lim is not None:
+            self.ax.set_ylim(bottom_lim, top_lim)
 
-        # Draw without clearing axes
+        # Draw without clearing axes or flushing events each frame
         self.canvas.draw_idle()
-        self.canvas.flush_events()
 
     def refresh_figure(self):
         """Refresh the figure if the size is updated."""
@@ -71,8 +72,8 @@ class BasePlot:
         self.ax.set_title(None)
         self.ax.set_xticks([])  # Restore x-ticks hidden state
         # Reinitialize the lines
-        self.line1, = self.ax.plot([], [], label='Controller Value', color='blue')
-        self.line2, = self.ax.plot([], [], label='Measurement Value', color='red')
+        self.line1, = self.ax.plot([], [], label='Controller Value', color='blue', antialiased=False, linewidth=1)
+        self.line2, = self.ax.plot([], [], label='Measurement Value', color='red', antialiased=False, linewidth=1)
         self.canvas.draw_idle()
 
 class TopPlot(BasePlot):
@@ -90,7 +91,13 @@ class TopPlot(BasePlot):
             top_measure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.data1
             )
-            title = "Data 0 and 1"
+            # Get parameter names with safe access
+            names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            # Check if we have enough parameter names, otherwise use default titles
+            if names and len(names) > 1:
+                title = f"{names[0]} and {names[1]}"
+            else:
+                title = "Data 0 and 1"
         elif chart_selection == "Data 4-7":
             top_controller = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.data4
@@ -98,7 +105,13 @@ class TopPlot(BasePlot):
             top_measure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.data5
             )
-            title = "Data 4 and 5"
+            # Get parameter names with safe access
+            names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            # Check if we have enough parameter names, otherwise use default titles
+            if names and len(names) > 5:
+                title = f"{names[4]} and {names[5]}"
+            else:
+                title = "Data 4 and 5"
             bottom_limit = 0
             top_limit = 1.1
 
@@ -129,7 +142,13 @@ class BottomPlot(BasePlot):
             top_measure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.data3
             )
-            title = "Data 2 and 3"
+            # Get parameter names with safe access
+            names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            # Check if we have enough parameter names, otherwise use default titles
+            if names and len(names) > 3:
+                title = f"{names[2]} and {names[3]}"
+            else:
+                title = "Data 2 and 3"
         elif chart_selection == "Data 4-7":
             top_controller = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.data6
@@ -139,7 +158,13 @@ class BottomPlot(BasePlot):
             )
             bottom_limit = 0
             top_limit = 1.1
-            title = "Data 6 and 7"
+            # Get parameter names with safe access
+            names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            # Check if we have enough parameter names, otherwise use default titles
+            if names and len(names) > 7:
+                title = f"{names[6]} and {names[7]}"
+            else:
+                title = "Data 6 and 7"
 
         if top_controller is None or top_measure is None:
             top_controller = 0

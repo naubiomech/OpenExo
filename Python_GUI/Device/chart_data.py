@@ -1,5 +1,18 @@
 class ChartData:
     def __init__(self):
+        self.rightTorque = 0.0
+        self.rightState = 0.0
+        self.leftTorque = 0.0
+        self.leftState = 0.0
+        self.rightSet = 0.0
+        self.leftSet = 0.0
+        self.rightFsr = 0.0
+        self.leftFsr = 0.0
+        self.param_names = []  # List to store parameter names
+        self.param_values = []  # List to store parameter values
+        self.num_params = 0 # Number of parameters
+        
+        # Add data0-data15 properties for fast access like old system
         self.data0 = 0.0  # rightTorque
         self.data1 = 0.0  # rightState
         self.data2 = 0.0  # rightSet
@@ -10,13 +23,30 @@ class ChartData:
         self.data7 = 0.0  # leftFsr
         self.data8 = 0.0  # minSV
         self.data9 = 0.0  # maxSV
-        self.data10 = 0.0  # battery
+        self.data10 = 0.0  # minSA
         self.data11 = 0.0  # maxSA
         self.data12 = 0.0  # battery
         self.data13 = 0.0  # maxFSR
         self.data14 = 0.0  # stancetime
         self.data15 = 0.0  # swingtime
 
+    #function to update the parameter names and number of parameters
+    def updateNames(
+        self, 
+        param_names, 
+        num_params
+    ):
+        self.param_names = param_names
+        self.num_params = num_params
+
+    # function to update the parameter values using the parameter list data streaming protocol
+    def updateParamValues(
+        self,
+        param_values
+    ):
+        self.param_values = param_values
+
+    # function to update the values of the chart data
     def updateValues(
         self,
         data0,  # rightTorque
@@ -29,13 +59,13 @@ class ChartData:
         data7,  # leftFsr
         data8,  # minSV
         data9,  # maxSV
-        data10,  # battery
-        data11,  # maxSA
-        data12,  # minSA
-        data13,  # maxFSR
-        data14,  # stancetime
-        data15,  # swingtime
-    ):
+        data10, # minSA
+        data11, # maxSA
+        data12, # battery
+        data13, # maxFSR
+        data14, # stancetime
+        data15, # swingtime
+    ):           
         self.data0 = data0
         self.data1 = data1
         self.data2 = data2
