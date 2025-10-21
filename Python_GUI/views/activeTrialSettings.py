@@ -38,8 +38,11 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         self.jointVar = StringVar(value="Select Joint")
 
         self.isBilateral = True
+        self.controller_index = 0
+        self.parameter_index = 0
         self.create_widgets()
-        self.update_dropdowns()
+        self.dynamic_dropdown = False
+        # Don't update dropdowns at init; wait for newSelection when data might be available
 
     def create_widgets(self):  # Frame UI elements
         # Back button to go back to Scan Window
@@ -107,6 +110,14 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         self.parameterInput.pack(pady=5)
         # END OF ELLIOTTS CODE - PUT NEW PARAMETERS IN INPUT IF NEEDED
 
+        # Manual entry fallbacks (shown when no controllers/parameters are received)
+        self.manualControllerLabel = tk.Label(self, text="Controller Index", font=(self.fontstyle, 15))
+        self.controllerIndexEntry = tk.Entry(self, font=(self.fontstyle, 16))
+        self.manualParameterLabel = tk.Label(self, text="Parameter Index", font=(self.fontstyle, 15))
+        self.parameterIndexEntry = tk.Entry(self, font=(self.fontstyle, 16))
+        # Start hidden; toggle visible when needed
+        # We use pack_forget/show logic in helper below
+
         # Value label
         valueInputLabel = tk.Label(self, text="Value", font=(self.fontstyle, 15))
         self.valueInput = tk.Entry(self, font=(self.fontstyle, 16)) 
@@ -148,6 +159,31 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         )
         updateTorqueButton.pack(side=BOTTOM, fill=X, padx=20, pady=20)
 
+    def _set_manual_mode(self, enabled: bool):
+        """Toggle between dropdown mode and manual-index-entry mode."""
+        try:
+            if enabled:
+                # Hide dropdowns
+                self.controllerInput.pack_forget()
+                self.parameterInput.pack_forget()
+                # Show manual entries
+                self.manualControllerLabel.pack(pady=5)
+                self.controllerIndexEntry.pack(pady=5)
+                self.manualParameterLabel.pack(pady=5)
+                self.parameterIndexEntry.pack(pady=5)
+            else:
+                # Hide manual entries
+                self.manualControllerLabel.pack_forget()
+                self.controllerIndexEntry.pack_forget()
+                self.manualParameterLabel.pack_forget()
+                self.parameterIndexEntry.pack_forget()
+                # Show dropdowns
+                self.controllerInput.pack(padx=5)
+                self.parameterInput.pack(pady=5)
+            self.dynamic_dropdown = True
+        except Exception:
+            pass
+
     # START OF ELLIOTTS CODE
     def populate_controller_dropdown(self):
         """Populate the controller dropdown with available controllers"""
@@ -160,12 +196,26 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
             
             if controllers:
                 self.controllerInput['values'] = controllers
-                if controllers:
+                # Set to first controller if nothing selected
+                if not self.controllerVar.get() or self.controllerVar.get() not in controllers:
                     self.controllerVar.set(controllers[0])
                 # Bind the controller selection to update parameters
                 self.controllerInput.bind('<<ComboboxSelected>>', self.on_controller_selected)
+                # Use dropdowns when data exists
+                self._set_manual_mode(False)
+                # Trigger initial parameter population
+                self.on_controller_selected()
             else:
                 print("No controllers available")
+                # Clear both dropdowns and indices when nothing is available
+                self.controllerInput['values'] = []
+                self.controllerVar.set("")
+                self.parameterInput['values'] = []
+                self.parameterVar.set("")
+                self.controller_index = 0
+                self.parameter_index = 0
+                # Enable manual entry mode
+                self._set_manual_mode(True)
                 
         except Exception as e:
             print(f"Error populating controller dropdown: {e}")
@@ -183,9 +233,9 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
             print(f"DEBUG: Controller selected: {selected_controller}")
             
             # Find the index of the selected controller
-            if selected_controller in controllers:
+            if controllers and selected_controller in controllers:
                 self.controller_index = controllers.index(selected_controller)
-                controller_index = controllers.index(selected_controller)
+                controller_index = self.controller_index
                 print(f"DEBUG: Controller index: {controller_index}")
                 
                 # Get the parameters for this specific controller
@@ -208,8 +258,9 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
                 self.parameterInput['values'] = []
                 self.parameterVar.set("")
                 print(f"DEBUG: Selected controller '{selected_controller}' not found in controllers list")
-            self.parameter_index = parameters.index(self.parameterInput.get())
-            print(f"DEBUG: Current parameter value: {self.parameter_index}")
+
+            # Ensure parameter_index remains consistent with the last parameter when using dropdowns
+            print(f"DEBUG: Current parameter value index: {self.parameter_index}")
             print(f"DEBUG: Current parameter input: {self.parameterInput.get()}")
             print(f"DEBUG: Current controller input: {self.controllerInput.get()}")
                 
@@ -220,15 +271,18 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
 
     def update_dropdowns(self):
         """Update both dropdowns with current data"""
+        # Always try to populate, even if previously empty
         self.populate_controller_dropdown()
-        # Also populate the parameter dropdown with all parameters initially
-        self.on_controller_selected()
 
     # END OF ELLIOTTS CODE
 
     def start_keyboard_cycle(self):
         """Start the keyboard cycle, focusing on the first input field."""
-        self.current_input_index = 0  # Start with the first input field
+        if self.dynamic_dropdown:
+            self.current_input_index = 2
+        else:
+            self.current_input_index = 0
+
         if not self.keyboard_window:  # Create the keyboard only if it doesn't already exist
             self.keyboard_window = tk.Toplevel(self)
             self.keyboard_window.title("Custom Keyboard")
@@ -318,9 +372,22 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
     async def UpdateButtonClicked(
         self, isBilateral, joint, controllerInput, parameterInput, valueInput,
     ):
-        controllerVal = self.controller_index
+        # Determine controller/parameter values based on available data
+        controllers = self.controller.deviceManager._realTimeProcessor.controllers
+        if controllers:
+            controllerVal = self.controller_index
+            parameterVal = self.parameter_index
+        else:
+            # Read manual indices; default to 0 on parse failure
+            try:
+                controllerVal = int(self.controllerIndexEntry.get())
+            except Exception:
+                controllerVal = 0
+            try:
+                parameterVal = int(self.parameterIndexEntry.get())
+            except Exception:
+                parameterVal = 0
         print(f"controllerVal: {controllerVal}")
-        parameterVal = self.parameter_index
         print(f"parameterVal: {parameterVal}")
         valueVal = valueInput.get()
 
@@ -345,8 +412,18 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
             active_trial_frame.newSelection(self)
 
     def newSelection(self, event):
+        # Update dropdowns when the frame is shown/selected
         self.update_dropdowns()
-        self.jointVar.set(self.jointSelector.get())
+        # Check if we actually have controller data now
+        controllers = self.controller.deviceManager._realTimeProcessor.controllers
+        if controllers:
+            print(f"Controllers available on frame show: {controllers}")
+        else:
+            print("No controllers available on frame show")
+
+    def show(self):
+        """Called by app when this frame is raised; ensure dropdowns reflect latest data."""
+        self.update_dropdowns()
 
     def UpdateTorque_on_device_disconnected(self):
         tk.messagebox.showwarning("Device Disconnected", "Please Reconnect")

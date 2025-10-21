@@ -100,31 +100,26 @@ class ScanWindow(tk.Frame):
         self.startTrialButton = ttk.Button(action_button_frame, text="Start Trial",
                                             command=async_handler(self.on_start_trial_button_clicked),
                                             state=DISABLED)
-        self.startTrialButton.grid(row=0, column=0, padx=5)
+        self.startTrialButton.grid(row=0, column=1, padx=5)
 
         # Button to start the debug (initially disabled)
         self.debugButton = ttk.Button(action_button_frame, text="Debug",
                                             command=async_handler(self.on_start_trial_debug_button_clicked),
                                             state=DISABLED)
-        self.debugButton.grid(row=0, column=1, padx=5)
+        self.debugButton.grid(row=0, column=2, padx=5)
 
         # Calibrate Torque button
         self.calTorqueButton = ttk.Button(action_button_frame, text="Calibrate Torque",
                                            command=async_handler(self.on_calibrate_torque_button_clicked),
                                            state=DISABLED)
-        self.calTorqueButton.grid(row=0, column=2, padx=5)
+        self.calTorqueButton.grid(row=0, column=3, padx=5)
 
-        # Connect button
-        self.connectButton = ttk.Button(action_button_frame, text="Connect",
-                                        command=async_handler(self.on_connect_button_clicked),
-                                        state=DISABLED)  # Initially disabled
-        self.connectButton.grid(row=0, column=3, padx=5)
 
         # Button to save the selected device
         self.saveDeviceButton = ttk.Button(action_button_frame, text="Save & Connect",
                                             command=async_handler(self.on_save_device_button_clicked),
                                             state=DISABLED)  # Initially disabled
-        self.saveDeviceButton.grid(row=0, column=3, padx=5)
+        self.saveDeviceButton.grid(row=0, column=0, padx=5)
 
         # Configure grid weights for centering
         for i in range(8):  # Assuming there are 7 rows
@@ -144,7 +139,6 @@ class ScanWindow(tk.Frame):
         """Saves the currently selected device to a file."""
         await self.controller.deviceManager.disconnect()  # Disconnects from any devices
         self.startScanButton.config(state=DISABLED)
-        self.connectButton.config(state=DISABLED)
         self.saveDeviceButton.config(state=DISABLED)
         self.loadDeviceButton.config(state=DISABLED)
         if self.selected_device_address:
@@ -163,7 +157,6 @@ class ScanWindow(tk.Frame):
             self.startTrialButton.config(state="normal")  # Enable Start Trial button
             self.debugButton.config(state="normal")  # Enable Start Trial button
             self.calTorqueButton.config(state="normal")   # Enable Calibrate Torque button
-            self.connectButton.config(state=DISABLED)
             self.saveDeviceButton.config(state=DISABLED)
             self.loadDeviceButton.config(state=DISABLED)
             self.deviceNameText.set(f"Connected: {self.selected_device_name} {self.selected_device_address}")
@@ -213,32 +206,7 @@ class ScanWindow(tk.Frame):
         """Handles the Calibrate Torque button click."""
         await self.controller.trial.calibrate(self.controller.deviceManager)
 
-    async def on_connect_button_clicked(self):
-        """Handles the Connect button click."""
-        self.startScanButton.config(state=DISABLED)
-        self.connectButton.config(state=DISABLED)
-        self.saveDeviceButton.config(state=DISABLED)
-        self.loadDeviceButton.config(state=DISABLED)
-        connect_message = f"Connecting to: {self.selected_device_name} {self.selected_device_address}"
-        self.deviceNameText.set(connect_message)
-        self.controller.deviceManager.set_deviceAddress(self.selected_device_address)  # Set the device address
 
-        # Attempt to connect to the device
-        success = await self.controller.deviceManager.scanAndConnect()
-        
-        if success:
-            self.startTrialButton.config(state="normal")  # Enable Start Trial button
-            self.debugButton.config(state = "normal")
-            self.calTorqueButton.config(state="normal")   # Enable Calibrate Torque button
-            self.deviceNameText.set(f"Connected: {self.selected_device_name} {self.selected_device_address}")
-        else:
-            self.deviceNameText.set("Connection Failed, Please Restart Device")  # Update text if connection fails
-            self.connectButton.config(state="normal")
-
-        self.startScanButton.config(state="normal")
-
-        if self.saved_address is not None:
-            self.loadDeviceButton.config(state="normal")
 
     async def on_start_trial_button_clicked(self):
         """Handles the Start Trial button click."""
@@ -310,11 +278,9 @@ class ScanWindow(tk.Frame):
         if selected_index:  # Check if any item is selected
             selected_device_info = self.deviceListbox.get(selected_index)
             self.selected_device_name, self.selected_device_address = selected_device_info.split(" - ")
-            self.connectButton.config(state="normal")  # Enable Connect button
             self.saveDeviceButton.config(state="normal")  # Enable Save & Connect button
             print(self.selected_device_name)  # Debug output
         else:
-            self.connectButton.config(state=DISABLED)  # Disable Connect button if no selection
             self.saveDeviceButton.config(state=DISABLED)  # Disable Save & Connect button if no selection
 
     def start_scanning_animation(self):
@@ -393,7 +359,6 @@ class ScanWindow(tk.Frame):
         self.startTrialButton.config(state=DISABLED)
         self.debugButton.config(state=DISABLED)
         self.calTorqueButton.config(state=DISABLED)
-        self.connectButton.config(state=DISABLED)
         self.saveDeviceButton.config(state=DISABLED)
         self.loadDeviceAvailible()
 
@@ -407,7 +372,6 @@ class ScanWindow(tk.Frame):
         self.startTrialButton.config(state=DISABLED)
         self.debugButton.config(state=DISABLED)
         self.calTorqueButton.config(state=DISABLED)
-        self.connectButton.config(state=DISABLED)
         self.saveDeviceButton.config(state=DISABLED)
         self.loadDeviceButton.config(state=DISABLED)
         

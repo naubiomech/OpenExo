@@ -39,7 +39,7 @@ class BasePlot:
         cls.figure_size = size
 
     def update_plot(self, x_values, y_values, second_y, bottom_lim, top_lim, title):
-        max_points = 40  # Keep only the last N points
+        max_points = 20  # Keep only the last 20 points
         if len(x_values) > max_points:
             x_values = x_values[-max_points:]
             y_values = y_values[-max_points:]
@@ -48,14 +48,13 @@ class BasePlot:
         self.line1.set_data(x_values, y_values)
         self.line2.set_data(x_values, second_y)
 
-        # Fixed limits for stability and performance on slow machines
-        if x_values:
-            self.ax.set_xlim(x_values[0], x_values[-1])
-        if bottom_lim is not None and top_lim is not None:
-            self.ax.set_ylim(bottom_lim, top_lim)
+        # Efficiently redraw only the updated parts
+        self.ax.relim()  # Recalculate limits based on new data
+        self.ax.autoscale(enable=True, axis='both', tight=False)
 
-        # Draw without clearing axes or flushing events each frame
+        # Draw without clearing axes
         self.canvas.draw_idle()
+        self.canvas.flush_events()
 
     def refresh_figure(self):
         """Refresh the figure if the size is updated."""

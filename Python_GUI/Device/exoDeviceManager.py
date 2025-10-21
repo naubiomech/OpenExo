@@ -364,3 +364,11 @@ class ExoDeviceManager:
         char = self.get_char_handle(self.UART_TX_UUID)
 
         await self.client.write_gatt_char(char, command, False)
+    
+    # Expose plotting parameter names collected by the real-time processor
+    def get_plotting_param_names(self):
+        return self._realTimeProcessor.get_plotting_param_names()
+    
+    def set_active_trial(self, active_trial):
+        """Set reference to the active trial frame for UI updates"""
+        self._realTimeProcessor.set_active_trial(active_trial)

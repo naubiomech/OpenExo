@@ -296,6 +296,9 @@ class ActiveTrial(tk.Frame):
         self.controller.show_frame("MachineLearning")
 
     def newSelection(self, event=None):
+        # Set this frame as the active trial for parameter updates
+        self.controller.deviceManager.set_active_trial(self)
+        
         # Disable buttons and dropdown untill proccess complete
         self.disable_interactions()
 
@@ -370,20 +373,10 @@ class ActiveTrial(tk.Frame):
         for plot in plots_to_update:
             plot.animate(selection)
 
-        # Adaptive interval: increase if we're lagging, decrease gently if we're keeping up
-        now = time.time()
-        if self._last_plot_tick is not None:
-            elapsed = (now - self._last_plot_tick)
-            target = self.update_interval_ms / 1000.0
-            if elapsed > target * 1.5:
-                self.update_interval_ms = min(self.max_interval_ms, int(self.update_interval_ms * 1.25 + 1))
-            else:
-                self.update_interval_ms = max(self.min_interval_ms, int(self.update_interval_ms * 0.9))
-        self._last_plot_tick = now
 
         # Schedule the next update using the adaptive interval
         self.plot_update_job = self.after(
-            self.update_interval_ms, self.update_plots, selection
+            5, self.update_plots, selection
         )
 
         # Enable interactions after the first plot update is complete
@@ -428,6 +421,16 @@ class ActiveTrial(tk.Frame):
     def hide(self):
         # This method is called when switching away from this frame
         self.stop_plot_updates()
+    
+    def update_dropdown_values(self):
+        """Called when parameter names are received - update the settings frame"""
+        try:
+            settings_frame = self.controller.frames.get("UpdateTorque")
+            if settings_frame:
+                settings_frame.update_dropdowns()
+                print("Updated dropdowns in UpdateTorque frame after receiving parameters")
+        except Exception as e:
+            print(f"Error updating dropdown values: {e}")
 
     # Handle Recalibrate FSRs Button click
     async def on_recal_FSR_button_clicked(self):
