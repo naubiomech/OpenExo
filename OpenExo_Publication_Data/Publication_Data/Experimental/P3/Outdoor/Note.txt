@@ -1,8 +1,0 @@
-"Outdoor_Results" contains the recorded values (and subsequently calculated values) from the test.
-
-While no metabolic results were presented in the text, we did collect metabolic data which is included here.
-These data were not presented in the paper as they were not collected in a way that facilitated a comparison between conditions. 
-This includes unstandardized speeds/durations of the task and the fact that no data was recorded for a few minutes after the collection 
-to account for the metabolic delay. Data and a modified code to assess it are included for full transparency. 
-
-

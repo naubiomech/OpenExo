@@ -15,6 +15,9 @@
         #include "Arduino.h"
         namespace logic_micro_pins  //Teensy
         {
+			//Pin to use when we need a value but don't actually want to use it.
+            const unsigned int not_connected_pin = 42;  //Selected 42 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
+			
             #if defined(ARDUINO_TEENSY36)
                 //Serial Pins, NC
                 const unsigned int rx1_pin = 0;
@@ -43,18 +46,21 @@
                 const unsigned int sync_default_pin = 25;
 				
 				//For Maxon PCB only
-				const unsigned int maxon_err_right_pin;
-				const unsigned int maxon_err_left_pin;
-				const unsigned int maxon_ctrl_left_pin;
-				const unsigned int maxon_ctrl_right_pin;
-				const unsigned int maxon_current_left_pin;
-				const unsigned int maxon_current_right_pin;
-				const unsigned int maxon_pwm_neutral_val;
-				const unsigned int maxon_pwm_u_bound;
-				const unsigned int maxon_pwm_l_bound;
+				const unsigned int maxon_err_right_pin = not_connected_pin;
+				const unsigned int maxon_err_left_pin = not_connected_pin;
+				const unsigned int maxon_ctrl_left_pin = not_connected_pin;
+				const unsigned int maxon_ctrl_right_pin = not_connected_pin;
+				const unsigned int maxon_current_left_pin = not_connected_pin;
+				const unsigned int maxon_current_right_pin = not_connected_pin;
+				const unsigned int maxon_pwm_neutral_val = 2048;
+				const unsigned int maxon_pwm_u_bound = 3690;
+				const unsigned int maxon_pwm_l_bound = 655;
 				
 				//Servo motor pins
-				const unsigned int servo_pins;
+				const unsigned int servo_pins[] = {};
+				
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
+				const unsigned int volt_sense = not_connected_pin;
             #endif
 
             const unsigned int sync_led_on_state = LOW;
@@ -87,9 +93,6 @@
                 //Pin to Stop the Motors
                 const unsigned int motor_stop_pin = 6;
             #endif
-
-            //Pin to use when we need a value but don't actually want to use it.
-            const unsigned int not_connected_pin = 42;  //Selected 42 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
             
             const unsigned int enable_left_pin[] = {not_connected_pin, not_connected_pin};
             const unsigned int enable_right_pin[] = {not_connected_pin, not_connected_pin};
@@ -112,6 +115,8 @@
         #include "Arduino.h"
         namespace logic_micro_pins  //Teensy
         {
+			//Pin to use when we need a value but don't actually want to use it.
+            const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
              #if defined(ARDUINO_TEENSY41)
                 //Serial Pins, NC
                 const unsigned int rx1_pin = 0;
@@ -140,18 +145,21 @@
                 const unsigned int sync_default_pin = 5;
 				
 				//For Maxon PCB only
-				const unsigned int maxon_err_right_pin;
-				const unsigned int maxon_err_left_pin;
-				const unsigned int maxon_ctrl_left_pin;
-				const unsigned int maxon_ctrl_right_pin;
-				const unsigned int maxon_current_left_pin;
-				const unsigned int maxon_current_right_pin;
-				const unsigned int maxon_pwm_neutral_val;
-				const unsigned int maxon_pwm_u_bound;
-				const unsigned int maxon_pwm_l_bound;
+				const unsigned int maxon_err_right_pin = not_connected_pin;
+				const unsigned int maxon_err_left_pin = not_connected_pin;
+				const unsigned int maxon_ctrl_left_pin = not_connected_pin;
+				const unsigned int maxon_ctrl_right_pin = not_connected_pin;
+				const unsigned int maxon_current_left_pin = not_connected_pin;
+				const unsigned int maxon_current_right_pin = not_connected_pin;
+				const unsigned int maxon_pwm_neutral_val = 2048;
+				const unsigned int maxon_pwm_u_bound = 3690;
+				const unsigned int maxon_pwm_l_bound = 655;
 				
 				//Servo motor pins
 				const unsigned int servo_pins[] = {};
+				
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
+				const unsigned int volt_sense = not_connected_pin;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -184,10 +192,7 @@
                 
                 
                 //Pin to Stop the Motors
-                const unsigned int motor_stop_pin = 9;
-                
-                //Pin to use when we need a value but don't actually want to use it.
-                const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
+                const unsigned int motor_stop_pin = 9;       
                 
                 //Motor enable Pins
                 const unsigned int enable_left_pin[] = {28, 29};
@@ -224,6 +229,9 @@
         #include "Arduino.h"
         namespace logic_micro_pins  //Teensy
         {
+			//Pin to use when we need a value but don't actually want to use it.
+            const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
+			
              #if defined(ARDUINO_TEENSY41)
                 //Serial Pins, NC
                 const unsigned int rx1_pin = 0;
@@ -252,18 +260,21 @@
                 const unsigned int sync_default_pin = 5;
 				
 				//For Maxon PCB only
-				const unsigned int maxon_err_right_pin;
-				const unsigned int maxon_err_left_pin;
-				const unsigned int maxon_ctrl_left_pin;
-				const unsigned int maxon_ctrl_right_pin;
-				const unsigned int maxon_current_left_pin;
-				const unsigned int maxon_current_right_pin;
-				const unsigned int maxon_pwm_neutral_val;
-				const unsigned int maxon_pwm_u_bound;
-				const unsigned int maxon_pwm_l_bound;
+				const unsigned int maxon_err_right_pin = not_connected_pin;
+				const unsigned int maxon_err_left_pin = not_connected_pin;
+				const unsigned int maxon_ctrl_left_pin = not_connected_pin;
+				const unsigned int maxon_ctrl_right_pin = not_connected_pin;
+				const unsigned int maxon_current_left_pin = not_connected_pin;
+				const unsigned int maxon_current_right_pin = not_connected_pin;
+				const unsigned int maxon_pwm_neutral_val = 2048;
+				const unsigned int maxon_pwm_u_bound = 3690;
+				const unsigned int maxon_pwm_l_bound = 655;
 				
 				//Servo motor pins
 				const unsigned int servo_pins[] = {};
+				
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
+				const unsigned int volt_sense = not_connected_pin;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -297,9 +308,7 @@
                 
                 //Pin to Stop the Motors
                 const unsigned int motor_stop_pin = 9;
-                
-                //Pin to use when we need a value but don't actually want to use it.
-                const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
+
                 
                 //Motor enable Pins
                 const unsigned int enable_left_pin[] = {28, 29};
@@ -336,6 +345,9 @@
         #include "Arduino.h"
         namespace logic_micro_pins  //Teensy
         {
+			//Pin to use when we need a value but don't actually want to use it.
+            const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
+			
              #if defined(ARDUINO_TEENSY41)
                 //Serial Pins, NC
                 const unsigned int rx1_pin = 0;
@@ -366,18 +378,21 @@
                 const unsigned int sync_default_pin = 5;
 				
 				//For Maxon PCB only
-				const unsigned int maxon_err_right_pin;
-				const unsigned int maxon_err_left_pin;
-				const unsigned int maxon_ctrl_left_pin;
-				const unsigned int maxon_ctrl_right_pin;
-				const unsigned int maxon_current_left_pin;
-				const unsigned int maxon_current_right_pin;
-				const unsigned int maxon_pwm_neutral_val;
-				const unsigned int maxon_pwm_u_bound;
-				const unsigned int maxon_pwm_l_bound;
+				const unsigned int maxon_err_right_pin = not_connected_pin;
+				const unsigned int maxon_err_left_pin = not_connected_pin;
+				const unsigned int maxon_ctrl_left_pin = not_connected_pin;
+				const unsigned int maxon_ctrl_right_pin = not_connected_pin;
+				const unsigned int maxon_current_left_pin = not_connected_pin;
+				const unsigned int maxon_current_right_pin = not_connected_pin;
+				const unsigned int maxon_pwm_neutral_val = 2048;
+				const unsigned int maxon_pwm_u_bound = 3690;
+				const unsigned int maxon_pwm_l_bound = 655;
 				
 				//Servo motor pins
 				const unsigned int servo_pins[] = {};
+				
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
+				const unsigned int volt_sense = not_connected_pin;//Set it to 27 to use the onboard voltage sensing. Refer to Config.h and modify RESISTOR_1 and RESISTOR_2 if needed.
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -400,9 +415,9 @@
                 
             #if defined(ARDUINO_TEENSY41)    
                 //SPI Follower Pins
-                const unsigned int miso_pin ;
-                const unsigned int mosi_pin= 11;
-                const unsigned int sck_pin ;
+                const unsigned int miso_pin = not_connected_pin;
+                const unsigned int mosi_pin = 11;
+                const unsigned int sck_pin = not_connected_pin;
                 const unsigned int cs_pin = 10;
                 const unsigned int irq_pin = 34;
                 const unsigned int rst_pin = 4;
@@ -410,9 +425,6 @@
                 
                 //Pin to Stop the Motors
                 const unsigned int motor_stop_pin = 9;
-                
-                //Pin to use when we need a value but don't actually want to use it.
-                const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
                 
                 //Motor enable Pins
                 const unsigned int enable_left_pin[] = {28, 29};
@@ -449,13 +461,16 @@
 		#include "Arduino.h"
 		namespace logic_micro_pins  //teensy
 		{
+			//Pin to use when we need a value but don't actually want to use it.
+            const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
+			
 			 #if defined(ARDUINO_TEENSY41)
 				//Maxon motor Pins
 				const unsigned int maxon_err_right_pin = 37;
 				const unsigned int maxon_err_left_pin = 37;
-				const unsigned int maxon_ctrl_left_pin ;
+				const unsigned int maxon_ctrl_left_pin = not_connected_pin;
 				const unsigned int maxon_ctrl_right_pin = A9;
-				const unsigned int maxon_current_left_pin ;
+				const unsigned int maxon_current_left_pin = not_connected_pin;
 				const unsigned int maxon_current_right_pin = A1;
 				const unsigned int maxon_pwm_neutral_val = 2048;
 				const unsigned int maxon_pwm_u_bound = 3690;
@@ -463,18 +478,21 @@
 				
 				//Servo motor pins
 				const unsigned int servo_pins[] = {26,27};
+				
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
+				const unsigned int volt_sense = not_connected_pin;
 			 
 				//Serial Pins, NC
-				const unsigned int rx1_pin ;
-				const unsigned int tx1_pin ;
+				const unsigned int rx1_pin = not_connected_pin;
+				const unsigned int tx1_pin = not_connected_pin;
 				
 				//CAN Pins
-				const unsigned int can_rx_pin ;
-				const unsigned int can_tx_pin ;
+				const unsigned int can_rx_pin = not_connected_pin;
+				const unsigned int can_tx_pin = not_connected_pin;
 				
 				//FSR Pins
-				const unsigned int fsr_sense_left_heel_pin ;
-				const unsigned int fsr_sense_left_toe_pin ;
+				const unsigned int fsr_sense_left_heel_pin = not_connected_pin;
+				const unsigned int fsr_sense_left_toe_pin = not_connected_pin;
 				const unsigned int fsr_sense_right_heel_pin= 17;
 				const unsigned int fsr_sense_right_toe_pin = 16;
 				
@@ -488,8 +506,8 @@
 				//const unsigned int torque_sensor_right1 = A8;
 				
 				//Sync LED Pins
-				const unsigned int sync_led_pin ;
-				const unsigned int sync_default_pin ;
+				const unsigned int sync_led_pin = not_connected_pin;
+				const unsigned int sync_default_pin = not_connected_pin;
 			#endif
 			
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors
@@ -498,9 +516,9 @@
 
 			 #if defined(ARDUINO_TEENSY41)
 				//Status LED Pins
-				const unsigned int status_led_r_pin ;
-				const unsigned int status_led_g_pin ;
-				const unsigned int status_led_b_pin ;
+				const unsigned int status_led_r_pin = not_connected_pin;
+				const unsigned int status_led_g_pin = not_connected_pin;
+				const unsigned int status_led_b_pin = not_connected_pin;
 			#endif
 
 			//If you have connected to pins with PWM set to true.
@@ -512,27 +530,24 @@
 				
 			#if defined(ARDUINO_TEENSY41)    
 				//SPI Follower Pins
-				const unsigned int miso_pin ;
-				const unsigned int mosi_pin ;
-				const unsigned int sck_pin ;
-				const unsigned int cs_pin ;
-				const unsigned int irq_pin ;
-				const unsigned int rst_pin ;
+				const unsigned int miso_pin = not_connected_pin;
+				const unsigned int mosi_pin = not_connected_pin;
+				const unsigned int sck_pin = not_connected_pin;
+				const unsigned int cs_pin = not_connected_pin;
+				const unsigned int irq_pin = not_connected_pin;
+				const unsigned int rst_pin = not_connected_pin;
 				const unsigned int spi_mode = 8; // This is 8 or 16 bit, not the actual SPI mode, I know it is confusing but that is how they chose to make the library.
 				
 				//Pin to Stop the Motors
-				const unsigned int motor_stop_pin ;
-				
-				//Pin to use when we need a value but don't actually want to use it.
-				const unsigned int not_connected_pin = 51;  //Selected 51 as it is a pad on the back so I figure it won't hurt anything if something goes wrong.
+				const unsigned int motor_stop_pin = not_connected_pin;
 				
 				//Motor enable Pins
 				const unsigned int enable_left_pin[] = {33};
 				const unsigned int enable_right_pin[] = {33};
 				
-				const unsigned int speed_check_pin;
+				const unsigned int speed_check_pin = not_connected_pin;
 				
-				const unsigned int left_ankle_angle_pin ;
+				const unsigned int left_ankle_angle_pin = not_connected_pin;
 				const unsigned int right_ankle_angle_pin = A8;
 				
 				// I2C 

@@ -168,7 +168,7 @@
         //Check the section that corresponds to the exo_name to get the correct parameters.
         get_section_key(ini,temp_exo_name,"sides",buffer,buffer_len); 
         data.exo_sides = buffer;
-
+		
         // logger::print(data.exo_sides.c_str());
         // logger::print("\t");
         // logger::println(config_map::exo_side[data.exo_sides]);
@@ -289,7 +289,16 @@
 
         config_to_send[config_defs::exo_elbow_default_controller_idx] = config_map::elbow_controllers[data.exo_elbow_default_controller];
         
-        //--------------------------------------------------------
+        #ifdef SIMPLE_DEBUG
+		Serial.print("\nLoaded exoskeleton configuration: ");
+		Serial.print("\nexo_name: ");
+		Serial.print(config_map::exo_name[data.exo_name]);
+		Serial.print(", side(s): ");
+		Serial.print(config_map::exo_side[data.exo_sides]);
+		Serial.print("\nFor a list of all pre-defined exoskeleton types, see namespace config_map in ParseIni.h (one-based indexing here)");
+		#endif
+		
+		//--------------------------------------------------------
         
         get_section_key(ini,temp_exo_name,"hipUseTorqueSensor",buffer,buffer_len);
         data.hip_use_torque_sensor = buffer;

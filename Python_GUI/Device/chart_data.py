@@ -10,7 +10,7 @@ class ChartData:
         self.data7 = 0.0  # leftFsr
         self.data8 = 0.0  # minSV
         self.data9 = 0.0  # maxSV
-        self.data10 = 0.0  # minSA
+        self.data10 = 0.0  # battery
         self.data11 = 0.0  # maxSA
         self.data12 = 0.0  # battery
         self.data13 = 0.0  # maxFSR
@@ -29,9 +29,9 @@ class ChartData:
         data7,  # leftFsr
         data8,  # minSV
         data9,  # maxSV
-        data10,  # minSA
+        data10,  # battery
         data11,  # maxSA
-        data12,  # battery
+        data12,  # minSA
         data13,  # maxFSR
         data14,  # stancetime
         data15,  # swingtime

@@ -86,7 +86,7 @@ namespace ble
         
         //Sending Commands
         {ble_names::send_batt,              1},
-        {ble_names::send_real_time_data,    10},
+        {ble_names::send_real_time_data,    11},
         {ble_names::send_error_count,       1},
         {ble_names::send_cal_done,          0},
         {ble_names::send_trq_cal,           2},
@@ -421,6 +421,18 @@ namespace ble_handlers
         tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE] = (float) msg->data[3];
         tx_msg.len = 3;
         uart_handler->UART_msg(tx_msg);
+		
+		#ifdef SIMPLE_DEBUG
+		Serial.print("\nNano received the following command update from the GUI and passed it to the Teensy:");
+		Serial.print("\n***joint_id: ");
+		Serial.print(tx_msg.joint_id);
+		Serial.print(", CONTROLLER_ID: ");
+		Serial.print(tx_msg.data[(uint8_t)UART_command_enums::controller_param::CONTROLLER_ID]);
+		Serial.print(", PARAM_INDEX: ");
+		Serial.print(tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_INDEX]);
+		Serial.print(", PARAM_VALUE: ");
+		Serial.print(tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE]);
+		#endif
     }
 
 }

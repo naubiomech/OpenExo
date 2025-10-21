@@ -2,6 +2,7 @@
 #include "error_codes.h"
 #include "Logger.h"
 #include "ParamsFromSD.h"
+#include "Config.h"
 
 /*
  * Constructor for the exo data.
@@ -165,6 +166,83 @@ void ExoData::start_pretrial_cal()
 {
     //Calibrate the Torque Sensors
     this->for_each_joint([](JointData* j_data, float* args) {j_data->calibrate_torque_sensor = j_data->is_used;});
+}
+
+float ExoData::get_batt_info(uint8_t batt_info_type)
+{
+	#if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41)
+	static bool ina_first_run = true;
+	if (ina_first_run) {
+		#if	BATTERY_SENSOR == 260
+			if (!ina260.begin()) {
+				Serial.println("Couldn't find INA260 chip");
+				while (1);
+			}
+		#elif BATTERY_SENSOR == 219
+			if (!ina219.begin()) {
+				Serial.println("Failed to find INA219 chip");
+				while (1) { delay(10); }
+			}
+		#elif BATTERY_SENSOR == 3
+		pinMode(logic_micro_pins::volt_sense, INPUT);
+		#endif
+		ina_first_run = false;
+	}
+		#if	BATTERY_SENSOR == 260
+			switch (batt_info_type)
+			{
+				case 0:
+				float battery_voltage = 0.001 * ina260.readBusVoltage();
+				if (battery_voltage < CRITICAL_BATT_VAL) {
+					return -1;
+				}
+				return battery_voltage;
+				break;
+				case 1:
+				{
+				float battery_power = 0.001 * ina260.readPower();
+				filtered_batt_pwr = utils::ewma(battery_power, filtered_batt_pwr, 0.05);
+				//Serial.print("\n&&&&&&&&&&&&&*****filtered_batt_pwr: ");
+				//Serial.print(filtered_batt_pwr);
+				return filtered_batt_pwr;
+				break;
+				}
+				default:
+				battery_voltage = 0.001 * ina260.readBusVoltage();
+				if (battery_voltage < CRITICAL_BATT_VAL) {
+					return -1;
+				}
+				return battery_voltage;
+			}
+		#elif BATTERY_SENSOR == 219
+			switch (batt_info_type)
+			{
+				case 0:
+				float battery_voltage = ina219.getBusVoltage_V();
+				if (battery_voltage < CRITICAL_BATT_VAL) {
+					return -1;
+				}
+				return battery_voltage;
+				break;
+				case 1:
+				float battery_power = 0.001 * ina219.getPower_mW();
+				return battery_power;
+				break;
+				default:
+				battery_voltage = ina219.getBusVoltage_V();
+				if (battery_voltage < CRITICAL_BATT_VAL) {
+					return -1;
+				}
+				return battery_voltage;
+			}
+		#elif BATTERY_SENSOR == 3
+			float _sense_pin_volt = 3.3 * analogRead(logic_micro_pins::volt_sense) / 4095;
+			float battery_voltage = _sense_pin_volt * (RESISTOR_1 + RESISTOR_2) / RESISTOR_2;
+			return battery_voltage;
+		#else
+			return 0;
+		#endif
+	#endif
 }
 
 void ExoData::print()

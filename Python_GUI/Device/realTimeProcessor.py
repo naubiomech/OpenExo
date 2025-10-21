@@ -116,13 +116,14 @@ class RealTimeProcessor:
         data5 = payload[5] if len(payload) > 5 else 0  # leftSet
         data6 = payload[6] if datalength >= 7 and len(payload) > 6 else 0  # rightFsr
         data7 = payload[7] if datalength >= 8 and len(payload) > 7 else 0  # leftFsr
-        data8 = payload[8] if datalength >= 9 and len(payload) > 8 else 0  # rightHeelFsr
-        data9 = payload[9] if datalength >= 10 and len(payload) > 9 else 0  # leftHeelFsr
-        data10 = payload[10] if datalength >= 11 and len(payload) > 10 else 0  # rightMotorCurrent
-        data11 = payload[11] if datalength >= 12 and len(payload) > 11 else 0  # leftMotorCurrent
-
-        # DEBUG: Print 12 data points
-        # print(f"12 Data Points: [0]{data0:.1f} [1]{data1:.1f} [2]{data2:.1f} [3]{data3:.1f} [4]{data4:.1f} [5]{data5:.1f} [6]{data6:.1f} [7]{data7:.1f} [8]{data8:.1f} [9]{data9:.1f} [10]{data10:.1f} [11]{data11:.1f}")
+        data8 = payload[8] if datalength >= 9 and len(payload) > 8 else 0  # minSV
+        data9 = payload[9] if datalength >= 10 and len(payload) > 9 else 0  # maxSV
+        data10 = payload[10] if datalength >= 11 and len(payload) > 10 else 0  # battery
+        data11 = payload[11] if datalength >= 12 and len(payload) > 11 else 0  # maxSA
+        data12 = payload[12] if datalength >= 13 and len(payload) > 12 else 0  # minSA
+        data13 = payload[13] if datalength >= 14 and len(payload) > 13 else 0  # maxFSR
+        data14 = payload[14] if datalength >= 15 and len(payload) > 14 else 0  # stancetime
+        data15 = payload[15] if datalength >= 16 and len(payload) > 15 else 0  # swingtime
 
         self._chart_data.updateValues(
             data0,  # rightTorque
@@ -133,18 +134,18 @@ class RealTimeProcessor:
             data5,  # leftSet
             data6,  # rightFsr
             data7,  # leftFsr
-            data8,  # rightHeelFsr
-            data9,  # leftHeelFsr
-            data10,  # rightMotorCurrent
-            0,  # leftMotorCurrent
-            0,      # placeholder
-            0,      # placeholder
-            0,      # placeholder
-            0,      # placeholder
+            data8,  # minSV
+            data9,  # maxSV
+            data10,  # battery
+            data11,  # maxSA
+            data12,  # minSA
+            data13,  # maxFSR
+            data14,  # stancetime
+            data15,  # swingtime
         )
-        self._predictor.addDataPoints([data8, data9, data10, 0, 0, 0, 0, self._predictor.state]) #add data to model, if recording data
+        self._predictor.addDataPoints([data8, data9, data12, data11, data13, data14, data15, self._predictor.state]) #add data to model, if recording data (using minSA=data12)
         
-        self._predictor.predictModel([data8, data9, data10, 0, 0, 0, 0]) #predict results from model
+        self._predictor.predictModel([data8, data9, data12, data11, data13, data14, data15]) #predict results from model (using minSA=data12)
 
 
         self._exo_data.addDataPoints(
@@ -158,15 +159,15 @@ class RealTimeProcessor:
             data6,  # rightFsr
             data7,  # leftFsr
             #store features
-            data8,  # rightHeelFsr
-            data9,  # leftHeelFsr
-            data10,  # rightMotorCurrent
-            0,  # leftMotorCurrent
-            0,      # placeholder
+            data8,  # minSV
+            data9,  # maxSV
+            data12,  # minSA
+            data11,  # maxSA
+            data13,  # maxFSR
+            data14,  # stancetime
+            data15,  # swingtime
             self._predictor.prediction, #store prediction
-            0,      # battery placeholder
-            "Task", # Task placeholder
-            0       # data12 placeholder
+            data10  # battery
         )
         
 

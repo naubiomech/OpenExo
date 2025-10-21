@@ -77,12 +77,12 @@ class BioFeedback(tk.Frame):
         small_label = ttk.Label(self, image=self.small_bg_image)
         small_label.grid(row=0, column=7, sticky="ne", padx=5, pady=10)
 
-        # For battery Label
-        batteryPercentLabel = ttk.Label(self, 
+        # For battery Label - using tk.Label instead of ttk.Label to support color changes
+        self.batteryPercentLabel = tk.Label(self, 
             textvariable=self.controller.
             deviceManager._realTimeProcessor._exo_data.BatteryPercent, 
                 font=(self.fontstyle, 12))
-        batteryPercentLabel.grid(row=0, column=7,sticky="E", padx=5, pady=(20, 0)) 
+        self.batteryPercentLabel.grid(row=0, column=7,sticky="E", padx=5, pady=(20, 0)) 
 
         # Initialize the FSR plot
         self.FSRPlot = FSRPlot(self)
@@ -247,6 +247,13 @@ class BioFeedback(tk.Frame):
         except Exception as e:
             print(f"Error in enable_interactions: {e}")
 
+    def update_battery_color(self):
+        """Update battery label color based on battery status"""
+        if self.controller.deviceManager._realTimeProcessor._exo_data.battery_is_low:
+            self.batteryPercentLabel.config(fg="red")
+        else:
+            self.batteryPercentLabel.config(fg="black")
+    
     def update_plots(self, selection):
         # Animate the current plot and schedule the next update
         # Cancel the previous update job if it exists
@@ -257,6 +264,9 @@ class BioFeedback(tk.Frame):
         # Only continue updating plots if the flag is set to True
         if not self.is_plotting:
             return
+        
+        # Update battery color
+        self.update_battery_color()
         
         # Animate the current plot
         self.currentPlots.animate(selection)
@@ -303,5 +313,7 @@ class BioFeedback(tk.Frame):
         self.controller.trial.loadDataToCSV(
             self.controller.deviceManager, True
         )  # Load data from Exo into CSV
+        # Reset mark value after trial ends due to disconnection
+        self.controller.deviceManager._realTimeProcessor._exo_data.resetMark()
         self.controller.show_frame("ScanWindow")# Navigate back to the scan page
         self.controller.frames["ScanWindow"].show()  # Call show method to reset elements

@@ -101,12 +101,12 @@ class MachineLearning(tk.Frame):
         calibrationMenuLabel.grid(row=0, column=0, columnspan=10, pady=20)
 
         # Battery status label
-        batteryPercentLabel = tk.Label(
+        self.batteryPercentLabel = tk.Label(
             self, 
             textvariable=self.controller.deviceManager._realTimeProcessor._exo_data.BatteryPercent, 
             font=(self.fontstyle, 12)
         )
-        batteryPercentLabel.grid(row=0, column=8,sticky="E") 
+        self.batteryPercentLabel.grid(row=0, column=8,sticky="E") 
 
         BasePlot.set_figure_size((3, 2)) 
 
@@ -392,6 +392,13 @@ class MachineLearning(tk.Frame):
         self.controller.show_frame("ScanWindow")
 
     # Update plots based on selection
+    def update_battery_color(self):
+        """Update battery label color based on battery status"""
+        if self.controller.deviceManager._realTimeProcessor._exo_data.battery_is_low:
+            self.batteryPercentLabel.config(fg="red")
+        else:
+            self.batteryPercentLabel.config(fg="black")
+    
     def update_plots(self, selection):
         # Cancel the previous update job if it exists
         if self.plot_update_job:
@@ -401,6 +408,9 @@ class MachineLearning(tk.Frame):
         # Only continue updating plots if the flag is set to True
         if not self.is_plotting:
             return
+        
+        # Update battery color
+        self.update_battery_color()
 
         # Determine which plots to animate based on the graph selection
         graph_selection = self.graphVar.get()
@@ -476,6 +486,8 @@ class MachineLearning(tk.Frame):
         self.controller.trial.loadDataToCSV(
             self.controller.deviceManager, True
         )  # Load data from Exo into CSV
+        # Reset mark value after trial ends due to disconnection
+        self.controller.deviceManager._realTimeProcessor._exo_data.resetMark()
         self.controller.show_frame("ScanWindow")# Navigate back to the scan page
         self.controller.frames["ScanWindow"].show()  # Call show method to reset elements
             

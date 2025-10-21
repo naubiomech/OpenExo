@@ -16,7 +16,7 @@
 
 ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
 {
-    switch (config_to_send[config_defs::battery_idx])
+    /* switch (config_to_send[config_defs::battery_idx])
     {
     case (uint8_t)config_defs::battery::smart:
         _battery = new SmartBattery();
@@ -28,8 +28,9 @@ ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
         //logger::println("ERROR: ComsMCU::ComsMCU->Unrecognized battery type!");
         _battery = new RCBattery();
         break;
-    }
-    _battery->init();
+    } */
+
+    // _battery->init();
     _exo_ble = new ExoBLE();
     _exo_ble->setup();
 
@@ -94,12 +95,10 @@ void ComsMCU::local_sample()
 	
     if (del_t > (BLE_times::_status_msg_delay/2)) 
     {
-        float filtered_value = _battery->get_parameter();
+        /* static float filtered_value = _battery->get_parameter();
         float raw_battery_value = _battery->get_parameter();
         filtered_value = utils::ewma(raw_battery_value, filtered_value, k_battery_ewma_alpha);
-        _data->battery_value = filtered_value;
-		Serial.print("\n_data->battery_value: ");
-		Serial.print(_data->battery_value);
+        _data->battery_value = filtered_value; */
         del_t = 0;
     }
 
@@ -226,11 +225,12 @@ void ComsMCU::update_gui()
         #endif
 
         //Send status data
-        BleMessage batt_msg = BleMessage();
+        /* BleMessage batt_msg = BleMessage();
         batt_msg.command = ble_names::send_batt;
         batt_msg.expecting = ble_command_helpers::get_length_for_command(batt_msg.command);
         batt_msg.data[0] = _data->battery_value;
-        _exo_ble->send_message(batt_msg);
+        _exo_ble->send_message(batt_msg); */
+
         del_t_status = 0;
 
         #if COMSMCU_DEBUG

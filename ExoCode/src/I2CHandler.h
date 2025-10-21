@@ -65,37 +65,37 @@ class I2C
 
 namespace i2c_cmds
 {
-    namespace smart
-    {
-        namespace get_battery_voltage
-        {
-            const uint8_t addr = 0x40;
-            const uint8_t reg = 0x02;
-            const uint8_t len = 2;
-        }
-        namespace get_battery_soc
-        {
-            const uint8_t addr = 0x40;
-            const uint8_t reg = 0x0e;
-            const uint8_t len = 2;
-        }
-    }
+    // namespace smart
+    // {
+        // namespace get_battery_voltage
+        // {
+            // const uint8_t addr = 0x40;
+            // const uint8_t reg = 0x02;
+            // const uint8_t len = 2;
+        // }
+        // namespace get_battery_soc
+        // {
+            // const uint8_t addr = 0x40;
+            // const uint8_t reg = 0x0e;
+            // const uint8_t len = 2;
+        // }
+    // }
 
-    namespace rc
-    {
-        namespace calibrate
-        {
-            const uint8_t addr = 0x40;
-            const uint8_t reg = 0x05;
-            const uint16_t val = 0x5000;
-        }
-        namespace get_battery_voltage
-        {
-            const uint8_t addr = 0x40;
-            const uint8_t reg = 0x02;
-            const uint8_t len = 2;
-        }
-    }
+    // namespace rc
+    // {
+        // namespace calibrate
+        // {
+            // const uint8_t addr = 0x40;
+            // const uint8_t reg = 0x05;
+            // const uint16_t val = 0x5000;
+        // }
+        // namespace get_battery_voltage
+        // {
+            // const uint8_t addr = 0x40;
+            // const uint8_t reg = 0x02;
+            // const uint8_t len = 2;
+        // }
+    // }
 
     namespace thigh_imu
     {

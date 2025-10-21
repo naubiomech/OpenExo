@@ -11,6 +11,7 @@
 
 #include "Arduino.h"
 #include "LogLevels.h"
+	#define SIMPLE_DEBUG //Uncomment to enter SIMPLE_DEBUG mode. The exoskeleton’s operating status will be printed to the Serial Monitor.
     #define FIRMWARE_VERSION 0_1_0
 
     #define AK_Board_V0_1 1
@@ -19,8 +20,12 @@
     #define AK_Board_V0_5_1 4
 	#define OpenExo_Board_V0_6_Maxon 5
 
-    #define BOARD_VERSION OpenExo_Board_V0_6_Maxon
-	#define BATTERY_SENSOR 0
+    #define BOARD_VERSION AK_Board_V0_5_1
+	
+	#define BATTERY_SENSOR 0 //Set it to 0 to disable, 219 to use INA219, 260 to use INA260, 3 to use the OpenExo Board 0.5.1 Mark 3's onboard voltage divider
+	#define CRITICAL_BATT_VAL 18 //In volts. Battery voltage below this will trigger the low battery warning in the GUI.
+	#define RESISTOR_1 47000 //Set it to the measured resistance of R1 on the OpenExo Board 0.5.1 Mark 3
+	#define RESISTOR_2 4700 //Set it to the measured resistance of R2 on the OpenExo Board 0.5.1 Mark 3
     #define REAL_TIME_I2C 1
     #define LOOP_FREQ_HZ 500
     #define LOOP_TIME_TOLERANCE 0.1 
@@ -85,7 +90,7 @@
     {
         const String FirmwareVersion = String(TOSTRING(FIRMWARE_VERSION));  //String to add to firmware char
         const String PCBVersion = String(TOSTRING(BOARD_VERSION));          //String to add to pcb char
-        const String DeviceName = String("Exo");                            //String to add to device char, if you would like the system to set it use "NULL"
+        const String DeviceName = String("NULL");                            //String to add to device char, if you would like the system to set it use "NULL"
     }
 
     namespace UART_times
