@@ -2402,7 +2402,7 @@ float SPV2::calc_motor_cmd()
 		uint16_t exo_status = _data->get_status();
 		bool active_trial = (exo_status == status_defs::messages::trial_on) || (exo_status == status_defs::messages::fsr_calibration) || (exo_status == status_defs::messages::fsr_refinement);
 		
-		/* if (!_controller_data->ps_connected) {
+		if (!_controller_data->ps_connected) {
 			if (!ina260.begin()) {
 				Serial.println("Couldn't find INA260 chip");
 				while (1);
