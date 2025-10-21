@@ -289,6 +289,9 @@ class ActiveTrial(tk.Frame):
         self.controller.show_frame("MachineLearning")
 
     def newSelection(self, event=None):
+        # Set this frame as the active trial for parameter updates
+        self.controller.deviceManager.set_active_trial(self)
+        
         # Disable buttons and dropdown untill proccess complete
         self.disable_interactions()
 
@@ -363,10 +366,11 @@ class ActiveTrial(tk.Frame):
         for plot in plots_to_update:
             plot.animate(selection)
 
-        # Schedule the next update
+
+        # Schedule the next update using the adaptive interval
         self.plot_update_job = self.after(
-            20, self.update_plots, selection
-        )  # Schedule with a delay
+            5, self.update_plots, selection
+        )
 
         # Enable interactions after the first plot update is complete
         self.after(20, self.enable_interactions)
@@ -410,6 +414,16 @@ class ActiveTrial(tk.Frame):
     def hide(self):
         # This method is called when switching away from this frame
         self.stop_plot_updates()
+    
+    def update_dropdown_values(self):
+        """Called when parameter names are received - update the settings frame"""
+        try:
+            settings_frame = self.controller.frames.get("UpdateTorque")
+            if settings_frame:
+                settings_frame.update_dropdowns()
+                print("Updated dropdowns in UpdateTorque frame after receiving parameters")
+        except Exception as e:
+            print(f"Error updating dropdown values: {e}")
 
     # Handle Recalibrate FSRs Button click
     async def on_recal_FSR_button_clicked(self):

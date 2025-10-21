@@ -37,6 +37,19 @@ class RealTimeProcessor:
             self._data_length = int(count_match)
             start = event_info[0]  # Start of data
             cmd = event_info[1]  # Command the data holds
+
+            # Fallback: if we start getting data before any parameter names were received,
+            # generate generic names data0..dataN-1 and initialize plotting structures
+            if self.handshake and not self.plotting_parameters and self.num_plotting_params == 0 and self._data_length is not None:
+                self.plotting_param_names = [f"data{i}" for i in range(self._data_length)]
+                self.num_plotting_params = self._data_length
+                print(f"No parameter names received; falling back to generic names: {self.plotting_param_names}")
+                # Initialize downstream structures
+                self._chart_data.updateNames(self.plotting_param_names, self.num_plotting_params)
+                self._exo_data.setParameterNames(self.plotting_param_names)
+                self._exo_data.initializeParamValues()
+                self.plotting_parameters = True
+
             # Data without the count
             event_without_count = f"{start}{cmd}{event_data}"
             # Parse the data and handle each part accordingly
@@ -167,6 +180,14 @@ class RealTimeProcessor:
 
     def UnkownDataCommand(self):
         return "Unkown Command!"
+    
+    def get_plotting_param_names(self):
+        """Return a copy of the plotting parameter names received from firmware."""
+        return list(self.plotting_param_names)
+    
+    def set_active_trial(self, active_trial):
+        """Set reference to the active trial frame for UI updates"""
+        self._active_trial = active_trial
 
 
 def tryParseFloat(stringVal):  # Try to parse float data from String
