@@ -2373,7 +2373,9 @@ float SPV2::calc_motor_cmd()
 		}
 		else if ((_controller_data->parameters[controller_defs::spv2::soft_or_stiff] >= 10) && (_controller_data->parameters[controller_defs::spv2::soft_or_stiff] <= 20)) {
 			uint8_t stiffness_cache = map(_controller_data->parameters[controller_defs::spv2::soft_or_stiff], 10, 20, _controller_data->parameters[controller_defs::spv2::servo_angle_soft], _controller_data->parameters[controller_defs::spv2::servo_angle_stiff]);
-			neutral_stiffness = constrain(stiffness_cache, _controller_data->parameters[controller_defs::spv2::servo_angle_soft], _controller_data->parameters[controller_defs::spv2::servo_angle_stiff]);
+
+			neutral_stiffness = max(min(stiffness_cache,max(_controller_data->parameters[controller_defs::spv2::servo_angle_soft], _controller_data->parameters[controller_defs::spv2::servo_angle_stiff])),min(_controller_data->parameters[controller_defs::spv2::servo_angle_soft], _controller_data->parameters[controller_defs::spv2::servo_angle_stiff]));
+
 		}
 		
 		
