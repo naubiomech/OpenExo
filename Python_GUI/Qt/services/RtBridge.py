@@ -125,6 +125,10 @@ class RtBridge(QtCore.QObject):
                         if val is not None:
                             self._payload.append(val)
                         if self._num_count == self._data_length:
+                            # Drop spurious single-value frames (e.g., fragmented BLE chunks)
+                            if self._data_length <= 1:
+                                self._reset_stream()
+                                return
                             # Emit payload; pad/crop to 16 entries for safety
                             values = list(self._payload)
                             if len(values) < 16:

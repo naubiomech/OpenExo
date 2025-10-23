@@ -31,10 +31,13 @@ class MainWindow(QtWidgets.QMainWindow):
         toolbar = self.addToolBar("Nav")
         act_scan = QtGui.QAction("Scan", self)
         act_trial = QtGui.QAction("Active Trial", self)
+        act_disc = QtGui.QAction("Disconnect", self)
         toolbar.addAction(act_scan)
         toolbar.addAction(act_trial)
+        toolbar.addAction(act_disc)
         act_scan.triggered.connect(lambda: self.stack.setCurrentWidget(self.scan_page))
         act_trial.triggered.connect(lambda: self.stack.setCurrentWidget(self.trial_page))
+        act_disc.triggered.connect(self._on_disconnect)
 
         # When scan page connects, enable trial start
         self.scan_page.btn_start_trial.clicked.connect(self._go_trial)
@@ -58,6 +61,14 @@ class MainWindow(QtWidgets.QMainWindow):
         # Device control wiring from ActiveTrialPage
         self.trial_page.deviceStartRequested.connect(self._on_device_start)
         self.trial_page.deviceStopRequested.connect(self._on_device_stop)
+        self.trial_page.recalibrateFSRRequested.connect(self._on_recal_fsr)
+        self.trial_page.sendPresetFSRRequested.connect(self._on_send_preset_fsr)
+        self.trial_page.markTrialRequested.connect(self._on_mark)
+        self.trial_page.endTrialRequested.connect(self._on_end_trial)
+        self.trial_page.saveCsvRequested.connect(self._on_save_csv)
+        self.trial_page.updateControllerRequested.connect(self._on_update_controller)
+        self.trial_page.bioFeedbackRequested.connect(self._on_bio_feedback)
+        self.trial_page.machineLearningRequested.connect(self._on_machine_learning)
         # Update Scan page status from device manager
         self.qt_dev.log.connect(self._on_dev_log)
         self.qt_dev.error.connect(self._on_dev_error)
@@ -68,9 +79,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stack.setCurrentWidget(self.trial_page)
         # Stop simulation so live data drives plots if available
         self.trial_page.stop_sim()
-        # Send start command to firmware to begin streaming ('E' per UART/BLE protocol)
+        # Begin trial sequence (E -> L -> R + thresholds) to ensure FSRs stream
         try:
-            self.qt_dev.write(b'E')
+            self.qt_dev.beginTrial()
         except Exception:
             pass
 
@@ -128,9 +139,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def _on_device_start(self):
-        # Start device streaming ('E')
+        # Begin trial sequence (ensure FSR calibration and presets)
         try:
-            self.qt_dev.write(b'E')
+            self.qt_dev.beginTrial()
             # Also stop local sim
             self.trial_page.stop_sim()
         except Exception:
@@ -143,6 +154,60 @@ class MainWindow(QtWidgets.QMainWindow):
             self.qt_dev.write(b'G')
         except Exception:
             pass
+
+    @QtCore.Slot()
+    def _on_recal_fsr(self):
+        try:
+            self.qt_dev.calibrateFSRs()
+        except Exception:
+            pass
+
+    @QtCore.Slot()
+    def _on_send_preset_fsr(self):
+        try:
+            self.qt_dev.sendPresetFsrValues()
+        except Exception:
+            pass
+
+    @QtCore.Slot()
+    def _on_mark(self):
+        pass
+
+    @QtCore.Slot()
+    def _on_end_trial(self):
+        try:
+            self.qt_dev.motorOff()
+            self.qt_dev.stopTrial()
+            self.qt_dev.disconnect()
+        except Exception:
+            pass
+
+    @QtCore.Slot()
+    def _on_disconnect(self):
+        try:
+            self.qt_dev.disconnect()
+        except Exception:
+            pass
+
+    @QtCore.Slot()
+    def _on_save_csv(self):
+        # Placeholder: integrate with data logging pipeline if available
+        pass
+
+    @QtCore.Slot()
+    def _on_update_controller(self):
+        # Placeholder: open/update controller parameters UI
+        pass
+
+    @QtCore.Slot()
+    def _on_bio_feedback(self):
+        # Placeholder hook
+        pass
+
+    @QtCore.Slot()
+    def _on_machine_learning(self):
+        # Placeholder hook
+        pass
 
     @QtCore.Slot(str)
     def _on_dev_log(self, msg: str):
