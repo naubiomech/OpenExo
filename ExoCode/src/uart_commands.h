@@ -380,7 +380,7 @@ namespace UART_command_handlers
 			rx_msg.data[7] = pwr2plot;
 			rx_msg.data[8] = exo_data->right_side.ankle.controller.SPV2_currentAngle;
 			rx_msg.data[9] = 0.001 * exo_data->right_side.ankle.controller.SPV2_current_voltage; // bus voltage returned in millis volts
-			rx_msg.data[10] = 10;
+			rx_msg.data[10] = rx_msg.data[9];
 			break;
 			}
 
