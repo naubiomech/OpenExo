@@ -27,6 +27,11 @@ class ActiveTrial(tk.Frame):
         self.timer_label = None  # Label for displaying the time
         self.timer_job = None  # Store the timer update job reference
         self.paused_flag = False
+        # Adaptive plotting cadence for slower machines
+        self.update_interval_ms = 50
+        self.min_interval_ms = 30
+        self.max_interval_ms = 200
+        self._last_plot_tick = None
 
         # Load pause and play icons
         pause_img = Image.open("Resources/Images/pause.png").convert("RGBA")
@@ -41,6 +46,8 @@ class ActiveTrial(tk.Frame):
         # UI elements
         self.fontstyle = 'Segoe UI'
 
+        names = self.controller.deviceManager._realTimeProcessor._chart_data.param_names
+        print("names", names)
         self.var = IntVar()
         self.chartVar = StringVar()
         self.chartVar.set("Data 0-3")
@@ -373,7 +380,7 @@ class ActiveTrial(tk.Frame):
         )
 
         # Enable interactions after the first plot update is complete
-        self.after(20, self.enable_interactions)
+        self.after(50, self.enable_interactions)
 
     def clear_top_plot(self):
         self.topPlot.clear_plot()

@@ -20,8 +20,8 @@ class BasePlot:
         self.second_y = []
 
         # Plot initialization
-        self.line1, = self.ax.plot([], [], label='Controller Value', color='blue')
-        self.line2, = self.ax.plot([], [], label='Measurement Value', color='red')
+        self.line1, = self.ax.plot([], [], label='Controller Value', color='blue', antialiased=False, linewidth=1)
+        self.line2, = self.ax.plot([], [], label='Measurement Value', color='red', antialiased=False, linewidth=1)
 
         self.ax.set_xticks([])  # Hide x-ticks for simplicity
         self.ax.set_title(title)
@@ -71,8 +71,8 @@ class BasePlot:
         self.ax.set_title(None)
         self.ax.set_xticks([])  # Restore x-ticks hidden state
         # Reinitialize the lines
-        self.line1, = self.ax.plot([], [], label='Controller Value', color='blue')
-        self.line2, = self.ax.plot([], [], label='Measurement Value', color='red')
+        self.line1, = self.ax.plot([], [], label='Controller Value', color='blue', antialiased=False, linewidth=1)
+        self.line2, = self.ax.plot([], [], label='Measurement Value', color='red', antialiased=False, linewidth=1)
         self.canvas.draw_idle()
 
 class TopPlot(BasePlot):
@@ -90,7 +90,13 @@ class TopPlot(BasePlot):
             top_measure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.data1
             )
-            title = "Data 0 and 1"
+            # Get parameter names with safe access
+            names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            # Check if we have enough parameter names, otherwise use default titles
+            if names and len(names) > 1:
+                title = f"{names[0]} and {names[1]}"
+            else:
+                title = "Data 0 and 1"
         elif chart_selection == "Data 4-7":
             top_controller = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.data4
@@ -98,7 +104,13 @@ class TopPlot(BasePlot):
             top_measure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.data5
             )
-            title = "Data 4 and 5"
+            # Get parameter names with safe access
+            names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            # Check if we have enough parameter names, otherwise use default titles
+            if names and len(names) > 5:
+                title = f"{names[4]} and {names[5]}"
+            else:
+                title = "Data 4 and 5"
             bottom_limit = 0
             top_limit = 1.1
 
@@ -129,7 +141,13 @@ class BottomPlot(BasePlot):
             top_measure = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.data3
             )
-            title = "Data 2 and 3"
+            # Get parameter names with safe access
+            names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            # Check if we have enough parameter names, otherwise use default titles
+            if names and len(names) > 3:
+                title = f"{names[2]} and {names[3]}"
+            else:
+                title = "Data 2 and 3"
         elif chart_selection == "Data 4-7":
             top_controller = (
                 self.master.controller.deviceManager._realTimeProcessor._chart_data.data6
@@ -139,7 +157,13 @@ class BottomPlot(BasePlot):
             )
             bottom_limit = 0
             top_limit = 1.1
-            title = "Data 6 and 7"
+            # Get parameter names with safe access
+            names = self.master.controller.deviceManager._realTimeProcessor._chart_data.param_names
+            # Check if we have enough parameter names, otherwise use default titles
+            if names and len(names) > 7:
+                title = f"{names[6]} and {names[7]}"
+            else:
+                title = "Data 6 and 7"
 
         if top_controller is None or top_measure is None:
             top_controller = 0

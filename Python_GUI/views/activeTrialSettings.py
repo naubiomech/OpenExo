@@ -4,8 +4,9 @@ from tkinter import (BOTTOM, CENTER, LEFT, RIGHT, TOP, E, N, S, StringVar, W,
 
 from async_tkinter_loop import async_handler
 from Widgets.Keyboard.custom_keyboard import CustomKeyboard
-import json
-import os
+
+from Device import realTimeProcessor
+
 jointMap = {
     "Right hip": 1,
     "Left hip": 2,
@@ -18,8 +19,6 @@ jointMap = {
 }
 
 class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
-    SETTINGS_FILE = "saved_data/last_torque_settings.json"  # File to save and load settings
-
     def __init__(self, parent, controller):  # Constructor for Frame
         super().__init__(parent)  # Correctly initialize the tk.Frame part
         # Initialize variables
@@ -74,6 +73,7 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         menu.config(font=(self.fontstyle, 26))  # Larger font for options in the dropdown menu
         jointSelector.pack(pady=5)
 
+        ''' OLD CODE - ELLIOTT
         # Controller label
         controllerInputLabel = tk.Label(self, text="Controller", font=(self.fontstyle, 15))
         self.controllerInput = tk.Entry(self, font=(self.fontstyle, 16))  # Use Entry instead of Text for simpler input
@@ -81,6 +81,34 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         # Parameter Label
         parameterInputLabel = tk.Label(self, text="Parameter", font=(self.fontstyle, 15))
         self.parameterInput = tk.Entry(self, font=(self.fontstyle, 16)) 
+        '''
+        # START OF ELLIOTTS CODE
+        # Controller label and dropdown
+        controllerInputLabel = tk.Label(self, text="Controller", font=(self.fontstyle, 15))
+        self.controllerVar = StringVar()
+        self.controllerInput = ttk.Combobox(
+            self, 
+            textvariable=self.controllerVar,
+            state="readonly",
+            font=(self.fontstyle, 16),
+            width=20
+        )
+        controllerInputLabel.pack(pady=5)
+        self.controllerInput.pack(padx=5)
+        
+        # Parameter Label and dropdown
+        parameterInputLabel = tk.Label(self, text="Parameter", font=(self.fontstyle, 15))
+        self.parameterVar = StringVar()
+        self.parameterInput = ttk.Combobox(
+            self, 
+            textvariable=self.parameterVar,
+            state="readonly",
+            font=(self.fontstyle, 16),
+            width=20
+        )
+        parameterInputLabel.pack(pady=5)
+        self.parameterInput.pack(pady=5)
+        # END OF ELLIOTTS CODE - PUT NEW PARAMETERS IN INPUT IF NEEDED
 
         # Manual entry fallbacks (shown when no controllers/parameters are received)
         self.manualControllerLabel = tk.Label(self, text="Controller Index", font=(self.fontstyle, 15))
@@ -126,9 +154,7 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
             width=10,
             command=async_handler(
                 self.on_update_button_clicked,
-                self.controllerInput,
-                self.parameterInput,
-                self.valueInput,
+
             ),
         )
         updateTorqueButton.pack(side=BOTTOM, fill=X, padx=20, pady=20)
@@ -270,13 +296,13 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
 
         self.update_keyboard_target()
 
-    # Update the keyboard to target the current input field.
     def update_keyboard_target(self):
+        """Update the keyboard to target the current input field."""
         target_input = self.inputs[self.current_input_index]
         self.keyboard.set_target(target_input)
 
-    # Handle the keyboard submission and move to the next input field.
     def keyboard_submit(self, value):
+        """Handle the keyboard submission and move to the next input field."""
         # Set the value for the current input field
         current_input = self.inputs[self.current_input_index]
         current_input.delete(0, tk.END)
@@ -289,8 +315,8 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
         else:
             self.close_keyboard()  # Close the keyboard after the last field
 
-    # Close the keyboard and reset the current input index.
     def close_keyboard(self):
+        """Close the keyboard and reset the current input index."""
         if self.keyboard_window:
             self.keyboard_window.destroy()
             self.keyboard_window = None
@@ -298,28 +324,50 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
 
     def handle_back_button(self):
         # Return to the previous frame
-        active_trial_frame = self.controller.frames[self.previous_frame]
-        active_trial_frame.newSelection(self)
-        active_trial_frame.clear_both_plot()
-        self.controller.show_frame(self.previous_frame)
+        if self.previous_frame:
+            self.controller.show_frame(self.previous_frame)
+            active_trial_frame = self.controller.frames[self.previous_frame]
+            active_trial_frame.newSelection(self)
+        else:
+            self.controller.show_frame("ActiveTrial")
+            active_trial_frame = self.controller.frames["ActiveTrial"]
+            active_trial_frame.newSelection(self)
+
+
+
+
+
+
+
+
+
+
+# HEY CONNOR THIS IS WHERE WE HANDLE THE UPDATE BUTTON BEING CLICKED
+
+
+
+
+
+
+
+
+
+
 
         
     async def on_update_button_clicked(
-        self, controllerInput, parameterInput, valueInput,
+        self, #controllerInput, parameterInput, valueInput,
     ):
         selected_joint = self.jointVar.get()  # Get the selected joint
         joint_id = jointMap[selected_joint]
 
-        await self.UpdateButtonClicked(
-            self.isBilateral,
-            joint_id,
-            controllerInput,
-            parameterInput,
-            valueInput,
-        )
+        print("Update Button Clicked")
+        print(f"Selected Joint: {selected_joint} (ID: {joint_id})")
+        #print(f"Controller Input: {self.controllerInput.get()}")
+        #print(f"Parameter Input: {self.parameterInput.get()}")
+        #print(f"Value Input: {self.valueInput.get()}")
 
-        # Save settings after updating
-        self.save_settings()
+        await self.UpdateButtonClicked(self.isBilateral, joint_id, self.controller_index, self.parameterInput, self.valueInput, )
 
     async def UpdateButtonClicked(
         self, isBilateral, joint, controllerInput, parameterInput, valueInput,
@@ -351,7 +399,7 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
 
         # Set Torque
         await self.controller.deviceManager.updateTorqueValues(
-            [isBilateral, joint, controllerVal, parameterVal, valueVal]
+            [isBilateral, joint, float(controllerVal), float(parameterVal), float(valueVal)]
         )
 
         if self.previous_frame:
@@ -362,34 +410,6 @@ class UpdateTorque(tk.Frame):  # Frame to start exo and calibrate
             self.controller.show_frame("ActiveTrial")
             active_trial_frame = self.controller.frames["ActiveTrial"]
             active_trial_frame.newSelection(self)
-
-    # Save the current settings to a file.
-    def save_settings(self):
-        settings = {
-            "joint": self.jointVar.get(),
-            "controller": self.controllerInput.get(),
-            "parameter": self.parameterInput.get(),
-            "value": self.valueInput.get(),
-            "isBilateral": self.isBilateral,
-        }
-        with open(self.SETTINGS_FILE, "w") as f:
-            json.dump(settings, f, indent=4)
-        print(f"Settings saved: {settings}")
-
-    # Load the last saved settings.
-    def load_settings(self):
-        if os.path.exists(self.SETTINGS_FILE):
-            with open(self.SETTINGS_FILE, "r") as f:
-                settings = json.load(f)
-                self.jointVar.set(settings.get("joint", "Left hip"))
-                self.controllerInput.insert(0, settings.get("controller", ""))
-                self.parameterInput.insert(0, settings.get("parameter", ""))
-                self.valueInput.insert(0, settings.get("value", ""))
-                self.isBilateral = settings.get("isBilateral", True)
-                self.bilateralButtonVar.set(
-                    "Bilateral Mode On" if self.isBilateral else "Bilateral Mode Off"
-                )
-            print(f"Loaded settings: {settings}")
 
     def newSelection(self, event):
         # Update dropdowns when the frame is shown/selected
