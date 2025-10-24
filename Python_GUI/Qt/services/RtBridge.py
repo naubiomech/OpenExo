@@ -19,6 +19,7 @@ class RtBridge(QtCore.QObject):
     handshakeReceived = QtCore.Signal()
     parameterNamesReceived = QtCore.Signal(list)
     controllersReceived = QtCore.Signal(list, list)
+    controllerMatrixReceived = QtCore.Signal(list)
     rtDataUpdated = QtCore.Signal(list)
 
     def __init__(self, parent=None):
@@ -31,6 +32,7 @@ class RtBridge(QtCore.QObject):
         self._controller_params: List[List[str]] = []
         self._temp_params: List[str] = []
         self._controllers_done = False
+        self._controller_matrix: List[List[str]] = []
 
         # Stream parse state (port of minimal logic)
         self._event_count_regex = QtCore.QRegularExpression("[0-9]+")
@@ -73,8 +75,15 @@ class RtBridge(QtCore.QObject):
                 if self._temp_params:
                     self._controller_params.append(self._temp_params)
                     self._temp_params = []
+                # Build 2D controller-parameter matrix: [ [controller, param1, param2, ...], ... ]
+                self._controller_matrix = []
+                for i, ctrl in enumerate(self._controllers):
+                    params = self._controller_params[i] if i < len(self._controller_params) else []
+                    row = [ctrl] + list(params)
+                    self._controller_matrix.append(row)
                 if self._controllers:
                     self.controllersReceived.emit(list(self._controllers), list(self._controller_params))
+                    self.controllerMatrixReceived.emit(list(self._controller_matrix))
                 self._controllers_done = True
                 return
             # parameter vs controller

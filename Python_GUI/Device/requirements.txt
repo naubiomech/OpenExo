@@ -8,3 +8,4 @@ matplotlib
 pygame
 pillow
 bleak
+PySide6

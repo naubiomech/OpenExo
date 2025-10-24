@@ -84,7 +84,6 @@ class QtExoDeviceManager(QtCore.QObject):
                             results[device.address] = device.name or "Unknown"
                     except Exception as ex:
                         print(f"[QtExoDeviceManager] scan error: {ex}")
-                    await asyncio.sleep(1)
             finally:
                 lst = [(name, addr) for addr, name in results.items()]
                 self.scanResults.emit(lst)
@@ -488,7 +487,7 @@ class QtExoDeviceManager(QtCore.QObject):
 
     @QtCore.Slot()
     def beginTrial(self):
-        """Mirror legacy beginTrial: start motors, calibrate FSRs, send preset FSR values."""
+        """Mirror legacy beginTrial: start motors, calibrate torque, calibrate FSRs, send preset FSR values."""
         if not self._ensure_connected():
             return
 
@@ -497,6 +496,8 @@ class QtExoDeviceManager(QtCore.QObject):
                 await asyncio.sleep(1)
                 # Start motors/stream
                 await self._client.write_gatt_char(UART_TX_UUID, b"E", response=False)
+                # Calibrate torque sensors
+                await self._client.write_gatt_char(UART_TX_UUID, b"H", response=False)
                 # Calibrate FSRs
                 await self._client.write_gatt_char(UART_TX_UUID, b"L", response=False)
                 # Send preset FSR values

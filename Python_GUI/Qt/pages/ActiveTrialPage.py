@@ -46,6 +46,11 @@ class ActiveTrialPage(QtWidgets.QWidget):
         controls.addWidget(title)
         controls.addSpacing(8)
 
+        # Update Controller at the top
+        self.btn_update_controller = QtWidgets.QPushButton("Update Controller")
+        controls.addWidget(self.btn_update_controller)
+        controls.addSpacing(8)
+
         # Toggle plotted data visibility
         self.btn_toggle_points = QtWidgets.QPushButton("Toggle Data Points")
         controls.addWidget(self.btn_toggle_points)
@@ -57,9 +62,6 @@ class ActiveTrialPage(QtWidgets.QWidget):
         # Save CSV (temp)
         self.btn_save_csv = QtWidgets.QPushButton("Save CSV")
         controls.addWidget(self.btn_save_csv)
-        # Update Controller (temp)
-        self.btn_update_controller = QtWidgets.QPushButton("Update Controller")
-        controls.addWidget(self.btn_update_controller)
         # Bio Feedback (temp)
         self.btn_bio_feedback = QtWidgets.QPushButton("Bio Feedback")
         controls.addWidget(self.btn_bio_feedback)
