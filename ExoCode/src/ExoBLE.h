@@ -73,11 +73,42 @@ class ExoBLE
          */
         void send_error(int error_code, int joint_id);
 
+        /**
+         * @brief sends a string message over BLE
+         * @param msg BleMessage to send
+         * @param msg_text string to send
+         * Dynamic Parameter Code
+         */
+        void send_message_w_string(BleMessage &msg, const char* msg_text);
+
+        /**
+         * @brief Sends the initial plotting parameter names over BLE
+         * Dynamic Parameter Code
+         */
+        void send_initial_plotting_parameter_names();
+
+        /**
+         * @brief Sends the initial controller parameters over BLE
+         * Dynamic Parameter Code
+         */
+        void send_initial_controller_parameters();
+
+        /**
+         * @brief Sends an initial handshake message over BLE
+         * Dynamic Parameter Code
+         */
+        void send_initial_handshake();
+
     private:
 
         //BLE connection state
         int _connected = 0;
         
+        //Add these member variables
+        //Dynamic Parameter Code
+        ExoData* _data;
+        uint8_t _config_to_send;
+
         //The Gatt database which defines the services and characteristics
         GattDb _gatt_db = GattDb();
 

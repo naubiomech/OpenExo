@@ -13,6 +13,34 @@
 #include "RealTimeI2C.h"
 
 /**
+ * @brief Enum to define the type of data that is being sent used with the data entry struct
+ * Dynamic Parameter Code
+ */
+enum DataType {
+    TYPE_FLOAT,
+    TYPE_INT,
+    TYPE_BOOL,
+};
+
+/**
+ * @brief Struct to hold a data entry with its name and pointer as well as its type
+ * Dynamic Parameter Code
+ */
+ struct DataEntry
+ {
+     void* value;  /**< Pointer to the float data */
+     const char* name; /**< Name of the data */
+     DataType type; /**< Type of the data using DataType enum*/
+ };
+
+/**
+ * @brief Macro to define a data entry with its value, name, and type used to create a data entry struct
+ * Dynamic Parameter Code
+ */
+ #define Data_Entry(data, dtype) {(void*)&(data), #data, dtype}
+
+
+/**
  * @brief Type to associate a command with an ammount of data
  *
  */
@@ -327,6 +355,187 @@ namespace UART_command_handlers
     {
     }
 
+    /**
+     * @brief Populates an array of DataEntry structs based on the current exo configuration. The struct will then be used for dynamic data plotting sent to the GUI
+     * @param exo_data Pointer to ExoData class
+     * @param config Pointer to configuration array 
+     * @param data_entries Pointer to array of DataEntry structs to be populated
+     * @param num_entries Reference to an integer that will hold the number of entries populated in the data_entries array
+     * Dynamic Parameter Code
+     */
+    inline static void populate_data_entries(ExoData *exo_data, uint8_t *config, DataEntry* data_entries, int& num_entries)
+    {
+        float right_gait;
+        float left_gait;
+        Serial.println(config[config_defs::exo_name_idx]);
+
+        //Note: Ankle and Hip are Configured for Step Controller, Elbow for the ElbowMinMax Controller, Multi-joint for their primary control schemes
+        switch (config[config_defs::exo_name_idx])
+        {
+
+        case (uint8_t)config_defs::exo_name::bilateral_ankle:
+
+            data_entries[0] = Data_Entry(exo_data->right_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[1] = Data_Entry(exo_data->right_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[2] = Data_Entry(exo_data->left_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[3] = Data_Entry(exo_data->left_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[4] = Data_Entry(exo_data->right_side.toe_stance, TYPE_FLOAT);
+            data_entries[5] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
+            data_entries[6] = Data_Entry(exo_data->left_side.toe_stance, TYPE_FLOAT);
+            data_entries[7] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
+            data_entries[8] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
+
+            num_entries = 9;  // Fixed: Set to actual number of entries filled
+
+            break;
+
+        case (uint8_t)config_defs::exo_name::bilateral_hip:
+
+            right_gait = exo_data->right_side.percent_gait / 100;
+            left_gait = exo_data->left_side.percent_gait / 100;
+            data_entries[0] = Data_Entry(exo_data->right_side.toe_stance, TYPE_BOOL);
+            data_entries[1] = Data_Entry(exo_data->left_side.hip.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[2] = Data_Entry(exo_data->left_side.hip.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[3] = Data_Entry(right_gait, TYPE_FLOAT);
+            data_entries[4] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
+            data_entries[5] = Data_Entry(left_gait, TYPE_FLOAT);
+            data_entries[6] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
+            data_entries[7] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
+            num_entries = 8;  // Fixed: Set to actual number of entries filled
+            
+            break;
+
+        case (uint8_t)config_defs::exo_name::bilateral_elbow:
+
+            data_entries[0] = Data_Entry(exo_data->right_side.elbow.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[1] = Data_Entry(exo_data->right_side.elbow.controller.filtered_setpoint, TYPE_FLOAT);
+            data_entries[2] = Data_Entry(exo_data->left_side.elbow.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[3] = Data_Entry(exo_data->left_side.elbow.controller.filtered_setpoint, TYPE_FLOAT);
+            data_entries[4] = Data_Entry(exo_data->right_side.elbow.controller.FlexSense, TYPE_FLOAT);
+            data_entries[5] = Data_Entry(exo_data->right_side.elbow.controller.ExtenseSense, TYPE_FLOAT);
+            data_entries[6] = Data_Entry(exo_data->left_side.elbow.controller.FlexSense, TYPE_FLOAT);
+            data_entries[7] = Data_Entry(exo_data->left_side.elbow.controller.ExtenseSense, TYPE_FLOAT);
+            num_entries = 8;  // Fixed: Set to actual number of entries filled
+
+            break;
+
+        case (uint8_t)config_defs::exo_name::bilateral_hip_ankle:
+
+            right_gait = exo_data->right_side.percent_gait / 100;
+            left_gait = exo_data->left_side.percent_gait / 100;
+
+            data_entries[0] = Data_Entry(exo_data->right_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[1] = Data_Entry(exo_data->right_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[2] = Data_Entry(exo_data->left_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[3] = Data_Entry(exo_data->left_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[4] = Data_Entry(exo_data->right_side.hip.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[5] = Data_Entry(right_gait, TYPE_FLOAT);
+            data_entries[6] = Data_Entry(exo_data->left_side.hip.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[7] = Data_Entry(left_gait, TYPE_FLOAT);
+            data_entries[8] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
+            num_entries = 9;  // Fixed: Set to actual number of entries filled
+
+            break;
+
+        case (uint8_t)config_defs::exo_name::bilateral_hip_elbow:
+
+            right_gait = exo_data->right_side.percent_gait / 100;
+            left_gait = exo_data->left_side.percent_gait / 100;
+
+            data_entries[0] = Data_Entry(exo_data->right_side.elbow.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[1] = Data_Entry(exo_data->right_side.elbow.controller.filtered_setpoint, TYPE_FLOAT);
+            data_entries[2] = Data_Entry(exo_data->left_side.elbow.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[3] = Data_Entry(exo_data->left_side.elbow.controller.filtered_setpoint, TYPE_FLOAT);
+            data_entries[4] = Data_Entry(exo_data->right_side.hip.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[5] = Data_Entry(right_gait, TYPE_FLOAT);
+            data_entries[6] = Data_Entry(exo_data->left_side.hip.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[7] = Data_Entry(left_gait, TYPE_FLOAT);
+            data_entries[8] = Data_Entry(exo_data->right_side.elbow.controller.FlexSense, TYPE_FLOAT);
+            data_entries[9] = Data_Entry(exo_data->left_side.elbow.controller.FlexSense, TYPE_FLOAT);
+            num_entries = 10;  // Fixed: Set to actual number of entries filled
+
+            break;
+
+        case (uint8_t)config_defs::exo_name::bilateral_ankle_elbow:
+
+            data_entries[0] = Data_Entry(exo_data->right_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[1] = Data_Entry(exo_data->right_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[2] = Data_Entry(exo_data->left_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[3] = Data_Entry(exo_data->left_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[4] = Data_Entry(exo_data->right_side.elbow.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[5] = Data_Entry(exo_data->right_side.elbow.controller.filtered_setpoint, TYPE_FLOAT);
+            data_entries[6] = Data_Entry(exo_data->left_side.elbow.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[7] = Data_Entry(exo_data->left_side.elbow.controller.filtered_setpoint, TYPE_FLOAT);
+            data_entries[8] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
+            data_entries[9] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
+            num_entries = 10;  // Fixed: Set to actual number of entries filled
+
+            break;
+
+        default: // Bilateral Ankle
+
+            /*
+            data_entries[0] = Data_Entry(exo_data->right_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[1] = Data_Entry(exo_data->right_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[2] = Data_Entry(exo_data->left_side.ankle.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[3] = Data_Entry(exo_data->left_side.ankle.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[4] = Data_Entry(exo_data->right_side.toe_stance, TYPE_FLOAT);
+            data_entries[5] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
+            data_entries[6] = Data_Entry(exo_data->left_side.toe_stance, TYPE_FLOAT);
+            data_entries[7] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
+            data_entries[8] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
+            num_entries = 9;  // Fixed: Set to actual number of entries filled
+            */
+            right_gait = exo_data->right_side.percent_gait / 100;
+            left_gait = exo_data->left_side.percent_gait / 100;
+            data_entries[0] = Data_Entry(exo_data->right_side.toe_stance, TYPE_BOOL);
+            data_entries[1] = Data_Entry(exo_data->left_side.hip.controller.filtered_torque_reading, TYPE_FLOAT);
+            data_entries[2] = Data_Entry(exo_data->left_side.hip.controller.ff_setpoint, TYPE_FLOAT);
+            data_entries[3] = Data_Entry(right_gait, TYPE_FLOAT);
+            data_entries[4] = Data_Entry(exo_data->right_side.toe_fsr, TYPE_FLOAT);
+            data_entries[5] = Data_Entry(left_gait, TYPE_FLOAT);
+            data_entries[6] = Data_Entry(exo_data->left_side.toe_fsr, TYPE_FLOAT);
+            data_entries[7] = Data_Entry(exo_data->right_side.heel_fsr, TYPE_FLOAT);
+            num_entries = 8;  // Fixed: Set to actual number of entries filled
+            
+            break;
+        }
+    }
+    
+    static int num_entries = 8; // Number of data entries (parameters) that will be sent to the GUI
+    static std::vector<std::string> param_names_arr; // Vector of strings to hold the names of the parameters that will be sent to the GUI
+    /**
+     * @brief uses populate_data_entries to initialize a vector of parameter names that will be sent to the GUI for dynamic data plotting
+     * @param exo_data Pointer to ExoData class 
+     * @param config Pointer to configuration array
+     * @param handler Pointer to UARTHandler class
+     * @param msg UART message that triggered the initialization
+     * Dynamic Parameter Code
+     */
+    inline static void initialize_parameter_names(ExoData *exo_data, uint8_t *config, UARTHandler *handler, UART_msg_t msg)
+    {
+        // update_config(handler, exo_data, msg);
+        DataEntry data_entries[10];
+        populate_data_entries(exo_data, config, data_entries, num_entries);
+
+        // Clear the parameter names array at the start of each call
+        param_names_arr.clear();
+
+        /*Set the length of the msg and copy the data into a vector to be accessed by ExoBLE*/
+        for (int i = 0; i < num_entries; i++) {
+            std::string param_name = data_entries[i].name;
+            param_names_arr.push_back(param_name);
+        }
+    }
+
+    /**
+     * @brief first function in line to sending the real time data to the GUI. It populates a UART message with the real time data based on the current exo configuration
+     * @param handler Pointer to UARTHandler class
+     * @param exo_data Pointer to ExoData class
+     * @param msg UART message that triggered the real time data request
+     * @param config Pointer to configuration array
+     * Dynamic Parameter Code
+     */
     inline static void get_real_time_data(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg, uint8_t *config)
     {
         UART_msg_t rx_msg;
@@ -343,7 +552,7 @@ namespace UART_command_handlers
         //1 = Top Orange Line
         //2 = Bottom Blue Line
         //3 = Bottom Orange Line
-        
+         
         //Tab 2
         //4 = Top Blue Line
         //5 = Top Orange Line
@@ -353,131 +562,25 @@ namespace UART_command_handlers
         //8 = Not Plotted, Will Save
         //9 = Not Plotted, Will Save
 
-        //Note: Ankle and Hip are Configured for Step Controller, Elbow for the ElbowMinMax Controller, Multi-joint for their primary control schemes
+        // update_config(handler, exo_data, msg);
+        DataEntry data_entries[10];
+        populate_data_entries(exo_data, config, data_entries, num_entries);
+        rx_msg.len = num_entries;
 
-        switch (config[config_defs::exo_name_idx])
+        for (int i = 0; i < num_entries; i++)
         {
-        case (uint8_t)config_defs::exo_name::bilateral_ankle:
-		{
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN;
-            rx_msg.data[0] = exo_data->left_side.ankle.controller.ff_setpoint;
-            rx_msg.data[1] = exo_data->left_side.ankle.controller.filtered_torque_reading;
-			rx_msg.data[2] = exo_data->right_side.ankle.controller.ff_setpoint;
-			rx_msg.data[3] = exo_data->right_side.ankle.controller.filtered_torque_reading;
-			rx_msg.data[4] = exo_data->left_side.toe_fsr;
-            rx_msg.data[5] = exo_data->left_side.toe_stance;
-			// rx_msg.data[5] = exo_data->left_side.heel_fsr;
-            rx_msg.data[6] = exo_data->right_side.toe_fsr;
-			rx_msg.data[7] = exo_data->right_side.toe_stance;
-			// rx_msg.data[7] = exo_data->right_side.heel_fsr;
-			rx_msg.data[8] = 8;
-			rx_msg.data[9] = 9;
-			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
-			break;
-		}
-
-        case (uint8_t)config_defs::exo_name::bilateral_hip:
-		{
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.hip.controller.filtered_torque_reading;
-            rx_msg.data[1] = exo_data->right_side.hip.controller.ff_setpoint;
-            rx_msg.data[2] = exo_data->left_side.hip.controller.filtered_torque_reading;
-            rx_msg.data[3] = exo_data->left_side.hip.controller.ff_setpoint;
-            rx_msg.data[4] = exo_data->right_side.percent_gait / 100;
-            rx_msg.data[5] = exo_data->right_side.toe_fsr;
-            rx_msg.data[6] = exo_data->left_side.percent_gait / 100;
-            rx_msg.data[7] = exo_data->left_side.toe_fsr;
-            rx_msg.data[8] = exo_data->right_side.heel_fsr;
-            rx_msg.data[9] = exo_data->left_side.heel_fsr;
-			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
-            break;
-		}
-
-        case (uint8_t)config_defs::exo_name::bilateral_elbow:
-		{
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_ELBOW_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.elbow.controller.filtered_torque_reading; 
-            rx_msg.data[1] = exo_data->right_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[2] = exo_data->left_side.elbow.controller.filtered_torque_reading;
-            rx_msg.data[3] = exo_data->left_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[4] = exo_data->right_side.elbow.controller.FlexSense;
-            rx_msg.data[5] = exo_data->right_side.elbow.controller.ExtenseSense;
-            rx_msg.data[6] = exo_data->left_side.elbow.controller.FlexSense;
-            rx_msg.data[7] = exo_data->left_side.elbow.controller.ExtenseSense;
-            rx_msg.data[8] = 8;
-			rx_msg.data[9] = 9;
-			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
-			break;
-		}
-
-        case (uint8_t)config_defs::exo_name::bilateral_hip_ankle:
-		{
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_ANKLE_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading; 
-            rx_msg.data[1] = exo_data->right_side.ankle.controller.ff_setpoint;
-            rx_msg.data[2] = exo_data->left_side.ankle.controller.filtered_torque_reading;
-            rx_msg.data[3] = exo_data->left_side.ankle.controller.ff_setpoint;
-            rx_msg.data[4] = exo_data->right_side.hip.controller.ff_setpoint;
-            rx_msg.data[5] = exo_data->right_side.percent_gait / 100;
-            rx_msg.data[6] = exo_data->left_side.hip.controller.ff_setpoint;
-            rx_msg.data[7] = exo_data->left_side.percent_gait / 100;
-            rx_msg.data[8] = exo_data->right_side.toe_fsr;
-            rx_msg.data[9] = exo_data->left_side.toe_fsr;
-			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
-			break;
-		}
-
-        case (uint8_t)config_defs::exo_name::bilateral_hip_elbow:
-		{
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_HIP_ELBOW_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.elbow.controller.filtered_torque_reading;
-            rx_msg.data[1] = exo_data->right_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[2] = exo_data->left_side.elbow.controller.filtered_torque_reading;
-            rx_msg.data[3] = exo_data->left_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[4] = exo_data->right_side.hip.controller.ff_setpoint;
-            rx_msg.data[5] = exo_data->right_side.percent_gait / 100;
-            rx_msg.data[6] = exo_data->left_side.hip.controller.ff_setpoint;
-            rx_msg.data[7] = exo_data->left_side.percent_gait / 100;
-            rx_msg.data[8] = exo_data->right_side.elbow.controller.FlexSense;
-            rx_msg.data[9] = exo_data->left_side.elbow.controller.FlexSense;
-			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
-			break;
-		}
-
-        case (uint8_t)config_defs::exo_name::bilateral_ankle_elbow:
-		{
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_ELBOW_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading;
-            rx_msg.data[1] = exo_data->right_side.ankle.controller.ff_setpoint;
-            rx_msg.data[2] = exo_data->left_side.ankle.controller.filtered_torque_reading;
-            rx_msg.data[3] = exo_data->left_side.ankle.controller.ff_setpoint;
-            rx_msg.data[4] = exo_data->right_side.elbow.controller.filtered_torque_reading;
-            rx_msg.data[5] = exo_data->right_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[6] = exo_data->left_side.elbow.controller.filtered_torque_reading;
-            rx_msg.data[7] = exo_data->left_side.elbow.controller.filtered_setpoint;
-            rx_msg.data[8] = exo_data->right_side.toe_fsr;
-            rx_msg.data[9] = exo_data->left_side.toe_fsr;
-			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
-			break;
-		}
-
-        default:
-		{
-            rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.ankle.controller.filtered_torque_reading;             //First Tab - Top Blue Line
-            rx_msg.data[1] = exo_data->right_side.ankle.controller.ff_setpoint;                         //First Tab - Top Orange Line
-            rx_msg.data[2] = exo_data->left_side.ankle.controller.filtered_torque_reading;              //First Tab - Bottom Blue Line
-            rx_msg.data[3] = exo_data->left_side.ankle.controller.ff_setpoint;                          //First Tab - Bottom Orange Line
-            rx_msg.data[4] = exo_data->right_side.toe_stance;                                           //Second Tab - Top Blue Line
-            rx_msg.data[5] = exo_data->right_side.toe_fsr;                                              //Second Tab - Top Orange Line
-            rx_msg.data[6] = exo_data->left_side.toe_stance;                                            //Second Tab - Bottom Blue Line
-            rx_msg.data[7] = exo_data->left_side.toe_fsr;                                               //Second Tab - Bottom Orange Line
-            rx_msg.data[8] = exo_data->right_side.heel_fsr;                                             //Not Plotted, Saved
-            rx_msg.data[9] = exo_data->left_side.heel_fsr;                                              //Not Plotted, Saved
-
-			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
-			break;
-		}
+            switch(data_entries[i].type)
+            {
+                case TYPE_FLOAT:
+                    rx_msg.data[i] = *(float*)data_entries[i].value;
+                    break;
+                case TYPE_INT:
+                    rx_msg.data[i] = (float)(*(int*)data_entries[i].value);
+                    break;
+                case TYPE_BOOL:
+                    rx_msg.data[i] = (*(bool*)data_entries[i].value) ? 1.0f : 0.0f;
+                    break;
+            }
         }
 
         #if REAL_TIME_I2C
@@ -485,6 +588,7 @@ namespace UART_command_handlers
         #else
         handler->UART_msg(rx_msg);
         #endif
+        
 
         //Serial.print("RX_Message: ");
         //UART_msg_t_utils::print_msg(rx_msg);
@@ -500,6 +604,7 @@ namespace UART_command_handlers
         uint8_t empty_config[ini_config::number_of_keys] = {0};
         get_real_time_data(handler, exo_data, msg, empty_config);
     }
+
 
     inline static void update_real_time_data(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
     {

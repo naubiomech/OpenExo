@@ -10,9 +10,10 @@
 
 #define EXOBLE_DEBUG 0
 
-ExoBLE::ExoBLE()
+ExoBLE::ExoBLE(ExoData* data, uint8_t config_to_send)
 {
-    ;
+    _data = data;
+    _config_to_send = config_to_send;  // Fix: was assigning to parameter instead of member ??? Elliot we need an explanation for this comment
 }
 
 bool ExoBLE::setup()
@@ -129,6 +130,11 @@ void ExoBLE::advertising_onoff(bool onoff)
     }
 }
 
+/**
+ * @brief Handles BLE updates such as polling and connection status
+ * @return 
+ * Dynamic Parameter Code (included)
+ */
 bool ExoBLE::handle_updates()
 {
     #if EXOBLE_DEBUG
@@ -174,6 +180,17 @@ bool ExoBLE::handle_updates()
         //The BLE connection status changed
         if (current_status < _connected)
         {
+            _data->connected = false;
+            _data->first_pass = true;
+            _data->acknowledgedPacket = false;
+            _data->plotting_param_recieved = false;
+            _data->real_time_active = false;
+            _data->current_sent_index = 0;
+            _data->controller_param_recieved =  false;
+            _data->initial_handshake_recieved = false;
+            _data->ackIndex = 0;
+
+            Serial.println("DISCONNECTION");
             //Disconnection
             #if EXOBLE_DEBUG
                 logger::print("Disconnection");
@@ -182,6 +199,8 @@ bool ExoBLE::handle_updates()
         }
         else if (current_status > _connected)
         {
+            _data->connected = true;
+            Serial.println("CONNECTION");
             //Connection
             #if EXOBLE_DEBUG
                 logger::print("Connection");
@@ -202,6 +221,118 @@ bool ExoBLE::handle_updates()
     return ble_queue::size();
 }
 
+/**
+ * @brief sends a string message over BLE
+ * @param msg BleMessage to send
+ * @param msg_text string to send
+ * Dynamic Parameter Code
+ */
+void ExoBLE::send_message_w_string(BleMessage &msg, const char* msg_text)
+{
+    if (!this->_connected)
+    {
+        return; /* Don't bother sending anything if no one is listening */
+    }
+    #if EXOBLE_DEBUG
+        BleMessage::print(msg);
+    #endif
+
+    static const int k_preamble_length = 3;
+    int max_payload_length = ((k_preamble_length + msg.expecting) * (MAX_PARSER_CHARACTERS + 1));
+    byte buffer[max_payload_length];
+
+    int bytes_to_send = _ble_parser.package_raw_data(buffer, msg);
+
+    _gatt_db.TXChar.writeValue(msg_text, false);
+}
+
+/**
+ * @brief Sends the initial plotting parameter names over BLE
+ * Dynamic Parameter Code
+ */
+void ExoBLE::send_initial_plotting_parameter_names()
+{
+        // Add timer logic here
+    static unsigned long first_connect_start_time = 0;
+    static bool timer_started = false;
+    
+    UART_msg_t msg; // make a message  so we can properly call get_real_time_data, this msg is currently blank
+    UARTHandler* handler = UARTHandler::get_instance();
+
+    UART_command_handlers::initialize_parameter_names(_data, _data->config, handler, msg);
+    static const int num_entries = UART_command_handlers::num_entries;
+    Serial.println("Inside initial parameter send");
+    
+    static unsigned int timer = 0;
+    static bool timerStarted = false;
+    static const int SEND_TIMER = 10;
+    static bool plotting_param_sent = false;
+
+    if(!timerStarted)
+    {
+        timerStarted = true;
+        timer = millis();
+    }
+
+    //for each entry in the param_names_arr, send the name to the GUI individually
+    if(!plotting_param_sent) //millis() - timer >= SEND_TIMER)
+    {
+
+        Serial.print(_data->current_sent_index);
+        Serial.print(": ");
+        std::string param_name = UART_command_handlers::param_names_arr[_data->current_sent_index];
+        Serial.println(param_name.c_str());
+        int success = _gatt_db.TXChar.writeValue(param_name.c_str());
+        // CRITICAL: Add delay between messages
+        delay(10); // 50ms delay between each parameter name
+
+        // Optional: Add BLE.poll() to process the transmission
+        BLE.poll();
+        
+        // reset timer
+        timer = millis();
+
+        _data->current_sent_index++;
+    }
+
+    if(_data->current_sent_index == UART_command_handlers::num_entries)
+    {
+    std::string end_str = "END"; //marks the end of the parameter names list
+    _gatt_db.TXChar.writeValue(end_str.c_str());
+    }
+}
+
+/**
+ * @brief Sends the initial controller parameters over BLE
+ * Dynamic Parameter Code
+ */
+void ExoBLE::send_initial_controller_parameters() 
+{
+
+    //Use controllerData class to send controller parameters
+    std::string key_char = "!";
+    _data->left_side.hip.controller.write_parameter_names(_gatt_db, key_char);
+    std::string end_key = "!END";
+    _gatt_db.TXChar.writeValue(end_key.c_str());
+}
+
+/**
+ * @brief Sends an initial handshake message over BLE
+ * Dynamic Parameter Code
+ */
+void ExoBLE::send_initial_handshake()
+{
+    std::string handshake_string = "handshake"; // Make global constant later, handshake delimiter
+    _gatt_db.TXChar.writeValue(handshake_string.c_str());
+
+    BLE.poll();
+}
+
+/**
+ * @brief sends a BLE message over BLE
+ * @param msg BleMessage to send
+ * Dynamic Parameter Code
+ */
 void ExoBLE::send_message(BleMessage &msg)
 {
     if (!this->_connected)
