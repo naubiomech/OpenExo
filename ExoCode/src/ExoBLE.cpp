@@ -283,8 +283,6 @@ void ExoBLE::send_initial_plotting_parameter_names()
         std::string param_name = UART_command_handlers::param_names_arr[_data->current_sent_index];
         Serial.println(param_name.c_str());
         int success = _gatt_db.TXChar.writeValue(param_name.c_str());
-        // CRITICAL: Add delay between messages
-        delay(10); // 50ms delay between each parameter name
 
         // Optional: Add BLE.poll() to process the transmission
         BLE.poll();

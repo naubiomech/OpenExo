@@ -4,7 +4,7 @@
    P. Stegall Jan 2022
 */  
 
-//Teensy Operation
+//Teensy Operation`
 #if defined(ARDUINO_TEENSY36) | defined(ARDUINO_TEENSY41)
 
 //UNCOMMENT TO UTILIZE

@@ -168,6 +168,18 @@ class ExoData
         int knee_torque_flag = 0;   /**< Flag to determine if we want to use torque sensor for that joint */
         int ankle_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
         int elbow_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
+
+        bool connected = false;
+        bool first_pass = true;
+        bool acknowledgedPacket = false;
+        bool plotting_param_recieved = false;
+        bool real_time_active = false;
+        int current_sent_index = 0;
+        bool controller_param_recieved =  false;
+        bool initial_handshake_recieved = false;
+        // This acknowledgement index keeps track of plotting parameter process
+        // function inside of ble_commands
+        int ackIndex = 0;
 		
         private:
         uint16_t _status;           /**< Status of the system*/

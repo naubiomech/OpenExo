@@ -19,9 +19,10 @@
 /**
  * Dynamic Parameter Code
  */
-#include <stdint.h>
-#include <string> 
-#include <unordered_map> 
+ #include <stdint.h>
+ #include <string> 
+ #include <vector>
+ #include <unordered_map>
 
 #include "GattDb.h" 
 

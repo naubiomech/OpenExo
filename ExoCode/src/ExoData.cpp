@@ -499,6 +499,5 @@ void ExoData::print()
             logger::println(right_side.elbow.controller.parameter_set);
         }
     }
-   
 };
 

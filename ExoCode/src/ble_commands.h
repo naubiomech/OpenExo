@@ -50,6 +50,7 @@ namespace ble_names
     static const char motors_off        = 'w';
     static const char mark              = 'N';
     static const char update_param      = 'f';
+    static const char send_initial_handshake = '$';
 
     //Sending Commands (Firmware->GUI)
     static const char send_real_time_data = '?';
@@ -83,6 +84,7 @@ namespace ble
         {ble_names::new_fsr,            2},
         {ble_names::new_trq,            4},
         {ble_names::update_param,       4},
+        {ble_names::send_initial_handshake, 0},
         
         //Sending Commands
         {ble_names::send_batt,              1},
@@ -434,7 +436,42 @@ namespace ble_handlers
 		Serial.print(tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE]);
 		#endif
     }
+     
+    inline static void send_initial_handshake(ExoData* data)
+     {
+        Serial.println("Info recieved from python");
+        data->acknowledgedPacket = true;
 
+        // determine which stage of acknowledged packets we are in
+
+        // first stage - handshake
+        if(data->ackIndex == 0)
+        {
+            data->initial_handshake_recieved = true;
+                    
+            // reset the packet acknowledge
+            data->acknowledgedPacket = false;
+        }
+
+        // second stage - plotting parameters
+        else if(data->ackIndex == 1)
+        {
+            data->plotting_param_recieved = true;
+
+            // reset the packet acknowledge
+            data->acknowledgedPacket = false;
+        }
+
+        // third stage - controller parameters
+        else if(data->ackIndex == 2)
+        {
+            data->controller_param_recieved = true;\
+
+            // reset the packet acknowledge
+            data->acknowledgedPacket = false;
+        }
+        data->ackIndex++;
+     }
 }
 
 #endif

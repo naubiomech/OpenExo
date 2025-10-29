@@ -34,7 +34,7 @@ class ExoBLE
          * 
          * @param data A reference to the ExoData object
          */
-        ExoBLE();
+         ExoBLE(ExoData* data, uint8_t config_to_send);
         
         /**
          * @brief Sets GATT DB, device name, and begins advertising. 
