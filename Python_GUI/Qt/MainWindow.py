@@ -294,22 +294,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_save_csv(self):
         try:
             if self._csv_file is None:
-                # Start logging
-                fname, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save CSV", "", "CSV Files (*.csv)")
-                if not fname:
-                    return
-                try:
-                    self._csv_file = open(fname, "w", newline="")
-                    self._csv_writer = csv.writer(self._csv_file)
-                    self._csv_header_written = False
-                    self._t0 = None
-                    try:
-                        self.scan_page.status.setText(f"Logging to {fname}")
-                    except Exception:
-                        pass
-                except Exception:
-                    self._csv_file = None
-                    self._csv_writer = None
+                # Start logging automatically to Qt/Saved_Data
+                self._start_csv_auto()
             else:
                 # Stop logging
                 try:
@@ -422,7 +408,8 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
 
     def _start_csv_auto(self):
-        base_dir = os.path.dirname(os.path.dirname(__file__))  # Python_GUI
+        # Save within Qt/Saved_Data
+        base_dir = os.path.dirname(__file__)  # Python_GUI/Qt
         save_dir = os.path.join(base_dir, "Saved_Data")
         try:
             os.makedirs(save_dir, exist_ok=True)
