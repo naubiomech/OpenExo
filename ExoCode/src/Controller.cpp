@@ -170,7 +170,7 @@ float _Controller::_pid(float cmd, float measurement, float p_gain, float i_gain
 {	
 	// Disable pid for torque control if the torque sensor isn't calibrated
 	if (_joint_data->torque_offset_reading == 0) {
-		Serial.print("\nTorque sensor not calibrated. Closed-loop torque control disabled."
+		Serial.print("\nTorque sensor not calibrated. Closed-loop torque control disabled.");
 		return cmd;
 	}
     //Check if time is ok
