@@ -57,7 +57,8 @@ class RtBridge(QtCore.QObject):
             return
 
         # Parameter names first, plain strings until END
-        if self._handshake and self._collecting_names and "c" not in s and not s.startswith("!"):
+        # Accept all lines (including those containing the letter 'c'); only exclude controller-prefixed lines
+        if self._handshake and self._collecting_names and not s.startswith("!"):
             if s == "END":
                 self._collecting_names = False
                 if self._names:
