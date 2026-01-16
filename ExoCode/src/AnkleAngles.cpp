@@ -69,5 +69,3 @@ float AnkleAngles::_update_population_statistics(const float new_value)
 
 
 #endif
-
-//JacksonPracticeSourceTreeComment 
