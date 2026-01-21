@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <utility>
 
-#include <Adafruit_INA260.h>
+//#include <Adafruit_INA260.h>
 
 /**
  * @brief This class defines the interface for controllers.  
@@ -454,7 +454,7 @@ class SPV2 : public _Controller
 public:
     SPV2(config_defs::joint_id id, ExoData* exo_data);
     ~SPV2() {};
-	Adafruit_INA260 ina260 = Adafruit_INA260();
+	//Adafruit_INA260 ina260 = Adafruit_INA260(); //SPV2 inherent INA260 use depreciated 
 
     float calc_motor_cmd();
 

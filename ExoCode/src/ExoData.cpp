@@ -192,12 +192,14 @@ float ExoData::get_batt_info(uint8_t batt_info_type)
 			switch (batt_info_type)
 			{
 				case 0:
+                {
 				float battery_voltage = 0.001 * ina260.readBusVoltage();
 				if (battery_voltage < CRITICAL_BATT_VAL) {
 					return -1;
 				}
 				return battery_voltage;
 				break;
+                }
 				case 1:
 				{
 				float battery_power = 0.001 * ina260.readPower();
@@ -208,32 +210,40 @@ float ExoData::get_batt_info(uint8_t batt_info_type)
 				break;
 				}
 				default:
+                {
 				battery_voltage = 0.001 * ina260.readBusVoltage();
 				if (battery_voltage < CRITICAL_BATT_VAL) {
 					return -1;
 				}
 				return battery_voltage;
+                }
 			}
 		#elif BATTERY_SENSOR == 219
 			switch (batt_info_type)
 			{
 				case 0:
+                {
 				float battery_voltage = ina219.getBusVoltage_V();
 				if (battery_voltage < CRITICAL_BATT_VAL) {
 					return -1;
 				}
 				return battery_voltage;
 				break;
+                }
 				case 1:
+                {
 				float battery_power = 0.001 * ina219.getPower_mW();
 				return battery_power;
 				break;
+                }
 				default:
-				battery_voltage = ina219.getBusVoltage_V();
+                {
+				float battery_voltage = ina219.getBusVoltage_V();
 				if (battery_voltage < CRITICAL_BATT_VAL) {
 					return -1;
 				}
 				return battery_voltage;
+                }
 			}
 		#elif BATTERY_SENSOR == 3
 			float _sense_pin_volt = 3.3 * analogRead(logic_micro_pins::volt_sense) / 4095;
