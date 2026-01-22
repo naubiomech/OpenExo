@@ -360,8 +360,8 @@
                 //FSR Pins
                 const unsigned int fsr_sense_left_heel_pin = A14;
                 const unsigned int fsr_sense_left_toe_pin = A15;
-                const unsigned int fsr_sense_right_heel_pin= A16;
-                const unsigned int fsr_sense_right_toe_pin = A17;
+                const unsigned int fsr_sense_right_heel_pin= A3;
+                const unsigned int fsr_sense_right_toe_pin = A2;
                 
                 //Torque Sensor Pins
                 const unsigned int num_available_joints = 2;
@@ -369,7 +369,7 @@
 				const unsigned int torque_sensor_left[] = {A16};
                 //const unsigned int torque_sensor_left1 = A16;
                 //const unsigned int torque_sensor_right[] = {A6, A7};
-				const unsigned int torque_sensor_right[] = {A15};
+				const unsigned int torque_sensor_right[] = {A6};
                 //const unsigned int torque_sensor_right1 = A8;
                 
                 
@@ -432,8 +432,8 @@
                 
                 const unsigned int speed_check_pin = 33;
 				
-				const unsigned int left_ankle_angle_pin = A14;
-                const unsigned int right_ankle_angle_pin = A14;
+				const unsigned int left_ankle_angle_pin = A13;
+                const unsigned int right_ankle_angle_pin = A12;
             #endif
             
             const unsigned int motor_enable_on_state = HIGH;
