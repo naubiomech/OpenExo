@@ -211,7 +211,7 @@ float ExoData::get_batt_info(uint8_t batt_info_type)
 				}
 				default:
                 {
-				battery_voltage = 0.001 * ina260.readBusVoltage();
+				float battery_voltage = 0.001 * ina260.readBusVoltage();
 				if (battery_voltage < CRITICAL_BATT_VAL) {
 					return -1;
 				}
