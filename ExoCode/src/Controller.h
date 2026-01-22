@@ -383,6 +383,10 @@ public:
     float flag_time;
     float change_time;
 
+    
+    float time_elapsed; //for modified sine controller 
+    float dt; //for modified sine controller 
+
     float calc_motor_cmd();         /* Function that calculates the motor command. */
 
 };

@@ -66,6 +66,8 @@ class TorqueSensor
         float _calibration;                 /**< Stores the value used for calibration. This is a zero torque offset*/
 		float _calibrated_reading;          /**< Torque value with offset applied */
         float _calibrated_reading_microSD;	/**< Torque value with offset (pulled from the SD Card) applied */
+        float _voltage_reading;
+        float _voltage_reading_microSD;
 		
         const uint16_t _cal_time = 1000;    /**< The time to do the initial calibration in ms*/  
         uint16_t _start_time;               /**< Time the calibration starts. */   

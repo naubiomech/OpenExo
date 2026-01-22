@@ -135,8 +135,10 @@ float TorqueSensor::read()
     //Reads the raw value from the torque sensor
     _raw_reading = analogRead(_pin);
 
+    _voltage_reading = (((float)_raw_reading * torque_calibration::AI_CNT_TO_V) - _calibration);
+
     //Adjusts the torque sensor value based on the reading obtained during calibration
-    _calibrated_reading = (((float)_raw_reading * torque_calibration::AI_CNT_TO_V) - _calibration) * torque_calibration::TRQ_V_TO_NM;
+    _calibrated_reading = (_voltage_reading * torque_calibration::TRQ_V_TO_NM);
 
     #ifdef TORQUE_DEBUG
         logger::print("TorqueSensor :: Read : pin ");
@@ -166,12 +168,43 @@ float TorqueSensor::readOffset()
     return _calibration;
 };
 	
+/*
 float TorqueSensor::read_microSD(float _calibration_microSD)
 {
     _raw_reading = analogRead(_pin);
 
     //Torque value calculated based on the offset pulled from the SD card
     _calibrated_reading_microSD = (((float)_raw_reading * torque_calibration::AI_CNT_TO_V) - _calibration_microSD) * torque_calibration::TRQ_V_TO_NM;
+    return _calibrated_reading_microSD;
+};
+*/
+
+float TorqueSensor::read_microSD(float _calibration_microSD)
+{
+    _raw_reading = analogRead(_pin);
+
+     //Torque (in voltage) value calculated based on the offset pulled from the SD card
+   // _voltage_reading_microSD = (((float)_raw_reading * torque_calibration::AI_CNT_TO_V) -1.2264);
+    _voltage_reading_microSD = (((float)_raw_reading * torque_calibration::AI_CNT_TO_V) -_calibration_microSD);
+    //Serial.print("calibration:");
+//Serial.println(_calibration_microSD);
+//Serial.print("voltage_reading:");
+//Serial.println( _voltage_reading_microSD);
+
+
+    //Adjusts the torque sensor value based on the reading obtained during calibration
+if (_voltage_reading_microSD <= 0) {
+    _calibrated_reading_microSD = (_voltage_reading_microSD * torque_calibration::TRQ_V_TO_NM_ng);
+    } else {
+    _calibrated_reading_microSD = (_voltage_reading_microSD * torque_calibration::TRQ_V_TO_NM_ps);
+    }
+
+    // Print calibrated torque
+   // Serial.print("Torque: ");
+    //Serial.println(_calibrated_reading_microSD);
+
+    //Torque value calculated based on the offset pulled from the SD card
+  //  _calibrated_reading_microSD = (((float)_raw_reading * torque_calibration::AI_CNT_TO_V) - _calibration_microSD) * torque_calibration::TRQ_V_TO_NM;
     return _calibrated_reading_microSD;
 };
 

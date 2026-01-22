@@ -1463,6 +1463,8 @@ float Chirp::calc_motor_cmd()
 
 //****************************************************
 
+/*
+//Original step controller commented out to allow for modified step controller with sine wave to test hip exo modified controller 
 Step::Step(config_defs::joint_id id, ExoData* exo_data)
     : _Controller(id, exo_data)
 {
@@ -1616,6 +1618,172 @@ float Step::calc_motor_cmd()
 
     return cmd;
 }
+*/
+// end of old step controller and beginning of modified one 
+
+Step::Step(config_defs::joint_id id, ExoData* exo_data)
+    : _Controller(id, exo_data)
+{
+#ifdef CONTROLLER_DEBUG
+    Serial.println("Step::Step");
+#endif
+
+    //Initializes Values
+    n = 1;
+    start_flag = 1;
+    start_time = 0;
+    cmd_ff = 0;
+    end_time = 0;
+
+    previous_command = 0;
+    previous_torque_reading = 0;
+    flag = 0;
+    difference = 0;
+    turn = 0;
+    flag_time = 0;
+    change_time = 0;
+
+    time_elapsed = 0.0;
+    dt = 0.001;
+}
+
+float Step::calc_motor_cmd()
+{
+   
+    float Amplitude = _controller_data->parameters[controller_defs::step::amplitude_idx];           //Magnitude of Step Response
+    float Frequency = _controller_data->parameters[controller_defs::step::duration_idx];             //Duration of Step Response %changed to Frequency in sine wave
+    int Repetitions = _controller_data->parameters[controller_defs::step::repetitions_idx];         //Number of Step Responses
+    float Spacing = _controller_data->parameters[controller_defs::step::spacing_idx];               //Time Between Each Step Response
+
+//    float tt = 0;
+
+//    if (n <= Repetitions)                                          //If we are less than the number of desired repetitions
+//    {
+//       if (start_flag == 1)                                        //If this is the start of this loop
+//        {
+//            start_time = millis();                                  //Record the start time
+//            start_flag = 0;                                         //Set the flag so that we don't continue to record start time
+//        }
+
+//        float current_time = millis();                              //Measure the current time
+
+//        tt = (current_time - start_time) / 1000;                    //Determine the time since the begining of the control iteration, converted to seconds
+
+//        if (tt <= Duration)                                         //If the time is less than the desired duration of the step
+//        {
+//            cmd_ff = Amplitude;                                     //Apply a torque at the desired magnitude
+//        }
+//        else
+//        {
+//            cmd_ff = 0;                                             //Set the torque to 0
+
+//            if (previous_time <= Duration && tt > Duration)         //Calculate the time that the amplitude ended
+//            {
+//                end_time = millis();
+//            }
+
+//            if (((current_time - end_time)/1000) >= Spacing)        //If the time since ending the step has exceeded our desired spacing
+//            {
+//                n = n + 1;                                          //Update the iteration count
+//                start_flag = 1;                                     //Update the start flag to get a new start time and begin a new cycle
+//            }
+//        }
+
+//        previous_time = tt;                                         //Record time to be used as previous time in next loop.
+
+//    }
+//     else
+//     {
+//        cmd_ff = 0;
+//    }
+
+    //Real-Time Torque Filtering if Using Torque Transducer
+    //if (cmd_ff != previous_command)
+    //{
+    //    flag = 1;
+    //    difference = cmd_ff - previous_command;
+    //    turn = millis();;
+    //}
+
+    //if (difference > 0)
+    //{
+    //    if (flag == 1 && (previous_torque_reading >=  0.9 * cmd_ff))
+    //    {
+    //        flag = 0;
+    //    }
+    //}
+
+    //if (difference < 0)
+    //{
+    //    //if (flag == 1 && (previous_torque_reading <= (1 - 0.9) * cmd_ff))
+    //    //{
+    //    //    flag = 0;
+    //    //}
+    //}
+
+    //if (flag == 0)
+    //{
+    //    _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, (_controller_data->parameters[controller_defs::step::alpha_idx] / 100));
+    //}
+    //else
+    //{
+    //    _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, 1);
+    //}
+   
+    float cmd_ff = Amplitude * sin(2.0 * PI * Frequency *time_elapsed);
+
+     _controller_data->filtered_torque_reading = _joint_data->torque_reading;
+    //_controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, 0.5);
+    _controller_data->ff_setpoint = cmd_ff;
+
+//Serial.print("torque:");
+//Serial.println(_controller_data->filtered_torque_reading,4);
+
+    float cmd = cmd_ff;
+
+    if (_controller_data->parameters[controller_defs::step::pid_flag_idx] > 0)
+    {
+        cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::step::p_gain_idx], _controller_data->parameters[controller_defs::step::i_gain_idx], _controller_data->parameters[controller_defs::step::d_gain_idx]);
+    }
+    else
+    {
+        cmd = cmd_ff;
+    }
+
+    previous_command = cmd_ff;
+
+    previous_torque_reading = _controller_data->filtered_torque_reading;
+
+    uint16_t exo_status = _data->get_status();
+   
+    bool active_trial = (exo_status == status_defs::messages::trial_on) || (exo_status == status_defs::messages::fsr_calibration) || (exo_status == status_defs::messages::fsr_refinement);
+
+    //if (active_trial)
+    //{
+    //    if (!_joint_data->is_left)
+    //    {
+    //        Serial.print(_controller_data->ff_setpoint);
+    //        Serial.print(',');
+    //        Serial.print(100);
+    //        Serial.print("\n");
+
+    //        Serial.print(_controller_data->filtered_torque_reading);
+    //        Serial.print(',');
+    //        Serial.print(200);
+    //        Serial.print("\n");
+
+    //        Serial.print(tt*1000);
+    //        Serial.print(',');
+    //        Serial.print(300);
+    //        Serial.print("\n");
+    //    }
+    //}
+   
+    time_elapsed+=dt;
+    return cmd;
+}
+
+
 
 /*******************************/
 
