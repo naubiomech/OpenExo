@@ -13,6 +13,12 @@ try:
 except ImportError as e:
     raise SystemExit("pyqtgraph is required. Install with: pip install pyqtgraph") from e
 
+from utils import (
+    UIConfig, PlotConfig,
+    load_logo, create_separator, create_section_label,
+    apply_button_style_batch, set_size_policy_fixed_height
+)
+
 
 class ActiveTrialPage(QtWidgets.QWidget):
     """Active Trial page with two stacked real-time plots (simulated data)."""
@@ -58,47 +64,40 @@ class ActiveTrialPage(QtWidgets.QWidget):
     def _build_ui(self):
         # Main horizontal layout: left controls, right plots
         main = QtWidgets.QHBoxLayout(self)
-        main.setContentsMargins(8, 8, 8, 8)  # Add margins around the page
-        main.setSpacing(10)  # Spacing between controls and plots
+        main.setContentsMargins(UIConfig.MARGIN_PAGE, UIConfig.MARGIN_PAGE, UIConfig.MARGIN_PAGE, UIConfig.MARGIN_PAGE)
+        main.setSpacing(UIConfig.SPACING_XLARGE)
 
         # Left controls column
         controls = QtWidgets.QVBoxLayout()
-        controls.setSpacing(6)  # Consistent spacing between control elements (minimum 6px)
+        controls.setSpacing(UIConfig.SPACING_MEDIUM)
         
-        # Top row with OpenExo logo only
+        # Top row with OpenExo logo and battery
         logo_row = QtWidgets.QHBoxLayout()
         
         # OpenExo logo on left - smaller for compact layout
-        try:
-            import os
-            openexo_label = QtWidgets.QLabel()
-            base_dir = os.path.dirname(os.path.dirname(__file__))  # Qt directory
-            openexo_path = os.path.join(base_dir, "Images", "OpenExo.png")
-            openexo_pixmap = QtGui.QPixmap(openexo_path)
-            if not openexo_pixmap.isNull():
-                scaled_openexo = openexo_pixmap.scaled(140, 28, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-                openexo_label.setPixmap(scaled_openexo)
-                logo_row.addWidget(openexo_label)
-            else:
-                print(f"Failed to load OpenExo logo from: {openexo_path}")
-        except Exception as e:
-            print(f"Error loading OpenExo logo: {e}")
+        openexo_logo = load_logo(
+            "OpenExo.png",
+            UIConfig.LOGO_OPENEXO_SMALL_WIDTH,
+            UIConfig.LOGO_OPENEXO_SMALL_HEIGHT
+        )
+        if openexo_logo:
+            logo_row.addWidget(openexo_logo)
         
         logo_row.addStretch(1)
         
         # Battery level label on the right
         self.lbl_battery = QtWidgets.QLabel("Battery: --")
-        self.lbl_battery.setStyleSheet("font-size: 12pt; color: #4CAF50; font-weight: bold;")  # Green color
+        self.lbl_battery.setStyleSheet(f"font-size: {UIConfig.FONT_SMALL}pt; color: {UIConfig.COLOR_SUCCESS}; font-weight: bold;")
         self.lbl_battery.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         logo_row.addWidget(self.lbl_battery)
         
         controls.addLayout(logo_row)
-        controls.addSpacing(4)
+        controls.addSpacing(UIConfig.SPACING_SMALL)
         
         title = QtWidgets.QLabel("Active Trial")
-        f = title.font(); f.setPointSize(16); title.setFont(f)  # Larger title
+        f = title.font(); f.setPointSize(UIConfig.FONT_SUBTITLE); title.setFont(f)
         controls.addWidget(title)
-        controls.addSpacing(8)
+        controls.addSpacing(UIConfig.MARGIN_PAGE)
 
         # ═══════ PRIORITY: CRITICAL CONTROLS ═══════
         # End Trial - Big prominent button at top
@@ -106,7 +105,7 @@ class ActiveTrialPage(QtWidgets.QWidget):
         controls.addWidget(self.btn_end_trial)
         
         # Add more spacing between End Trial and Pause
-        controls.addSpacing(12)
+        controls.addSpacing(UIConfig.SPACING_XXLARGE)
         
         # Pause/Play button
         self.btn_pause_play = QtWidgets.QPushButton("Pause")
@@ -114,17 +113,12 @@ class ActiveTrialPage(QtWidgets.QWidget):
         controls.addWidget(self.btn_pause_play)
         
         # Separator
-        controls.addSpacing(10)
-        separator1 = QtWidgets.QFrame()
-        separator1.setFrameShape(QtWidgets.QFrame.HLine)
-        separator1.setStyleSheet("background-color: #555;")
-        controls.addWidget(separator1)
+        controls.addSpacing(UIConfig.SPACING_XLARGE)
+        controls.addWidget(create_separator())
         
         # ═══════ COMMON ACTIONS ═══════
-        lbl_common = QtWidgets.QLabel("Common Actions")
-        lbl_common.setStyleSheet("font-weight: bold; color: #AAA; font-size: 10pt;")
-        controls.addWidget(lbl_common)
-        controls.addSpacing(4)
+        controls.addWidget(create_section_label("Common Actions"))
+        controls.addSpacing(UIConfig.SPACING_SMALL)
         
         self.btn_update_controller = QtWidgets.QPushButton("Update Controller")
         controls.addWidget(self.btn_update_controller)
@@ -137,17 +131,12 @@ class ActiveTrialPage(QtWidgets.QWidget):
         controls.addWidget(self.btn_save_csv)
         
         # Separator
-        controls.addSpacing(10)
-        separator2 = QtWidgets.QFrame()
-        separator2.setFrameShape(QtWidgets.QFrame.HLine)
-        separator2.setStyleSheet("background-color: #555;")
-        controls.addWidget(separator2)
+        controls.addSpacing(UIConfig.SPACING_XLARGE)
+        controls.addWidget(create_separator())
         
         # ═══════ SETTINGS ═══════
-        lbl_settings = QtWidgets.QLabel("Settings")
-        lbl_settings.setStyleSheet("font-weight: bold; color: #AAA; font-size: 10pt;")
-        controls.addWidget(lbl_settings)
-        controls.addSpacing(4)
+        controls.addWidget(create_section_label("Settings"))
+        controls.addSpacing(UIConfig.SPACING_SMALL)
         
         self.btn_set_preamble = QtWidgets.QPushButton("Set CSV Prefix")
         controls.addWidget(self.btn_set_preamble)
@@ -156,17 +145,12 @@ class ActiveTrialPage(QtWidgets.QWidget):
         controls.addWidget(self.btn_toggle_points)
         
         # Separator
-        controls.addSpacing(10)
-        separator3 = QtWidgets.QFrame()
-        separator3.setFrameShape(QtWidgets.QFrame.HLine)
-        separator3.setStyleSheet("background-color: #555;")
-        controls.addWidget(separator3)
+        controls.addSpacing(UIConfig.SPACING_XLARGE)
+        controls.addWidget(create_separator())
         
         # ═══════ ADVANCED ═══════
-        lbl_advanced = QtWidgets.QLabel("Advanced")
-        lbl_advanced.setStyleSheet("font-weight: bold; color: #AAA; font-size: 10pt;")
-        controls.addWidget(lbl_advanced)
-        controls.addSpacing(4)
+        controls.addWidget(create_section_label("Advanced"))
+        controls.addSpacing(UIConfig.SPACING_SMALL)
         
         self.btn_bio_feedback = QtWidgets.QPushButton("Bio Feedback")
         controls.addWidget(self.btn_bio_feedback)
@@ -193,21 +177,33 @@ class ActiveTrialPage(QtWidgets.QWidget):
 
         # Top plot (e.g., Controller vs Measurement)
         self.plot_top = self.graph.addPlot(row=0, col=0)
-        self.plot_top.showGrid(x=True, y=True, alpha=0.3)
+        self.plot_top.showGrid(x=True, y=True, alpha=PlotConfig.GRID_ALPHA)
         self.plot_top.addLegend()
         self.plot_top.setLabel("left", "Top Signal")
         self.plot_top.setLabel("bottom", "t (s)")
-        self.curve_top_cmd = self.plot_top.plot(pen=pg.mkPen('b', width=2), name='Controller')
-        self.curve_top_meas = self.plot_top.plot(pen=pg.mkPen('r', width=2), name='Measurement')
+        self.curve_top_cmd = self.plot_top.plot(
+            pen=pg.mkPen(PlotConfig.COLOR_CONTROLLER, width=PlotConfig.CURVE_WIDTH),
+            name='Controller'
+        )
+        self.curve_top_meas = self.plot_top.plot(
+            pen=pg.mkPen(PlotConfig.COLOR_MEASUREMENT, width=PlotConfig.CURVE_WIDTH),
+            name='Measurement'
+        )
 
         # Bottom plot (e.g., additional signals)
         self.plot_bottom = self.graph.addPlot(row=1, col=0)
-        self.plot_bottom.showGrid(x=True, y=True, alpha=0.3)
+        self.plot_bottom.showGrid(x=True, y=True, alpha=PlotConfig.GRID_ALPHA)
         self.plot_bottom.addLegend()
         self.plot_bottom.setLabel("left", "Bottom Signal")
         self.plot_bottom.setLabel("bottom", "t (s)")
-        self.curve_bot_a = self.plot_bottom.plot(pen=pg.mkPen('g', width=2), name='Signal A')
-        self.curve_bot_b = self.plot_bottom.plot(pen=pg.mkPen('m', width=2), name='Signal B')
+        self.curve_bot_a = self.plot_bottom.plot(
+            pen=pg.mkPen(PlotConfig.COLOR_SIGNAL_A, width=PlotConfig.CURVE_WIDTH),
+            name='Signal A'
+        )
+        self.curve_bot_b = self.plot_bottom.plot(
+            pen=pg.mkPen(PlotConfig.COLOR_SIGNAL_B, width=PlotConfig.CURVE_WIDTH),
+            name='Signal B'
+        )
 
         # Wrap controls in a widget
         controls_widget = QtWidgets.QWidget()
@@ -233,54 +229,41 @@ class ActiveTrialPage(QtWidgets.QWidget):
         self.btn_recal_torque.clicked.connect(self.recalibrateTorqueRequested.emit)
         self.btn_mark.clicked.connect(self.markTrialRequested.emit)
 
-        # Make buttons dynamically resize with window
-        def _style(btn: QtWidgets.QPushButton):
-            f = btn.font()
-            f.setPointSize(13)  # Larger base font size for readability
-            btn.setFont(f)
-            btn.setMinimumHeight(38)  # Good button height
-            # No minimum width - let it resize with layout
-            btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-            # Use margins to ensure spacing even at smallest size
-            btn.setStyleSheet("padding: 6px 10px; margin-bottom: 2px;")  # Add bottom margin for spacing
-
-        for b in (
-            self.btn_toggle_points,
-            self.btn_end_trial,
-            self.btn_save_csv,
-            self.btn_set_preamble,
-            self.btn_update_controller,
-            self.btn_bio_feedback,
-            self.btn_ml,
-            self.btn_recal_fsr,
-            self.btn_send_preset_fsr,
-            self.btn_recal_torque,
-            self.btn_mark,
-            self.btn_pause_play,
-        ):
-            _style(b)
+        # Apply consistent button styling
+        buttons = [
+            self.btn_toggle_points, self.btn_end_trial, self.btn_save_csv,
+            self.btn_set_preamble, self.btn_update_controller, self.btn_bio_feedback,
+            self.btn_ml, self.btn_recal_fsr, self.btn_send_preset_fsr, self.btn_recal_torque,
+            self.btn_mark, self.btn_pause_play,
+        ]
+        apply_button_style_batch(buttons, height=UIConfig.BTN_HEIGHT_SMALL, padding="6px 10px")
+        
+        # Set size policy for all buttons
+        for btn in buttons:
+            set_size_policy_fixed_height(btn)
+            btn.setStyleSheet(btn.styleSheet() + " margin-bottom: 2px;")
         
         # Special styling for End Trial button - make it prominent and red
         f = self.btn_end_trial.font()
-        f.setPointSize(14)
+        f.setPointSize(UIConfig.FONT_MEDIUM)
         f.setBold(True)
         self.btn_end_trial.setFont(f)
-        self.btn_end_trial.setMinimumHeight(48)  # Taller
+        self.btn_end_trial.setMinimumHeight(UIConfig.BTN_HEIGHT_LARGE)
         self.btn_end_trial.setStyleSheet(
-            "background-color: #D32F2F; color: white; padding: 10px; "
+            f"background-color: {UIConfig.COLOR_CRITICAL}; color: white; padding: 10px; "
             "margin-bottom: 4px; font-weight: bold; border-radius: 4px;"
         )
         
         # Special styling for Pause button - make it blue
         self.btn_pause_play.setStyleSheet(
-            "background-color: #1976D2; color: white; padding: 8px; "
+            f"background-color: {UIConfig.COLOR_ACTION}; color: white; padding: 8px; "
             "margin-bottom: 4px; font-weight: bold; border-radius: 4px;"
         )
 
     def _init_state(self):
         # Fixed-size buffers for plotting (seconds-window * rate)
-        self.rate_hz = 30
-        self.window_secs = 10
+        self.rate_hz = PlotConfig.RATE_HZ
+        self.window_secs = PlotConfig.WINDOW_SECS
         self.maxlen = self.rate_hz * self.window_secs
         self.t0 = time.time()
 
@@ -319,10 +302,14 @@ class ActiveTrialPage(QtWidgets.QWidget):
         try:
             self.lbl_battery.setText(f"Battery: {voltage:.2f}V")
             # Change color if low (< 11V is typical low for 3S lipo, or 0V)
-            if voltage < 11.0:
-                self.lbl_battery.setStyleSheet("font-size: 12pt; color: #FF5252; font-weight: bold;")  # Red for low or zero
+            if voltage < UIConfig.BATTERY_LOW_VOLTAGE:
+                self.lbl_battery.setStyleSheet(
+                    f"font-size: {UIConfig.FONT_SMALL}pt; color: {UIConfig.COLOR_WARNING}; font-weight: bold;"
+                )
             else:
-                self.lbl_battery.setStyleSheet("font-size: 12pt; color: #4CAF50; font-weight: bold;")  # Green for good
+                self.lbl_battery.setStyleSheet(
+                    f"font-size: {UIConfig.FONT_SMALL}pt; color: {UIConfig.COLOR_SUCCESS}; font-weight: bold;"
+                )
         except Exception:
             pass
 

@@ -9,12 +9,13 @@ try:
 except ImportError as e:
     raise SystemExit("PySide6 is required. Install with: pip install PySide6") from e
 
-from pages.ScanPage import ScanWindowQt
-from pages.ActiveTrialPage import ActiveTrialPage
-from pages.ActiveTrialSettingsPage import ActiveTrialSettingsPage
-from pages.ActiveTrialBasicSettingsPage import ActiveTrialBasicSettingsPage
-from services.QtExoDeviceManager import QtExoDeviceManager
-from services.RtBridge import RtBridge
+from pages import (
+    ScanWindowQt,
+    ActiveTrialPage,
+    ActiveTrialSettingsPage,
+    ActiveTrialBasicSettingsPage,
+)
+from services import QtExoDeviceManager, RtBridge
 
 
 class MainWindow(QtWidgets.QMainWindow):
