@@ -2542,7 +2542,7 @@ float SPV2::calc_motor_cmd()
         logger::println("SPV2::calc_motor_cmd : stop");
     #endif
 		
-	bool servo_switch = _controller_data->parameters[controller_defs::spv2::do_use_servo];
+	bool servo_switch = _controller_data->parameters[controller_defs::spv2::do_use_servo]; //pull from the SD card whether or not to use the servo
 	// if (_controller_data->parameters[controller_defs::spv2::plantar_scaling]) {
 		// servo_switch = true;
 	// }
@@ -2550,66 +2550,66 @@ float SPV2::calc_motor_cmd()
 		// servo_switch = false;
 	// }
 	
-	if (_data->user_paused || !active_trial)
+	if (_data->user_paused || !active_trial) // if not an active trial
 	{
 		if (SD_content_imported)
 		{
-			utils::actuate_servo(27, servo_home);
+			utils::actuate_servo(27, servo_home); // make servo go home 
 		}
 	}
-	else
+	else // if active trial
     {
 		// Serial.print("  |  |  |  Battery voltage (mV): ");
 		// Serial.print(_controller_data->SPV2_current_voltage);
 		
-		if (!servo_switch)
+		if (!servo_switch) // if servo off 
         {
-			utils::actuate_servo(27, servo_home);
+			utils::actuate_servo(27, servo_home); // servo go home
 		}
 		
-		if (exo_status == status_defs::messages::fsr_refinement)
+		if (exo_status == status_defs::messages::fsr_refinement) 
 		{
 			_controller_data->SPV2_fsr_calibrated_once = true;
 		}
 		
-		if (_controller_data->SPV2_fsr_calibrated_once)
+		if (_controller_data->SPV2_fsr_calibrated_once) // if FSR calibrated 
         {
 			
 			
                 //Servo movement
                 //When does the arm go DOWN?//
 				//Reset only after toe FSR drops below a threshold
-				if ((percent_grf_heel + percent_grf > servo_fsr_threshold) && (!_controller_data->servo_did_go_down))
+				if ((percent_grf_heel + percent_grf > servo_fsr_threshold) && (!_controller_data->servo_did_go_down)) // if GRF exceeds FSR threshold and servo off
                 {
-					if (servo_switch)
+					if (servo_switch) // if servo enabled
                     {
-					    _controller_data->servo_get_ready = true;
+					    _controller_data->servo_get_ready = true; 
 					    _controller_data->servo_departure_time = millis();
 					}
 				}
 
-				if (percent_grf_heel + percent_grf < servo_fsr_threshold)
+				if (percent_grf_heel + percent_grf < servo_fsr_threshold) // if GRF is under threshold
                 {
-					_controller_data->servo_did_go_down = false;
+					_controller_data->servo_did_go_down = false; // servo did not go down
 				}
 				
-				if (_controller_data->servo_get_ready)
+				if (_controller_data->servo_get_ready) // if the servo is ready 
                 {
-					if ((millis() - _controller_data->servo_departure_time) < 300)
+					if ((millis() - _controller_data->servo_departure_time) < 300)  //and time is less than 300 ms, keep servo down 
                     {
 						//Servo goes to the target position (DOWN)
 						utils::actuate_servo(27, servo_target);
-						_controller_data->servo_did_go_down = true;
+						_controller_data->servo_did_go_down = true;   // keep servo down
 					}
 					else
                     {	
-						_controller_data->servo_get_ready = false;
+						_controller_data->servo_get_ready = false; // disable servo for rest of step
 					}
 				}
-				else
+				else // servo not
                 {
 					//Servo goes back to the home position (UP)
-					utils::actuate_servo(27, servo_home);
+					utils::actuate_servo(27, servo_home); // let servo stay up 
 				}
 				
 
@@ -2640,6 +2640,7 @@ float SPV2::calc_motor_cmd()
 				Serial.print("\n******Stiffness servo angle: ");
 				Serial.print(_controller_data->SPV2_currentAngle);
 					utils::actuate_servo(26, _controller_data->SPV2_currentAngle);
+                 
 	
 				}
 				

@@ -360,8 +360,8 @@
                 //FSR Pins
                 const unsigned int fsr_sense_left_heel_pin = A14;
                 const unsigned int fsr_sense_left_toe_pin = A15;
-                const unsigned int fsr_sense_right_heel_pin= A17;
-                const unsigned int fsr_sense_right_toe_pin = A16;
+                const unsigned int fsr_sense_right_heel_pin= A16;
+                const unsigned int fsr_sense_right_toe_pin = A17;
                 
                 //Torque Sensor Pins
                 const unsigned int num_available_joints = 2;
@@ -389,7 +389,7 @@
 				const unsigned int maxon_pwm_l_bound = 655;
 				
 				//Servo motor pins
-				const unsigned int servo_pins[] = {};
+				const unsigned int servo_pins[] = {26,27};
 				
 				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
 				const unsigned int volt_sense = not_connected_pin;//Set it to 27 to use the onboard voltage sensing. Refer to Config.h and modify RESISTOR_1 and RESISTOR_2 if needed.

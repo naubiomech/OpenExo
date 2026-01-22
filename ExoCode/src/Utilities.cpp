@@ -401,6 +401,8 @@ namespace utils
 		init_servos();
 		if (servo_map.count(servo_pin) > 0) {
 			servo_map[servo_pin].write(target_angle);
+            //logger::println('Writing Angle:');
+            //logger::println(target_angle);
 		}
 	}
 	#endif
