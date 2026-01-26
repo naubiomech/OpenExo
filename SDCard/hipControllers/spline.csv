@@ -1,0 +1,6 @@
+5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,,,,,,,,,,
+15,"parameter number, the number of parameters to read per line",,,,,,,,,,,,,,
+,Parameter list for the  spline controller,,,,,,,,,,,,,,
+,Parameter order:,,,,,,,,,,,,,,
+Node1_x,Node1_y,Node2_x,Node2_y,Node3_x,Node3_y,Node4_x,Node4_y,Node5_x,Node5_y,sim %gait,1=%gait,PID Flag,P Gain,I Gain,D Gain
+0,0,25,5,50,10,75,-5,100,0,0,0,0,0,0,0
