@@ -1828,6 +1828,7 @@ float Step::calc_motor_cmd()
     else
     {
         cmd = cmd_ff;
+        Serial.print("\nCheck");
     }
 
     previous_command = cmd_ff;

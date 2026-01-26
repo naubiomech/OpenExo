@@ -467,10 +467,10 @@
 			 #if defined(ARDUINO_TEENSY41)
 				//Maxon motor Pins
 				const unsigned int maxon_err_right_pin = 37;
-				const unsigned int maxon_err_left_pin = 37;
-				const unsigned int maxon_ctrl_left_pin = not_connected_pin;
+				const unsigned int maxon_err_left_pin = 36;
+				const unsigned int maxon_ctrl_left_pin = A8; //Possibly A8
 				const unsigned int maxon_ctrl_right_pin = A9;
-				const unsigned int maxon_current_left_pin = not_connected_pin;
+				const unsigned int maxon_current_left_pin = A0; //Possibly A0
 				const unsigned int maxon_current_right_pin = A1;
 				const unsigned int maxon_pwm_neutral_val = 2048;
 				const unsigned int maxon_pwm_u_bound = 3690;
@@ -491,15 +491,15 @@
 				const unsigned int can_tx_pin = not_connected_pin;
 				
 				//FSR Pins
-				const unsigned int fsr_sense_left_heel_pin = not_connected_pin;
-				const unsigned int fsr_sense_left_toe_pin = not_connected_pin;
+				const unsigned int fsr_sense_left_heel_pin = 38; //38
+				const unsigned int fsr_sense_left_toe_pin = 39; //39
 				const unsigned int fsr_sense_right_heel_pin= 17;
 				const unsigned int fsr_sense_right_toe_pin = 16;
 				
 				//Torque Sensor Pins (This will need to be updated/fixed)
 				const unsigned int num_available_joints = 2;
 				//const unsigned int torque_sensor_left[] = {A16, A17};
-				const unsigned int torque_sensor_left[] = {A6};
+			    const unsigned int torque_sensor_left[] = {A16}; //used to be A6 now A16
 				//const unsigned int torque_sensor_left1 = A16;
 				//const unsigned int torque_sensor_right[] = {A6, A7};
 				const unsigned int torque_sensor_right[] = {A6};
