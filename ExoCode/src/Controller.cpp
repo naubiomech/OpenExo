@@ -2524,12 +2524,12 @@ float SPV2::calc_motor_cmd()
 
 		if (cmd_ff < -0.5)
         {
-			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
+			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading,  _controller_data->parameters[controller_defs::spv2::kp],  _controller_data->parameters[controller_defs::spv2::ki],  _controller_data->parameters[controller_defs::spv2::kd]);
 			// cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 		}
 		else
         {
-			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 80 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]); // less jittery during zero-torque mode
+			cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading,  _controller_data->parameters[controller_defs::spv2::kp],  _controller_data->parameters[controller_defs::spv2::ki],  _controller_data->parameters[controller_defs::spv2::kd]); // less jittery during zero-torque mode
 			// cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 10 * _controller_data->parameters[controller_defs::spv2::kp], 0 * _controller_data->parameters[controller_defs::spv2::ki], 20 * _controller_data->parameters[controller_defs::spv2::kd]);
 		}
 	
@@ -2554,7 +2554,8 @@ float SPV2::calc_motor_cmd()
 	{
 		if (SD_content_imported)
 		{
-			utils::actuate_servo(27, servo_home); // make servo go home 
+			utils::actuate_servo(27, servo_home); // make servo go home
+            _controller_data->clutch_command=servo_home; 
 		}
 	}
 	else // if active trial
@@ -2565,6 +2566,7 @@ float SPV2::calc_motor_cmd()
 		if (!servo_switch) // if servo off 
         {
 			utils::actuate_servo(27, servo_home); // servo go home
+            _controller_data->clutch_command=servo_home;
 		}
 		
 		if (exo_status == status_defs::messages::fsr_refinement) 
@@ -2599,6 +2601,7 @@ float SPV2::calc_motor_cmd()
                     {
 						//Servo goes to the target position (DOWN)
 						utils::actuate_servo(27, servo_target);
+                        _controller_data->clutch_command=servo_target;
 						_controller_data->servo_did_go_down = true;   // keep servo down
 					}
 					else
@@ -2609,7 +2612,8 @@ float SPV2::calc_motor_cmd()
 				else // servo not
                 {
 					//Servo goes back to the home position (UP)
-					utils::actuate_servo(27, servo_home); // let servo stay up 
+					utils::actuate_servo(27, servo_home); // let servo stay up
+                    _controller_data->clutch_command=servo_home; 
 				}
 				
 
@@ -2639,7 +2643,7 @@ float SPV2::calc_motor_cmd()
 					
 				Serial.print("\n******Stiffness servo angle: ");
 				Serial.print(_controller_data->SPV2_currentAngle);
-					utils::actuate_servo(26, _controller_data->SPV2_currentAngle);
+					utils::actuate_servo(26, _controller_data->SPV2_currentAngle); // may be able to change this line to manually control continuous stiffness
                  
 	
 				}
@@ -2658,6 +2662,7 @@ float SPV2::calc_motor_cmd()
 		else {
 			//when the FSR is being calibrated, move the servo out of the way
 			utils::actuate_servo(27, servo_home);
+            _controller_data->clutch_command=servo_home;
 		}
 	}
 

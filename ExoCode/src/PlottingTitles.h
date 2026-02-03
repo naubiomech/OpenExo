@@ -33,7 +33,7 @@ inline const char* getColumnHeader(uint8_t column_index, uint8_t* config_to_send
         {
             // Inner switch: Selects the specific column name for this mode (0-based)
             switch (column_index) {
-                case 0:  return "Clutch Command";
+                case 0:  return "PWM Signal";
                 case 1:  return "Ankle Angle";
                 case 2:  return "Desired Torque (R)";
                 case 3:  return "Measured Torque (R)";

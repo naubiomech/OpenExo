@@ -457,6 +457,7 @@ public:
 	//Adafruit_INA260 ina260 = Adafruit_INA260(); //SPV2 inherent INA260 use depreciated 
 
     float calc_motor_cmd();
+    
 
 private:
 	void SPV2::_plantar_setpoint_adjuster(SideData* side_data, ControllerData* controller_data, float currentPrescription);

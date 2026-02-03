@@ -255,7 +255,8 @@ class ControllerData {
         float filtered_torque_reading;                      /**< Filtered torque reading, used for filtering torque signal */
         float filtered_cmd;                                 /**< Filtered command, used for filtering motor commands */
         float filtered_setpoint;                            /**< Filtered setpoint for the controller */
-        
+        float clutch_command;
+
         //Variables for Auto Kf in the PID Controller
         float kf = 1;                                       /**< Gain for the controller */
         float prev_max_measured = 0;                        /**< Previous max measured value */
