@@ -18,6 +18,7 @@ except Exception:
 UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 UART_TX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"  # Write
 UART_RX_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"  # Notify
+ERROR_CHAR_UUID = "33b65d43-611c-11ed-9b6a-0242ac120002"  # Notify
 
 
 class QtExoDeviceManager(QtCore.QObject):
@@ -33,6 +34,7 @@ class QtExoDeviceManager(QtCore.QObject):
     error = QtCore.Signal(str)
     log = QtCore.Signal(str)
     dataReceived = QtCore.Signal(bytes)     # raw bytes from UART RX notify
+    deviceErrorReceived = QtCore.Signal(str)  # error messages from ErrorChar notify
     scanResults = QtCore.Signal(list)       # list[(name, address)]
 
     def __init__(self, parent=None):
@@ -41,23 +43,13 @@ class QtExoDeviceManager(QtCore.QObject):
         self._client: Optional[object] = None
         self._is_connecting = False
         self._is_connected = False
+        self._error_notify_enabled = False
         # Persistent asyncio loop running in a background thread
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._loop_thread: Optional[threading.Thread] = None
         # Store last FSR values
         self._curr_left_fsr_value: float = 0.25
         self._curr_right_fsr_value: float = 0.25
-        # Joint dictionary matching legacy manager
-        self.jointDictionary = {
-            1: 33.0,
-            2: 65.0,
-            3: 34.0,
-            4: 66.0,
-            5: 36.0,
-            6: 68.0,
-            7: 40.0,
-            8: 72.0,
-        }
 
     # Public API
 
@@ -172,8 +164,23 @@ class QtExoDeviceManager(QtCore.QObject):
                                 except Exception:
                                     pass
 
+                            def _on_error(sender, data: bytearray):
+                                try:
+                                    msg = bytes(data).decode("utf-8", errors="ignore").strip("\x00").strip()
+                                    if msg:
+                                        self.deviceErrorReceived.emit(msg)
+                                except Exception:
+                                    pass
+
                             self.log.emit("Starting notifications…")
                             await client.start_notify(UART_RX_UUID, _on_rx)
+                            self._error_notify_enabled = False
+                            try:
+                                await client.start_notify(ERROR_CHAR_UUID, _on_error)
+                                self._error_notify_enabled = True
+                            except Exception as ex:
+                                self.log.emit("Error characteristic not found; continuing with UART only.")
+                                print(f"[QtExoDeviceManager] error char notify failed: {ex}")
 
                             self._client = client
                             self._is_connected = True
@@ -207,6 +214,11 @@ class QtExoDeviceManager(QtCore.QObject):
                         await self._client.stop_notify(UART_RX_UUID)
                     except Exception:
                         pass
+                    if self._error_notify_enabled:
+                        try:
+                            await self._client.stop_notify(ERROR_CHAR_UUID)
+                        except Exception:
+                            pass
                     try:
                         await self._client.disconnect()
                     except Exception:
@@ -349,25 +361,26 @@ class QtExoDeviceManager(QtCore.QObject):
                 totalLoops = 1
                 loopCount = 0
                 float_values = parameter_list
+                use_bilateral = bool(float_values[0]) if float_values else False
 
-                if float_values and bool(float_values[0]) is True:
-                    totalLoops = 2
+                mirror_val = None
+                if float_values and len(float_values) > 1 and use_bilateral:
+                    key = int(float_values[1])
+                    side_bits = key & 0x60
+                    if side_bits in (0x20, 0x40):
+                        totalLoops = 2
+                        mirror_val = key ^ 0x60
 
                 while loopCount != totalLoops:
                     await self._client.write_gatt_char(UART_TX_UUID, b"f", response=False)
 
                     for i in range(1, len(float_values)):
                         if i == 1:
-                            key = float_values[1]
-                            joint_val = self.jointDictionary.get(key)
-                            if joint_val is None:
-                                raise ValueError("Invalid joint selection")
-                            if loopCount == 1 and key % 2 == 0:
-                                val = joint_val - 32
-                            elif loopCount == 1 and key % 2 != 0:
-                                val = joint_val + 32
+                            key = int(float_values[1])
+                            if use_bilateral and mirror_val is not None:
+                                val = key if loopCount == 0 else mirror_val
                             else:
-                                val = joint_val
+                                val = key
                             float_bytes = struct.pack("<d", float(val))
                         else:
                             float_bytes = struct.pack("<d", float(float_values[i]))
@@ -559,5 +572,3 @@ class QtExoDeviceManager(QtCore.QObject):
             return False
 
     # Removed invalid get_char_handle; bleak accepts UUIDs directly
-
-

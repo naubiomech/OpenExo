@@ -43,6 +43,8 @@ class SideData {
         JointData knee;     /**< Data for the knee joint */
         JointData ankle;    /**< Data for the ankle joint */
         JointData elbow;    /**< Data for the elbow joint */
+        JointData arm_1;    /**< Data for the arm 1 joint */
+        JointData arm_2;    /**< Data for the arm 2 joint */
         
         float percent_gait;             /**< Estimate of the percent gait based on heel strike */
         float expected_step_duration;   /**< Estimate of how long the next step will take based on the most recent step times */

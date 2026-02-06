@@ -22,7 +22,7 @@ namespace ini_config
     const int buffer_length = 500;  /**< Length of the buffer for reading the file. */
     const int key_length = 25;      /**< Max length of the key name */
     const int section_length = 10;  /**< Max length of the section name */
-    const int number_of_keys = 49;  /**< Number of keys to be parsed. */
+    const int number_of_keys = 71;  /**< Number of keys to be parsed. */
 }
 
 //Reading the ini file from the SD card; 1 is the lowest value to confirm that data is present for sending over SPI
@@ -76,6 +76,7 @@ namespace config_defs
         left_ankle_elbow = 20,
         right_ankle_elbow = 21,
         test = 22,
+        bilateral_arm = 23,
     };
     
     enum class exo_side : uint8_t           //Side options
@@ -91,6 +92,8 @@ namespace config_defs
         knee = 2,
         ankle = 3,
         elbow = 4,
+        arm_1 = 5,
+        arm_2 = 6,
     };
     
     enum class motor : uint8_t              //Motor options
@@ -103,6 +106,8 @@ namespace config_defs
 		MaxonMotor = 6,
 		NullMotor = 7,
         AK60v3 = 8,
+        AK45_36 = 9,
+        AK45_10 = 10,
     };
     
     enum class gearing : uint8_t            //Gearing ratio options
@@ -116,7 +121,7 @@ namespace config_defs
     
     enum class joint_id : uint8_t           //Joint IDs
     {
-        //Byte format : [0, is_left, !is_left, unused_joint, is_elbow, is_ankle, is_knee, is_hip]
+        //Byte format : [arm_2, is_left, !is_left, arm_1, is_elbow, is_ankle, is_knee, is_hip]
         left = 0b01000000,
         right = 0b00100000,
         
@@ -124,18 +129,24 @@ namespace config_defs
         knee = 0b00000010,
         ankle = 0b00000100,
         elbow = 0b00001000,
+        arm_1 = 0b00010000,
+        arm_2 = 0b10000000,
                 
         left_hip = left|hip,                //Set Motor ID to: 65
         left_knee = left|knee,              //Set Motor ID to: 66
         left_ankle = left|ankle,            //Set Motor ID to: 68
         left_elbow = left|elbow,            //Set Motor ID to: 72
-                                            //Unused Joint ID: 80
-        
+        left_arm_1 = left|arm_1,            //Set Motor ID to: 80
+        left_arm_2 = left|arm_2,            //Set Motor ID to: 192
+                                            //Unused Joint ID: 96
+
         right_hip = right|hip,              //Set Motor ID to: 33
         right_knee = right|knee,            //Set Motor ID to: 34
         right_ankle = right|ankle,          //Set Motor ID to: 36
         right_elbow = right|elbow,          //Set Motor ID to: 40
-                                            //Unused Joint ID: 48
+        right_arm_1 = right|arm_1,          //Set Motor ID to: 48
+        right_arm_2 = right|arm_2,          //Set Motor ID to: 160
+                                            //Unused Joint ID: 56
     };
         
     enum class  hip_controllers : uint8_t   //Hip Controller IDs
@@ -148,6 +159,7 @@ namespace config_defs
         step = 6,
         phmc = 7,
 		calibr_manager = 8,
+        spline = 9,
 		
 		Count //Leave this at the end of the enum class. Count can be used to get the total number of controllers defined for this joint.
     };
@@ -177,6 +189,7 @@ namespace config_defs
         step = 9,
 		spv2 = 10,
 		pjmc_plus = 11,
+        spline = 12,
 		
 		Count //Leave this at the end of the enum class. Count can be used to get the total number of controllers defined for this joint.
     };
@@ -191,6 +204,26 @@ namespace config_defs
         step = 6,
 		
 		Count //Leave this at the end of the enum class. Count can be used to get the total number of controllers defined for this joint.
+    };
+
+    enum class arm_1_controllers : uint8_t  //Arm 1 Controller IDs
+    {
+        disabled = 1,
+        zero_torque = 2,
+        constant_torque = 3,
+        spline = 4,
+
+        Count //Leave this at the end of the enum class. Count can be used to get the total number of controllers defined for this joint.
+    };
+
+    enum class arm_2_controllers : uint8_t  //Arm 2 Controller IDs
+    {
+        disabled = 1,
+        zero_torque = 2,
+        constant_torque = 3,
+        spline = 4,
+
+        Count //Leave this at the end of the enum class. Count can be used to get the total number of controllers defined for this joint.
     };
     
     enum class use_torque_sensor : uint8_t  //Option to use or not use torque sensor for low-level control
@@ -235,54 +268,77 @@ namespace config_defs
     static const int knee_idx = 6;
     static const int ankle_idx = 7;
     static const int elbow_idx = 8;
+
+    static const int arm_1_idx = 9;
+    static const int arm_2_idx = 10;
     
-    static const int hip_gear_idx = 9;
-    static const int knee_gear_idx = 10;
-    static const int ankle_gear_idx = 11;
-    static const int elbow_gear_idx = 12;
+    static const int hip_gear_idx = 11;
+    static const int knee_gear_idx = 12;
+    static const int ankle_gear_idx = 13;
+    static const int elbow_gear_idx = 14;
+    static const int arm_1_gear_idx = 15;
+    static const int arm_2_gear_idx = 16;
     
-    static const int exo_hip_default_controller_idx = 13;
-    static const int exo_knee_default_controller_idx = 14;
-    static const int exo_ankle_default_controller_idx = 15;
-    static const int exo_elbow_default_controller_idx = 16;
+    static const int exo_hip_default_controller_idx = 17;
+    static const int exo_knee_default_controller_idx = 18;
+    static const int exo_ankle_default_controller_idx = 19;
+    static const int exo_elbow_default_controller_idx = 20;
+    static const int exo_arm_1_default_controller_idx = 21;
+    static const int exo_arm_2_default_controller_idx = 22;
     
-    static const int hip_use_torque_sensor_idx = 17;
-    static const int knee_use_torque_sensor_idx = 18;
-    static const int ankle_use_torque_sensor_idx = 19;
-    static const int elbow_use_torque_sensor_idx = 20;
+    static const int hip_use_torque_sensor_idx = 23;
+    static const int knee_use_torque_sensor_idx = 24;
+    static const int ankle_use_torque_sensor_idx = 25;
+    static const int elbow_use_torque_sensor_idx = 26;
+    static const int arm_1_use_torque_sensor_idx = 27;
+    static const int arm_2_use_torque_sensor_idx = 28;
 	
-	static const int hip_flip_motor_dir_idx = 21;
-	static const int knee_flip_motor_dir_idx = 22;
-	static const int ankle_flip_motor_dir_idx = 23;
-    static const int elbow_flip_motor_dir_idx = 24;
+	static const int hip_flip_motor_dir_idx = 29;
+	static const int knee_flip_motor_dir_idx = 30;
+	static const int ankle_flip_motor_dir_idx = 31;
+    static const int elbow_flip_motor_dir_idx = 32;
+    static const int arm_1_flip_motor_dir_idx = 33;
+    static const int arm_2_flip_motor_dir_idx = 34;
 	
-	static const int hip_flip_torque_dir_idx = 25;
-	static const int knee_flip_torque_dir_idx = 26;
-	static const int ankle_flip_torque_dir_idx = 27;
-    static const int elbow_flip_torque_dir_idx = 28;
+	static const int hip_flip_torque_dir_idx = 35;
+	static const int knee_flip_torque_dir_idx = 36;
+	static const int ankle_flip_torque_dir_idx = 37;
+    static const int elbow_flip_torque_dir_idx = 38;
+    static const int arm_1_flip_torque_dir_idx = 39;
+    static const int arm_2_flip_torque_dir_idx = 40;
 	
-	static const int hip_flip_angle_dir_idx = 29;
-	static const int knee_flip_angle_dir_idx = 30;
-	static const int ankle_flip_angle_dir_idx = 31;
-    static const int elbow_flip_angle_dir_idx = 32;
+	static const int hip_flip_angle_dir_idx = 41;
+	static const int knee_flip_angle_dir_idx = 42;
+	static const int ankle_flip_angle_dir_idx = 43;
+    static const int elbow_flip_angle_dir_idx = 44;
+    static const int arm_1_flip_angle_dir_idx = 45;
+    static const int arm_2_flip_angle_dir_idx = 46;
 	
-	static const int left_hip_RoM_idx = 33;
-	static const int right_hip_RoM_idx = 34;
-	static const int left_knee_RoM_idx = 35;
-	static const int right_knee_RoM_idx = 36;
-	static const int left_ankle_RoM_idx = 37;
-	static const int right_ankle_RoM_idx = 38;
-    static const int left_elbow_RoM_idx = 39;
-    static const int right_elbow_RoM_idx = 40;
+	static const int left_hip_RoM_idx = 47;
+	static const int right_hip_RoM_idx = 48;
+	static const int left_knee_RoM_idx = 49;
+	static const int right_knee_RoM_idx = 50;
+	static const int left_ankle_RoM_idx = 51;
+	static const int right_ankle_RoM_idx = 52;
+    static const int left_elbow_RoM_idx = 53;
+    static const int right_elbow_RoM_idx = 54;
+    static const int left_arm_1_RoM_idx = 55;
+    static const int right_arm_1_RoM_idx = 56;
+    static const int left_arm_2_RoM_idx = 57;
+    static const int right_arm_2_RoM_idx = 58;
 	
-	static const int left_hip_torque_offset_idx = 41;
-	static const int right_hip_torque_offset_idx = 42;
-	static const int left_knee_torque_offset_idx = 43;
-	static const int right_knee_torque_offset_idx = 44;
-	static const int left_ankle_torque_offset_idx = 45;
-	static const int right_ankle_torque_offset_idx = 46;
-	static const int left_elbow_torque_offset_idx = 47;
-	static const int right_elbow_torque_offset_idx = 48;
+	static const int left_hip_torque_offset_idx = 59;
+	static const int right_hip_torque_offset_idx = 60;
+	static const int left_knee_torque_offset_idx = 61;
+	static const int right_knee_torque_offset_idx = 62;
+	static const int left_ankle_torque_offset_idx = 63;
+	static const int right_ankle_torque_offset_idx = 64;
+	static const int left_elbow_torque_offset_idx = 65;
+	static const int right_elbow_torque_offset_idx = 66;
+    static const int left_arm_1_torque_offset_idx = 67;
+    static const int right_arm_1_torque_offset_idx = 68;
+    static const int left_arm_2_torque_offset_idx = 69;
+    static const int right_arm_2_torque_offset_idx = 70;
 }
 
 #if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41) 
@@ -366,6 +422,13 @@ namespace config_defs
 
         const IniKeyCode exo_name 
         { 
+            {"Ankle", (uint8_t)config_defs::exo_name::bilateral_ankle},
+            {"Hip", (uint8_t)config_defs::exo_name::bilateral_hip},
+            {"Knee", (uint8_t)config_defs::exo_name::bilateral_knee},
+            {"Elbow", (uint8_t)config_defs::exo_name::bilateral_elbow},
+            {"HipAnkle", (uint8_t)config_defs::exo_name::bilateral_hip_ankle},
+            {"HipElbow", (uint8_t)config_defs::exo_name::bilateral_hip_elbow},
+            {"AnkleElbow", (uint8_t)config_defs::exo_name::bilateral_ankle_elbow},
             {"bilateralAnkle", (uint8_t)config_defs::exo_name::bilateral_ankle}, 
             {"bilateralHip", (uint8_t)config_defs::exo_name::bilateral_hip},
             {"bilateralKnee", (uint8_t)config_defs::exo_name::bilateral_knee},
@@ -388,6 +451,8 @@ namespace config_defs
             {"leftAnkleElbow", (uint8_t)config_defs::exo_name::left_ankle_elbow},
             {"rightAnkleElbow", (uint8_t)config_defs::exo_name::right_ankle_elbow},
             {"test", (uint8_t)config_defs::exo_name::test},
+            {"Arm", (uint8_t)config_defs::exo_name::bilateral_arm},
+            {"bilateralArm", (uint8_t)config_defs::exo_name::bilateral_arm},
         };
         
         const IniKeyCode exo_side 
@@ -407,6 +472,8 @@ namespace config_defs
 			{"MaxonMotor", (uint8_t)config_defs::motor::MaxonMotor},
 			{"NullMotor", (uint8_t)config_defs::motor::NullMotor},
             {"AK60v3", (uint8_t)config_defs::motor::AK60v3},
+            {"AK45_36", (uint8_t)config_defs::motor::AK45_36},
+            {"AK45_10", (uint8_t)config_defs::motor::AK45_10},
         };
         
         const IniKeyCode gearing 
@@ -428,6 +495,7 @@ namespace config_defs
             {"step", (uint8_t)config_defs::hip_controllers::step},
             {"phmc", (uint8_t)config_defs::hip_controllers::phmc},
 			{"calibrManager", (uint8_t)config_defs::hip_controllers::calibr_manager},
+            {"spline", (uint8_t)config_defs::hip_controllers::spline},
 
         };
         
@@ -454,6 +522,7 @@ namespace config_defs
             {"step", (uint8_t)config_defs::ankle_controllers::step},
 			{"SPV2", (uint8_t)config_defs::ankle_controllers::spv2},
 			{"PJMC_PLUS", (uint8_t)config_defs::ankle_controllers::pjmc_plus},
+            {"spline", (uint8_t)config_defs::ankle_controllers::spline},
         };  
 
         const IniKeyCode elbow_controllers
@@ -464,6 +533,22 @@ namespace config_defs
             {"calibrManager", (uint8_t)config_defs::elbow_controllers::calibr_manager},
             {"chirp", (uint8_t)config_defs::elbow_controllers::chirp},
             {"step", (uint8_t)config_defs::elbow_controllers::step},
+        };
+
+        const IniKeyCode arm_1_controllers
+        {
+            {"0", (uint8_t)config_defs::arm_1_controllers::disabled},
+            {"zeroTorque", (uint8_t)config_defs::arm_1_controllers::zero_torque},
+            {"constantTorque", (uint8_t)config_defs::arm_1_controllers::constant_torque},
+            {"spline", (uint8_t)config_defs::arm_1_controllers::spline},
+        };
+
+        const IniKeyCode arm_2_controllers
+        {
+            {"0", (uint8_t)config_defs::arm_2_controllers::disabled},
+            {"zeroTorque", (uint8_t)config_defs::arm_2_controllers::zero_torque},
+            {"constantTorque", (uint8_t)config_defs::arm_2_controllers::constant_torque},
+            {"spline", (uint8_t)config_defs::arm_2_controllers::spline},
         };
         
         const IniKeyCode use_torque_sensor
@@ -514,36 +599,50 @@ namespace config_defs
         std::string exo_knee;
         std::string exo_ankle;
         std::string exo_elbow;
+        std::string exo_arm_1;
+        std::string exo_arm_2;
         
         std::string hip_gearing;
         std::string knee_gearing;
         std::string ankle_gearing;
         std::string elbow_gearing;
+        std::string arm_1_gearing;
+        std::string arm_2_gearing;
         
         std::string exo_hip_default_controller;
         std::string exo_knee_default_controller;
         std::string exo_ankle_default_controller;
         std::string exo_elbow_default_controller;
+        std::string exo_arm_1_default_controller;
+        std::string exo_arm_2_default_controller;
         
         std::string hip_use_torque_sensor;
         std::string knee_use_torque_sensor;
         std::string ankle_use_torque_sensor;
         std::string elbow_use_torque_sensor;
+        std::string arm_1_use_torque_sensor;
+        std::string arm_2_use_torque_sensor;
 		
 		std::string hip_flip_motor_dir;
         std::string knee_flip_motor_dir;
         std::string ankle_flip_motor_dir;
         std::string elbow_flip_motor_dir;
+        std::string arm_1_flip_motor_dir;
+        std::string arm_2_flip_motor_dir;
 		
 		std::string hip_flip_torque_dir;
         std::string knee_flip_torque_dir;
         std::string ankle_flip_torque_dir;
         std::string elbow_flip_torque_dir;
+        std::string arm_1_flip_torque_dir;
+        std::string arm_2_flip_torque_dir;
 		
 		std::string hip_flip_angle_dir;
         std::string knee_flip_angle_dir;
         std::string ankle_flip_angle_dir;
         std::string elbow_flip_angle_dir;
+        std::string arm_1_flip_angle_dir;
+        std::string arm_2_flip_angle_dir;
 		
 		float left_hip_RoM;
 		float right_hip_RoM;
@@ -553,6 +652,10 @@ namespace config_defs
 		float right_ankle_RoM;
         float left_elbow_RoM;
         float right_elbow_RoM;
+        float left_arm_1_RoM;
+        float right_arm_1_RoM;
+        float left_arm_2_RoM;
+        float right_arm_2_RoM;
 		
 		float left_hip_torque_offset;
 		float right_hip_torque_offset;
@@ -562,6 +665,10 @@ namespace config_defs
 		float right_ankle_torque_offset;
 		float left_elbow_torque_offset;
 		float right_elbow_torque_offset;
+        float left_arm_1_torque_offset;
+        float right_arm_1_torque_offset;
+        float left_arm_2_torque_offset;
+        float right_arm_2_torque_offset;
 		
     };
 #endif

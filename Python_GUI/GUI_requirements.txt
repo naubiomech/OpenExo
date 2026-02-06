@@ -1,4 +1,4 @@
 # Dependencies for the Qt GUI (Python_GUI/Qt)
-PySide6
-pyqtgraph
-bleak
+PySide6>=6.6.0
+pyqtgraph>=0.13.3
+bleak>=0.21.0

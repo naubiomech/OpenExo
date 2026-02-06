@@ -348,8 +348,12 @@ void ble_rx::on_rx_recieved(BLEDevice central, BLECharacteristic characteristic)
     //Must reset message to avoid duplicate data
     (*msg) = *empty_msg;
 
-    char data[32] = {0};
+    char data[255] = {0};
     int len = characteristic.valueLength();
+    if (len > (int)sizeof(data))
+    {
+        len = sizeof(data);
+    }
     characteristic.readValue(data, len);
 
         #if EXOBLE_DEBUG

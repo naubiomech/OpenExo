@@ -9,12 +9,14 @@ try:
 except ImportError as e:
     raise SystemExit("PySide6 is required. Install with: pip install PySide6") from e
 
-from pages.ScanPage import ScanWindowQt
-from pages.ActiveTrialPage import ActiveTrialPage
-from pages.ActiveTrialSettingsPage import ActiveTrialSettingsPage
-from pages.ActiveTrialBasicSettingsPage import ActiveTrialBasicSettingsPage
-from services.QtExoDeviceManager import QtExoDeviceManager
-from services.RtBridge import RtBridge
+from pages import (
+    ScanWindowQt,
+    ActiveTrialPage,
+    ActiveTrialSettingsPage,
+    ActiveTrialBasicSettingsPage,
+    BioFeedbackPage,
+)
+from services import QtExoDeviceManager, RtBridge
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -22,8 +24,8 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.setWindowTitle("OpenExo - Qt")
         # Compact default window size (resizable)
-        self.setMinimumSize(700, 400)
-        self.resize(900, 500)
+        self.setMinimumSize(776, 400)
+        self.resize(776, 400)
 
         self.stack = QtWidgets.QStackedWidget()
         self.setCentralWidget(self.stack)
@@ -33,11 +35,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.trial_page = ActiveTrialPage()
         self.settings_page = ActiveTrialSettingsPage()
         self.basic_settings_page = ActiveTrialBasicSettingsPage()
+        self.bio_feedback_page = BioFeedbackPage()
 
         self.stack.addWidget(self.scan_page)
         self.stack.addWidget(self.trial_page)
         self.stack.addWidget(self.settings_page)
         self.stack.addWidget(self.basic_settings_page)
+        self.stack.addWidget(self.bio_feedback_page)
+#     self.stack.setCurrentWidget(self.trial_page)
 
         # Simple top bar navigation
         toolbar = self.addToolBar("Nav")
@@ -113,6 +118,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings_page.cancelRequested.connect(lambda: self.stack.setCurrentWidget(self.trial_page))
         self.basic_settings_page.applyRequested.connect(self._on_apply_settings)
         self.basic_settings_page.cancelRequested.connect(lambda: self.stack.setCurrentWidget(self.trial_page))
+        self.bio_feedback_page.backRequested.connect(self._on_bio_feedback_back)
+        self.bio_feedback_page.deviceStartRequested.connect(self._on_device_start)
+        self.bio_feedback_page.deviceStopRequested.connect(self._on_device_stop_motors)
+        self.bio_feedback_page.recalibrateFSRRequested.connect(self._on_recal_fsr)
+        self.bio_feedback_page.markTrialRequested.connect(self._on_mark)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        size = self.size()
+        print(f"[MainWindow] size={size.width()}x{size.height()}")
 
     def _go_trial(self):
         self.stack.setCurrentWidget(self.trial_page)
@@ -147,6 +162,11 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             page = self.trial_page
             page.apply_values(values)
+            try:
+                if self.stack.currentWidget() == self.bio_feedback_page:
+                    self.bio_feedback_page.apply_values(values)
+            except Exception:
+                pass
             # CSV logging
             if self._csv_writer is not None:
                 if not self._csv_header_written:
@@ -323,6 +343,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.trial_page.update_mark_count(self._mark_counter)
         except Exception:
             pass
+        try:
+            self.bio_feedback_page.update_mark_count(self._mark_counter)
+        except Exception:
+            pass
 
     @QtCore.Slot()
     def _on_end_trial(self):
@@ -471,8 +495,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def _on_bio_feedback(self):
-        # Placeholder hook
-        pass
+        try:
+            self.bio_feedback_page.start_plotting()
+        except Exception:
+            pass
+        self.stack.setCurrentWidget(self.bio_feedback_page)
+
+    def _on_bio_feedback_back(self):
+        try:
+            self.bio_feedback_page.stop_plotting()
+        except Exception:
+            pass
+        self.stack.setCurrentWidget(self.trial_page)
 
     @QtCore.Slot()
     def _on_machine_learning(self):

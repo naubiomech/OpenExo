@@ -11,6 +11,8 @@ SideData::SideData(bool is_left, uint8_t* config_to_send)
 , knee((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::knee), config_to_send, is_left ? config_to_send[config_defs::left_knee_RoM_idx] : config_to_send[config_defs::right_knee_RoM_idx], config_to_send[config_defs::knee_flip_angle_dir_idx], is_left ? config_to_send[config_defs::left_knee_torque_offset_idx] : config_to_send[config_defs::right_knee_torque_offset_idx])
 , ankle((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::ankle), config_to_send, is_left ? config_to_send[config_defs::left_ankle_RoM_idx] : config_to_send[config_defs::right_ankle_RoM_idx], config_to_send[config_defs::ankle_flip_angle_dir_idx], is_left ? config_to_send[config_defs::left_ankle_torque_offset_idx] : config_to_send[config_defs::right_ankle_torque_offset_idx])
 , elbow((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::elbow), config_to_send, is_left ? config_to_send[config_defs::left_elbow_RoM_idx] : config_to_send[config_defs::right_elbow_RoM_idx], config_to_send[config_defs::elbow_flip_angle_dir_idx], is_left ? config_to_send[config_defs::left_elbow_torque_offset_idx] : config_to_send[config_defs::right_elbow_torque_offset_idx])
+, arm_1((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::arm_1), config_to_send, is_left ? config_to_send[config_defs::left_arm_1_RoM_idx] : config_to_send[config_defs::right_arm_1_RoM_idx], config_to_send[config_defs::arm_1_flip_angle_dir_idx], is_left ? config_to_send[config_defs::left_arm_1_torque_offset_idx] : config_to_send[config_defs::right_arm_1_torque_offset_idx])
+, arm_2((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::arm_2), config_to_send, is_left ? config_to_send[config_defs::left_arm_2_RoM_idx] : config_to_send[config_defs::right_arm_2_RoM_idx], config_to_send[config_defs::arm_2_flip_angle_dir_idx], is_left ? config_to_send[config_defs::left_arm_2_torque_offset_idx] : config_to_send[config_defs::right_arm_2_torque_offset_idx])
 {
     this->is_left = is_left;
     
@@ -72,5 +74,7 @@ void SideData::reconfigure(uint8_t* config_to_send)
     knee.reconfigure(config_to_send);
     ankle.reconfigure(config_to_send);
     elbow.reconfigure(config_to_send);
+    arm_1.reconfigure(config_to_send);
+    arm_2.reconfigure(config_to_send);
 };
  

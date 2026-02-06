@@ -26,11 +26,17 @@ BleMessage ble_queue::pop()
     {
         BleMessage msg = queue[m_size];
         m_size--;
+        #if defined(ARDUINO_ARDUINO_NANO33BLE) | defined(ARDUINO_NANO_RP2040_CONNECT)
+            queue_mutex.unlock();
+        #endif
         return msg;
     }
     else
     {
         logger::println("BleMessageQueue::pop_queue->No messages in Queue!", LogLevel::Warn);
+        #if defined(ARDUINO_ARDUINO_NANO33BLE) | defined(ARDUINO_NANO_RP2040_CONNECT)
+            queue_mutex.unlock();
+        #endif
         return empty_message;
     }
 
@@ -56,6 +62,9 @@ void ble_queue::push(BleMessage* msg)
     if (m_size >= (k_max_size-1))
     {
         logger::println("BleMessageQueue::push_queue->Queue Full!", LogLevel::Warn);
+        #if defined(ARDUINO_ARDUINO_NANO33BLE) | defined(ARDUINO_NANO_RP2040_CONNECT)
+            queue_mutex.unlock();
+        #endif
         return;
     }
 

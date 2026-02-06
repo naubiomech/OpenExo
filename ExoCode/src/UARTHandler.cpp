@@ -7,6 +7,15 @@
 #define UART_DATA_TYPE short int //If type is changes you will need to comment/uncomment lines in pack_float and unpack_float
 #define FIXED_POINT_FACTOR 100
 
+// Nano -> Teensy sends raw floats; Teensy -> Nano stays fixed-point ints.
+#if defined(ARDUINO_ARDUINO_NANO33BLE) || defined(ARDUINO_NANO_RP2040_CONNECT)
+#define UART_PACK_FLOATS 1
+#define UART_UNPACK_FLOATS 0
+#else
+#define UART_PACK_FLOATS 0
+#define UART_UNPACK_FLOATS 1
+#endif
+
 //Set to 1 to enable debug prints
 #define DEBUG_UART_HANDLER 0
 
@@ -159,14 +168,22 @@ void UARTHandler::_pack(uint8_t msg_id, uint8_t len, uint8_t joint_id, float *da
     data_to_pack[COMMAND] = msg_id;
     data_to_pack[JOINT_ID] = joint_id;
     
-    //Convert float array to short int array
-    uint8_t _num_bytes = sizeof(float)/sizeof(UART_DATA_TYPE);
+    //Pack payload with platform-specific encoding.
+#if UART_PACK_FLOATS
+    uint8_t _num_bytes = sizeof(float);
+#else
+    uint8_t _num_bytes = sizeof(UART_DATA_TYPE);
     uint8_t buf[_num_bytes];
+#endif
     for (int i=0; i<len; i++)
     {
-        utils::float_to_short_fixed_point_bytes(data[i], buf, FIXED_POINT_FACTOR);
         uint8_t _offset = (DATA_START) + _num_bytes*i;
+#if UART_PACK_FLOATS
+        memcpy((data_to_pack + _offset), (uint8_t*)&data[i], _num_bytes);
+#else
+        utils::float_to_short_fixed_point_bytes(data[i], buf, FIXED_POINT_FACTOR);
         memcpy((data_to_pack + _offset), buf, _num_bytes);
+#endif
     }
 }
 
@@ -177,16 +194,27 @@ UART_msg_t UARTHandler::_unpack(uint8_t* data, uint8_t len)
     msg.joint_id = data[JOINT_ID];
     float _total_len = len*sizeof(uint8_t);
     float _meta_len = sizeof(msg.command)+sizeof(msg.joint_id);
-    float _conv_factor = ((float)sizeof(UART_DATA_TYPE)/(float)sizeof(float));
-    msg.len = (_total_len - _meta_len) * _conv_factor;
+#if UART_UNPACK_FLOATS
+    float _bytes_per = sizeof(float);
+    msg.len = (uint8_t)((_total_len - _meta_len) / _bytes_per);
+#else
+    float _bytes_per = sizeof(UART_DATA_TYPE);
+    msg.len = (uint8_t)((_total_len - _meta_len) / _bytes_per);
+#endif
 
-    //Fill msg.data, converting the short ints to floats
-    for (int i=0; i<len; i++)
+    //Fill msg.data, converting the payload to floats as needed.
+    for (int i=0; i<msg.len; i++)
     {
-        uint8_t _data_offset = (DATA_START) + (i*2);
+        uint8_t _data_offset = (DATA_START) + (i * (uint8_t)_bytes_per);
+#if UART_UNPACK_FLOATS
+        float tmp = 0;
+        memcpy(&tmp, (uint8_t*)data + _data_offset, sizeof(float));
+        msg.data[i] = tmp;
+#else
         float tmp = 0;
         utils::short_fixed_point_bytes_to_float((uint8_t*)data+_data_offset, &tmp, FIXED_POINT_FACTOR);
         msg.data[i] = tmp;
+#endif
     }
 
     return msg;
@@ -195,8 +223,12 @@ UART_msg_t UARTHandler::_unpack(uint8_t* data, uint8_t len)
 uint8_t UARTHandler::_get_packed_length(uint8_t msg_id, uint8_t len, uint8_t joint_id, float *data)
 {
     uint8_t _val = 0;
+#if UART_PACK_FLOATS
+    _val += (float)len * sizeof(float);
+#else
     //We are converting from float to short int, we must multiply by the size difference
-    _val += (float)len * (sizeof(float)/sizeof(UART_DATA_TYPE));
+    _val += (float)len * sizeof(UART_DATA_TYPE);
+#endif
     _val += sizeof(msg_id);
     _val += sizeof(joint_id); 
     return _val;
