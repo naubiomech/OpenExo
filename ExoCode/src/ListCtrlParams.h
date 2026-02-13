@@ -22,7 +22,7 @@
 	// Define the size of the array and the max length for each string
 	const int MAX_COLUMNS = 30;
 	const int MAX_STRING_LENGTH = 10;
-	const int MAX_SNAPSHOTS = 2 * ((uint8_t)config_defs::ankle_controllers::Count + (uint8_t)config_defs::hip_controllers::Count + (uint8_t)config_defs::knee_controllers::Count + (uint8_t)config_defs::elbow_controllers::Count);
+	const int MAX_SNAPSHOTS = 2 * ((uint8_t)config_defs::ankle_controllers::Count + (uint8_t)config_defs::hip_controllers::Count + (uint8_t)config_defs::knee_controllers::Count + (uint8_t)config_defs::elbow_controllers::Count + (uint8_t)config_defs::arm_1_controllers::Count + (uint8_t)config_defs::arm_2_controllers::Count);
 	// Calculate the MAX size of the transmission buffer:
 	// (Max Chars per Cell + 1 comma delimiter) * MAX_COLUMNS + 
 	// (+ 1 newline character) * MAX_SNAPSHOTS + 

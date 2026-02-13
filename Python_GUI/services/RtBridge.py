@@ -101,8 +101,11 @@ class RtBridge(QtCore.QObject):
                         continue
                     prefix = parts[0].lower()
                     if prefix == 'f':
-                        # Legacy fetch command header, ignore beyond logging
-                        continue
+                        # Legacy fetch command header; keep data if the row has content.
+                        if len(parts) > 1:
+                            parts = parts[1:]
+                        else:
+                            continue
                     if prefix == 't':
                         param_names = [p.strip() for p in parts[1:] if p.strip()]
                         print(f"RtBridge::feed_bytes->Parameter names: {param_names}")
@@ -300,4 +303,3 @@ class RtBridge(QtCore.QObject):
         self._num_count = 0
         self._payload.clear()
         self._buffer.clear()
-

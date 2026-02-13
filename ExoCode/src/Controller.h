@@ -79,6 +79,9 @@ class _Controller
         float _prev_input;                  /**< Prev error term for calculating derivative */
         float _prev_de_dt;                  /**< Prev error derivative used if the timestep is not good*/
         float _prev_pid_time;               /**< Prev time the PID was called */
+
+        float _sim_gait_context = 0.0f;     /**< Timer context for simulated gait */
+        float _sim_elapsed_us = 0.0f;       /**< Accumulated simulated time */
         		
         /**
          * @brief Calculates the current PID contribution to the motor command. 
@@ -90,6 +93,13 @@ class _Controller
          * @param derivative gain
          */
         float _pid(float cmd, float measurement, float p_gain, float i_gain, float d_gain);
+
+        /**
+         * @brief Returns percent gait, optionally using a simulated 1-second cycle.
+         *
+         * @param simulate flag to use simulated percent gait
+         */
+        float _get_percent_gait(bool simulate);
 		
 		/**
          * @brief A function that returns cmd_ff for stateless PJMC. 
@@ -205,6 +215,25 @@ class ZhangCollins: public _Controller
 
         float torque_cmd;
 		float cmd;
+};
+
+/**
+ * @brief Spline Controller
+ * This controller is for the hip and ankle joints
+ * Applies a spline curve defined by five (percent gait, torque) nodes.
+ *
+ * See ControllerData.h for details on the parameters used.
+ */
+class Spline: public _Controller
+{
+    public:
+        Spline(config_defs::joint_id id, ExoData* exo_data);
+        ~Spline(){};
+
+        float calc_motor_cmd();
+
+    private:
+        float _spline_interpolate(const float* x, const float* y, float percent_gait);
 };
 
 /**

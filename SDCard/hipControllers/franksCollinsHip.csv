@@ -1,8 +1,8 @@
-5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,,,,,,,,
-14,"parameter number, the number of parameters to read per line",,,,,,,,,,,,
-,Parameter list for the FranksCollins controller,,,,,,,,,,,,
-,Parameter order:,,,,,,,,,,,,
-mass,Trough Normalized Torque  (Nm/kg),Peak Normalized Torque (Nm/kg),start percent gait,trough onset percent gait,trough percent gait,mid time (% gait),mid duration(% gait),peak percent gait,peak offset percent gait,use_pid,p_gain,i_gain,d_gain
-200,4,3,84,16.4,26.2,48.6,1.6,81.9,24.7,0,10,0,50
-200,1,1,84,16.4,26.2,48.6,1.6,81.9,24.7,0,10,0,50
-200,1.7,2,52,23,79,0,0,30,25,0,10,0,50
+5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,,,,,,,,,
+15,"parameter number, the number of parameters to read per line",,,,,,,,,,,,,
+,Parameter list for the FranksCollins controller,,,,,,,,,,,,,
+,Parameter order:,,,,,,,,,,,,,
+mass,Trough Normalized Torque  (Nm/kg),Peak Normalized Torque (Nm/kg),start percent gait,trough onset percent gait,trough percent gait,mid time (% gait),mid duration(% gait),peak percent gait,peak offset percent gait,sim %gait,use_pid,p_gain,i_gain,d_gain
+200,4,3,84,16.4,26.2,48.6,1.6,81.9,24.7,0,0,10,0,50
+200,1,1,84,16.4,26.2,48.6,1.6,81.9,24.7,0,0,10,0,50
+200,1.7,2,52,23,79,0,0,30,25,0,0,10,0,50

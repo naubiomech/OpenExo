@@ -3,6 +3,11 @@ try:
 except ImportError as e:
     raise SystemExit("PySide6 is required. Install with: pip install PySide6") from e
 
+from utils import (
+    UIConfig, JointConfig, SettingsManager,
+    style_button, style_combo_box, style_spinbox
+)
+
 
 class ActiveTrialSettingsPage(QtWidgets.QWidget):
     """Settings page to manually enter controller/parameter/value without text fields.
@@ -17,17 +22,6 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
         self.setObjectName("ActiveTrialSettingsPage")
         self._controller_matrix: list[list[str]] = []
         self._joint_controllers: dict = {}  # Maps joint name to list of controller indices
-        # Joint ID to joint number mapping (matches QtExoDeviceManager.jointDictionary)
-        self._joint_id_to_num = {
-            33: 1,  # Left Hip
-            65: 2,  # Right Hip
-            34: 3,  # Left Knee
-            66: 4,  # Right Knee
-            36: 5,  # Left Ankle
-            68: 6,  # Right Ankle
-            40: 7,  # Left Elbow
-            72: 8,  # Right Elbow
-        }
         self._bilateral_state = False  # Store bilateral state
         self._last_selection = {
             "bilateral": False,
@@ -41,21 +35,20 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
 
     def _build_ui(self):
         layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(16, 16, 16, 16)
-        layout.setSpacing(12)
+        layout.setContentsMargins(UIConfig.MARGIN_FORM, UIConfig.MARGIN_FORM, UIConfig.MARGIN_FORM, UIConfig.MARGIN_FORM)
+        layout.setSpacing(UIConfig.SPACING_XXLARGE)
 
         title = QtWidgets.QLabel("Update Controller Settings")
         title.setAlignment(QtCore.Qt.AlignCenter)
-        f = title.font(); f.setPointSize(22); title.setFont(f)
+        f = title.font(); f.setPointSize(UIConfig.FONT_TITLE); title.setFont(f)
         layout.addWidget(title)
 
         # Joint selector at the top
         joint_selector_layout = QtWidgets.QHBoxLayout()
         lbl_joint_selector = QtWidgets.QLabel("Select Joint:")
-        ljsf = lbl_joint_selector.font(); ljsf.setPointSize(18); lbl_joint_selector.setFont(ljsf)
+        ljsf = lbl_joint_selector.font(); ljsf.setPointSize(UIConfig.FONT_LARGE); lbl_joint_selector.setFont(ljsf)
         self.combo_joint = QtWidgets.QComboBox()
-        jcf = self.combo_joint.font(); jcf.setPointSize(18); self.combo_joint.setFont(jcf)
-        self.combo_joint.setMinimumHeight(56)
+        style_combo_box(self.combo_joint, height=UIConfig.BTN_HEIGHT_XLARGE, font_size=UIConfig.FONT_LARGE)
         self.combo_joint.currentIndexChanged.connect(self._on_joint_changed)
         joint_selector_layout.addWidget(lbl_joint_selector)
         joint_selector_layout.addWidget(self.combo_joint, 1)
@@ -66,9 +59,9 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
         self.table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        tf = self.table.font(); tf.setPointSize(16); self.table.setFont(tf)
-        self.table.verticalHeader().setDefaultSectionSize(44)
-        self.table.horizontalHeader().setDefaultSectionSize(140)
+        tf = self.table.font(); tf.setPointSize(UIConfig.FONT_SUBTITLE); self.table.setFont(tf)
+        self.table.verticalHeader().setDefaultSectionSize(UIConfig.TABLE_ROW_HEIGHT)
+        self.table.horizontalHeader().setDefaultSectionSize(UIConfig.TABLE_COL_WIDTH)
         # Auto-populate controller/parameter on selection
         self.table.cellClicked.connect(self._on_cell_clicked)
         layout.addWidget(self.table, 1)
@@ -78,40 +71,40 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
         row = 0
 
         self.chk_bilateral = QtWidgets.QCheckBox("Bilateral mode")
-        bf = self.chk_bilateral.font(); bf.setPointSize(18); self.chk_bilateral.setFont(bf)
+        bf = self.chk_bilateral.font(); bf.setPointSize(UIConfig.FONT_LARGE); self.chk_bilateral.setFont(bf)
         self.chk_bilateral.setChecked(self._bilateral_state)  # Load saved state
         self.chk_bilateral.stateChanged.connect(self._on_bilateral_changed)
         form.addWidget(self.chk_bilateral, row, 0, 1, 2)
         row += 1
 
         lbl_controller = QtWidgets.QLabel("Controller")
-        lcf = lbl_controller.font(); lcf.setPointSize(18); lbl_controller.setFont(lcf)
+        lcf = lbl_controller.font(); lcf.setPointSize(UIConfig.FONT_LARGE); lbl_controller.setFont(lcf)
         self.combo_controller = QtWidgets.QComboBox()
-        ccf = self.combo_controller.font(); ccf.setPointSize(18); self.combo_controller.setFont(ccf)
-        self.combo_controller.setMinimumHeight(56)
+        style_combo_box(self.combo_controller, height=UIConfig.BTN_HEIGHT_XLARGE, font_size=UIConfig.FONT_LARGE)
         self.combo_controller.currentIndexChanged.connect(self._on_controller_changed)
         form.addWidget(lbl_controller, row, 0)
         form.addWidget(self.combo_controller, row, 1)
         row += 1
 
         lbl_param = QtWidgets.QLabel("Parameter")
-        lpf = lbl_param.font(); lpf.setPointSize(18); lbl_param.setFont(lpf)
+        lpf = lbl_param.font(); lpf.setPointSize(UIConfig.FONT_LARGE); lbl_param.setFont(lpf)
         self.combo_param = QtWidgets.QComboBox()
-        cpf = self.combo_param.font(); cpf.setPointSize(18); self.combo_param.setFont(cpf)
-        self.combo_param.setMinimumHeight(56)
+        style_combo_box(self.combo_param, height=UIConfig.BTN_HEIGHT_XLARGE, font_size=UIConfig.FONT_LARGE)
         form.addWidget(lbl_param, row, 0)
         form.addWidget(self.combo_param, row, 1)
         row += 1
 
         lbl_value = QtWidgets.QLabel("Value")
-        lvf = lbl_value.font(); lvf.setPointSize(18); lbl_value.setFont(lvf)
+        lvf = lbl_value.font(); lvf.setPointSize(UIConfig.FONT_LARGE); lbl_value.setFont(lvf)
         self.spin_value = QtWidgets.QDoubleSpinBox()
         self.spin_value.setDecimals(4)
         self.spin_value.setRange(-100000.0, 100000.0)
         self.spin_value.setSingleStep(0.1)
         self.spin_value.setValue(0.0)
-        svf = self.spin_value.font(); svf.setPointSize(18); self.spin_value.setFont(svf)
-        self.spin_value.setMinimumHeight(56)
+        style_spinbox(self.spin_value, height=UIConfig.BTN_HEIGHT_XLARGE, font_size=UIConfig.FONT_LARGE)
+        self.spin_value.setButtonSymbols(QtWidgets.QAbstractSpinBox.UpDownArrows)
+        self.spin_value.setMinimumWidth(90)
+        self.spin_value.setStyleSheet("QDoubleSpinBox::up-button, QDoubleSpinBox::down-button { width: 24px; }")
         form.addWidget(lbl_value, row, 0)
         form.addWidget(self.spin_value, row, 1)
 
@@ -121,11 +114,10 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
         btn_row = QtWidgets.QHBoxLayout()
         self.btn_apply = QtWidgets.QPushButton("Apply")
         self.btn_cancel = QtWidgets.QPushButton("Cancel")
-        for b in (self.btn_apply, self.btn_cancel):
-            fb = b.font(); fb.setPointSize(18); b.setFont(fb)
-            b.setMinimumHeight(56)
-            b.setMinimumWidth(200)
-            b.setStyleSheet("padding: 10px 16px;")
+        style_button(self.btn_apply, height=UIConfig.BTN_HEIGHT_XLARGE, width=UIConfig.BTN_WIDTH_MEDIUM, 
+                    font_size=UIConfig.FONT_LARGE, padding="10px 16px")
+        style_button(self.btn_cancel, height=UIConfig.BTN_HEIGHT_XLARGE, width=UIConfig.BTN_WIDTH_MEDIUM,
+                    font_size=UIConfig.FONT_LARGE, padding="10px 16px")
         btn_row.addStretch(1)
         btn_row.addWidget(self.btn_cancel)
         btn_row.addWidget(self.btn_apply)
@@ -170,82 +162,54 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
 
     def _load_settings(self):
         """Load saved settings from file."""
-        import os
-        base_dir = os.path.dirname(os.path.dirname(__file__))  # Qt directory
-        settings_file = os.path.join(base_dir, "Saved_Data", "gui_settings.txt")
         try:
-            if os.path.exists(settings_file):
-                with open(settings_file, 'r') as f:
-                    lines = f.readlines()
-                    for line in lines:
-                        if line.startswith("bilateral="):
-                            self._bilateral_state = line.split("=")[1].strip() == "True"
-                            self._last_selection["bilateral"] = self._bilateral_state
-                            print(f"[Settings] Loaded bilateral state: {self._bilateral_state}")
-                        elif line.startswith("last_joint="):
-                            val = line.split("=")[1].strip()
-                            if val and val != "None":
-                                self._last_selection["joint"] = val
-                        elif line.startswith("last_controller="):
-                            val = line.split("=")[1].strip()
-                            if val and val != "None":
-                                self._last_selection["controller"] = val
-                        elif line.startswith("last_parameter="):
-                            try:
-                                val = line.split("=")[1].strip()
-                                if val and val != "None":
-                                    self._last_selection["parameter"] = int(val)
-                            except:
-                                pass
-                        elif line.startswith("last_value="):
-                            try:
-                                val = line.split("=")[1].strip()
-                                if val and val != "None":
-                                    self._last_selection["value"] = float(val)
-                            except:
-                                pass
+            self._bilateral_state = SettingsManager.get_bool("bilateral", False)
+            self._last_selection["bilateral"] = self._bilateral_state
+            print(f"[Settings] Loaded bilateral state: {self._bilateral_state}")
+            
+            # Load last selection values
+            joint = SettingsManager.get_setting("last_joint")
+            if joint and joint != "None":
+                self._last_selection["joint"] = joint
+            
+            controller = SettingsManager.get_setting("last_controller")
+            if controller and controller != "None":
+                self._last_selection["controller"] = controller
+            
+            param = SettingsManager.get_int("last_parameter", 0)
+            if param is not None:
+                self._last_selection["parameter"] = param
+            
+            value = SettingsManager.get_float("last_value", 0.0)
+            if value is not None:
+                self._last_selection["value"] = value
         except Exception as e:
             print(f"Error loading settings: {e}")
 
     def _save_settings(self):
         """Save settings to file."""
-        import os
-        base_dir = os.path.dirname(os.path.dirname(__file__))  # Qt directory
-        save_dir = os.path.join(base_dir, "Saved_Data")
-        settings_file = os.path.join(save_dir, "gui_settings.txt")
         try:
-            os.makedirs(save_dir, exist_ok=True)
-            # Read existing settings to preserve them
-            existing = {}
-            if os.path.exists(settings_file):
-                with open(settings_file, 'r') as f:
-                    for line in f.readlines():
-                        if '=' in line:
-                            key, val = line.strip().split('=', 1)
-                            existing[key] = val
-            # Update with current values (only save non-None values)
-            existing["bilateral"] = str(self._bilateral_state)
+            updates = {"bilateral": str(self._bilateral_state)}
             
+            # Only save non-None values
             joint = self._last_selection.get("joint")
             if joint and joint != "None":
-                existing["last_joint"] = str(joint)
+                updates["last_joint"] = str(joint)
             
             controller = self._last_selection.get("controller")
             if controller and controller != "None":
-                existing["last_controller"] = str(controller)
+                updates["last_controller"] = str(controller)
             
             parameter = self._last_selection.get("parameter")
             if parameter is not None:
-                existing["last_parameter"] = str(parameter)
+                updates["last_parameter"] = str(parameter)
             
             value = self._last_selection.get("value")
             if value is not None:
-                existing["last_value"] = str(value)
-            # Write all settings
-            with open(settings_file, 'w') as f:
-                for key, val in existing.items():
-                    f.write(f"{key}={val}\n")
-            print(f"[Settings] Saved settings to {settings_file}")
+                updates["last_value"] = str(value)
+            
+            SettingsManager.update_settings(updates)
+            print(f"[Settings] Saved settings")
         except Exception as e:
             print(f"Error saving settings: {e}")
 
@@ -359,11 +323,6 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                             except (ValueError, IndexError):
                                 print(f"Warning: Could not parse joint ID from row[1]='{row[1]}'")
                         
-                        # Convert joint ID to joint number (1-8) using the mapping
-                        joint_num = self._joint_id_to_num.get(joint_id_raw, 1)
-                        if joint_id_raw and joint_id_raw not in self._joint_id_to_num:
-                            print(f"Warning: Unknown joint ID {joint_id_raw}, defaulting to joint 1")
-                        
                         # Extract actual controller ID from row[3]
                         controller_id = controller_local_idx  # Default to local index if parsing fails
                         if len(row) > 3:
@@ -375,8 +334,9 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                         else:
                             print(f"Warning: Row too short (len={len(row)}), cannot extract controller ID from row[3]")
                         
-                        payload = [is_bilateral, joint_num, controller_id, parameter_idx, value]
-                        print(f"Payload: is_bilateral={is_bilateral}, joint_num={joint_num} (joint_id={joint_id_raw}), controller_id={controller_id}, param_idx={parameter_idx}, value={value}")
+                        # Use the actual joint_id_raw (like 65, 68) not the mapped joint_num
+                        payload = [is_bilateral, joint_id_raw, controller_id, parameter_idx, value]
+                        print(f"Payload: is_bilateral={is_bilateral}, joint_id={joint_id_raw}, controller_id={controller_id}, param_idx={parameter_idx}, value={value}")
                         print(f"Full row: {row}")
                         print(f"======================\n")
                         

@@ -208,6 +208,16 @@
         // logger::println(config_map::motor[data.exo_elbow]);
 
         config_to_send[config_defs::elbow_idx] = config_map::motor[data.exo_elbow];
+
+        get_section_key(ini,"Exo","arm_1",buffer,buffer_len);
+        data.exo_arm_1 = buffer;
+
+        config_to_send[config_defs::arm_1_idx] = config_map::motor[data.exo_arm_1];
+
+        get_section_key(ini,"Exo","arm_2",buffer,buffer_len);
+        data.exo_arm_2 = buffer;
+
+        config_to_send[config_defs::arm_2_idx] = config_map::motor[data.exo_arm_2];
         
         //--------------------------------------------------------
         
@@ -246,6 +256,14 @@
         // logger::println(config_map::motor[data.exo_elbow]);
 
         config_to_send[config_defs::elbow_gear_idx] = config_map::gearing[data.elbow_gearing];
+
+        get_section_key(ini,"Exo","arm_1GearRatio",buffer,buffer_len);
+        data.arm_1_gearing = buffer;
+        config_to_send[config_defs::arm_1_gear_idx] = config_map::gearing[data.arm_1_gearing];
+
+        get_section_key(ini,"Exo","arm_2GearRatio",buffer,buffer_len);
+        data.arm_2_gearing = buffer;
+        config_to_send[config_defs::arm_2_gear_idx] = config_map::gearing[data.arm_2_gearing];
         
         //--------------------------------------------------------
         
@@ -284,6 +302,14 @@
         // logger::println(config_map::elbow_controllers[data.exo_elbow_default_controller]);
 
         config_to_send[config_defs::exo_elbow_default_controller_idx] = config_map::elbow_controllers[data.exo_elbow_default_controller];
+
+        get_section_key(ini,"Exo","arm_1DefaultController",buffer,buffer_len);
+        data.exo_arm_1_default_controller = buffer;
+        config_to_send[config_defs::exo_arm_1_default_controller_idx] = config_map::arm_1_controllers[data.exo_arm_1_default_controller];
+
+        get_section_key(ini,"Exo","arm_2DefaultController",buffer,buffer_len);
+        data.exo_arm_2_default_controller = buffer;
+        config_to_send[config_defs::exo_arm_2_default_controller_idx] = config_map::arm_2_controllers[data.exo_arm_2_default_controller];
         
         #ifdef SIMPLE_DEBUG
 		Serial.print("\nLoaded exoskeleton configuration: ");
@@ -332,6 +358,14 @@
 
         config_to_send[config_defs::elbow_use_torque_sensor_idx] = config_map::use_torque_sensor[data.elbow_use_torque_sensor];
 
+        get_section_key(ini,"Exo","arm_1UseTorqueSensor",buffer,buffer_len);
+        data.arm_1_use_torque_sensor = buffer;
+        config_to_send[config_defs::arm_1_use_torque_sensor_idx] = config_map::use_torque_sensor[data.arm_1_use_torque_sensor];
+
+        get_section_key(ini,"Exo","arm_2UseTorqueSensor",buffer,buffer_len);
+        data.arm_2_use_torque_sensor = buffer;
+        config_to_send[config_defs::arm_2_use_torque_sensor_idx] = config_map::use_torque_sensor[data.arm_2_use_torque_sensor];
+
         //--------------------------------------------------------
 		
         get_section_key(ini,"Exo","hipFlipMotorDir",buffer,buffer_len);
@@ -349,6 +383,14 @@
         get_section_key(ini,"Exo","elbowFlipMotorDir",buffer,buffer_len);
         data.elbow_flip_motor_dir = buffer;
         config_to_send[config_defs::elbow_flip_motor_dir_idx] = config_map::flip_motor_dir[data.elbow_flip_motor_dir];
+
+        get_section_key(ini,"Exo","arm_1FlipMotorDir",buffer,buffer_len);
+        data.arm_1_flip_motor_dir = buffer;
+        config_to_send[config_defs::arm_1_flip_motor_dir_idx] = config_map::flip_motor_dir[data.arm_1_flip_motor_dir];
+
+        get_section_key(ini,"Exo","arm_2FlipMotorDir",buffer,buffer_len);
+        data.arm_2_flip_motor_dir = buffer;
+        config_to_send[config_defs::arm_2_flip_motor_dir_idx] = config_map::flip_motor_dir[data.arm_2_flip_motor_dir];
 
         //--------------------------------------------------------
 		
@@ -368,6 +410,14 @@
         data.elbow_flip_torque_dir = buffer;
         config_to_send[config_defs::elbow_flip_torque_dir_idx] = config_map::flip_torque_dir[data.elbow_flip_torque_dir];
 
+        get_section_key(ini,"Exo","arm_1FlipTorqueDir",buffer,buffer_len);
+        data.arm_1_flip_torque_dir = buffer;
+        config_to_send[config_defs::arm_1_flip_torque_dir_idx] = config_map::flip_torque_dir[data.arm_1_flip_torque_dir];
+
+        get_section_key(ini,"Exo","arm_2FlipTorqueDir",buffer,buffer_len);
+        data.arm_2_flip_torque_dir = buffer;
+        config_to_send[config_defs::arm_2_flip_torque_dir_idx] = config_map::flip_torque_dir[data.arm_2_flip_torque_dir];
+
         //--------------------------------------------------------
 
         get_section_key(ini,"Exo","hipFlipAngleDir",buffer,buffer_len);
@@ -385,6 +435,14 @@
         get_section_key(ini,"Exo","elbowFlipAngleDir",buffer,buffer_len);
         data.elbow_flip_angle_dir = buffer;
         config_to_send[config_defs::elbow_flip_angle_dir_idx] = config_map::flip_angle_dir[data.elbow_flip_angle_dir];
+
+        get_section_key(ini,"Exo","arm_1FlipAngleDir",buffer,buffer_len);
+        data.arm_1_flip_angle_dir = buffer;
+        config_to_send[config_defs::arm_1_flip_angle_dir_idx] = config_map::flip_angle_dir[data.arm_1_flip_angle_dir];
+
+        get_section_key(ini,"Exo","arm_2FlipAngleDir",buffer,buffer_len);
+        data.arm_2_flip_angle_dir = buffer;
+        config_to_send[config_defs::arm_2_flip_angle_dir_idx] = config_map::flip_angle_dir[data.arm_2_flip_angle_dir];
 
         //--------------------------------------------------------
 		
@@ -419,6 +477,22 @@
         get_section_key(ini,"Exo","rightElbowRoM",buffer,buffer_len);
         data.right_elbow_RoM = atof(buffer);
         config_to_send[config_defs::right_elbow_RoM_idx] = data.right_elbow_RoM;
+
+        get_section_key(ini,"Exo","leftArm1RoM",buffer,buffer_len);
+        data.left_arm_1_RoM = atof(buffer);
+        config_to_send[config_defs::left_arm_1_RoM_idx] = data.left_arm_1_RoM;
+
+        get_section_key(ini,"Exo","rightArm1RoM",buffer,buffer_len);
+        data.right_arm_1_RoM = atof(buffer);
+        config_to_send[config_defs::right_arm_1_RoM_idx] = data.right_arm_1_RoM;
+
+        get_section_key(ini,"Exo","leftArm2RoM",buffer,buffer_len);
+        data.left_arm_2_RoM = atof(buffer);
+        config_to_send[config_defs::left_arm_2_RoM_idx] = data.left_arm_2_RoM;
+
+        get_section_key(ini,"Exo","rightArm2RoM",buffer,buffer_len);
+        data.right_arm_2_RoM = atof(buffer);
+        config_to_send[config_defs::right_arm_2_RoM_idx] = data.right_arm_2_RoM;
 		
 		get_section_key(ini,"Exo","leftHipTorqueOffset",buffer,buffer_len);
 		data.left_hip_torque_offset = atof(buffer);
@@ -451,6 +525,22 @@
 		get_section_key(ini,"Exo","rightElbowTorqueOffset",buffer,buffer_len);
 		data.right_elbow_torque_offset = atof(buffer);
 		config_to_send[config_defs::right_elbow_torque_offset_idx] =  data.right_elbow_torque_offset;
+
+        get_section_key(ini,"Exo","leftArm1TorqueOffset",buffer,buffer_len);
+        data.left_arm_1_torque_offset = atof(buffer);
+        config_to_send[config_defs::left_arm_1_torque_offset_idx] = data.left_arm_1_torque_offset;
+
+        get_section_key(ini,"Exo","rightArm1TorqueOffset",buffer,buffer_len);
+        data.right_arm_1_torque_offset = atof(buffer);
+        config_to_send[config_defs::right_arm_1_torque_offset_idx] = data.right_arm_1_torque_offset;
+
+        get_section_key(ini,"Exo","leftArm2TorqueOffset",buffer,buffer_len);
+        data.left_arm_2_torque_offset = atof(buffer);
+        config_to_send[config_defs::left_arm_2_torque_offset_idx] = data.left_arm_2_torque_offset;
+
+        get_section_key(ini,"Exo","rightArm2TorqueOffset",buffer,buffer_len);
+        data.right_arm_2_torque_offset = atof(buffer);
+        config_to_send[config_defs::right_arm_2_torque_offset_idx] = data.right_arm_2_torque_offset;
     }
 
     /*

@@ -15,6 +15,8 @@ Side::Side(bool is_left, ExoData* exo_data)
 , _knee((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::knee), exo_data)
 , _ankle((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::ankle), exo_data)
 , _elbow((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::elbow), exo_data)
+, _arm_1((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::arm_1), exo_data)
+, _arm_2((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::arm_2), exo_data)
 , _heel_fsr(is_left ? logic_micro_pins::fsr_sense_left_heel_pin : logic_micro_pins::fsr_sense_right_heel_pin) //Check if it is the left and use the appropriate pin for the side.
 , _toe_fsr(is_left ? logic_micro_pins::fsr_sense_left_toe_pin : logic_micro_pins::fsr_sense_right_toe_pin)
 {
@@ -62,6 +64,8 @@ void Side::disable_motors()
     _knee._motor->enable(true);
     _ankle._motor->enable(true);
     _elbow._motor->enable(true);
+    _arm_1._motor->enable(true);
+    _arm_2._motor->enable(true);
 };
 
 
@@ -155,6 +159,14 @@ void Side::read_data()
     if (_side_data->elbow.is_used)
     {
         _elbow.read_data();
+    }
+    if (_side_data->arm_1.is_used)
+    {
+        _arm_1.read_data();
+    }
+    if (_side_data->arm_2.is_used)
+    {
+        _arm_2.read_data();
     }
     
 };
@@ -548,6 +560,14 @@ void Side::update_motor_cmds()
     if (_side_data->elbow.is_used)
     {
         _elbow.run_joint();
+    }
+    if (_side_data->arm_1.is_used)
+    {
+        _arm_1.run_joint();
+    }
+    if (_side_data->arm_2.is_used)
+    {
+        _arm_2.run_joint();
     }
 };
 

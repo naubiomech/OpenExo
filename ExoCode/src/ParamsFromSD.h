@@ -32,7 +32,7 @@
      */
     namespace param_error
     {
-        const uint8_t num_joint_ids = 3;                            /**< Number of bits the joint type ids need */
+        const uint8_t num_joint_ids = 5;                            /**< Number of bits the joint type ids need */
         const uint8_t SD_not_found_idx = num_joint_ids;             /**< Error when SD card isn't present */
         const uint8_t file_not_found_idx = SD_not_found_idx + 1;    /**< Error when file is not found on the SD card */
     }
@@ -47,6 +47,7 @@
             {(uint8_t)config_defs::hip_controllers::disabled,"hipControllers/zeroTorque.csv"},
             {(uint8_t)config_defs::hip_controllers::zero_torque,"hipControllers/zeroTorque.csv"},
             {(uint8_t)config_defs::hip_controllers::franks_collins_hip, "hipControllers/franksCollinsHip.csv"},
+            {(uint8_t)config_defs::hip_controllers::spline, "hipControllers/spline.csv"},
             {(uint8_t)config_defs::hip_controllers::constant_torque, "hipControllers/constantTorque.csv"},
             {(uint8_t)config_defs::hip_controllers::chirp,"hipControllers/chirp.csv"},
             {(uint8_t)config_defs::hip_controllers::step,"hipControllers/step.csv"},
@@ -68,6 +69,7 @@
             {(uint8_t)config_defs::ankle_controllers::zero_torque,"ankleControllers/zeroTorque.csv"},
             {(uint8_t)config_defs::ankle_controllers::pjmc,"ankleControllers/PJMC.csv"},
             {(uint8_t)config_defs::ankle_controllers::zhang_collins,"ankleControllers/zhangCollins.csv"},
+            {(uint8_t)config_defs::ankle_controllers::spline,"ankleControllers/spline.csv"},
             {(uint8_t)config_defs::ankle_controllers::constant_torque, "ankleControllers/constantTorque.csv"},
             {(uint8_t)config_defs::ankle_controllers::trec,"ankleControllers/trec.csv"},
             {(uint8_t)config_defs::ankle_controllers::chirp,"ankleControllers/chirp.csv"},
@@ -83,6 +85,22 @@
             {(uint8_t)config_defs::elbow_controllers::elbow_min_max, "elbowControllers/elbowMinMax.csv"},
             {(uint8_t)config_defs::elbow_controllers::chirp,"elbowControllers/chirp.csv"},
             {(uint8_t)config_defs::elbow_controllers::step,"elbowControllers/step.csv"},
+        };
+
+        const ParamFilenameKey arm_1
+        {
+            {(uint8_t)config_defs::arm_1_controllers::disabled,"arm1Controllers/zeroTorque.csv"},
+            {(uint8_t)config_defs::arm_1_controllers::zero_torque,"arm1Controllers/zeroTorque.csv"},
+            {(uint8_t)config_defs::arm_1_controllers::constant_torque,"arm1Controllers/constantTorque.csv"},
+            {(uint8_t)config_defs::arm_1_controllers::spline,"arm1Controllers/spline.csv"},
+        };
+
+        const ParamFilenameKey arm_2
+        {
+            {(uint8_t)config_defs::arm_2_controllers::disabled,"arm2Controllers/zeroTorque.csv"},
+            {(uint8_t)config_defs::arm_2_controllers::zero_torque,"arm2Controllers/zeroTorque.csv"},
+            {(uint8_t)config_defs::arm_2_controllers::constant_torque,"arm2Controllers/constantTorque.csv"},
+            {(uint8_t)config_defs::arm_2_controllers::spline,"arm2Controllers/spline.csv"},
         };
 
     };

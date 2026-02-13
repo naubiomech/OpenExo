@@ -48,7 +48,7 @@ inline const char* getColumnHeader(uint8_t column_index, uint8_t* config_to_send
             }
         }
 		
-		case (uint8_t)config_defs::exo_name::bilateral_hip:
+        case (uint8_t)config_defs::exo_name::bilateral_hip:
         {
             // Inner switch: Selects the specific column name for this mode (0-based)
             switch (column_index) {
@@ -62,6 +62,24 @@ inline const char* getColumnHeader(uint8_t column_index, uint8_t* config_to_send
                 case 7:  return "Toe FSR (L)";
                 case 8:  return "Heel FSR (R)";
                 case 9:  return "Heel FSR (L)";
+                case 10: return "Battery Level (Volts)";
+                default: return "INVALID_COL";
+            }
+        }
+
+        case (uint8_t)config_defs::exo_name::bilateral_arm:
+        {
+            switch (column_index) {
+                case 0:  return "Measured Torque Arm1 (R)";
+                case 1:  return "Desired Torque Arm1 (R)";
+                case 2:  return "Measured Torque Arm1 (L)";
+                case 3:  return "Desired Torque Arm1 (L)";
+                case 4:  return "Measured Torque Arm2 (R)";
+                case 5:  return "Desired Torque Arm2 (R)";
+                case 6:  return "Measured Torque Arm2 (L)";
+                case 7:  return "Desired Torque Arm2 (L)";
+                case 8:  return "Gait/100 (R)";
+                case 9:  return "Gait/100 (L)";
                 case 10: return "Battery Level (Volts)";
                 default: return "INVALID_COL";
             }
@@ -97,7 +115,6 @@ void create_plotting_titles(uint8_t* config_to_send);
 
 #endif
 #endif
-
 
 
 

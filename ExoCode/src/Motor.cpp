@@ -79,6 +79,26 @@ _Motor::_Motor(config_defs::joint_id id, ExoData* exo_data, int enable_pin)
                 _motor_data = &(exo_data->right_side.elbow.motor);
             }
             break;
+        case (uint8_t)config_defs::joint_id::arm_1:
+            if (_is_left)
+            {
+                _motor_data = &(exo_data->left_side.arm_1.motor);
+            }
+            else
+            {
+                _motor_data = &(exo_data->right_side.arm_1.motor);
+            }
+            break;
+        case (uint8_t)config_defs::joint_id::arm_2:
+            if (_is_left)
+            {
+                _motor_data = &(exo_data->left_side.arm_2.motor);
+            }
+            else
+            {
+                _motor_data = &(exo_data->right_side.arm_2.motor);
+            }
+            break;
     }
 
     #ifdef MOTOR_DEBUG
@@ -612,6 +632,46 @@ _CANMotor(id, exo_data, enable_pin)
 
 #ifdef MOTOR_DEBUG
     logger::println("AK60v3::AK60v3 : Leaving Constructor");
+#endif
+};
+
+/*
+ * Constructor for the motor
+ * Takes the joint id and a pointer to the exo_data
+ * Only stores the id, exo_data pointer, and if it is left (for easy access)
+ */
+AK45_36::AK45_36(config_defs::joint_id id, ExoData* exo_data, int enable_pin): //Constructor: type is the motor type
+_CANMotor(id, exo_data, enable_pin)
+{
+    _I_MAX = 6.5f;
+    _V_MAX = 5.44f;
+
+    float kt = 0.127f;
+    set_Kt(kt);
+    exo_data->get_joint_with(static_cast<uint8_t>(id))->motor.kt = kt;
+
+#ifdef MOTOR_DEBUG
+    logger::println("AK45_36::AK45_36 : Leaving Constructor");
+#endif
+};
+
+/*
+ * Constructor for the motor
+ * Takes the joint id and a pointer to the exo_data
+ * Only stores the id, exo_data pointer, and if it is left (for easy access)
+ */
+AK45_10::AK45_10(config_defs::joint_id id, ExoData* exo_data, int enable_pin): //Constructor: type is the motor type
+_CANMotor(id, exo_data, enable_pin)
+{
+    _I_MAX = 6.5f;
+    _V_MAX = 18.85f;
+
+    float kt = 0.127f;
+    set_Kt(kt);
+    exo_data->get_joint_with(static_cast<uint8_t>(id))->motor.kt = kt;
+
+#ifdef MOTOR_DEBUG
+    logger::println("AK45_10::AK45_10 : Leaving Constructor");
 #endif
 };
 

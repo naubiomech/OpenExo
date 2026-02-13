@@ -39,6 +39,18 @@ ControllerData::ControllerData(config_defs::joint_id id, uint8_t* config_to_send
             joint = config_defs::JointType::elbow;
             break;
         }
+        case (uint8_t)config_defs::joint_id::arm_1:
+        {
+            controller = config_to_send[config_defs::exo_arm_1_default_controller_idx];
+            joint = config_defs::JointType::arm_1;
+            break;
+        }
+        case (uint8_t)config_defs::joint_id::arm_2:
+        {
+            controller = config_to_send[config_defs::exo_arm_2_default_controller_idx];
+            joint = config_defs::JointType::arm_2;
+            break;
+        }
     }
     
     setpoint = 0;
@@ -56,26 +68,36 @@ ControllerData::ControllerData(config_defs::joint_id id, uint8_t* config_to_send
 void ControllerData::reconfigure(uint8_t* config_to_send) 
 {
     //Just reset controller
-    switch ((uint8_t)joint)  //Use the id with the side masked out.
+    switch ((uint8_t)joint)
     {
-        case (uint8_t)config_defs::joint_id::hip:
+        case (uint8_t)config_defs::JointType::hip:
         {
             controller = config_to_send[config_defs::exo_hip_default_controller_idx];
             break;
         }
-        case (uint8_t)config_defs::joint_id::knee:
+        case (uint8_t)config_defs::JointType::knee:
         {
             controller = config_to_send[config_defs::exo_knee_default_controller_idx];
             break;
         }
-        case (uint8_t)config_defs::joint_id::ankle:
+        case (uint8_t)config_defs::JointType::ankle:
         {
             controller = config_to_send[config_defs::exo_ankle_default_controller_idx];
             break;
         }
-        case (uint8_t)config_defs::joint_id::elbow:
+        case (uint8_t)config_defs::JointType::elbow:
         {
             controller = config_to_send[config_defs::exo_elbow_default_controller_idx];
+            break;
+        }
+        case (uint8_t)config_defs::JointType::arm_1:
+        {
+            controller = config_to_send[config_defs::exo_arm_1_default_controller_idx];
+            break;
+        }
+        case (uint8_t)config_defs::JointType::arm_2:
+        {
+            controller = config_to_send[config_defs::exo_arm_2_default_controller_idx];
             break;
         }
     }

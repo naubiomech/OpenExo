@@ -26,7 +26,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 	failed2open = 0;
 	
 	//Loop through joints
-	for (int i_joint = 1; i_joint < 9; i_joint++) {
+	for (int i_joint = 1; i_joint < 13; i_joint++) {
 		switch (i_joint)
 		{
 		case 1://left ankle
@@ -101,6 +101,42 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 			continue;
 		}
 			break;
+		case 9://left arm 1
+		if ((config_to_send[config_defs::exo_arm_1_default_controller_idx] > 1) && ((((uint8_t)config_defs::exo_side::bilateral == config_to_send[config_defs::exo_side_idx])) || (((uint8_t)config_defs::exo_side::left == config_to_send[config_defs::exo_side_idx]))))
+		{
+			csvCount = (uint8_t)config_defs::arm_1_controllers::Count;
+		}
+		else {
+			continue;
+		}
+			break;
+		case 10://right arm 1
+		if ((config_to_send[config_defs::exo_arm_1_default_controller_idx] > 1) && ((((uint8_t)config_defs::exo_side::bilateral == config_to_send[config_defs::exo_side_idx])) || (((uint8_t)config_defs::exo_side::right == config_to_send[config_defs::exo_side_idx]))))
+		{
+			csvCount = (uint8_t)config_defs::arm_1_controllers::Count;
+		}
+		else {
+			continue;
+		}
+			break;
+		case 11://left arm 2
+		if ((config_to_send[config_defs::exo_arm_2_default_controller_idx] > 1) && ((((uint8_t)config_defs::exo_side::bilateral == config_to_send[config_defs::exo_side_idx])) || (((uint8_t)config_defs::exo_side::left == config_to_send[config_defs::exo_side_idx]))))
+		{
+			csvCount = (uint8_t)config_defs::arm_2_controllers::Count;
+		}
+		else {
+			continue;
+		}
+			break;
+		case 12://right arm 2
+		if ((config_to_send[config_defs::exo_arm_2_default_controller_idx] > 1) && ((((uint8_t)config_defs::exo_side::bilateral == config_to_send[config_defs::exo_side_idx])) || (((uint8_t)config_defs::exo_side::right == config_to_send[config_defs::exo_side_idx]))))
+		{
+			csvCount = (uint8_t)config_defs::arm_2_controllers::Count;
+		}
+		else {
+			continue;
+		}
+			break;
 		}
 		
 	
@@ -109,7 +145,8 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 		//Serial.print(csvCount);
 		
 		
-		for (int i_ctrl = 2; i_ctrl < csvCount; i_ctrl++) {//starting from 2 to skip the first controllers (Disabled controllers)
+		int start_ctrl = 2; // Skip disabled controller for all joints.
+		for (int i_ctrl = start_ctrl; i_ctrl < csvCount; i_ctrl++) {
 			bool csvExists;
 			std::string filename;
 			char joint_id_string;
@@ -195,6 +232,42 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				csvExists = controller_parameter_filenames::elbow.count(i_ctrl);
 				if (csvExists) {
 					filename = controller_parameter_filenames::elbow[i_ctrl];
+				}
+				break;
+			case 9://left arm 1
+				joint_id_val = (uint8_t)config_defs::joint_id::left_arm_1;
+				strncpy(jointName, "Arm1(L)", 10);
+				jointName[9] = '\0';
+				csvExists = controller_parameter_filenames::arm_1.count(i_ctrl);
+				if (csvExists) {
+					filename = controller_parameter_filenames::arm_1[i_ctrl];
+				}
+				break;
+			case 10://right arm 1
+				joint_id_val = (uint8_t)config_defs::joint_id::right_arm_1;
+				strncpy(jointName, "Arm1(R)", 10);
+				jointName[9] = '\0';
+				csvExists = controller_parameter_filenames::arm_1.count(i_ctrl);
+				if (csvExists) {
+					filename = controller_parameter_filenames::arm_1[i_ctrl];
+				}
+				break;
+			case 11://left arm 2
+				joint_id_val = (uint8_t)config_defs::joint_id::left_arm_2;
+				strncpy(jointName, "Arm2(L)", 10);
+				jointName[9] = '\0';
+				csvExists = controller_parameter_filenames::arm_2.count(i_ctrl);
+				if (csvExists) {
+					filename = controller_parameter_filenames::arm_2[i_ctrl];
+				}
+				break;
+			case 12://right arm 2
+				joint_id_val = (uint8_t)config_defs::joint_id::right_arm_2;
+				strncpy(jointName, "Arm2(R)", 10);
+				jointName[9] = '\0';
+				csvExists = controller_parameter_filenames::arm_2.count(i_ctrl);
+				if (csvExists) {
+					filename = controller_parameter_filenames::arm_2[i_ctrl];
 				}
 				break;
 			} 

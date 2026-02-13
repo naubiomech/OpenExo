@@ -53,6 +53,12 @@ _Joint::_Joint(config_defs::joint_id id, ExoData* exo_data)
             case (uint8_t)config_defs::joint_id::elbow:
                 logger::print("Elbow");
                 break;
+            case (uint8_t)config_defs::joint_id::arm_1:
+                logger::print("Arm 1");
+                break;
+            case (uint8_t)config_defs::joint_id::arm_2:
+                logger::print("Arm 2");
+                break;
             default:
                 break;
         }
@@ -244,6 +250,66 @@ unsigned int _Joint::get_torque_sensor_pin(config_defs::joint_id id, ExoData* ex
             }
             break;
         }
+        case (uint8_t)config_defs::joint_id::arm_1:
+        {
+            if (utils::get_is_left(id) && exo_data->left_side.arm_1.is_used && exo_data->arm_1_torque_flag == 1)
+            {
+                if (_Joint::left_torque_sensor_used_count < logic_micro_pins::num_available_joints)
+                {
+                    return logic_micro_pins::torque_sensor_left[_Joint::left_torque_sensor_used_count++];
+                }
+                else
+                {
+                    return logic_micro_pins::not_connected_pin;
+                }
+            }
+            else if (!(utils::get_is_left(id)) && exo_data->right_side.arm_1.is_used && exo_data->arm_1_torque_flag == 1)
+            {
+                if (_Joint::right_torque_sensor_used_count < logic_micro_pins::num_available_joints)
+                {
+                    return logic_micro_pins::torque_sensor_right[_Joint::right_torque_sensor_used_count++];
+                }
+                else
+                {
+                    return logic_micro_pins::not_connected_pin;
+                }
+            }
+            else
+            {
+                return logic_micro_pins::not_connected_pin;
+            }
+            break;
+        }
+        case (uint8_t)config_defs::joint_id::arm_2:
+        {
+            if (utils::get_is_left(id) && exo_data->left_side.arm_2.is_used && exo_data->arm_2_torque_flag == 1)
+            {
+                if (_Joint::left_torque_sensor_used_count < logic_micro_pins::num_available_joints)
+                {
+                    return logic_micro_pins::torque_sensor_left[_Joint::left_torque_sensor_used_count++];
+                }
+                else
+                {
+                    return logic_micro_pins::not_connected_pin;
+                }
+            }
+            else if (!(utils::get_is_left(id)) && exo_data->right_side.arm_2.is_used && exo_data->arm_2_torque_flag == 1)
+            {
+                if (_Joint::right_torque_sensor_used_count < logic_micro_pins::num_available_joints)
+                {
+                    return logic_micro_pins::torque_sensor_right[_Joint::right_torque_sensor_used_count++];
+                }
+                else
+                {
+                    return logic_micro_pins::not_connected_pin;
+                }
+            }
+            else
+            {
+                return logic_micro_pins::not_connected_pin;
+            }
+            break;
+        }
         default :
         {
             return logic_micro_pins::not_connected_pin;
@@ -377,6 +443,66 @@ unsigned int _Joint::get_motor_enable_pin(config_defs::joint_id id, ExoData* exo
             }
             break;
         }
+        case (uint8_t)config_defs::joint_id::arm_1:
+        {
+            if (utils::get_is_left(id) & exo_data->left_side.arm_1.is_used)
+            {
+                if (_Joint::left_motor_used_count < logic_micro_pins::num_available_joints)
+                {
+                    return logic_micro_pins::enable_left_pin[_Joint::left_motor_used_count++];
+                }
+                else
+                {
+                    return logic_micro_pins::not_connected_pin;
+                }
+            }
+            else if (!(utils::get_is_left(id)) && exo_data->right_side.arm_1.is_used)
+            {
+                if (_Joint::right_motor_used_count < logic_micro_pins::num_available_joints)
+                {
+                    return logic_micro_pins::enable_right_pin[_Joint::right_motor_used_count++];
+                }
+                else
+                {
+                    return logic_micro_pins::not_connected_pin;
+                }
+            }
+            else
+            {
+                return logic_micro_pins::not_connected_pin;
+            }
+            break;
+        }
+        case (uint8_t)config_defs::joint_id::arm_2:
+        {
+            if (utils::get_is_left(id) & exo_data->left_side.arm_2.is_used)
+            {
+                if (_Joint::left_motor_used_count < logic_micro_pins::num_available_joints)
+                {
+                    return logic_micro_pins::enable_left_pin[_Joint::left_motor_used_count++];
+                }
+                else
+                {
+                    return logic_micro_pins::not_connected_pin;
+                }
+            }
+            else if (!(utils::get_is_left(id)) && exo_data->right_side.arm_2.is_used)
+            {
+                if (_Joint::right_motor_used_count < logic_micro_pins::num_available_joints)
+                {
+                    return logic_micro_pins::enable_right_pin[_Joint::right_motor_used_count++];
+                }
+                else
+                {
+                    return logic_micro_pins::not_connected_pin;
+                }
+            }
+            else
+            {
+                return logic_micro_pins::not_connected_pin;
+            }
+            break;
+        }
         default :
         {
             return logic_micro_pins::not_connected_pin;
@@ -396,6 +522,7 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
 : _Joint(id, exo_data)  // <-- Initializer list
 , _zero_torque(id, exo_data)
 , _franks_collins_hip(id, exo_data)
+, _spline(id, exo_data)
 , _constant_torque(id, exo_data)
 , _chirp(id, exo_data)
 , _step(id, exo_data)
@@ -469,6 +596,18 @@ HipJoint::HipJoint(config_defs::joint_id id, ExoData* exo_data)
                     logger::println("AK60v3");
                 #endif
                 HipJoint::set_motor(new AK60v3(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_36:
+                #ifdef JOINT_DEBUG
+                    logger::println("AK45_36");
+                #endif
+                HipJoint::set_motor(new AK45_36(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_10:
+                #ifdef JOINT_DEBUG
+                    logger::println("AK45_10");
+                #endif
+                HipJoint::set_motor(new AK45_10(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
                 break;
 			case (uint8_t)config_defs::motor::MaxonMotor:
                 #ifdef JOINT_DEBUG
@@ -575,6 +714,9 @@ void HipJoint::set_controller(uint8_t controller_id)
         case (uint8_t)config_defs::hip_controllers::franks_collins_hip :
             _controller = &_franks_collins_hip;
             break;
+        case (uint8_t)config_defs::hip_controllers::spline :
+            _controller = &_spline;
+            break;
         case (uint8_t)config_defs::hip_controllers::constant_torque:
             _controller = &_constant_torque;
             break;
@@ -677,6 +819,18 @@ KneeJoint::KneeJoint(config_defs::joint_id id, ExoData* exo_data)
                     logger::println("AK60v3");
                 #endif
                 KneeJoint::set_motor(new AK60v3(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_36:
+                #ifdef JOINT_DEBUG
+                    logger::println("AK45_36");
+                #endif
+                KneeJoint::set_motor(new AK45_36(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_10:
+                #ifdef JOINT_DEBUG
+                    logger::println("AK45_10");
+                #endif
+                KneeJoint::set_motor(new AK45_10(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
                 break;
 			case (uint8_t)config_defs::motor::MaxonMotor:
                 #ifdef JOINT_DEBUG
@@ -807,6 +961,7 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
 , _zero_torque(id, exo_data)
 , _proportional_joint_moment(id, exo_data)
 , _zhang_collins(id, exo_data)
+, _spline(id, exo_data)
 , _constant_torque(id, exo_data)
 , _trec(id, exo_data)
 , _calibr_manager(id, exo_data)
@@ -880,6 +1035,18 @@ AnkleJoint::AnkleJoint(config_defs::joint_id id, ExoData* exo_data)
                     logger::println("AK60v3");
                 #endif
                 AnkleJoint::set_motor(new AK60v3(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_36:
+                #ifdef JOINT_DEBUG
+                    logger::println("AK45_36");
+                #endif
+                AnkleJoint::set_motor(new AK45_36(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_10:
+                #ifdef JOINT_DEBUG
+                    logger::println("AK45_10");
+                #endif
+                AnkleJoint::set_motor(new AK45_10(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
                 break;
 			case (uint8_t)config_defs::motor::MaxonMotor:
                 #ifdef JOINT_DEBUG
@@ -1011,6 +1178,9 @@ void AnkleJoint::set_controller(uint8_t controller_id)  //Changes the high level
         case (uint8_t)config_defs::ankle_controllers::zhang_collins :
             _controller = &_zhang_collins;
             break;
+        case (uint8_t)config_defs::ankle_controllers::spline :
+            _controller = &_spline;
+            break;
         case (uint8_t)config_defs::ankle_controllers::constant_torque:
             _controller = &_constant_torque;
             break;
@@ -1113,6 +1283,18 @@ ElbowJoint::ElbowJoint(config_defs::joint_id id, ExoData* exo_data)
                     logger::println("AK60v3");
                 #endif
                 ElbowJoint::set_motor(new AK60v3(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_36:
+                #ifdef JOINT_DEBUG
+                    logger::println("AK45_36");
+                #endif
+                ElbowJoint::set_motor(new AK45_36(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_10:
+                #ifdef JOINT_DEBUG
+                    logger::println("AK45_10");
+                #endif
+                ElbowJoint::set_motor(new AK45_10(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
                 break;
 			case (uint8_t)config_defs::motor::MaxonMotor:
                 #ifdef JOINT_DEBUG
@@ -1238,6 +1420,242 @@ void ElbowJoint::set_controller(uint8_t controller_id)  //Changes the high level
             break;
         case (uint8_t)config_defs::elbow_controllers::step:
             _controller = &_step;
+            break;
+        default:
+            logger::print("Unkown Controller!\n", LogLevel::Error);
+            _controller = &_zero_torque;
+            break;
+    }
+};
+
+//*********************************************
+Arm1Joint::Arm1Joint(config_defs::joint_id id, ExoData* exo_data)
+: _Joint(id, exo_data)
+, _zero_torque(id, exo_data)
+, _spline(id, exo_data)
+, _constant_torque(id, exo_data)
+{
+    #ifdef JOINT_DEBUG
+        logger::print(_is_left ? "Left " : "Right ");
+        logger::println("Arm 1 : Constructor");
+    #endif
+
+    if (_is_left)
+    {
+        _joint_data = &(exo_data->left_side.arm_1);
+    }
+    else
+    {
+        _joint_data = &(exo_data->right_side.arm_1);
+    }
+
+    if (_joint_data->is_used)
+    {
+        switch (exo_data->left_side.arm_1.motor.motor_type)
+        {
+            case (uint8_t)config_defs::motor::AK60:
+                Arm1Joint::set_motor(new AK60(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK80:
+                Arm1Joint::set_motor(new AK80(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK60v1_1:
+                Arm1Joint::set_motor(new AK60v1_1(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK70:
+                Arm1Joint::set_motor(new AK70(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK60v3:
+                Arm1Joint::set_motor(new AK60v3(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_36:
+                Arm1Joint::set_motor(new AK45_36(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_10:
+                Arm1Joint::set_motor(new AK45_10(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::MaxonMotor:
+                Arm1Joint::set_motor(new MaxonMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            default:
+                Arm1Joint::set_motor(new NullMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+        }
+
+        delay(5);
+        set_controller(exo_data->left_side.arm_1.controller.controller);
+    }
+};
+
+void Arm1Joint::run_joint()
+{
+    set_controller(_joint_data->controller.controller);
+
+    _joint_data->controller.setpoint = _controller->calc_motor_cmd();
+
+    const uint16_t exo_status = _data->get_status();
+    const bool correct_status = (exo_status == status_defs::messages::trial_on) ||
+        (exo_status == status_defs::messages::fsr_calibration) ||
+        (exo_status == status_defs::messages::fsr_refinement);
+    const bool error = correct_status ? _error_manager.run(_joint_data) : false;
+
+    if (error)
+    {
+        _motor->set_error();
+        _motor->on_off();
+        _motor->enable();
+
+        for (int i = 0; i < _error_manager.errorQueueSize(); i++)
+        {
+            ErrorReporter::get_instance()->report(_error_manager.popError(), _id);
+        }
+    }
+
+    bool is_AK60v3 = (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::AK60v3);
+
+    _motor->on_off();
+    if (!is_AK60v3)
+    {
+        _motor->enable();
+    }
+
+    _motor->transaction(_joint_data->controller.setpoint / _joint_data->motor.gearing);
+};
+
+void Arm1Joint::set_controller(uint8_t controller_id)
+{
+    switch (controller_id)
+    {
+        case (uint8_t)config_defs::arm_1_controllers::disabled:
+            _joint_data->motor.enabled = false;
+            _controller = &_zero_torque;
+            break;
+        case (uint8_t)config_defs::arm_1_controllers::zero_torque:
+            _controller = &_zero_torque;
+            break;
+        case (uint8_t)config_defs::arm_1_controllers::constant_torque:
+            _controller = &_constant_torque;
+            break;
+        case (uint8_t)config_defs::arm_1_controllers::spline:
+            _controller = &_spline;
+            break;
+        default:
+            logger::print("Unkown Controller!\n", LogLevel::Error);
+            _controller = &_zero_torque;
+            break;
+    }
+};
+
+//*********************************************
+Arm2Joint::Arm2Joint(config_defs::joint_id id, ExoData* exo_data)
+: _Joint(id, exo_data)
+, _zero_torque(id, exo_data)
+, _spline(id, exo_data)
+, _constant_torque(id, exo_data)
+{
+    #ifdef JOINT_DEBUG
+        logger::print(_is_left ? "Left " : "Right ");
+        logger::println("Arm 2 : Constructor");
+    #endif
+
+    if (_is_left)
+    {
+        _joint_data = &(exo_data->left_side.arm_2);
+    }
+    else
+    {
+        _joint_data = &(exo_data->right_side.arm_2);
+    }
+
+    if (_joint_data->is_used)
+    {
+        switch (exo_data->left_side.arm_2.motor.motor_type)
+        {
+            case (uint8_t)config_defs::motor::AK60:
+                Arm2Joint::set_motor(new AK60(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK80:
+                Arm2Joint::set_motor(new AK80(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK60v1_1:
+                Arm2Joint::set_motor(new AK60v1_1(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK70:
+                Arm2Joint::set_motor(new AK70(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK60v3:
+                Arm2Joint::set_motor(new AK60v3(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_36:
+                Arm2Joint::set_motor(new AK45_36(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::AK45_10:
+                Arm2Joint::set_motor(new AK45_10(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            case (uint8_t)config_defs::motor::MaxonMotor:
+                Arm2Joint::set_motor(new MaxonMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+            default:
+                Arm2Joint::set_motor(new NullMotor(id, exo_data, _Joint::get_motor_enable_pin(id, exo_data)));
+                break;
+        }
+
+        delay(5);
+        set_controller(exo_data->left_side.arm_2.controller.controller);
+    }
+};
+
+void Arm2Joint::run_joint()
+{
+    set_controller(_joint_data->controller.controller);
+
+    _joint_data->controller.setpoint = _controller->calc_motor_cmd();
+
+    const uint16_t exo_status = _data->get_status();
+    const bool correct_status = (exo_status == status_defs::messages::trial_on) ||
+        (exo_status == status_defs::messages::fsr_calibration) ||
+        (exo_status == status_defs::messages::fsr_refinement);
+    const bool error = correct_status ? _error_manager.run(_joint_data) : false;
+
+    if (error)
+    {
+        _motor->set_error();
+        _motor->on_off();
+        _motor->enable();
+
+        for (int i = 0; i < _error_manager.errorQueueSize(); i++)
+        {
+            ErrorReporter::get_instance()->report(_error_manager.popError(), _id);
+        }
+    }
+
+    bool is_AK60v3 = (_joint_data->motor.motor_type == (uint8_t)config_defs::motor::AK60v3);
+
+    _motor->on_off();
+    if (!is_AK60v3)
+    {
+        _motor->enable();
+    }
+
+    _motor->transaction(_joint_data->controller.setpoint / _joint_data->motor.gearing);
+};
+
+void Arm2Joint::set_controller(uint8_t controller_id)
+{
+    switch (controller_id)
+    {
+        case (uint8_t)config_defs::arm_2_controllers::disabled:
+            _joint_data->motor.enabled = false;
+            _controller = &_zero_torque;
+            break;
+        case (uint8_t)config_defs::arm_2_controllers::zero_torque:
+            _controller = &_zero_torque;
+            break;
+        case (uint8_t)config_defs::arm_2_controllers::constant_torque:
+            _controller = &_constant_torque;
+            break;
+        case (uint8_t)config_defs::arm_2_controllers::spline:
+            _controller = &_spline;
             break;
         default:
             logger::print("Unkown Controller!\n", LogLevel::Error);

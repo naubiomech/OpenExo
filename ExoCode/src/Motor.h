@@ -288,5 +288,25 @@ class AK60v3 : public _CANMotor
           ~AK60v3(){};
 };
 
+/**
+* @brief Class for AK45-36 motor
+*/
+class AK45_36 : public _CANMotor
+{
+  	public:
+          AK45_36(config_defs::joint_id id, ExoData* exo_data, int enable_pin); // Constructor: type is the motor type
+          ~AK45_36(){};
+};
+
+/**
+* @brief Class for AK45-10 motor
+*/
+class AK45_10 : public _CANMotor
+{
+  	public:
+          AK45_10(config_defs::joint_id id, ExoData* exo_data, int enable_pin); // Constructor: type is the motor type
+          ~AK45_10(){};
+};
+
 #endif
 #endif
