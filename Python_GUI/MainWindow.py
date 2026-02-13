@@ -119,6 +119,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.bio_feedback_page.deviceStopRequested.connect(self._on_device_stop_motors)
         self.bio_feedback_page.recalibrateFSRRequested.connect(self._on_recal_fsr)
         self.bio_feedback_page.markTrialRequested.connect(self._on_mark)
+        
+        # Display log file location for debugging
+        log_path = self.qt_dev.get_log_file_path()
+        if log_path and log_path != "Log file not available":
+            print(f"\n{'='*80}")
+            print(f"Device Manager Log File: {log_path}")
+            print(f"{'='*80}\n")
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
