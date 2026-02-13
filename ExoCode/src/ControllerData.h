@@ -241,6 +241,24 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t num_parameter = 17;
     }
 
+    namespace angle_based
+    {
+        const uint8_t stance_extension_setpoint_idx = 0;        //Stance Phase Extension Setpoint (Nm)
+        const uint8_t stance_flexion_setpoint_idx = 1;          //Stance Phase Flexion Setpoint (Nm)
+        const uint8_t swing_setpoint_idx = 2;                   //Swing Phase Setpoint (Nm)
+        const uint8_t swing_assist_endpoint_idx = 3;            //Duration of Swing Phase Assistance (ms)
+        const uint8_t max_torque_idx = 4;                       //Maximum Torque Limit (Nm)
+        const uint8_t recalibrate_flag_idx = 5;                 //Flag to Recalibrate Normalized Moment (change value to recalibrate)
+        const uint8_t recalibrate_angle_idx = 6;                //Flag to recalibrate normalized angle
+        const uint8_t offset_alpha_idx = 7;                       //value of EWMA alpha for angle offset (between 0 and 1)
+        const uint8_t lower_toe_threshold_idx = 8;              //Toe FSR threshold to enter stance (0-1)
+        const uint8_t upper_toe_threshold_idx = 9;              //Toe FSR threshold to enter swing (0-1)
+        const uint8_t correction_factor_0_idx = 10;             //Correction factor for angle offset
+        const uint8_t correction_factor_1_idx = 11;             //Correction factor for angle offset
+        const uint8_t correction_factor_2_idx = 12;             //Correction factor for angle offset
+        const uint8_t num_parameter = 13;
+    }
+    
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
 }
 
@@ -434,6 +452,27 @@ class ControllerData {
         //Variables for the PHMC Controller
         float fs;
         float state;
+
+        //Variables for angle based controller
+        float encoder_angle;
+        float encoder_offset;
+        float intended_encoder_offset;
+        float combined_fsr;
+        float stance_moment;
+        float normalized_stance_moment;
+        float min_stance_moment;
+        float max_stance_moment;
+        int recal_flag;
+        int control_state;
+        float filt_cmd_ff;
+        float normalized_angle;
+        int recal_angle;
+        float maxAngle;
+        float minAngle;
+        int steps;
+        float sum_min;
+        bool local_toe_stance;
+        float max_torque;
 };      
 
 #endif

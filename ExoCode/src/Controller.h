@@ -523,5 +523,90 @@ private:
 
 };
 
+/**
+ * @brief Angle Based Controller 
+ * 
+ * NOTE: THIS CONTROLLER IS STILL UNDER DEVELOPMENT 
+ * 
+ * See ControllerData.h for details on the user defined parameters utilized.
+ */
+class AngleBased : public _Controller
+{
+public:
+    AngleBased(config_defs::joint_id id, ExoData* exo_data);
+    ~AngleBased() {};    
+    float encoder_angle;            /* Stores current encoder angle, after being normalized to the calibrated offset. */
+    float combined_fsr;             /* Stores the combined(toeand heel) fsr value. */
+    float correction_factor[3];        /* Correction factor for the encoders when torque is being applied by the motor*/
+    float limit_rate;               /* The max rate (in rads) at which the encode angle is allowed to change per ms*/
+    int last_update_time;           /* Stores the last time the enocders were updated*/
+    float offset_alpha;               /* The alpha value used in the exponential weighted moving average equation */
+    float diff_cmd;                 /* Stores the difference in command values use to update the encoder offset */
+    float torque_alpha;             /* The alpha value used in the exponential weighted moving average equation for torque*/
+    float filt_cmd_ff;          /* Stores the filtered torque value */
+    float encoder_offset;           /* Store the encoder offset from the calibarition phase at the initation of the trial. */
+    float intended_encoder_offset;  /* Stores the goal encoder offset while the rate limit begins to chage the actual encoder offset */
+    float encoder_offset_0;         /* Stores original encoder offset*/
+    bool skip_intended_encoder_offset; /* Flag to skip the intended encoder offset calculation. */
+    bool first_loop;                /* Flag to initiate encoder calibration at the initiation of the trial.*/
+    
+    float stance_moment;            /* Estimate stance moment by multiplying hip angle by combined fsr. */
+    float normalized_stance_moment; /* Normalized stance_moment to - 1 to 1 range. */
+    float max_stance_moment;        /* Maxium stance_moment from calibration period. */
+    float min_stance_moment;        /* Minimum stance_moment from calibration period. */
+    bool startFlag;                 /* Flag to mark the time at which the lastest instance of swing phase began. */
+    unsigned long swingStartTime;   /* Stores the time at which the latest instance of swing phase began. */
+    float swingStartPhase;          /* Stores the percent gait phase at which the latest instance of swing began. */
+    int steps;                      /* Number of steps that have occured. */
+    int prev_recalibrate_value;
+    int recal_loop_flag;
+    float local_max;
+    float local_min;
+    int ending_step;
+    float upper_toe_change;
+    float lower_toe_change;
+    bool local_toe_stance;          /* Flag to indicate if the toe is in stance phase. Needs different thresholds than the ankle so keeping it here to avoid conflict */
+    float raw_toe_fsr;
+    float lower_toe_threshold;
+    float upper_toe_threshold;
+    float prev_toe_fsr;
+    
+    int state;
+    int prev_state;
+    float normalized_angle;
+    float max_angle;
+    float min_angle;
+    float local_angle_max;
+    float local_angle_min;
+    int recal_angle_flag;
+    int prev_recal_angle_flag;
+    int recal_angle_loop;
+    int ending_angle;
+    int prev_step;
+    float sum_max_angle;
+    float sum_min_angle;
+    float average_max_angle;
+    float average_min_angle;
+    int count;
+    int moment_count;
+    float sum_max;
+    float sum_min;
+    int starting_angle;
+    int starting_step;
+    long prev_time;
+    float prev_cmd;
+    bool calibrating;
+    //Functions
+    float calc_motor_cmd();         /* Function to calcualte the desired motor command. */
+    void calibrate_encoders();      /* Function to finds the offset angle when the user is standing still upon initiation of the trial. */
+    void normalize_stance_moment(); /* Function to calucalte the max and min stance_moment to normalize to the variable between -1 and 1. */
+    void normalize_angle();
+    bool local_toe_stance_schmitt();    /* Function to determine toe stance using Schmidt method, this toe stance is specific only to the anglebased hip controller*/
+    //float getAngle();               /* Function to get the average angle over the past *5* readings. */
+
+    private:
+
+};
+
 #endif
 #endif

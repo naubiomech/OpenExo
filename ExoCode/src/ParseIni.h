@@ -160,6 +160,7 @@ namespace config_defs
         phmc = 7,
 		calibr_manager = 8,
         spline = 9,
+        angle_based = 10,
 		
 		Count //Leave this at the end of the enum class. Count can be used to get the total number of controllers defined for this joint.
     };
@@ -496,6 +497,7 @@ namespace config_defs
             {"phmc", (uint8_t)config_defs::hip_controllers::phmc},
 			{"calibrManager", (uint8_t)config_defs::hip_controllers::calibr_manager},
             {"spline", (uint8_t)config_defs::hip_controllers::spline},
+            {"angleBased", (uint8_t)config_defs::hip_controllers::angle_based},
 
         };
         

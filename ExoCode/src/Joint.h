@@ -163,6 +163,7 @@ class HipJoint : public _Joint
         Step _step;                                     /**< Step Controller for Device Characterization */
         ProportionalHipMoment _proportional_hip_moment; /**< Proportional Hip Moment Conroller */
         CalibrManager _calibr_manager;                  /**< Calibration Manager "Controller" */
+        AngleBased _angle_based;                        /**< Angle Based controller */
 		
 };
 

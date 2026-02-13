@@ -1,0 +1,6 @@
+5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,,,,,,,
+13,"parameter number, the number of parameters to read per line",,,,,,,,,,,
+,Parameter list for the ZeroTorque controller,,,,,,,,,,,
+,Parameter order: ,,,,,,,,,,,
+Stance Extension Setpoint (Nm),Stance Flexion Setpoint (Nm),swing_setpoint,Swing Assistance Endpoint (% gait),Maximum Torque Setpoint (Nm),Recalibrate Flag,Recalibrate_Angle,EWMA Alpha,Low Toe Stance Threshold,Upper Toe Stance Threshold,Angle Correction Factor 0,Angle Correction Factor 1,Angle Correction Factor 2
+5,3,2.5,85,9,0,0,87.5,0.01,0.01,3500,51.9,-13.3
