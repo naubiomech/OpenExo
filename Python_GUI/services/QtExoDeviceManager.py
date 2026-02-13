@@ -36,6 +36,9 @@ class QtExoDeviceManager(QtCore.QObject):
     dataReceived = QtCore.Signal(bytes)     # raw bytes from UART RX notify
     deviceErrorReceived = QtCore.Signal(str)  # error messages from ErrorChar notify
     scanResults = QtCore.Signal(list)       # list[(name, address)]
+    scanProgress = QtCore.Signal(int)       # scan progress percentage (0-100)
+    connectScanProgress = QtCore.Signal(int) # scanning phase during connection (0-100)
+    connectionProgress = QtCore.Signal(int) # connection progress percentage (0-100)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -44,6 +47,7 @@ class QtExoDeviceManager(QtCore.QObject):
         self._is_connecting = False
         self._is_connected = False
         self._error_notify_enabled = False
+        self._intentional_disconnect = False  # Track if disconnect was intentional
         # Persistent asyncio loop running in a background thread
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._loop_thread: Optional[threading.Thread] = None
@@ -59,12 +63,16 @@ class QtExoDeviceManager(QtCore.QObject):
         self._is_connecting = False
         self._client = None
 
-        if reason:
-            self.log.emit(f"Disconnected ({reason})")
-        else:
-            self.log.emit("Disconnected")
-
-        self.disconnected.emit()
+        # Only emit signals if this was NOT an intentional disconnect
+        if not self._intentional_disconnect:
+            if reason:
+                self.log.emit(f"Disconnected ({reason})")
+            else:
+                self.log.emit("Disconnected")
+            self.disconnected.emit()
+        
+        # Reset flag for next time
+        self._intentional_disconnect = False
 
     @QtCore.Slot(str)
     def set_mac(self, mac: str):
@@ -81,16 +89,60 @@ class QtExoDeviceManager(QtCore.QObject):
         async def _run_scan():
             results = {}
             try:
-                self.log.emit("Scanning (UART UUID filter)…")
-                for i in range(3):
-                    print(f"[QtExoDeviceManager] scan attempt {i+1} of 3")
+                self.scanProgress.emit(0)
+                self.log.emit("Scanning for devices (UART UUID filter)…")
+                print(f"[QtExoDeviceManager] Starting BLE scan with UART service filter")
+                
+                # Simulate progress during scan with periodic updates
+                scan_duration = 10.0  # seconds
+                update_interval = 0.5  # update every 0.5 seconds
+                updates = int(scan_duration / update_interval)
+                
+                # Start the scan in background
+                scan_task = asyncio.create_task(
+                    BleakScanner.discover(
+                        timeout=scan_duration,
+                        service_uuids=[UART_SERVICE_UUID]
+                    )
+                )
+                
+                # Update progress while scanning
+                for i in range(updates):
+                    if scan_task.done():
+                        break
+                    progress = int((i + 1) / updates * 90)  # Go up to 90%
+                    self.scanProgress.emit(progress)
+                    await asyncio.sleep(update_interval)
+                
+                # Wait for scan to complete
+                devices = await scan_task
+                self.scanProgress.emit(95)
+                
+                print(f"[QtExoDeviceManager] Scan found {len(devices)} device(s)")
+                
+                # Filter and collect all matching devices
+                for device in devices:
                     try:
-                        device = await BleakScanner.find_device_by_filter(self._filter_exo)
-                        if device:
+                        # Double-check with our filter (belt and suspenders approach)
+                        if device.address not in results:
                             results[device.address] = device.name or "Unknown"
+                            print(f"[QtExoDeviceManager] Found: {device.name} ({device.address})")
                     except Exception as ex:
-                        print(f"[QtExoDeviceManager] scan error: {ex}")
+                        print(f"[QtExoDeviceManager] Error processing device: {ex}")
+                
+                self.scanProgress.emit(100)
+                
+                if not results:
+                    self.log.emit("No OpenExo devices found")
+                else:
+                    self.log.emit(f"Found {len(results)} OpenExo device(s)")
+                    
+            except Exception as ex:
+                self.error.emit(f"Scan error: {ex}")
+                print(f"[QtExoDeviceManager] scan error: {ex}")
+                self.scanProgress.emit(0)  # Reset on error
             finally:
+                # Convert to list format: [(name, address), ...]
                 lst = [(name, addr) for addr, name in results.items()]
                 self.scanResults.emit(lst)
 
@@ -117,83 +169,125 @@ class QtExoDeviceManager(QtCore.QObject):
 
         async def _run_connect():
             try:
-                attempts = 4
-                for attempt in range(attempts):
-                    self.log.emit(f"Attempt {attempt+1} of {attempts}")
-                    # exoDeviceManager.py approach: filter by UART service UUID during scan
-                    self.log.emit("Scanning with UART UUID filter…")
-                    device = None
-                    try:
-                        device = await BleakScanner.find_device_by_filter(self._filter_exo, timeout=10.0)
-                    except Exception as se:
-                        print(f"[QtExoDeviceManager] find_device_by_filter error: {se}")
+                self.connectScanProgress.emit(0)
+                self.connectionProgress.emit(0)
+                # Wrap entire connection process in timeout (40 seconds total - 4 attempts × 10s each)
+                async with asyncio.timeout(40):
+                    attempts = 4
+                    for attempt in range(attempts):
+                        # Scanning phase progress: each attempt gets 25% (0-100%)
+                        scan_base = int((attempt / attempts) * 100)
+                        self.connectScanProgress.emit(scan_base)
+                        
+                        self.log.emit(f"Attempt {attempt+1} of {attempts}")
+                        self.log.emit("Scanning for device…")
+                        
+                        device = None
+                        try:
+                            # Each scan attempt has 8 second timeout with progress updates
+                            scan_duration = 8.0
+                            scan_start = asyncio.get_event_loop().time()
+                            
+                            # Start scanning in background
+                            scan_task = asyncio.create_task(
+                                BleakScanner.find_device_by_filter(self._filter_exo, timeout=scan_duration)
+                            )
+                            
+                            # Update progress while scanning
+                            while not scan_task.done():
+                                elapsed = asyncio.get_event_loop().time() - scan_start
+                                scan_progress = min(elapsed / scan_duration, 1.0)
+                                # Map to current attempt's 25% range
+                                progress = scan_base + int(scan_progress * 25)
+                                self.connectScanProgress.emit(progress)
+                                await asyncio.sleep(0.2)  # Update every 200ms
+                            
+                            device = await scan_task
+                        except Exception as se:
+                            print(f"[QtExoDeviceManager] find_device_by_filter error: {se}")
 
-                    if device:
-                        self.log.emit(f"Found: {device.name} - {device.address}")
-                        # If a specific MAC was requested, ensure match
-                        if self._mac and device.address != self._mac:
-                            self.log.emit("Found device does not match the specified address.")
-                            device = None
+                        if device:
+                            # Device found - hide scanning bar, start connection bar
+                            self.connectScanProgress.emit(100)  # Complete scanning
+                            self.log.emit(f"Found: {device.name} - {device.address}")
+                            # If a specific MAC was requested, ensure match
+                            if self._mac and device.address != self._mac:
+                                self.log.emit("Found device does not match the specified address.")
+                                device = None
+                            else:
+                                # Hide scanning bar, start connecting phase
+                                self.connectScanProgress.emit(-1)  # Signal to hide scanning bar
+                                self.connectionProgress.emit(20)
+                                self.log.emit("Connecting to device…")
+                                print(f"[QtExoDeviceManager] connecting to {device.name} {device.address}")
+                                def _disc_cb(_):
+                                    try:
+                                        self._mark_disconnected("link lost")
+                                    except Exception:
+                                        pass
+                                client = BleakClient(device, disconnected_callback=_disc_cb)
+                                ok = await client.connect()
+                                self.connectionProgress.emit(50)
+                                print(f"[QtExoDeviceManager] connect() returned={ok}, is_connected={getattr(client, 'is_connected', False)}")
+                                if not getattr(client, "is_connected", False):
+                                    # Cleanup and retry next attempt
+                                    self.connectionProgress.emit(0)
+                                    self.connectScanProgress.emit(scan_base)  # Keep scan progress
+                                    try:
+                                        await client.disconnect()
+                                    except Exception:
+                                        pass
+                                    await asyncio.sleep(2)
+                                    continue
+
+                                # Touch services to populate cache
+                                self.connectionProgress.emit(65)
+                                _ = client.services
+
+                                def _on_rx(sender, data: bytearray):
+                                    try:
+                                        self.dataReceived.emit(bytes(data))
+                                    except Exception:
+                                        pass
+
+                                def _on_error(sender, data: bytearray):
+                                    try:
+                                        msg = bytes(data).decode("utf-8", errors="ignore").strip("\x00").strip()
+                                        if msg:
+                                            self.deviceErrorReceived.emit(msg)
+                                    except Exception:
+                                        pass
+
+                                self.connectionProgress.emit(75)
+                                self.log.emit("Starting notifications…")
+                                await client.start_notify(UART_RX_UUID, _on_rx)
+                                self._error_notify_enabled = False
+                                try:
+                                    await client.start_notify(ERROR_CHAR_UUID, _on_error)
+                                    self._error_notify_enabled = True
+                                except Exception as ex:
+                                    self.log.emit("Error characteristic not found; continuing with UART only.")
+                                    print(f"[QtExoDeviceManager] error char notify failed: {ex}")
+
+                                self.connectionProgress.emit(90)
+                                self._client = client
+                                self._is_connected = True
+                                self.connected.emit(device.name or "", device.address)
+                                self.connectionProgress.emit(100)
+                                self.log.emit("Connected and notifications started")
+                                print("[QtExoDeviceManager] connected; notify started")
+                                return
                         else:
-                            # Try to connect
-                            self.log.emit("Connecting…")
-                            print(f"[QtExoDeviceManager] connecting to {device.name} {device.address}")
-                            def _disc_cb(_):
-                                try:
-                                    self._mark_disconnected("link lost")
-                                except Exception:
-                                    pass
-                            client = BleakClient(device, disconnected_callback=_disc_cb)
-                            ok = await client.connect()
-                            print(f"[QtExoDeviceManager] connect() returned={ok}, is_connected={getattr(client, 'is_connected', False)}")
-                            if not getattr(client, "is_connected", False):
-                                # Cleanup and retry next attempt
-                                try:
-                                    await client.disconnect()
-                                except Exception:
-                                    pass
-                                await asyncio.sleep(2)
-                                continue
+                            self.log.emit("No device found.")
 
-                            # Touch services to populate cache
-                            _ = client.services
-
-                            def _on_rx(sender, data: bytearray):
-                                try:
-                                    self.dataReceived.emit(bytes(data))
-                                except Exception:
-                                    pass
-
-                            def _on_error(sender, data: bytearray):
-                                try:
-                                    msg = bytes(data).decode("utf-8", errors="ignore").strip("\x00").strip()
-                                    if msg:
-                                        self.deviceErrorReceived.emit(msg)
-                                except Exception:
-                                    pass
-
-                            self.log.emit("Starting notifications…")
-                            await client.start_notify(UART_RX_UUID, _on_rx)
-                            self._error_notify_enabled = False
-                            try:
-                                await client.start_notify(ERROR_CHAR_UUID, _on_error)
-                                self._error_notify_enabled = True
-                            except Exception as ex:
-                                self.log.emit("Error characteristic not found; continuing with UART only.")
-                                print(f"[QtExoDeviceManager] error char notify failed: {ex}")
-
-                            self._client = client
-                            self._is_connected = True
-                            self.connected.emit(device.name or "", device.address)
-                            self.log.emit("Connected and notifications started")
-                            print("[QtExoDeviceManager] connected; notify started")
-                            return
-                    else:
-                        self.log.emit("No device found.")
-
-                # If we exit loop without returning
-                self.error.emit("Max attempts reached. Could not connect.")
+                    # If we exit loop without returning
+                    self.error.emit("Max attempts reached. Could not connect.")
+            except asyncio.TimeoutError:
+                self.connectionProgress.emit(0)
+                self.error.emit("Connection timeout after 40 seconds")
+                print(f"[QtExoDeviceManager] connect timeout after 40 seconds")
             except Exception as ex:
+                self.connectionProgress.emit(0)
                 self.error.emit(str(ex))
                 print(f"[QtExoDeviceManager] connect error: {ex}")
             finally:
@@ -204,47 +298,46 @@ class QtExoDeviceManager(QtCore.QObject):
 
     @QtCore.Slot()
     def disconnect(self):
-        if not self._client and not self._loop:
+        """Immediately disconnect from device (intentional disconnect)."""
+        if not self._client:
             return
-
+        
+        # Mark as intentional so we don't show disconnect notification
+        self._intentional_disconnect = True
+        
+        # Immediately mark as disconnected in UI
+        self._is_connected = False
+        self._is_connecting = False
+        
+        # Store client reference and clear it immediately
+        client_to_disconnect = self._client
+        self._client = None
+        
+        # Do the actual BLE disconnect in background (non-blocking)
         async def _run_disconnect():
             try:
-                if self._client:
+                if client_to_disconnect:
                     try:
-                        await self._client.stop_notify(UART_RX_UUID)
+                        await client_to_disconnect.stop_notify(UART_RX_UUID)
                     except Exception:
                         pass
                     if self._error_notify_enabled:
                         try:
-                            await self._client.stop_notify(ERROR_CHAR_UUID)
+                            await client_to_disconnect.stop_notify(ERROR_CHAR_UUID)
                         except Exception:
                             pass
                     try:
-                        await self._client.disconnect()
+                        await client_to_disconnect.disconnect()
                     except Exception:
                         pass
-                    self.log.emit("Disconnected")
+                print("[QtExoDeviceManager] Disconnect complete")
             except Exception as ex:
-                self.error.emit(str(ex))
-            finally:
-                self._client = None
-                self._is_connected = False
-                self.disconnected.emit()
+                print(f"[QtExoDeviceManager] Disconnect error: {ex}")
 
         if self._loop:
-            fut = asyncio.run_coroutine_threadsafe(_run_disconnect(), self._loop)
-
-            def _stop_loop(_):
-                try:
-                    if self._loop:
-                        self._loop.call_soon_threadsafe(self._loop.stop)
-                except Exception:
-                    pass
-                finally:
-                    self._loop = None
-                    self._loop_thread = None
-
-            fut.add_done_callback(_stop_loop)
+            # Fire and forget - don't wait for disconnect to complete
+            asyncio.run_coroutine_threadsafe(_run_disconnect(), self._loop)
+            # Don't stop the loop - keep it running for reconnection
 
     @QtCore.Slot(bytes)
     def write(self, payload: bytes):
@@ -267,6 +360,12 @@ class QtExoDeviceManager(QtCore.QObject):
     def _ensure_connected(self) -> bool:
         if not (self._client and self._loop and self._is_connected):
             self.error.emit("Not connected")
+            return False
+
+        # Check if the asyncio loop thread is still alive
+        if not (self._loop_thread and self._loop_thread.is_alive()):
+            self._mark_disconnected("event loop died")
+            self.error.emit("Not connected - event loop stopped")
             return False
 
         # If the OS link dropped, BleakClient.is_connected will be False.

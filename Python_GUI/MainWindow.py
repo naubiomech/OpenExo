@@ -90,10 +90,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._csv_preamble = ""  # Preamble for CSV filename
         # Store controller -> params 2D matrix
         self._controller_matrix = []
-        # Track intentional disconnect
-        self._intentional_disconnect = False
-        # Suppress unexpected-disconnect popup for a brief window after intentional actions (e.g., End Trial)
-        self._suppress_disconnect_popup_until = 0.0
         # Device control wiring from ActiveTrialPage
         self.trial_page.deviceStartRequested.connect(self._on_device_start)
         self.trial_page.deviceStopRequested.connect(self._on_device_stop_motors)
@@ -136,6 +132,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # Clear old plot data
         try:
             self.trial_page.clear_plots()
+        except Exception:
+            pass
+        # Reset data rate monitoring
+        try:
+            self.rt_bridge.reset_monitoring()
         except Exception:
             pass
         # Ensure CSV logging is started automatically with timestamped filename
@@ -351,23 +352,35 @@ class MainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def _on_end_trial(self):
         try:
-            # Mark as intentional disconnect
-            self._intentional_disconnect = True
+            # Print trial summary diagnostics
+            try:
+                self.rt_bridge.print_trial_summary()
+            except Exception:
+                pass
             
-            # A disconnect may fire more than once (explicit disconnect + OS callback);
-            # suppress the "unexpected disconnect" popup for a short window.
-            self._suppress_disconnect_popup_until = time.monotonic() + 3.0
-
+            # Send stop trial and motor off commands immediately
+            try:
+                self.qt_dev.write(b'G')  # Stop trial
+                self.qt_dev.write(b'w')  # Motor off - CRITICAL SAFETY COMMAND
+            except Exception:
+                pass
+            
+            # Reset scan page buttons immediately
+            self.scan_page.btn_start_trial.setEnabled(False)
+            self.scan_page.btn_calibrate_torque.setEnabled(False)
+            self.scan_page.btn_save_connect.setEnabled(True)
+            
+            # Clear trial page plots
+            try:
+                self.trial_page.clear_plots()
+            except Exception:
+                pass
+            
             # Navigate to scan page immediately
             self.stack.setCurrentWidget(self.scan_page)
             
-            # Send stop trial and motor off commands, then disconnect
-            try:
-                self.qt_dev.write(b'G')  # Stop trial
-                QtCore.QTimer.singleShot(100, lambda: self.qt_dev.write(b'w'))  # Motor off after delay
-                QtCore.QTimer.singleShot(500, self.qt_dev.disconnect)  # Disconnect after commands sent
-            except Exception:
-                pass
+            # Wait 200ms to ensure motor off command is sent before disconnecting
+            QtCore.QTimer.singleShot(200, self.qt_dev.disconnect)
             
             # Stop CSV if running
             if self._csv_file is not None:
@@ -395,15 +408,11 @@ class MainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def _on_disconnect(self):
         try:
-            # Mark as intentional disconnect
-            self._intentional_disconnect = True
+            # Disconnect immediately (non-blocking, no popup)
+            self.qt_dev.disconnect()
             
-            self._suppress_disconnect_popup_until = time.monotonic() + 3.0
-
             # Navigate to scan page immediately
             self.stack.setCurrentWidget(self.scan_page)
-            
-            self.qt_dev.disconnect()
             # Stop CSV if running
             if self._csv_file is not None:
                 try:
@@ -567,15 +576,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def _on_dev_disconnected(self):
+        """Handle unexpected disconnects (intentional disconnects don't trigger this)."""
         try:
-            # Check if this was an intentional disconnect (or immediately followed an intentional action)
-            now = time.monotonic()
-            is_intentional = self._intentional_disconnect or (now < self._suppress_disconnect_popup_until)
-            # Reset flag (but keep the time window so duplicate disconnect signals don't trigger a popup)
-            self._intentional_disconnect = False
-
-            
-            self.scan_page.status.setText("Disconnected")
+            self.scan_page.status.setText("Disconnected unexpectedly")
             self.scan_page.btn_save_connect.setEnabled(True)
             self.scan_page.btn_start_trial.setEnabled(False)
             try:
@@ -583,20 +586,19 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception:
                 pass
             
-            # Only show popup for unintentional disconnects
-            if not is_intentional:
-                try:
-                    self.qt_dev.motorOff()
-                    self.qt_dev.stopTrial()
-                except Exception:
-                    pass
-                # Popup dialog informing user of unexpected disconnect
-                try:
-                    QtWidgets.QMessageBox.warning(self, "Device Disconnected", "The device has been unexpectedly disconnected.")
-                except Exception:
-                    pass
-                # Navigate back to the Scan page on unexpected disconnect
-                self.stack.setCurrentWidget(self.scan_page)
+            # This is an unexpected disconnect - show popup
+            try:
+                self.qt_dev.motorOff()
+                self.qt_dev.stopTrial()
+            except Exception:
+                pass
+            # Popup dialog informing user of unexpected disconnect
+            try:
+                QtWidgets.QMessageBox.warning(self, "Device Disconnected", "The device has been unexpectedly disconnected.")
+            except Exception:
+                pass
+            # Navigate back to the Scan page on unexpected disconnect
+            self.stack.setCurrentWidget(self.scan_page)
             
             # Ensure CSV is closed and announce saved path
             if self._csv_file is not None:

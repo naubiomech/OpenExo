@@ -1,4 +1,5 @@
 from typing import List
+import time
 
 try:
     from PySide6 import QtCore
@@ -48,10 +49,50 @@ class RtBridge(QtCore.QObject):
 
         # Handshake payload reassembly state
         self._collecting_handshake_payload = False
+        
+        # Data rate monitoring
+        self.DEBUG_DATA_RATE = True  # Set to False to disable data rate printing
+        self._data_packet_count = 0
+        self._bytes_received = 0
+        self._data_rate_timer = QtCore.QTimer()
+        self._data_rate_timer.timeout.connect(self._print_data_rate)
+        self._data_rate_timer.start(1000)  # Print every 1 second
+        self._last_packet_time = None
+        self._packet_intervals = []  # Track time between packets for jitter analysis
+        self._expected_hz = 100  # Expected data rate (will auto-detect)
+        self._total_packets_received = 0
+        self._total_time_elapsed = 0.0
+        self._monitoring_start_time = None
+        self._dropped_packet_count = 0
+        
+        # Additional BLE metrics
+        self._ble_chunk_count = 0  # Number of BLE chunks received (not packets)
+        self._ble_chunk_sizes = []  # Track BLE chunk sizes
+        self._consecutive_drops = 0  # Track consecutive packet drops
+        self._max_consecutive_drops = 0  # Worst consecutive drop streak
+        self._stall_count = 0  # Number of times data stopped flowing >100ms
+        self._last_stall_time = None
+        
         self._handshake_payload_buf: str = ""
 
     @QtCore.Slot(bytes)
     def feed_bytes(self, data: bytes):
+        # Track bytes received
+        self._bytes_received += len(data)
+        
+        # Track BLE chunk metrics
+        self._ble_chunk_count += 1
+        chunk_size = len(data)
+        self._ble_chunk_sizes.append(chunk_size)
+        
+        # Detect stalls (>100ms between any data)
+        current_time = time.time()
+        if self._last_stall_time is not None:
+            stall_interval = (current_time - self._last_stall_time) * 1000
+            if stall_interval > 100:
+                self._stall_count += 1
+        self._last_stall_time = current_time
+        
         try:
             s = data.decode("utf-8")
         except Exception:
@@ -284,6 +325,35 @@ class RtBridge(QtCore.QObject):
                             elif len(values) > 16:
                                 values = values[:16]
                             self.rtDataUpdated.emit(values)
+                            
+                            # Track data rate and timing
+                            self._data_packet_count += 1
+                            self._total_packets_received += 1
+                            current_time = time.time()
+                            
+                            if self._monitoring_start_time is None:
+                                self._monitoring_start_time = current_time
+                            
+                            if self._last_packet_time is not None:
+                                interval = (current_time - self._last_packet_time) * 1000  # Convert to ms
+                                self._packet_intervals.append(interval)
+                                
+                                # Detect dropped packets (interval > 2.5x expected)
+                                # More conservative threshold to avoid false positives from jitter
+                                expected_interval = 1000.0 / self._expected_hz if self._expected_hz > 0 else 14.3
+                                if interval > expected_interval * 2.5:
+                                    # Estimate how many packets were dropped
+                                    dropped = int(round(interval / expected_interval)) - 1
+                                    self._dropped_packet_count += max(0, dropped)
+                                    self._consecutive_drops += dropped
+                                    if self._consecutive_drops > self._max_consecutive_drops:
+                                        self._max_consecutive_drops = self._consecutive_drops
+                                else:
+                                    # Reset consecutive drop counter on successful packet
+                                    self._consecutive_drops = 0
+                            
+                            self._last_packet_time = current_time
+                            
                             # reset state
                             self._reset_stream()
                         else:
@@ -303,3 +373,177 @@ class RtBridge(QtCore.QObject):
         self._num_count = 0
         self._payload.clear()
         self._buffer.clear()
+    
+    def print_trial_summary(self):
+        """Print comprehensive trial summary with all statistics."""
+        if not self.DEBUG_DATA_RATE or self._total_packets_received == 0:
+            return
+        
+        if self._monitoring_start_time is not None:
+            total_time = time.time() - self._monitoring_start_time
+        else:
+            total_time = self._total_time_elapsed
+        
+        if total_time == 0:
+            return
+        
+        overall_hz = self._total_packets_received / total_time
+        total_bytes = self._total_packets_received * (self._bytes_received / max(1, self._data_packet_count))
+        total_kb = total_bytes / 1024.0
+        total_mb = total_kb / 1024.0
+        
+        # Calculate expected packets and loss
+        expected_total = self._expected_hz * total_time
+        total_lost = max(0, expected_total - self._total_packets_received)
+        loss_pct = (total_lost / expected_total * 100) if expected_total > 0 else 0
+        
+        print("\n" + "="*60)
+        print("           TRIAL DATA COLLECTION SUMMARY")
+        print("="*60)
+        print(f"  Duration: {total_time:.1f} seconds ({total_time/60:.1f} minutes)")
+        print(f"  Total packets: {self._total_packets_received}")
+        print(f"  Average rate: {overall_hz:.1f} Hz")
+        print(f"  Expected rate: {self._expected_hz} Hz")
+        print(f"  Total data: {total_bytes:.0f} bytes ({total_kb:.2f} KB / {total_mb:.2f} MB)")
+        print(f"  Packet loss: {loss_pct:.2f}% (~{int(total_lost)} packets)")
+        
+        if self._max_consecutive_drops > 0:
+            print(f"  Worst drop streak: {self._max_consecutive_drops} consecutive packets")
+        
+        # BLE reliability indicators
+        if self._max_consecutive_drops == 0 and loss_pct < 1:
+            reliability = "EXCELLENT - No significant interruptions"
+        elif self._max_consecutive_drops < 5 and loss_pct < 5:
+            reliability = "GOOD - Minor interruptions"
+        elif self._max_consecutive_drops < 10 and loss_pct < 10:
+            reliability = "FAIR - Noticeable interruptions"
+        else:
+            reliability = "POOR - Frequent interruptions"
+        
+        if overall_hz >= self._expected_hz * 0.95:
+            quality = "EXCELLENT - Minimal packet loss"
+        elif overall_hz >= self._expected_hz * 0.90:
+            quality = "GOOD - Acceptable performance"
+        elif overall_hz >= self._expected_hz * 0.80:
+            quality = "FAIR - Some packet loss detected"
+        else:
+            quality = "POOR - Significant packet loss"
+        
+        print(f"  Data quality: {quality}")
+        print(f"  BLE reliability: {reliability}")
+        print("="*60 + "\n")
+    
+    def reset_monitoring(self):
+        """Reset data rate monitoring statistics (call when starting new trial)."""
+        self._data_packet_count = 0
+        self._bytes_received = 0
+        self._packet_intervals.clear()
+        self._total_packets_received = 0
+        self._total_time_elapsed = 0.0
+        self._monitoring_start_time = None
+        self._last_packet_time = None
+        self._dropped_packet_count = 0
+        self._ble_chunk_count = 0
+        self._ble_chunk_sizes.clear()
+        self._consecutive_drops = 0
+        self._max_consecutive_drops = 0
+        self._stall_count = 0
+        self._last_stall_time = None
+        
+        print("[RtBridge] Data rate monitoring reset")
+
+    @QtCore.Slot()
+    def _print_data_rate(self):
+        """Print comprehensive data collection statistics every second."""
+        if not self.DEBUG_DATA_RATE:
+            return
+            
+        if self._data_packet_count > 0:
+            hz = self._data_packet_count
+            bytes_per_sec = self._bytes_received
+            kb_per_sec = bytes_per_sec / 1024.0
+            
+            # Calculate average packet size
+            avg_packet_size = bytes_per_sec / self._data_packet_count if self._data_packet_count > 0 else 0
+            
+            # Update expected Hz based on observed rate (after first few seconds)
+            if self._total_packets_received > 100 and hz > 10:
+                self._expected_hz = hz
+            
+            # Calculate overall statistics
+            if self._monitoring_start_time is not None:
+                self._total_time_elapsed = time.time() - self._monitoring_start_time
+                overall_hz = self._total_packets_received / self._total_time_elapsed if self._total_time_elapsed > 0 else 0
+            else:
+                overall_hz = 0
+            
+            # Calculate packet loss percentage (two methods)
+            # Method 1: Based on timing gap detection
+            gap_detected_drops = self._dropped_packet_count
+            gap_loss_pct = 0.0
+            if (self._data_packet_count + gap_detected_drops) > 0:
+                gap_loss_pct = (gap_detected_drops / (self._data_packet_count + gap_detected_drops)) * 100
+            
+            # Method 2: Based on expected Hz vs actual count
+            expected_packets_hz = self._expected_hz  # Expected in this 1-second window
+            hz_detected_drops = max(0, expected_packets_hz - self._data_packet_count)
+            hz_loss_pct = 0.0
+            if expected_packets_hz > 0:
+                hz_loss_pct = (hz_detected_drops / expected_packets_hz) * 100
+            
+            # Use Hz-based method as primary (more reliable)
+            packet_loss_pct = hz_loss_pct
+            actual_drops = hz_detected_drops
+            
+            # Calculate timing statistics
+            if len(self._packet_intervals) > 0:
+                avg_interval = sum(self._packet_intervals) / len(self._packet_intervals)
+                min_interval = min(self._packet_intervals)
+                max_interval = max(self._packet_intervals)
+                jitter = max_interval - min_interval
+                
+                # Connection quality indicator
+                quality = "EXCELLENT"
+                if jitter > 50 or packet_loss_pct > 10:
+                    quality = "POOR"
+                elif jitter > 20 or packet_loss_pct > 5:
+                    quality = "FAIR"
+                elif jitter > 10 or packet_loss_pct > 2:
+                    quality = "GOOD"
+                
+                # Calculate BLE chunk statistics
+                avg_chunk_size = sum(self._ble_chunk_sizes) / len(self._ble_chunk_sizes) if self._ble_chunk_sizes else 0
+                min_chunk = min(self._ble_chunk_sizes) if self._ble_chunk_sizes else 0
+                max_chunk = max(self._ble_chunk_sizes) if self._ble_chunk_sizes else 0
+                chunks_per_packet = self._ble_chunk_count / self._data_packet_count if self._data_packet_count > 0 else 0
+                
+                print(f"\n[RtBridge] ===== Data Rate Stats =====")
+                print(f"  Rate: {hz} Hz (expected: {self._expected_hz} Hz)")
+                print(f"  Throughput: {bytes_per_sec} bytes/sec ({kb_per_sec:.2f} KB/s)")
+                print(f"  Avg packet: {avg_packet_size:.1f} bytes")
+                print(f"  Timing: avg={avg_interval:.1f}ms, min={min_interval:.1f}ms, max={max_interval:.1f}ms")
+                print(f"  Jitter: {jitter:.1f}ms")
+                print(f"  Packet loss: {packet_loss_pct:.1f}% (~{int(actual_drops)} packets this second)")
+                if gap_detected_drops > 0:
+                    print(f"  Gap-detected drops: {gap_detected_drops} (from timing analysis)")
+                if self._max_consecutive_drops > 0:
+                    print(f"  Max consecutive drops: {self._max_consecutive_drops} packets")
+                print(f"  BLE chunks: {self._ble_chunk_count} (avg {chunks_per_packet:.1f} per packet)")
+                print(f"  BLE chunk size: avg={avg_chunk_size:.1f}B, min={min_chunk}B, max={max_chunk}B")
+                if self._stall_count > 0:
+                    print(f"  Data stalls: {self._stall_count} (>100ms gaps)")
+                print(f"  Overall: {self._total_packets_received} packets in {self._total_time_elapsed:.1f}s (avg {overall_hz:.1f} Hz)")
+                print(f"  Quality: {quality}")
+                print(f"================================\n")
+            else:
+                print(f"[RtBridge] Data rate: {hz} Hz | {bytes_per_sec} bytes/sec ({kb_per_sec:.2f} KB/s) | "
+                      f"Avg packet: {avg_packet_size:.1f} bytes")
+            
+            # Reset per-second counters
+            self._data_packet_count = 0
+            self._bytes_received = 0
+            self._packet_intervals.clear()
+            self._dropped_packet_count = 0
+            self._ble_chunk_count = 0
+            self._ble_chunk_sizes.clear()
+            self._stall_count = 0

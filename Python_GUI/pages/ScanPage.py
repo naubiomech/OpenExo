@@ -47,6 +47,9 @@ class ScanWindowQt(QtWidgets.QWidget):
         self.setMinimumSize(UIConfig.WINDOW_MIN_WIDTH, UIConfig.WINDOW_MIN_HEIGHT)
         self.resize(UIConfig.WINDOW_DEFAULT_WIDTH, UIConfig.WINDOW_DEFAULT_HEIGHT)
         
+        #last progress to prevent backwards movement
+        self._last_connection_progress = 0
+        
         # Settings file path
         base_dir = os.path.dirname(os.path.dirname(__file__))
         self.SETTINGS_FILE = os.path.join(base_dir, "Saved_Data", "saved_device.txt")
@@ -125,6 +128,84 @@ class ScanWindowQt(QtWidgets.QWidget):
         layout.addLayout(btn_row)
         layout.addSpacing(UIConfig.SPACING_TINY)
 
+        # Progress bar for scanning
+        self.scan_progress = QtWidgets.QProgressBar()
+        self.scan_progress.setRange(0, 100)
+        self.scan_progress.setValue(0)
+        self.scan_progress.setTextVisible(True)
+        self.scan_progress.setFormat("Scanning... %p%")
+        self.scan_progress.setMinimumHeight(UIConfig.BTN_HEIGHT_SMALL)
+        self.scan_progress.setStyleSheet("""
+            QProgressBar {
+                border: 2px solid #555;
+                border-radius: 5px;
+                text-align: center;
+                background-color: #2b2b2b;
+                color: white;
+                font-size: 14px;
+            }
+            QProgressBar::chunk {
+                background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                                   stop:0 #4a9eff, stop:1 #2d7dd2);
+                border-radius: 3px;
+            }
+        """)
+        self.scan_progress.setVisible(False)  # Hidden by default
+        layout.addWidget(self.scan_progress)
+        layout.addSpacing(UIConfig.SPACING_TINY)
+
+        # Progress bar for scanning during connection (looking for device)
+        self.connect_scan_progress = QtWidgets.QProgressBar()
+        self.connect_scan_progress.setRange(0, 100)
+        self.connect_scan_progress.setValue(0)
+        self.connect_scan_progress.setTextVisible(True)
+        self.connect_scan_progress.setFormat("Looking for device... %p%")
+        self.connect_scan_progress.setMinimumHeight(UIConfig.BTN_HEIGHT_SMALL)
+        self.connect_scan_progress.setStyleSheet("""
+            QProgressBar {
+                border: 2px solid #555;
+                border-radius: 5px;
+                text-align: center;
+                background-color: #2b2b2b;
+                color: white;
+                font-size: 14px;
+            }
+            QProgressBar::chunk {
+                background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                                   stop:0 #f59e0b, stop:1 #d97706);
+                border-radius: 3px;
+            }
+        """)
+        self.connect_scan_progress.setVisible(False)  # Hidden by default
+        layout.addWidget(self.connect_scan_progress)
+        layout.addSpacing(UIConfig.SPACING_TINY)
+
+        # Progress bar for connecting (BLE connection phase)
+        self.connection_progress = QtWidgets.QProgressBar()
+        self.connection_progress.setRange(0, 100)
+        self.connection_progress.setValue(0)
+        self.connection_progress.setTextVisible(True)
+        self.connection_progress.setFormat("Connecting... %p%")
+        self.connection_progress.setMinimumHeight(UIConfig.BTN_HEIGHT_SMALL)
+        self.connection_progress.setStyleSheet("""
+            QProgressBar {
+                border: 2px solid #555;
+                border-radius: 5px;
+                text-align: center;
+                background-color: #2b2b2b;
+                color: white;
+                font-size: 14px;
+            }
+            QProgressBar::chunk {
+                background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                                   stop:0 #4ade80, stop:1 #22c55e);
+                border-radius: 3px;
+            }
+        """)
+        self.connection_progress.setVisible(False)  # Hidden by default
+        layout.addWidget(self.connection_progress)
+        layout.addSpacing(UIConfig.SPACING_TINY)
+
         # Devices list - fills space between top and bottom buttons
         self.list_devices = QtWidgets.QListWidget()
         self.list_devices.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -198,18 +279,22 @@ class ScanWindowQt(QtWidgets.QWidget):
             self.status.setText("Scanner not ready")
             return
         self.btn_scan.setEnabled(False)
+        self.btn_load.setEnabled(False)
         self.btn_save_connect.setEnabled(False)
         self.list_devices.clear()
+        self.scan_progress.setValue(0)
+        self.scan_progress.setVisible(True)
         self._pending_scan = True
         if self._qt_dev is not None and self._connected:
             try:
-                self.status.setText("Disconnecting…")
+                #Disconnect immediately
                 self._qt_dev.disconnect()
+                self._connected = False
             except Exception:
                 self._connected = False
-                self._start_scan_now()
-        else:
-            self._start_scan_now()
+        
+        # Start scan immediately without waiting for disconnect
+        self._start_scan_now()
 
     @QtCore.Slot()
     def on_load_saved(self):
@@ -220,6 +305,12 @@ class ScanWindowQt(QtWidgets.QWidget):
                 if addr:
                     self.selected_address = addr
                     self.status.setText(f"Connecting to saved device: {addr}")
+                    # Reset progress and show only scanning bar initially
+                    self._last_connection_progress = 0
+                    self.connect_scan_progress.setValue(0)
+                    self.connect_scan_progress.setVisible(True)
+                    self.connection_progress.setValue(0)
+                    self.connection_progress.setVisible(False)  # Hidden until device found
                     # Disable Load and Save & Connect buttons during connection
                     # Keep Start Scan enabled so user can disconnect and start new scan
                     self.btn_load.setEnabled(False)
@@ -259,6 +350,12 @@ class ScanWindowQt(QtWidgets.QWidget):
             return
 
         self.status.setText(f"Connecting to: {self.selected_name or ''} {self.selected_address}")
+        # Reset progress and show only scanning bar initially
+        self._last_connection_progress = 0
+        self.connect_scan_progress.setValue(0)
+        self.connect_scan_progress.setVisible(True)
+        self.connection_progress.setValue(0)
+        self.connection_progress.setVisible(False)  # Hidden until device found
         self.btn_save_connect.setEnabled(False)
         # Emit request for Qt device manager to handle connection
         self.connectRequested.emit(self.selected_address)
@@ -294,15 +391,23 @@ class ScanWindowQt(QtWidgets.QWidget):
         self._scanner.error.connect(self._on_error)
         qt_dev.connected.connect(self._on_device_connected)
         qt_dev.disconnected.connect(self._on_device_disconnected)
+        qt_dev.scanProgress.connect(self._on_scan_progress)
+        qt_dev.connectScanProgress.connect(self._on_connect_scan_progress)
+        qt_dev.connectionProgress.connect(self._on_connection_progress)
 
     # Worker callbacks
     @QtCore.Slot(list)
     def _on_scan_results(self, results: List[Tuple[str, str]]):
         self._pending_scan = False
         self.btn_scan.setEnabled(True)
+        self.scan_progress.setVisible(False)
         self.list_devices.clear()
         
-        # Always re-enable Load button if saved device exists
+        # Re-enable Load button if saved device exists
+        if os.path.exists(self.SETTINGS_FILE):
+            self.btn_load.setEnabled(True)
+        
+        # Continue with existing logic
         if os.path.exists(self.SETTINGS_FILE):
             try:
                 with open(self.SETTINGS_FILE, "r") as f:
@@ -323,6 +428,10 @@ class ScanWindowQt(QtWidgets.QWidget):
     @QtCore.Slot(str, str)
     def _on_device_connected(self, name: str, address: str):
         self._connected = True
+        self.connect_scan_progress.setVisible(False)
+        self.connection_progress.setVisible(False)
+        self.status.setText(f"Connected: {name} {address}")
+        self.btn_start_trial.setEnabled(True)
         # Keep Save & Connect disabled after connection
         self.btn_save_connect.setEnabled(False)
 
@@ -353,10 +462,64 @@ class ScanWindowQt(QtWidgets.QWidget):
     @QtCore.Slot(str)
     def _on_error(self, message: str):
         self.status.setText(message)
+        self.scan_progress.setVisible(False)
+        self.connect_scan_progress.setVisible(False)
+        self.connection_progress.setVisible(False)
+        # Re-enable buttons on error
+        self.btn_scan.setEnabled(True)
+        self.btn_save_connect.setEnabled(True)
+        if os.path.exists(self.SETTINGS_FILE):
+            self.btn_load.setEnabled(True)
 
     @QtCore.Slot(str)
     def _on_connect(self, message: str):
         self.status.setText(message)
+
+    @QtCore.Slot(int)
+    def _on_scan_progress(self, progress: int):
+        """Update the scan progress bar (for 'Start Scan' button)."""
+        self.scan_progress.setValue(progress)
+        if progress >= 100:
+            # Hide progress bar when complete
+            QtCore.QTimer.singleShot(500, lambda: self.scan_progress.setVisible(False))
+
+    @QtCore.Slot(int)
+    def _on_connect_scan_progress(self, progress: int):
+        """Update the scanning phase progress during connection."""
+        if progress == -1:
+            # Signal to hide the scanning bar immediately
+            self.connect_scan_progress.setVisible(False)
+        else:
+            self.connect_scan_progress.setValue(progress)
+            if progress >= 100:
+                # Hide when device found
+                QtCore.QTimer.singleShot(200, lambda: self.connect_scan_progress.setVisible(False))
+
+    @QtCore.Slot(int)
+    def _on_connection_progress(self, progress: int):
+        """Update the connection progress bar - only move forward, never backwards."""
+        if progress == 0:
+            # Reset on new connection attempt
+            self._last_connection_progress = 0
+            self.connection_progress.setValue(0)
+            self.connection_progress.setVisible(False)
+            # Don't hide - might be retrying
+        elif progress > self._last_connection_progress:
+            # Show connection bar when it starts (device found)
+            if not self.connection_progress.isVisible():
+                self.connection_progress.setVisible(True)
+            # Only update if progress is moving forward
+            self._last_connection_progress = progress
+            self.connection_progress.setValue(progress)
+            if progress >= 100:
+                # Hide progress bar when complete
+                QtCore.QTimer.singleShot(500, lambda: self._reset_connection_progress())
+    
+    def _reset_connection_progress(self):
+        """Reset connection progress tracking."""
+        self.connection_progress.setVisible(False)
+        self.connect_scan_progress.setVisible(False)
+        self._last_connection_progress = 0
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
