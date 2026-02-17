@@ -3046,7 +3046,7 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
 }
 float AngleBased::calc_motor_cmd()
 {
-    Serial.println("Running Angle Based calc cmd");
+    //Serial.println("Running Angle Based calc cmd");
     //if (millis() - prev_time > 100)
     //{
         
@@ -3060,10 +3060,10 @@ float AngleBased::calc_motor_cmd()
         int recal_angle_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_angle_idx];
         float lower_toe_threshold = _controller_data->parameters[controller_defs::angle_based::lower_toe_threshold_idx];
         float upper_toe_threshold = _controller_data->parameters[controller_defs::angle_based::upper_toe_threshold_idx];
-        Serial.print("lower_toe_threshold: ");
-        Serial.println(lower_toe_threshold);
-        Serial.print("upper_toe_threshold: ");
-        Serial.println(upper_toe_threshold);
+        //Serial.print("lower_toe_threshold: ");
+        //Serial.println(lower_toe_threshold);
+        //Serial.print("upper_toe_threshold: ");
+        //Serial.println(upper_toe_threshold);
         correction_factor[0] = _controller_data->parameters[controller_defs::angle_based::correction_factor_0_idx];
         correction_factor[0] = correction_factor[0] / 1000.0;
         correction_factor[1] = _controller_data->parameters[controller_defs::angle_based::correction_factor_1_idx];
@@ -3272,10 +3272,14 @@ float AngleBased::calc_motor_cmd()
         // Determine the Torque Setpoint
         float cmd_ff = 0.0; // Initialize the feed-foward command to 0
         // State Logic
+        
+        if (!local_toe_stance && !_side_data->heel_stance && (_side_data->percent_gait > 50.0))
+        {
+            state = 3;
+        }
         if ((_side_data->heel_stance || local_toe_stance) && normalized_stance_moment > 0)
         {
             state = 1;
-            Serial.println("state = 1");
             if(prev_state == 3) // If we just entered stance, we need to reset the encoder offset to prevent large jumps in perceived angle
             {
                 skip_intended_encoder_offset = true; // Skip the intended encoder offset calculation
@@ -3287,15 +3291,13 @@ float AngleBased::calc_motor_cmd()
             if(state != 3)
             {
                 state = 2;
-            Serial.println("state = 2");
             }
         }
-        if (!local_toe_stance && !_side_data->heel_stance)
-        {
-            state = 3;
-            Serial.println("state = 3");
-        }
         _controller_data->control_state = state;
+        Serial.print("Percent Gait: ");
+        Serial.println(_side_data->percent_gait);
+        Serial.print("State: ");
+        Serial.println(state);
         // Determine Torque Setpoint
         if (state == 1) // If we are in early stance
         {
