@@ -30,7 +30,7 @@ TorqueSensor::TorqueSensor(unsigned int pin)
     //Configure pin if it is used
     if (this->_is_used)
     {
-        pinMode(this->_pin, INPUT);
+        pinMode(this->_pin, INPUT_DISABLE);
     }
     
     #ifdef TORQUE_DEBUG

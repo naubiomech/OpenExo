@@ -70,7 +70,7 @@ class JointData {
         float post_transmission_torque = 0; /**< Torque after torque_output_alpha. */
 
         //Torque absolute check
-        float torque_output_threshold = 40; /**< Maximum value of the the filtered torque. */
+        float torque_output_threshold = 60; /**< Maximum value of the the filtered torque. */
 
         //Torque variance check
         const int torque_failure_count_max = 2;         /**< Amount of samples outside of error bounds. */

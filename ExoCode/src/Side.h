@@ -160,6 +160,8 @@ class Side
         KneeJoint _knee;    /**< Instance of a knee joint */
         AnkleJoint _ankle;  /**< Instance of an ankle joint */
         ElbowJoint _elbow;  /**< Instance of an elbow joint */
+        Arm1Joint _arm_1;   /**< Instance of an arm 1 joint */
+        Arm2Joint _arm_2;   /**< Instance of an arm 2 joint */
         
         //FSR objects for the side. 
         FSR _heel_fsr;                        /**< Heel force sensitive resistor, typically is a raw value */

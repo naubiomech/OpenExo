@@ -28,6 +28,9 @@
 //Specific Libraries
 #include "src/ParseIni.h"
 #include "src/ParamsFromSD.h"
+#include "src/ListCtrlParams.h"
+#include "src/SendBulkChar.h"
+#include "src/PlottingTitles.h"
 
 //Board to board coms
 #include "src/UARTHandler.h"
@@ -49,7 +52,7 @@ void setup()
     analogReadResolution(12);
     
     Serial.begin(115200);
-    delay(500);
+    //delay(500);
 
     #ifdef SIMPLE_DEBUG
         Serial.print("\nIn SIMPLE_DEBUG mode, debugging statements are printed.");
@@ -62,6 +65,15 @@ void setup()
     //Get the config information from the SD card (calls function in ParseIni).
     ini_parser(config_info::config_to_send);              
     
+	//Debugging ListCtrlParams
+	long initialTime = millis();
+	ctrl_param_array_gen(config_info::config_to_send);
+	create_plotting_titles(config_info::config_to_send);
+	send_bulk_char();
+	long time_spent = millis() - initialTime;
+	Serial.print("\nTeensy Boot time added: ");
+	Serial.print(time_spent);
+	
     //Print to confirm config came through correctly (Should not contain zeros).
     #if defined(MAIN_DEBUG) || defined(SIMPLE_DEBUG)
         for (int i = 0; i < ini_config::number_of_keys; i++)
@@ -87,7 +99,7 @@ void setup()
 }
 
 void loop()
-{       
+{
     static bool first_run = true;
     
     //Create the data object
@@ -675,6 +687,7 @@ void loop()
 #include "src/UART_msg_t.h"
 #include "src/ComsLed.h"
 #include "src/RealTimeI2C.h"
+#include "src/GetBulkChar.h"
 
 #include "src/WaistBarometer.h"
 #include "src/InclineDetector.h"
@@ -722,8 +735,19 @@ namespace config_info
 void setup()
 {
     Serial.begin(115200);
-    delay(100);
-
+	
+	long initialTime = millis();
+	readSingleMessageBlocking();
+	long time_spent = millis() - initialTime;
+	//delay(5000);
+	Serial.print("\nNano Boot time added: ");
+	Serial.print(time_spent);
+	Serial.println("\n--- MESSAGE RECEIVED (Full Frame) ---");
+    Serial.print("Frame Size: ");
+    Serial.println(strlen(rxBuffer_bulkStr)); 
+    Serial.print("Frame: ");
+    Serial.println(rxBuffer_bulkStr);
+	
     #if MAIN_DEBUG
       while (!Serial);
         logger::print("Setup->Getting config");

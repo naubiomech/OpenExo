@@ -19,9 +19,10 @@
 bool AnkleAngles::init(bool is_left)
 {
     _left = is_left;
-    pinMode(_left_pin, INPUT);
-    pinMode(_right_pin, INPUT);
+    pinMode(_left_pin, INPUT_DISABLE);
+    pinMode(_right_pin, INPUT_DISABLE);
     _is_initialized = true;
+    return true;
 }
 
 float AnkleAngles::get(bool is_left, bool return_normalized)
@@ -65,6 +66,7 @@ float AnkleAngles::_update_population_statistics(const float new_value)
     }
     
     return min(return_value, 1.4);
+
 }
 
 

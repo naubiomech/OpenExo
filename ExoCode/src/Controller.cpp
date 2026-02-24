@@ -11,10 +11,6 @@
 #include <math.h>
 #include <random>
 #include <cmath>
-/* #include <Adafruit_INA260.h>
-//#include <Adafruit_INA219.h>
-Adafruit_INA260 ina260 = Adafruit_INA260();
-//Adafruit_INA219 ina219; */
 
 _Controller::_Controller(config_defs::joint_id id, ExoData* exo_data)
 {
@@ -24,6 +20,8 @@ _Controller::_Controller(config_defs::joint_id id, ExoData* exo_data)
     _t_helper = Time_Helper::get_instance();
     _t_helper_context = _t_helper->generate_new_context();
     _t_helper_delta_t = 0;
+    _sim_gait_context = _t_helper->generate_new_context();
+    _sim_elapsed_us = 0.0f;
     
     //We just need to know the side to point at the right data location so it is only for the constructor
     bool is_left = utils::get_is_left(_id);
@@ -100,6 +98,36 @@ _Controller::_Controller(config_defs::joint_id id, ExoData* exo_data)
                 _joint_data = &(exo_data->right_side.elbow);
             }
             break;
+        case (uint8_t)config_defs::joint_id::arm_1:
+            #ifdef CONTROLLER_DEBUG
+                logger::print("ARM 1 ");
+            #endif
+            if (is_left)
+            {
+                _controller_data = &(exo_data->left_side.arm_1.controller);
+                _joint_data = &(exo_data->left_side.arm_1);
+            }
+            else
+            {
+                _controller_data = &(exo_data->right_side.arm_1.controller);
+                _joint_data = &(exo_data->right_side.arm_1);
+            }
+            break;
+        case (uint8_t)config_defs::joint_id::arm_2:
+            #ifdef CONTROLLER_DEBUG
+                logger::print("ARM 2 ");
+            #endif
+            if (is_left)
+            {
+                _controller_data = &(exo_data->left_side.arm_2.controller);
+                _joint_data = &(exo_data->left_side.arm_2);
+            }
+            else
+            {
+                _controller_data = &(exo_data->right_side.arm_2.controller);
+                _joint_data = &(exo_data->right_side.arm_2);
+            }
+            break;
     }
 
     #ifdef CONTROLLER_DEBUG
@@ -173,19 +201,10 @@ float _Controller::_pid(float cmd, float measurement, float p_gain, float i_gain
 		Serial.print("\nTorque sensor not calibrated. Closed-loop torque control disabled.");
 		return cmd;
 	}
-    //Check if time is ok
-    bool time_good = true;
-
-    if (_t_helper->tick(_t_helper_context) > ((float) 1/LOOP_FREQ_HZ * 1000000 * (1 + LOOP_TIME_TOLERANCE)))
-    {
-        time_good = false;
-    }
-
-    //Record the current time
-    float now = micros();
-
-    //Record the change in time 
-    float dt = (now - _prev_pid_time) * 1000000;
+    const float expected_us = (1.0f / LOOP_FREQ_HZ) * 1000000.0f;
+    const float dt_us = _t_helper->tick(_t_helper_context);
+    const bool time_good = (dt_us > 0.0f) && (dt_us <= expected_us * (1.0f + LOOP_TIME_TOLERANCE));
+    const float dt_s = dt_us / 1000000.0f;
 
     //Calculate the difference in the prescribed and measured torque 
     float error_val = cmd - measurement;  
@@ -193,7 +212,10 @@ float _Controller::_pid(float cmd, float measurement, float p_gain, float i_gain
     //If we want to to include the integral term (Note: We generally do not like to use the I gain but we have it here for completeness) 
     if (i_gain != 0)
     {
-        _pid_error_sum += error_val / LOOP_FREQ_HZ;
+        if (time_good)
+        {
+            _pid_error_sum += error_val * dt_s;
+        }
     }
     else
     {
@@ -213,11 +235,11 @@ float _Controller::_pid(float cmd, float measurement, float p_gain, float i_gain
     //Initialize the derivative of the error 
     float de_dt = 0;
 
-    //Calculate the derivative of the erro
-    if (time_good)
+    //Calculate the derivative of the error
+    if (time_good && dt_s > 0.0f)
     {
-       de_dt = -(measurement - _prev_input) * (1000.0f / LOOP_FREQ_HZ);  //Convert to ms
-       _prev_de_dt = de_dt;
+        de_dt = -(measurement - _prev_input) / dt_s;
+        _prev_de_dt = de_dt;
     }
     else 
     {
@@ -225,7 +247,6 @@ float _Controller::_pid(float cmd, float measurement, float p_gain, float i_gain
     }
 
     //Set the previous times for the next loop through the controller
-    _prev_pid_time = now;
     _prev_input = measurement;
 
     //Calculate the individual P,I,and D Terms
@@ -236,6 +257,19 @@ float _Controller::_pid(float cmd, float measurement, float p_gain, float i_gain
     //Return the summed PID
     return p + i + d;
 
+}
+
+//****************************************************
+
+float _Controller::_get_percent_gait(bool simulate)
+{
+    if (!simulate)
+    {
+        return _side_data->percent_stance;
+    }
+
+    _sim_elapsed_us += _t_helper->tick(_sim_gait_context);
+    return fmodf(_sim_elapsed_us, 1000000.0f) / 1000000.0f * 100.0f;
 }
 
 //****************************************************
@@ -283,8 +317,12 @@ float ZeroTorque::calc_motor_cmd()
     //Set the feed-forward setpoint to the feed-forward command
     _controller_data->ff_setpoint = cmd_ff;
 
+    //Set the desired torque for plotting
+    _controller_data->desired_torque = cmd_ff;
+
     //Send the motor command
     return cmd;
+
 }
 
 //****************************************************
@@ -498,6 +536,9 @@ float TREC::calc_motor_cmd()
 	_controller_data->setpoint = cmd;
     _controller_data->filtered_setpoint = squelched_propulsive_term;
 
+    //Set the desired torque for plotting
+    _controller_data->desired_torque = _controller_data->filtered_setpoint;
+
     #ifdef CONTROLLER_DEBUG
         logger::println("TREC::calc_motor_cmd : stop");
     #endif
@@ -556,7 +597,7 @@ float ProportionalJointMoment::calc_motor_cmd()
     /* Low-Pass Filter Measured Torque */
 	const float torque = _joint_data->torque_reading;
     const float alpha = (_controller_data->parameters[controller_defs::proportional_joint_moment::torque_alpha_idx] != 0) ? _controller_data->parameters[controller_defs::proportional_joint_moment::torque_alpha_idx] : 0.5;
-    _controller_data->filtered_torque_reading = utils::ewma(torque, _controller_data->filtered_torque_reading, 1); //NOTE: Currently hard coded to not filer, can do so by replacing 1 with alpha
+    _controller_data->filtered_torque_reading = utils::ewma(torque, _controller_data->filtered_torque_reading, alpha); 
 
     /* Find the maximum measured torque and maximum setpoint during stance */
     if (_side_data->toe_stance) 
@@ -602,10 +643,49 @@ float ProportionalJointMoment::calc_motor_cmd()
     /* If the PID flag is enalbed, do PID control, otherwise just send feed-forward command. */
     if (_controller_data->parameters[controller_defs::proportional_joint_moment::use_pid_idx])
     {
+        // --------------------------- Gain scheduling (optional) ------------------------------
+        
+        // Defaults to nominal gains if gain scheduling is not enabled
+        float kp_use = _controller_data->parameters[controller_defs::proportional_joint_moment::p_gain_idx];
+        float ki_use = _controller_data->parameters[controller_defs::proportional_joint_moment::i_gain_idx];
+        float kd_use = _controller_data->parameters[controller_defs::proportional_joint_moment::d_gain_idx];
 
-		cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::proportional_joint_moment::p_gain_idx], _controller_data->parameters[controller_defs::proportional_joint_moment::i_gain_idx], _controller_data->parameters[controller_defs::proportional_joint_moment::d_gain_idx]);
+        const bool gain_sched_enabled =
+            (_controller_data->parameters[controller_defs::proportional_joint_moment::GS_Flag] > 0.5f);
 
-	}
+        if (gain_sched_enabled)
+        {
+            // Conditions for "near zero" gains:
+            // - setpoint is between +/- 3.5 Nm
+            // - measured torque is within +/- 3.5 Nm of setpoint
+            const float ZERO_BAND_NM = 3.5f;
+            const bool near_zero_setpoint = (fabsf(_controller_data->filtered_setpoint) < 4);
+            const bool near_zero_measured  = (fabsf(_controller_data->filtered_torque_reading) <= ZERO_BAND_NM);
+
+            if (near_zero_setpoint && near_zero_measured)
+            {
+                kp_use = _controller_data->parameters[controller_defs::proportional_joint_moment::kp_zero];
+                ki_use = _controller_data->parameters[controller_defs::proportional_joint_moment::ki_zero];
+                kd_use = _controller_data->parameters[controller_defs::proportional_joint_moment::kd_zero];
+    
+            }
+            else
+            {
+                kp_use = _controller_data->parameters[controller_defs::proportional_joint_moment::p_gain_idx];
+                ki_use = _controller_data->parameters[controller_defs::proportional_joint_moment::i_gain_idx];
+                kd_use = _controller_data->parameters[controller_defs::proportional_joint_moment::d_gain_idx];
+            }
+            
+        } // End of gain scheduling
+
+        // PID on Motor Command
+        cmd =  _pid(_controller_data->filtered_setpoint,
+                            _controller_data->filtered_torque_reading,
+                            kp_use,
+                            ki_use,
+                            kd_use);
+			
+    } // End of PID flag check
     else
     {
         cmd = cmd_ff;
@@ -613,6 +693,9 @@ float ProportionalJointMoment::calc_motor_cmd()
     
     /* Filter the commnad being sent to the motor. */
     _controller_data->filtered_cmd = utils::ewma(cmd, _controller_data->filtered_cmd, 1);
+
+    //Set the desired torque for plotting
+    _controller_data->desired_torque = _controller_data->filtered_setpoint;
 
     /* Send the motor the command. */
     return _controller_data->filtered_cmd;
@@ -636,7 +719,7 @@ float ZhangCollins::calc_motor_cmd()
 {
     
     //Calculates Percent Gait
-    float percent_gait = _side_data->percent_stance;
+    float percent_gait = _get_percent_gait(_controller_data->parameters[controller_defs::zhang_collins::sim_gait_idx] > 0.0f);
 			
     //Pull in user defined parameter values
     float peak_torque_Nm = _controller_data->parameters[controller_defs::zhang_collins::torque_idx];
@@ -671,6 +754,9 @@ float ZhangCollins::calc_motor_cmd()
     //Sets previous command for next loop of controller
 	_controller_data->previous_cmd = cmd;
 	
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = torque_cmd;
+
     return cmd;
 };
 
@@ -716,6 +802,150 @@ float ZhangCollins::_spline_generation(float node1, float node2, float node3, fl
 
 //****************************************************
 
+Spline::Spline(config_defs::joint_id id, ExoData* exo_data)
+: _Controller(id, exo_data)
+{
+    #ifdef CONTROLLER_DEBUG
+        logger::println("Spline::Constructor");
+    #endif
+};
+
+float Spline::calc_motor_cmd()
+{
+    const bool simulate_gait = _controller_data->parameters[controller_defs::spline::sim_gait_idx] > 0.0f;
+    const bool use_percent_gait = _controller_data->parameters[controller_defs::spline::use_percent_gait_idx] > 0.0f;
+    float percent_gait = 0.0f;
+    if (simulate_gait)
+    {
+        percent_gait = _get_percent_gait(true);
+    }
+    else
+    {
+        percent_gait = use_percent_gait ? _side_data->percent_gait : _side_data->percent_stance;
+    }
+
+    float x[5] =
+    {
+        _controller_data->parameters[controller_defs::spline::node1_x_idx],
+        _controller_data->parameters[controller_defs::spline::node2_x_idx],
+        _controller_data->parameters[controller_defs::spline::node3_x_idx],
+        _controller_data->parameters[controller_defs::spline::node4_x_idx],
+        _controller_data->parameters[controller_defs::spline::node5_x_idx],
+    };
+
+    float y[5] =
+    {
+        _controller_data->parameters[controller_defs::spline::node1_y_idx],
+        _controller_data->parameters[controller_defs::spline::node2_y_idx],
+        _controller_data->parameters[controller_defs::spline::node3_y_idx],
+        _controller_data->parameters[controller_defs::spline::node4_y_idx],
+        _controller_data->parameters[controller_defs::spline::node5_y_idx],
+    };
+
+    float torque_cmd = _spline_interpolate(x, y, percent_gait);
+    if (torque_cmd > 15.0f)
+    {
+        torque_cmd = 15.0f;
+    }
+    else if (torque_cmd < -15.0f)
+    {
+        torque_cmd = -15.0f;
+    }
+
+    _controller_data->ff_setpoint = torque_cmd;
+    _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, 0.5f);
+
+    float cmd = 0.0f;
+    if (_controller_data->parameters[controller_defs::spline::use_pid_idx] > 0.0f)
+    {
+        cmd = torque_cmd + _pid(torque_cmd,
+                                _controller_data->filtered_torque_reading,
+                                _controller_data->parameters[controller_defs::spline::p_gain_idx],
+                                _controller_data->parameters[controller_defs::spline::i_gain_idx],
+                                _controller_data->parameters[controller_defs::spline::d_gain_idx]);
+    }
+    else
+    {
+        cmd = torque_cmd;
+    }
+
+    _controller_data->previous_cmd = cmd;
+    _controller_data->desired_torque = torque_cmd;
+
+    return cmd;
+}
+
+float Spline::_spline_interpolate(const float* x, const float* y, float percent_gait)
+{
+    const int n = 5;
+    float y2[n];
+    float u[n - 1];
+
+    for (int i = 1; i < n; ++i)
+    {
+        if (x[i] <= x[i - 1])
+        {
+            return 0.0f;
+        }
+    }
+
+    if (percent_gait <= x[0])
+    {
+        return y[0];
+    }
+    if (percent_gait >= x[n - 1])
+    {
+        return y[n - 1];
+    }
+
+    y2[0] = 0.0f;
+    u[0] = 0.0f;
+
+    for (int i = 1; i < n - 1; ++i)
+    {
+        float sig = (x[i] - x[i - 1]) / (x[i + 1] - x[i - 1]);
+        float p = (sig * y2[i - 1]) + 2.0f;
+        y2[i] = (sig - 1.0f) / p;
+
+        float dy_next = (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
+        float dy_prev = (y[i] - y[i - 1]) / (x[i] - x[i - 1]);
+        float dd = dy_next - dy_prev;
+        u[i] = (6.0f * dd / (x[i + 1] - x[i - 1]) - sig * u[i - 1]) / p;
+    }
+
+    y2[n - 1] = 0.0f;
+
+    for (int k = n - 2; k >= 0; --k)
+    {
+        y2[k] = y2[k] * y2[k + 1] + u[k];
+    }
+
+    int k = 0;
+    for (int i = 0; i < n - 1; ++i)
+    {
+        if (percent_gait >= x[i] && percent_gait <= x[i + 1])
+        {
+            k = i;
+            break;
+        }
+    }
+
+    float h = x[k + 1] - x[k];
+    if (h <= 0.0f)
+    {
+        return 0.0f;
+    }
+
+    float a = (x[k + 1] - percent_gait) / h;
+    float b = (percent_gait - x[k]) / h;
+
+    return (a * y[k]) + (b * y[k + 1])
+        + (((a * a * a) - a) * y2[k] + ((b * b * b) - b) * y2[k + 1]) * (h * h) / 6.0f;
+}
+
+
+//****************************************************
+
 FranksCollinsHip::FranksCollinsHip(config_defs::joint_id id, ExoData* exo_data)
 : _Controller(id, exo_data)
 {
@@ -733,7 +963,7 @@ float FranksCollinsHip::calc_motor_cmd()
     float start_percent_gait = _controller_data->parameters[controller_defs::franks_collins_hip::start_percent_gait_idx];
 
     //Calculates the percent gait
-    float percent_gait = _side_data->percent_gait;
+    float percent_gait = _get_percent_gait(_controller_data->parameters[controller_defs::franks_collins_hip::sim_gait_idx] > 0.0f);
     float expected_duration = _side_data->expected_step_duration;
 
     //Determines the time when the user exceeds the defined startpoint of the shifted gait cycle (done to avoid discontinuties realted to heel strike)
@@ -842,6 +1072,9 @@ float FranksCollinsHip::calc_motor_cmd()
     {
         cmd = torque_cmd;
     }
+
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = torque_cmd;
 
     return cmd;
 }
@@ -982,6 +1215,9 @@ float ConstantTorque::calc_motor_cmd()
     previous_command = cmd_ff;
 
     previous_torque_reading = _controller_data->filtered_torque_reading;
+
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = cmd_ff;
 
     return cmd;
 }
@@ -1258,6 +1494,9 @@ float ElbowMinMax::calc_motor_cmd()
     //Get motor command based on PID
     cmd = _controller_data->filtered_setpoint + _pid(_controller_data->filtered_setpoint, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::elbow_min_max::P_gain_idx], _controller_data->parameters[controller_defs::elbow_min_max::I_gain_idx], _controller_data->parameters[controller_defs::elbow_min_max::D_gain_idx]);       //originally, (10, 0, 200)
 
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = _controller_data->filtered_setpoint;
+
     return cmd;
 }
 
@@ -1348,7 +1587,10 @@ float CalibrManager::calc_motor_cmd()
 	
 	_controller_data->ff_setpoint = cmd;
     return cmd;
-	
+
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = _controller_data->ff_setpoint;
+
 }
 
 //****************************************************
@@ -1458,6 +1700,9 @@ float Chirp::calc_motor_cmd()
     {
         return 0;
     }
+
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = _controller_data->ff_setpoint;
 
 }
 
@@ -1615,6 +1860,9 @@ float Step::calc_motor_cmd()
     //        Serial.print("\n");
     //    }
     //}
+
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = cmd_ff;
 
     return cmd;
 }
@@ -2113,6 +2361,9 @@ float ProportionalHipMoment::calc_motor_cmd()
     //Set the motor command equal to the setpoint, this is for open-loop control, we would need a torque sensor and to call the PID function if we wanted to do closed-loop
     float cmd = setpoint;
 
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = setpoint;
+
     //Return the Motor Command
     return cmd;
 }
@@ -2560,7 +2811,9 @@ float SPV2::calc_motor_cmd()
 		}
 		else if ((_controller_data->parameters[controller_defs::spv2::soft_or_stiff] >= 10) && (_controller_data->parameters[controller_defs::spv2::soft_or_stiff] <= 20)) {
 			uint8_t stiffness_cache = map(_controller_data->parameters[controller_defs::spv2::soft_or_stiff], 10, 20, _controller_data->parameters[controller_defs::spv2::servo_angle_soft], _controller_data->parameters[controller_defs::spv2::servo_angle_stiff]);
-			neutral_stiffness = constrain(stiffness_cache, _controller_data->parameters[controller_defs::spv2::servo_angle_soft], _controller_data->parameters[controller_defs::spv2::servo_angle_stiff]);
+
+			neutral_stiffness = max(min(stiffness_cache,max(_controller_data->parameters[controller_defs::spv2::servo_angle_soft], _controller_data->parameters[controller_defs::spv2::servo_angle_stiff])),min(_controller_data->parameters[controller_defs::spv2::servo_angle_soft], _controller_data->parameters[controller_defs::spv2::servo_angle_stiff]));
+
 		}
 		
 		
@@ -2573,6 +2826,7 @@ float SPV2::calc_motor_cmd()
 		uint16_t exo_status = _data->get_status();
 		bool active_trial = (exo_status == status_defs::messages::trial_on) || (exo_status == status_defs::messages::fsr_calibration) || (exo_status == status_defs::messages::fsr_refinement);
 		
+		//Block uncomment the following section if the device has an INA260 chip
 		/* if (!_controller_data->ps_connected) {
 			if (!ina260.begin()) {
 				Serial.println("Couldn't find INA260 chip");
@@ -2781,10 +3035,10 @@ float SPV2::calc_motor_cmd()
 				//Serial.print("\nStep count: ");
 				//Serial.print(_controller_data->SPV2_step_count);
 			_controller_data->SPV2_motor_off = 20;
-			if ((servo_switch) && (_controller_data->servo_did_go_down) && ((_controller_data->filtered_torque_reading - cmd_ff) < 0) && (percent_grf > 0.1))
+			if ((servo_switch) && (_controller_data->servo_did_go_down) && ((_controller_data->filtered_torque_reading - cmd_ff) < 0) && (percent_grf > 0.02))
 			{
 				cmd = _pid(0, 0, 0, 0, 0);  //Reset the PID error sum by sending a 0 I gain
-				cmd = -25;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
+				cmd = -20;                    //Send 0 Nm torque command to "turn off" the motor to extend the battery life
 				_controller_data->SPV2_motor_off = -20;
 			}
 			
@@ -2808,6 +3062,10 @@ float SPV2::calc_motor_cmd()
 		}
 
 	}
+
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = _controller_data->ff_setpoint;
+
 }
 
 //****************************************************
@@ -2844,7 +3102,7 @@ float PJMC_PLUS::calc_motor_cmd()
 	float cmd;
 	
     //PID on Motor Command
-    cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, 20 * _controller_data->parameters[controller_defs::pjmc_plus::kp], 80 * _controller_data->parameters[controller_defs::pjmc_plus::ki], 20 * _controller_data->parameters[controller_defs::pjmc_plus::kd]);
+    cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::pjmc_plus::kp], _controller_data->parameters[controller_defs::pjmc_plus::ki], _controller_data->parameters[controller_defs::pjmc_plus::kd]);
 
     #ifdef CONTROLLER_DEBUG
     logger::println("pjmcPlus::calc_motor_cmd : stop");
@@ -2855,6 +3113,9 @@ float PJMC_PLUS::calc_motor_cmd()
 	_controller_data->setpoint = cmd;
     _controller_data->filtered_setpoint = cmd;
 	
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = _controller_data->ff_setpoint;
+    
 	return cmd;
 }
 #endif

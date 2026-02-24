@@ -32,6 +32,7 @@ Exo::Exo(ExoData* exo_data)
 
 {
     this->data = exo_data;
+    data->set_default_parameters();
     
     #ifdef EXO_DEBUG
         logger::println("Exo :: Constructor : _data set");

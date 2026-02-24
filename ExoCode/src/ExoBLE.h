@@ -77,12 +77,17 @@ class ExoBLE
 
         //BLE connection state
         int _connected = 0;
+        bool _handshake_payload_pending = true;
         
         //The Gatt database which defines the services and characteristics
         GattDb _gatt_db = GattDb();
 
         //The parser used to serialize and deserialize the BLE data
         BleParser _ble_parser = BleParser();
+
+        static ExoBLE* _instance;
+        static void _on_tx_subscribed(BLEDevice central, BLECharacteristic characteristic);
+        void _handle_tx_subscribed(BLECharacteristic characteristic);
 };
 
 /**

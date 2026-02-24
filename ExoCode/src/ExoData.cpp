@@ -47,6 +47,16 @@ ExoData::ExoData(uint8_t* config_to_send)
     {
         elbow_torque_flag = 1;
     }
+
+    if ((config_to_send[config_defs::arm_1_use_torque_sensor_idx] == (uint8_t)config_defs::use_torque_sensor::yes))
+    {
+        arm_1_torque_flag = 1;
+    }
+
+    if ((config_to_send[config_defs::arm_2_use_torque_sensor_idx] == (uint8_t)config_defs::use_torque_sensor::yes))
+    {
+        arm_2_torque_flag = 1;
+    }
 };
 
 void ExoData::reconfigure(uint8_t* config_to_send) 
@@ -67,6 +77,10 @@ uint8_t ExoData::get_used_joints(uint8_t* used_joints)
     len += left_side.ankle.is_used;
     used_joints[len] = ((left_side.elbow.is_used) ? (1) : (0));
     len += left_side.elbow.is_used;
+    used_joints[len] = ((left_side.arm_1.is_used) ? (1) : (0));
+    len += left_side.arm_1.is_used;
+    used_joints[len] = ((left_side.arm_2.is_used) ? (1) : (0));
+    len += left_side.arm_2.is_used;
     used_joints[len] = ((right_side.hip.is_used) ? (1) : (0));
     len += right_side.hip.is_used;
     used_joints[len] = ((right_side.knee.is_used) ? (1) : (0));
@@ -75,6 +89,10 @@ uint8_t ExoData::get_used_joints(uint8_t* used_joints)
     len += right_side.ankle.is_used;
     used_joints[len] = ((right_side.elbow.is_used) ? (1) : (0));
     len += right_side.elbow.is_used;
+    used_joints[len] = ((right_side.arm_1.is_used) ? (1) : (0));
+    len += right_side.arm_1.is_used;
+    used_joints[len] = ((right_side.arm_2.is_used) ? (1) : (0));
+    len += right_side.arm_2.is_used;
     return len;
 };
 
@@ -95,6 +113,12 @@ JointData* ExoData::get_joint_with(uint8_t id)
     case (uint8_t)config_defs::joint_id::left_elbow:
         j_data = &left_side.elbow;
         break;
+    case (uint8_t)config_defs::joint_id::left_arm_1:
+        j_data = &left_side.arm_1;
+        break;
+    case (uint8_t)config_defs::joint_id::left_arm_2:
+        j_data = &left_side.arm_2;
+        break;
     case (uint8_t)config_defs::joint_id::right_hip:
         j_data = &right_side.hip;
         break;
@@ -106,6 +130,12 @@ JointData* ExoData::get_joint_with(uint8_t id)
         break; 
     case (uint8_t)config_defs::joint_id::right_elbow:
         j_data = &right_side.elbow;
+        break;
+    case (uint8_t)config_defs::joint_id::right_arm_1:
+        j_data = &right_side.arm_1;
+        break;
+    case (uint8_t)config_defs::joint_id::right_arm_2:
+        j_data = &right_side.arm_2;
         break;
     default:
         // logger::print("ExoData::get_joint_with->No joint with ");
@@ -501,4 +531,3 @@ void ExoData::print()
     }
    
 };
-

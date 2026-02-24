@@ -77,6 +77,8 @@ class ComsMCU
          * @param msg Complete BLE message
          */
         void _process_complete_gui_command(BleMessage* msg);
+        void _schedule_system_reset();
+        void _maybe_system_reset();
 
         //Reference to ExoBLE object, this is the next step down the composition heirarchy
         ExoBLE* _exo_ble;
@@ -91,6 +93,9 @@ class ComsMCU
         // _Battery* _battery;
 
         const int _mark_index = 1;
+        bool _reset_pending = false;
+        uint32_t _reset_start_ms = 0;
+        const uint32_t _reset_delay_ms = 5000;
 
         //Alpha value for the exponentially weighted moving average on the battery data
         // const float k_battery_ewma_alpha = 0.1;

@@ -157,6 +157,7 @@ class HipJoint : public _Joint
         //Objects for joint specific controllers
         ZeroTorque _zero_torque;                        /**< Zero torque controller */
         FranksCollinsHip _franks_collins_hip;           /**< Franks Collins Hip controller */
+        Spline _spline;                                 /**< Spline controller */
         ConstantTorque _constant_torque;                /**< Constant torque controller */
         Chirp _chirp;                                   /**< Chirp Controller for Device Characterization */                    
         Step _step;                                     /**< Step Controller for Device Characterization */
@@ -231,6 +232,7 @@ class AnkleJoint : public _Joint
         ZeroTorque _zero_torque;                                /**< Zero torque controller */
         ProportionalJointMoment _proportional_joint_moment;     /**< Proportional joint moment controller */
         ZhangCollins _zhang_collins;                            /**< Zhang Collins controller */
+        Spline _spline;                                         /**< Spline controller */
         ConstantTorque _constant_torque;                        /**< Constant torque controller*/
         TREC _trec;                                             /**< TREC */
 		CalibrManager _calibr_manager;                          /**< Calibration Manager "Controller" */
@@ -270,6 +272,60 @@ protected:
     Chirp _chirp;                                           /**< Chirp Controller for Device Characterization */
     Step _step;                                             /**< Step Controller for Device Characterization */
 
+};
+
+/**
+ * @brief Class for the arm 1 joint which contains joint specific controllers.
+ */
+class Arm1Joint : public _Joint
+{
+public:
+    Arm1Joint(config_defs::joint_id id, ExoData* exo_data);
+    ~Arm1Joint() {};
+
+    /**
+     * @brief Reads the sensors for the joint and sends a torque command, See _Joint
+     */
+    void run_joint();
+
+    /**
+     * @brief Sets the controller that is to be used, See _Joint
+     *
+     * @param controller id.
+     */
+    void set_controller(uint8_t);
+
+protected:
+    ZeroTorque _zero_torque;        /**< Zero torque controller */
+    Spline _spline;                 /**< Spline controller */
+    ConstantTorque _constant_torque;/**< Constant torque controller */
+};
+
+/**
+ * @brief Class for the arm 2 joint which contains joint specific controllers.
+ */
+class Arm2Joint : public _Joint
+{
+public:
+    Arm2Joint(config_defs::joint_id id, ExoData* exo_data);
+    ~Arm2Joint() {};
+
+    /**
+     * @brief Reads the sensors for the joint and sends a torque command, See _Joint
+     */
+    void run_joint();
+
+    /**
+     * @brief Sets the controller that is to be used, See _Joint
+     *
+     * @param controller id.
+     */
+    void set_controller(uint8_t);
+
+protected:
+    ZeroTorque _zero_torque;        /**< Zero torque controller */
+    Spline _spline;                 /**< Spline controller */
+    ConstantTorque _constant_torque;/**< Constant torque controller */
 };
 
 #endif

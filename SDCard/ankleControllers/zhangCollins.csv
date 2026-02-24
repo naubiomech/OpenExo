@@ -1,10 +1,10 @@
-5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,,,
-9,"parameter number, the number of parameters to read per line",,,,,,,
-,Parameter list for the ZeroTorque controller,,,,,,,
-,Parameter order:,,,,,,,
-Torque (Nm),Peak Time (% Gait),Rise Time (% Gait),Fall Time (% Gait),"Direciton (0 = PF, >0 = DF)",use_pid,p_gain,i_gain,d_gain
-0,0,0,0,0,0,0,0,0
--15,90,28,10,1,1,10,0,30
--15,90,28,10,1,1,5,0,15
--15,85,28,15,1,1,10,0,30
-0,0,0,0,1,1,10,0,30
+5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,,,,
+10,"parameter number, the number of parameters to read per line",,,,,,,,
+,Parameter list for the ZeroTorque controller,,,,,,,,
+,Parameter order:,,,,,,,,
+Torque (Nm),Peak Time (% Gait),Rise Time (% Gait),Fall Time (% Gait),"Direciton (0 = PF, >0 = DF)",use_pid,sim %gait,p_gain,i_gain,d_gain
+0,0,0,0,0,0,0,0,0,0
+-15,90,28,10,1,1,0,10,0,30
+-15,90,28,10,1,1,0,5,0,15
+-15,85,28,15,1,1,0,10,0,30
+0,0,0,0,1,1,0,10,0,30

@@ -41,7 +41,11 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t i_gain_idx = 5;                       //Value of I Gain for PID control
         const uint8_t d_gain_idx = 6;                       //Value of D Gain for PID control 
         const uint8_t torque_alpha_idx = 7;                 //Filtering term
-        const uint8_t num_parameter = 8;
+        const uint8_t GS_Flag = 8;                          // 0 = off, 1 = on
+        const uint8_t kp_zero = 9;                          // reduced gains near zero-torque
+        const uint8_t ki_zero = 10;
+        const uint8_t kd_zero = 11;
+        const uint8_t num_parameter = 12;
     }
 
     namespace zhang_collins
@@ -52,11 +56,33 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t rise_time_idx = 2;                        //Time from zero torque until peak torque (Expressed as a % of gait cycle)
         const uint8_t fall_time_idx = 3;                        //Time from peak torque until zero torque (Expressed as a % of gait cycle)
         const uint8_t direction_idx = 4;                        //Flag to flip torque from PF to DF
-        const uint8_t use_pid_idx = 5;                          //Flag to use PID control
-        const uint8_t p_gain_idx = 6;                           //Value of P Gain for PID control
-        const uint8_t i_gain_idx = 7;                           //Value of I Gain for PID control
-        const uint8_t d_gain_idx = 8;                           //Value of D Gain for PID control 
-        const uint8_t num_parameter = 9;
+        const uint8_t sim_gait_idx = 5;                         //Flag to simulate percent gait
+        const uint8_t use_pid_idx = 6;                          //Flag to use PID control
+        const uint8_t p_gain_idx = 7;                           //Value of P Gain for PID control
+        const uint8_t i_gain_idx = 8;                           //Value of I Gain for PID control
+        const uint8_t d_gain_idx = 9;                           //Value of D Gain for PID control 
+        const uint8_t num_parameter = 10;
+    }
+
+    namespace spline
+    {
+        const uint8_t node1_x_idx = 0;                          //Percent gait for node 1
+        const uint8_t node1_y_idx = 1;                          //Torque for node 1 in Nm
+        const uint8_t node2_x_idx = 2;                          //Percent gait for node 2
+        const uint8_t node2_y_idx = 3;                          //Torque for node 2 in Nm
+        const uint8_t node3_x_idx = 4;                          //Percent gait for node 3
+        const uint8_t node3_y_idx = 5;                          //Torque for node 3 in Nm
+        const uint8_t node4_x_idx = 6;                          //Percent gait for node 4
+        const uint8_t node4_y_idx = 7;                          //Torque for node 4 in Nm
+        const uint8_t node5_x_idx = 8;                          //Percent gait for node 5
+        const uint8_t node5_y_idx = 9;                          //Torque for node 5 in Nm
+        const uint8_t sim_gait_idx = 10;                        //Flag to simulate percent gait
+        const uint8_t use_percent_gait_idx = 11;                //0 = use percent stance (legacy), 1 = use percent gait
+        const uint8_t use_pid_idx = 12;                         //Flag to use PID control
+        const uint8_t p_gain_idx = 13;                          //Value of P Gain for PID control
+        const uint8_t i_gain_idx = 14;                          //Value of I Gain for PID control
+        const uint8_t d_gain_idx = 15;                          //Value of D Gain for PID control
+        const uint8_t num_parameter = 16;
     }
 
     namespace franks_collins_hip
@@ -71,11 +97,12 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t mid_duration_idx = 7;                     //Time of zero torque period between extension and flexion torques
         const uint8_t peak_percent_gait_idx = 8;                //Percent of Gait Cycle where peak flexion torque occurs
         const uint8_t peak_offset_percent_gait_idx = 9;         //Percent of Gait Cycle where torque stops being applied
-        const uint8_t use_pid_idx = 10;                         //Flag to determine whether or not PID used
-        const uint8_t p_gain_idx = 11;                          //Value of P Gain for PID control
-        const uint8_t i_gain_idx = 12;                          //Value of I Gain for PID control
-        const uint8_t d_gain_idx = 13;                          //Value of D Gain for PID control 
-        const uint8_t num_parameter = 14;                   
+        const uint8_t sim_gait_idx = 10;                        //Flag to simulate percent gait
+        const uint8_t use_pid_idx = 11;                         //Flag to determine whether or not PID used
+        const uint8_t p_gain_idx = 12;                          //Value of P Gain for PID control
+        const uint8_t i_gain_idx = 13;                          //Value of I Gain for PID control
+        const uint8_t d_gain_idx = 14;                          //Value of D Gain for PID control 
+        const uint8_t num_parameter = 15;                   
     }
 
     namespace constant_torque
@@ -245,6 +272,7 @@ class ControllerData {
 
         float setpoint;                                     /**< Controller setpoint, basically the motor command. */
         float ff_setpoint;                                  /**< Feed forwared setpoint, only updated in closed loop controllers */
+        float desired_torque;                               /**< Desired torque command for the controller */
         float parameters[controller_defs::max_parameters];  /**< Parameter list for the controller see the controller_defs namespace for the specific controller. */
         uint8_t parameter_set;                              /**< Temporary value used to store the parameter set while we are pulling from the sd card. */
 

@@ -7,12 +7,72 @@
 #include "Config.h"
 #include "error_codes.h"
 #include "Logger.h"
+#include "GetBulkChar.h"
 
 #define EXOBLE_DEBUG 0
 
+ExoBLE* ExoBLE::_instance = nullptr;
+
+namespace
+{
+    constexpr size_t kHandshakeChunkSize = 19;
+
+    bool send_handshake_payload(BLECharacteristic &characteristic)
+    {
+        const char ready_msg[] = "READY";
+        characteristic.writeValue(ready_msg);
+        delay(20);
+
+        const char *raw_payload = rxBuffer_bulkStr;
+        if (raw_payload == nullptr || raw_payload[0] == '\0')
+        {
+            return false;
+        }
+
+        static char sanitized_payload[MAX_MESSAGE_SIZE + 2] = {0};
+        size_t write_index = 0;
+        sanitized_payload[0] = '\0';
+
+        for (size_t i = 0; raw_payload[i] != '\0' && i < MAX_MESSAGE_SIZE; ++i)
+        {
+            if (write_index >= (MAX_MESSAGE_SIZE - 1))
+            {
+                break;
+            }
+
+            char c = raw_payload[i];
+            if (c == '\r')
+            {
+                continue;
+            }
+
+            sanitized_payload[write_index++] = (c == '\n') ? '|' : c;
+        }
+
+        if (write_index >= MAX_MESSAGE_SIZE)
+        {
+            write_index = MAX_MESSAGE_SIZE - 1;
+        }
+
+        sanitized_payload[write_index++] = '\n';
+        sanitized_payload[write_index] = '\0';
+
+        size_t offset = 0;
+        while (offset < write_index)
+        {
+            size_t chunk_len = ((write_index - offset) > kHandshakeChunkSize) ? kHandshakeChunkSize : (write_index - offset);
+            characteristic.writeValue((const uint8_t *)(sanitized_payload + offset), chunk_len);
+            delay(20);
+            offset += chunk_len;
+        }
+
+        return true;
+    }
+}
+
 ExoBLE::ExoBLE()
 {
-    ;
+    _instance = this;
 }
 
 bool ExoBLE::setup()
@@ -95,6 +155,12 @@ bool ExoBLE::setup()
     BLE.addService(_gatt_db.ErrorService);
 
     _gatt_db.RXChar.setEventHandler(BLEWritten, ble_rx::on_rx_recieved);
+
+
+    // When the central subscribes to notifications on TX, deliver the READY handshake and payload
+    _gatt_db.TXChar.setEventHandler(BLESubscribed, ExoBLE::_on_tx_subscribed);
+
+
     BLE.setConnectionInterval(6, 6);
     advertising_onoff(true);
 
@@ -187,10 +253,23 @@ bool ExoBLE::handle_updates()
                 logger::print("Connection");
                 logger::print("\n");
             #endif
+
+            // Mark connected and send the handshake payload to the GUI
+            _connected = current_status;
+            const bool delivered = send_handshake_payload(_gatt_db.TXChar);
+            _handshake_payload_pending = !delivered;
         }
 
         advertising_onoff(current_status == 0);
         _connected = current_status;
+    }
+
+    if (_connected > 0 && _handshake_payload_pending && rxBuffer_bulkStr[0] != '\0')
+    {
+        if (send_handshake_payload(_gatt_db.TXChar))
+        {
+            _handshake_payload_pending = false;
+        }
     }
 
     #if EXOBLE_DEBUG
@@ -246,6 +325,20 @@ void ExoBLE::send_error(int error_code, int joint_id)
     _gatt_db.ErrorChar.writeValue(error_char);
 }
 
+void ExoBLE::_on_tx_subscribed(BLEDevice /*central*/, BLECharacteristic characteristic)
+{
+    if (_instance != nullptr)
+    {
+        _instance->_handle_tx_subscribed(characteristic);
+    }
+}
+
+void ExoBLE::_handle_tx_subscribed(BLECharacteristic characteristic)
+{
+    const bool delivered = send_handshake_payload(characteristic);
+    _handshake_payload_pending = !delivered;
+}
+
 void ble_rx::on_rx_recieved(BLEDevice central, BLECharacteristic characteristic)
 {
     static BleMessage *empty_msg = new BleMessage();
@@ -255,8 +348,12 @@ void ble_rx::on_rx_recieved(BLEDevice central, BLECharacteristic characteristic)
     //Must reset message to avoid duplicate data
     (*msg) = *empty_msg;
 
-    char data[32] = {0};
+    char data[255] = {0};
     int len = characteristic.valueLength();
+    if (len > (int)sizeof(data))
+    {
+        len = sizeof(data);
+    }
     characteristic.readValue(data, len);
 
         #if EXOBLE_DEBUG

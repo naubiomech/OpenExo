@@ -66,9 +66,9 @@
     config_info::config_to_send[config_defs::battery_idx] = (uint8_t)config_defs::battery::dumb;
     config_info::config_to_send[config_defs::exo_name_idx] = (uint8_t)config_defs::exo_name::bilateral_hip;
     config_info::config_to_send[config_defs::exo_side_idx] = (uint8_t)config_defs::exo_side::bilateral;
-    config_info::config_to_send[config_defs::hip_idx] = (uint8_t)config_defs::motor::AK60_v1_1;
+    config_info::config_to_send[config_defs::hip_idx] = (uint8_t)config_defs::motor::AK60v1_1;
     config_info::config_to_send[config_defs::knee_idx] = (uint8_t)config_defs::motor::not_used;
-    config_info::config_to_send[config_defs::ankle_idx] = (uint8_t)config_defs::motor::AK60_v1_1;
+    config_info::config_to_send[config_defs::ankle_idx] = (uint8_t)config_defs::motor::AK60v1_1;
     config_info::config_to_send[config_defs::hip_gear_idx] = (uint8_t)config_defs::gearing::gearing_1_1;
     config_info::config_to_send[config_defs::knee_gear_idx] = (uint8_t)config_defs::gearing::gearing_1_1;
     config_info::config_to_send[config_defs::ankle_gear_idx] = (uint8_t)config_defs::gearing::gearing_1_1;
@@ -85,10 +85,10 @@
     
     // these should be changed to match the ID of the motors.
     
-        static AK60_v1_1 left_hip_motor(config_defs::joint_id::left_hip, &exo_data, _Joint::get_motor_enable_pin(config_defs::joint_id::left_hip, &exo_data));
-        static AK60_v1_1 right_hip_motor(config_defs::joint_id::right_hip, &exo_data, _Joint::get_motor_enable_pin(config_defs::joint_id::right_hip, &exo_data));
-        static AK60_v1_1 left_ankle_motor(config_defs::joint_id::left_ankle, &exo_data, _Joint::get_motor_enable_pin(config_defs::joint_id::left_ankle, &exo_data));
-        static AK60_v1_1 right_ankle_motor(config_defs::joint_id::right_ankle, &exo_data, _Joint::get_motor_enable_pin(config_defs::joint_id::right_ankle, &exo_data));
+        static AK60v1_1 left_hip_motor(config_defs::joint_id::left_hip, &exo_data, _Joint::get_motor_enable_pin(config_defs::joint_id::left_hip, &exo_data));
+        static AK60v1_1 right_hip_motor(config_defs::joint_id::right_hip, &exo_data, _Joint::get_motor_enable_pin(config_defs::joint_id::right_hip, &exo_data));
+        static AK60v1_1 left_ankle_motor(config_defs::joint_id::left_ankle, &exo_data, _Joint::get_motor_enable_pin(config_defs::joint_id::left_ankle, &exo_data));
+        static AK60v1_1 right_ankle_motor(config_defs::joint_id::right_ankle, &exo_data, _Joint::get_motor_enable_pin(config_defs::joint_id::right_ankle, &exo_data));
     
     
     

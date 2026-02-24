@@ -7,7 +7,7 @@
     void print_param_error_message(uint8_t error_type)
     {
         //logger::print(utils::get_is_left(error_type)? "Left " : "Right ");
-        switch (error_type & ((uint8_t)config_defs::joint_id::hip | (uint8_t)config_defs::joint_id::knee | (uint8_t)config_defs::joint_id::ankle | (uint8_t)config_defs::joint_id::elbow))
+        switch (error_type & ((uint8_t)config_defs::joint_id::hip | (uint8_t)config_defs::joint_id::knee | (uint8_t)config_defs::joint_id::ankle | (uint8_t)config_defs::joint_id::elbow | (uint8_t)config_defs::joint_id::arm_1 | (uint8_t)config_defs::joint_id::arm_2))
         {
             case (uint8_t)config_defs::joint_id::hip:
                 //logger::print("Hip ");    
@@ -20,6 +20,12 @@
                 break;
             case (uint8_t)config_defs::joint_id::elbow:
                 //logger::print("Elbow ");
+                break;
+            case (uint8_t)config_defs::joint_id::arm_1:
+                //logger::print("Arm 1 ");
+                break;
+            case (uint8_t)config_defs::joint_id::arm_2:
+                //logger::print("Arm 2 ");
                 break;
         }
         if (utils::get_bit(error_type, param_error::SD_not_found_idx))
@@ -832,6 +838,176 @@
                     #ifdef SD_PARAM_DEBUG
                         logger::println("set_controller_params : File Closed");
                     #endif
+                }
+                break;
+            }
+            case (uint8_t)config_defs::joint_id::arm_1:
+            {
+                SPI.begin();
+
+                if (!SD.begin(SD_SELECT))
+                {
+                    error_type = utils::update_bit((uint8_t)config_defs::joint_id::arm_1, 1, param_error::SD_not_found_idx);
+                    return error_type;
+                }
+                else
+                {
+                    filename = controller_parameter_filenames::arm_1[controller_id];
+                    param_file = SD.open(filename.c_str(), FILE_READ);
+
+                    if (param_file)
+                    {
+                        uint8_t param_num = 0;
+                        float read_val = 0;
+                        while (param_file.available())
+                        {
+                            header_size = param_file.parseInt();
+                            line_to_read = header_size + set_num;
+                            for (int line_being_read = 0; line_being_read < line_to_read; line_being_read++)
+                            {
+                                if (line_being_read == 1)
+                                {
+                                    param_num_in_file = param_file.parseInt();
+                                }
+                                while (!param_file.findUntil('\n', '\n'))
+                                {
+                                    ;
+                                }
+                            }
+
+                            unsigned long line_start = param_file.position();
+                            param_file.readStringUntil('\n');
+                            unsigned long line_end = param_file.position();
+                            param_file.seek(line_start);
+                            (void)line_end;
+
+                            if (utils::get_is_left(joint_id))
+                            {
+                                while (param_num < controller_defs::max_parameters)
+                                {
+                                    if (param_num_in_file > param_num)
+                                    {
+                                        read_val = param_file.parseFloat();
+                                    }
+                                    else
+                                    {
+                                        read_val = 0;
+                                    }
+
+                                    exo_data->left_side.arm_1.controller.parameters[param_num] = read_val;
+                                    param_num++;
+                                }
+                            }
+                            else
+                            {
+                                while (param_num < controller_defs::max_parameters)
+                                {
+                                    if (param_num_in_file > param_num)
+                                    {
+                                        read_val = param_file.parseFloat();
+                                    }
+                                    else
+                                    {
+                                        read_val = 0;
+                                    }
+
+                                    exo_data->right_side.arm_1.controller.parameters[param_num] = read_val;
+                                    param_num++;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        error_type = utils::update_bit((uint8_t)config_defs::joint_id::arm_1, 1, param_error::file_not_found_idx);
+                    }
+                    param_file.close();
+                }
+                break;
+            }
+            case (uint8_t)config_defs::joint_id::arm_2:
+            {
+                SPI.begin();
+
+                if (!SD.begin(SD_SELECT))
+                {
+                    error_type = utils::update_bit((uint8_t)config_defs::joint_id::arm_2, 1, param_error::SD_not_found_idx);
+                    return error_type;
+                }
+                else
+                {
+                    filename = controller_parameter_filenames::arm_2[controller_id];
+                    param_file = SD.open(filename.c_str(), FILE_READ);
+
+                    if (param_file)
+                    {
+                        uint8_t param_num = 0;
+                        float read_val = 0;
+                        while (param_file.available())
+                        {
+                            header_size = param_file.parseInt();
+                            line_to_read = header_size + set_num;
+                            for (int line_being_read = 0; line_being_read < line_to_read; line_being_read++)
+                            {
+                                if (line_being_read == 1)
+                                {
+                                    param_num_in_file = param_file.parseInt();
+                                }
+                                while (!param_file.findUntil('\n', '\n'))
+                                {
+                                    ;
+                                }
+                            }
+
+                            unsigned long line_start = param_file.position();
+                            param_file.readStringUntil('\n');
+                            unsigned long line_end = param_file.position();
+                            param_file.seek(line_start);
+                            (void)line_end;
+
+                            if (utils::get_is_left(joint_id))
+                            {
+                                while (param_num < controller_defs::max_parameters)
+                                {
+                                    if (param_num_in_file > param_num)
+                                    {
+                                        read_val = param_file.parseFloat();
+                                    }
+                                    else
+                                    {
+                                        read_val = 0;
+                                    }
+
+                                    exo_data->left_side.arm_2.controller.parameters[param_num] = read_val;
+                                    param_num++;
+                                }
+                            }
+                            else
+                            {
+                                while (param_num < controller_defs::max_parameters)
+                                {
+                                    if (param_num_in_file > param_num)
+                                    {
+                                        read_val = param_file.parseFloat();
+                                    }
+                                    else
+                                    {
+                                        read_val = 0;
+                                    }
+
+                                    exo_data->right_side.arm_2.controller.parameters[param_num] = read_val;
+                                    param_num++;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        error_type = utils::update_bit((uint8_t)config_defs::joint_id::arm_2, 1, param_error::file_not_found_idx);
+                    }
+                    param_file.close();
                 }
                 break;
             }

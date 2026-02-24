@@ -68,10 +68,14 @@ class ExoData
                 func(&left_side.knee, NULL);
                 func(&left_side.ankle, NULL);
                 func(&left_side.elbow, NULL);
+                func(&left_side.arm_1, NULL);
+                func(&left_side.arm_2, NULL);
                 func(&right_side.hip, NULL);
                 func(&right_side.knee, NULL);
                 func(&right_side.ankle, NULL);
                 func(&right_side.elbow, NULL);
+                func(&right_side.arm_1, NULL);
+                func(&right_side.arm_2, NULL);
         }
         template <typename F>
         void for_each_joint(F &&func, float* args)
@@ -80,10 +84,14 @@ class ExoData
                 func(&left_side.knee, args);
                 func(&left_side.ankle, args);
                 func(&left_side.elbow, args);
+                func(&left_side.arm_1, args);
+                func(&left_side.arm_2, args);
                 func(&right_side.hip, args);
                 func(&right_side.knee, args);
                 func(&right_side.ankle, args);
                 func(&right_side.elbow, args);
+                func(&right_side.arm_1, args);
+                func(&right_side.arm_2, args);
         }
 
         //Returns a list of all of the joint IDs that are currently being used
@@ -168,6 +176,8 @@ class ExoData
         int knee_torque_flag = 0;   /**< Flag to determine if we want to use torque sensor for that joint */
         int ankle_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
         int elbow_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
+        int arm_1_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
+        int arm_2_torque_flag = 0;  /**< Flag to determine if we want to use torque sensor for that joint */
 		
         private:
         uint16_t _status;           /**< Status of the system*/
