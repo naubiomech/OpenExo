@@ -3273,7 +3273,7 @@ float AngleBased::calc_motor_cmd()
         float cmd_ff = 0.0; // Initialize the feed-foward command to 0
         // State Logic
         
-        if (!local_toe_stance && !_side_data->heel_stance && (_side_data->percent_gait > 50.0))
+        if (!local_toe_stance && !_side_data->heel_stance)
         {
             state = 3;
         }
@@ -3439,7 +3439,11 @@ bool AngleBased::local_toe_stance_schmitt()    /* Function to determine toe stan
     float neg_delta = prev_toe_fsr - raw_toe_fsr;
     
     // we only want local toe stance to be true if the real toe stance is true and other conditions are met
-    if(stance)
+    if(_side_data->percent_gait < 50.0)
+    {
+        stance = true;
+    }
+    else if(stance)
     {
         if(neg_delta > 0.01) //lower
         {
@@ -3457,12 +3461,6 @@ bool AngleBased::local_toe_stance_schmitt()    /* Function to determine toe stan
             stance = local_toe_stance;
         }
     }
-    /*
-    else
-    {
-        stance = local_toe_stance;
-    }
-    */
     return stance;
 }
 #endif
