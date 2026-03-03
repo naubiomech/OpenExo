@@ -3086,7 +3086,16 @@ float AngleBased::calc_motor_cmd()
             intended_encoder_offset = encoder_offset;
         }
         // Handle the Angle Data
-        encoder_angle = _joint_data->position - encoder_offset;
+        /*if(_joint_data->is_left)
+        {
+            encoder_angle = -1*_joint_data->position - encoder_offset;
+        }
+        else
+        {
+            encoder_angle = _joint_data->position - encoder_offset;
+        }*/
+       encoder_angle = _joint_data->position - encoder_offset;
+        
         //encoder_angle = utils::ewma(intended_encoder_angle, encoder_angle, 0.85); // if using the ewma you must change the if statement above (if(abs(cmd_ff)) >=1) to set intended_encoder_angle rather than encoder_angle
         _controller_data->encoder_angle = utils::radians_to_degrees(encoder_angle);
         // Calculate the Combined FSR value (Toe + Heel)
@@ -3403,7 +3412,15 @@ void AngleBased::calibrate_encoders()
     float sum_encoder_readings = 0.0;                                        
     for (int i = 0; i < 5; i++)
     {
-        sum_encoder_readings += _joint_data->position;
+        /*if(_joint_data->is_left)
+        {
+            sum_encoder_readings += -1*_joint_data->position;
+        }
+        else
+        {
+            sum_encoder_readings += _joint_data->position;
+        }*/
+       sum_encoder_readings += _joint_data->position;
     }
     encoder_offset = sum_encoder_readings/5;
     encoder_offset_0 = sum_encoder_readings/5;

@@ -645,7 +645,7 @@ void HipJoint::run_joint()
     #ifdef JOINT_DEBUG
         logger::print("HipJoint::run_joint::Start");
     #endif
-
+    
     //Make sure the correct controller is running.
     set_controller(_joint_data->controller.controller);
     
