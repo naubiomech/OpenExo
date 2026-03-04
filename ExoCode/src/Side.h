@@ -26,8 +26,12 @@
 #include "ThIMU.h"
 #include "InclinationDetector.h"
 
+#include "I2CHandler.h"
+
 #include <stdint.h>
 #include <algorithm>
+
+
 
 /**
  * @brief Class to operate a side.

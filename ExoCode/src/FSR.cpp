@@ -1,5 +1,6 @@
 
 #include "FSR.h"
+#include "I2CHandler.h"
 
 #include "Board.h"
 #include "Logger.h"
@@ -35,6 +36,36 @@ FSR::FSR(int pin)
     #endif
 }
 
+/*
+ * Constructor for the force sensitive resistor
+ * Takes in the pin to use and sets it as an analog input
+ * Calibration and readings are initialized to 0 
+ */
+FSR::wirelessFSR(uint8_t addr, uint8_t reg, uint8_t len)
+{
+    _addr = addr;
+    _reg = reg;
+    _len = len;
+
+    _raw_reading = 0;
+    _calibrated_reading = 0;
+    
+    _last_do_calibrate = false; 
+    _start_time = 0;
+    _calibration_min = 0;
+    _calibration_max = 0;
+    
+    _state = false;
+    _last_do_refinement = false;
+    _step_count = 0;
+    _calibration_refinement_min = 0;
+    _calibration_refinement_max = 0;
+    
+    #ifdef FSR_DEBUG
+        logger::println("FSR:: Constructor : Exit");
+    #endif
+}
+
 bool FSR::calibrate(bool do_calibrate)
 {
     //Check for rising edge of do_calibrate and start the timer
@@ -46,7 +77,9 @@ bool FSR::calibrate(bool do_calibrate)
         _start_time = millis();
 
         /* Set the Max & Min Values */
-        _calibration_max = analogRead(_pin);
+        uint8_t temp_calibration_max;
+        I2C::get_instance()->read_i2c(&temp_calibration_max, _addr, _reg, _len);
+        _calibration_max = temp_calibration_max;
         _calibration_min = _calibration_max;
     }
     
@@ -60,7 +93,8 @@ bool FSR::calibrate(bool do_calibrate)
         // logger::print("FSR::calibrate : Continuing Cal for pin - ");
         // logger::println(_pin);
 
-        uint16_t current_reading = analogRead(_pin);
+        uint8_t current_reading = 0;
+        I2C::get_instance()->read_i2c(&current_reading, _addr, _reg, _len);
 
         //Track the min and max.
         _calibration_max = max(_calibration_max, current_reading);
@@ -105,7 +139,8 @@ bool FSR::refine_calibration(bool do_refinement)
         //Check if we are done with the calibration
         if (_step_count < _num_steps)
         {
-            uint16_t current_reading = analogRead(_pin);
+            uint8_t current_reading = 0;
+            I2C::get_instance()->read_i2c(&current_reading, _addr, _reg, _len);
 
             //For each step find max and min for every step, keep a running record of the max and min for the step.
             _step_max = max(_step_max, current_reading);
@@ -150,7 +185,9 @@ bool FSR::refine_calibration(bool do_refinement)
 
 float FSR::read()
 {
-    _raw_reading = analogRead(_pin);
+    uint8_t temp_reading; 
+    I2C::get_instance()->read_i2c(&temp_reading, _addr, _reg, _len);
+    _raw_reading = temp_reading;
 
     //Return the value using the calibrated refinement if it is done.
     if (_calibration_refinement_max > 0)

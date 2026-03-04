@@ -12,7 +12,7 @@
 
 #include <Arduino.h>
 
-#if defined(ARDUINO_ARDUINO_NANO33BLE)
+#if defined(ARDUINO_ARDUINO_NANO33BLE) || defined(ARDUINO_TEENSY41) 
 
 #include <Wire.h>
 
@@ -37,12 +37,11 @@ class I2C
             Wire.beginTransmission(addr);
             Wire.write(reg);
             Wire.endTransmission();
-            Wire.requestFrom(addr, 2, false);
+            Wire.requestFrom(addr, len);
             for (uint8_t i=0; i<len; i++)
             {
                 ret[i] = Wire.read();
             }
-            Wire.endTransmission();
         }
 
         void write_i2c(uint8_t addr, uint8_t reg, uint8_t val)
@@ -132,6 +131,28 @@ namespace i2c_cmds
             const uint8_t reg = 0x03;
             const uint8_t len = 2;
         }
+    }
+    namespace wireless_fsr
+    {
+        const uint8_t len = 4; 
+        const uint8_t esp_addr = 0x08;
+        namespace leftfootheel
+        {
+            const uint8_t reg = 0x00;   
+        }
+        namespace leftfoottoe
+        {
+            const uint8_t reg = 0x04;
+        }
+        namespace rightfootheel
+        {
+            const uint8_t reg = 0x08;
+        }
+        namespace rightfoottoe
+        {
+            const uint8_t reg = 0x0C;
+        }
+
     }
 }
 

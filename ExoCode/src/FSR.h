@@ -18,6 +18,7 @@
 #include "Board.h"
 #include "Utilities.h"
 #include "ExoData.h"
+#include "I2CHandler.h"
 
 /**
     * @brief Handles raw (non-regressed) FSR signal. 
@@ -26,7 +27,9 @@
 class FSR
 {
 	public:
-		FSR(int pin);
+
+        FSR(int pin);
+		FSR(uint8_t* ret, uint8_t addr, uint8_t reg, uint8_t len);
 		
         /**
          * @brief Does an initial time based calculation to find a rough range for the signal
@@ -96,6 +99,13 @@ class FSR
 		float _calibrated_reading;      /**< Sensor reading with calibration applied */
         
         int _pin;                       /**< The pin the sensor is connected to */
+        
+        uint8_t* _ret;
+        uint8_t _addr;
+        uint8_t _reg;
+        uint8_t _len;
+
+
         
         //Used for calibration
         const uint16_t _cal_time = 5000;    /**< This is time to do the initial calibration */
