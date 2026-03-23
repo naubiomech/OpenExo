@@ -399,7 +399,7 @@ namespace UART_command_handlers
             rx_msg.data[1] = 0; //exo_data->right_side.ankle.joint_position; //exo_data->left_side.ankle.controller.filtered_torque_reading; //set to ankle angle
 			rx_msg.data[2] = exo_data->right_side.ankle.controller.ff_setpoint;
 			rx_msg.data[3] = exo_data->right_side.ankle.controller.filtered_torque_reading;
-			rx_msg.data[4] = 0;//exo_data->left_side.toe_fsr;
+			rx_msg.data[4] = exo_data->right_side.ankle.joint_position;//exo_data->left_side.toe_fsr;
             rx_msg.data[5] = exo_data->right_side.toe_stance; ///exo_data->left_side.toe_stance;
 			// rx_msg.data[5] = exo_data->left_side.heel_fsr;
             rx_msg.data[6] = exo_data->right_side.toe_fsr;
