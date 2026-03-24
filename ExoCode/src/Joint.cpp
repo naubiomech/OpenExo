@@ -1434,6 +1434,7 @@ Arm1Joint::Arm1Joint(config_defs::joint_id id, ExoData* exo_data)
 , _zero_torque(id, exo_data)
 , _spline(id, exo_data)
 , _constant_torque(id, exo_data)
+, _arm_basic(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
@@ -1539,6 +1540,9 @@ void Arm1Joint::set_controller(uint8_t controller_id)
         case (uint8_t)config_defs::arm_1_controllers::spline:
             _controller = &_spline;
             break;
+        case (uint8_t)config_defs::arm_1_controllers::arm_basic:
+            _controller = &_arm_basic;
+            break;
         default:
             logger::print("Unkown Controller!\n", LogLevel::Error);
             _controller = &_zero_torque;
@@ -1552,6 +1556,7 @@ Arm2Joint::Arm2Joint(config_defs::joint_id id, ExoData* exo_data)
 , _zero_torque(id, exo_data)
 , _spline(id, exo_data)
 , _constant_torque(id, exo_data)
+, _arm_basic(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
@@ -1656,6 +1661,9 @@ void Arm2Joint::set_controller(uint8_t controller_id)
             break;
         case (uint8_t)config_defs::arm_2_controllers::spline:
             _controller = &_spline;
+            break;
+        case (uint8_t)config_defs::arm_2_controllers::arm_basic:
+            _controller = &_arm_basic;
             break;
         default:
             logger::print("Unkown Controller!\n", LogLevel::Error);

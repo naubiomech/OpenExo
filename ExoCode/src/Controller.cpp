@@ -2950,4 +2950,63 @@ float PJMC_PLUS::calc_motor_cmd()
     
 	return cmd;
 }
+
+//****************************************************
+
+arm_basic::arm_basic(config_defs::joint_id id, ExoData* exo_data)
+    : _Controller(id, exo_data)
+{
+#ifdef CONTROLLER_DEBUG
+    logger::println("arm_basic::Constructor");
+#endif
+     /*
+    Initializes variables upon startup
+    previous_torque_reading = 0;
+    previous_command = 0;
+    flag = 0;
+    difference = 0;
+    */
+}
+
+float arm_basic::calc_motor_cmd() //Value is sent as the motor command
+
+{
+
+    //Creates the cmd variable and initializes it to 0;
+    float cmd_ff = 0;     
+
+    if (_side_data->do_calibration_toe_fsr)          //If the FSRs are being calibrated or if the toe fsr is 0, send a command of zero
+    {
+        cmd_ff = 0;
+    }
+    
+    else
+    {
+        cmd_ff = _controller_data->parameters[controller_defs::arm_basic::amplitude_idx];         //Send a command at the specified amplitude
+
+        //determine motor command direction
+        if (_controller_data->parameters[controller_defs::arm_basic::direction_idx] == 0)         //If the user wants to send a PF/Flexion torque (positive)
+        {
+            cmd_ff = 1 * cmd_ff;
+        }
+        else if (_controller_data->parameters[controller_defs::arm_basic::direction_idx] == 1)    //If the user wants to send a DF/Extension torque
+        {
+            cmd_ff = -1 * cmd_ff;
+        }
+        else
+        {
+            cmd_ff = cmd_ff;                                                                       //If the direction flag is something other than 0 or 1, do nothing to the motor command
+        }
+    }
+
+    //Set the feed-forward setpoint
+    _controller_data->ff_setpoint = cmd_ff;
+
+    float cmd = cmd_ff;
+
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = cmd_ff;
+
+    return cmd;
+}
 #endif

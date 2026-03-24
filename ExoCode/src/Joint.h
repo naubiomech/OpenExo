@@ -299,6 +299,7 @@ protected:
     ZeroTorque _zero_torque;        /**< Zero torque controller */
     Spline _spline;                 /**< Spline controller */
     ConstantTorque _constant_torque;/**< Constant torque controller */
+    arm_basic _arm_basic;/**< Arm Basic controller */
 };
 
 /**
@@ -326,6 +327,7 @@ protected:
     ZeroTorque _zero_torque;        /**< Zero torque controller */
     Spline _spline;                 /**< Spline controller */
     ConstantTorque _constant_torque;/**< Constant torque controller */
+    arm_basic _arm_basic;/**< Arm Basic controller */
 };
 
 #endif

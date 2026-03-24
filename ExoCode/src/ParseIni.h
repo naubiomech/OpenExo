@@ -212,6 +212,7 @@ namespace config_defs
         zero_torque = 2,
         constant_torque = 3,
         spline = 4,
+        arm_basic = 5,
 
         Count //Leave this at the end of the enum class. Count can be used to get the total number of controllers defined for this joint.
     };
@@ -222,6 +223,7 @@ namespace config_defs
         zero_torque = 2,
         constant_torque = 3,
         spline = 4,
+        arm_basic = 5,
 
         Count //Leave this at the end of the enum class. Count can be used to get the total number of controllers defined for this joint.
     };
@@ -541,6 +543,7 @@ namespace config_defs
             {"zeroTorque", (uint8_t)config_defs::arm_1_controllers::zero_torque},
             {"constantTorque", (uint8_t)config_defs::arm_1_controllers::constant_torque},
             {"spline", (uint8_t)config_defs::arm_1_controllers::spline},
+            {"arm_basic", (uint8_t)config_defs::arm_1_controllers::arm_basic},
         };
 
         const IniKeyCode arm_2_controllers
@@ -549,6 +552,7 @@ namespace config_defs
             {"zeroTorque", (uint8_t)config_defs::arm_2_controllers::zero_torque},
             {"constantTorque", (uint8_t)config_defs::arm_2_controllers::constant_torque},
             {"spline", (uint8_t)config_defs::arm_2_controllers::spline},
+            {"arm_basic", (uint8_t)config_defs::arm_1_controllers::arm_basic},
         };
         
         const IniKeyCode use_torque_sensor

@@ -523,5 +523,28 @@ private:
 
 };
 
+/**
+ * @brief Arm Basic Controller
+ * This controller is for the arm 1 and arm 2 joints
+ * Describe Controller here
+ *
+ * See ControllerData.h for details on the parameters used.
+ */
+class arm_basic : public _Controller
+{
+public:
+    arm_basic(config_defs::joint_id id, ExoData* exo_data);
+    ~arm_basic() {};
+
+    float calc_motor_cmd();
+
+    /* Remnants from constant toruqe controller
+    float previous_command;     Stores Previous Loop's Torque Command
+    float previous_torque_reading;  Stores Previous Loop's Measured Torque
+    int flag;                       Flag that Determines Filter Status
+    float difference;               Stores Difference in Command when Changed
+    */
+};
+
 #endif
 #endif
