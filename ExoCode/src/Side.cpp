@@ -17,8 +17,8 @@ Side::Side(bool is_left, ExoData* exo_data)
 , _elbow((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::elbow), exo_data)
 , _arm_1((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::arm_1), exo_data)
 , _arm_2((config_defs::joint_id)((uint8_t)(is_left ? config_defs::joint_id::left : config_defs::joint_id::right) | (uint8_t)config_defs::joint_id::arm_2), exo_data)
-, _heel_fsr(is_left ? i2c_cmds::wireless_fsr::leftfootheel::reg : i2c_cmds::wireless_fsr::rightfootheel::reg) //Check if it is the left and use the appropriate pin for the side.
-, _toe_fsr(is_left ? i2c_cmds::wireless_fsr::leftfoottoe::reg : i2c_cmds::wireless_fsr::rightfoottoe::reg)
+, _heel_fsr(i2c_cmds::wireless_fsr::esp_addr, is_left ? i2c_cmds::wireless_fsr::leftfootheel::reg : i2c_cmds::wireless_fsr::rightfootheel::reg, i2c_cmds::wireless_fsr::len) //Check if it is the left and use the appropriate pin for the side.
+, _toe_fsr(i2c_cmds::wireless_fsr::esp_addr, is_left ? i2c_cmds::wireless_fsr::leftfoottoe::reg : i2c_cmds::wireless_fsr::rightfoottoe::reg, i2c_cmds::wireless_fsr::len)
 {
 
     _data = exo_data;
@@ -105,6 +105,12 @@ void Side::read_data()
     //Check the FSRs
     _side_data->heel_fsr = _heel_fsr.read();
     _side_data->toe_fsr = _toe_fsr.read();
+
+    Serial.println("FSR reading, side class: ");
+    Serial.print("Heel:");
+    Serial.println(_side_data->heel_fsr);
+    Serial.print("Toe: ");
+    Serial.println(_side_data->toe_fsr);
 
     //Check if a ground strike is detected
     _side_data->ground_strike = _check_ground_strike();

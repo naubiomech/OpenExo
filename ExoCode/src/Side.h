@@ -168,8 +168,8 @@ class Side
         Arm2Joint _arm_2;   /**< Instance of an arm 2 joint */
         
         //FSR objects for the side. 
-        FSR _heel_fsr;                        /**< Heel force sensitive resistor, typically is a raw value */
-		FSR_Regressed _toe_fsr;               /**< Toe force sensitive resistor, typically is a regressed value */
+        wirelessFSR _heel_fsr;                        /**< Heel force sensitive resistor, typically is a raw value */
+		wirelessFSR _toe_fsr;               /**< Toe force sensitive resistor, typically is a regressed value */
 
         //Inclination object for the side
         InclinationDetector* inclination_detector;

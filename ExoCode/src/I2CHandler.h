@@ -27,12 +27,12 @@ class I2C
 
         void read_i2c(uint8_t* ret, uint8_t addr, uint8_t reg, uint8_t len)
         {
-            // logger::print("Reading from I2C device: ");
-            // logger::print(addr);
-            // logger::print(" at register: ");
-            // logger::print(reg);
-            // logger::print(" with length: ");
-            // logger::println(len);
+            Serial.print("Reading from I2C device: ");
+            Serial.print(addr);
+            Serial.print(" at register: ");
+            Serial.print(reg);
+            Serial.print(" with length: ");
+            Serial.println(len);
 
             Wire.beginTransmission(addr);
             Wire.write(reg);

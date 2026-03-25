@@ -36,35 +36,6 @@ FSR::FSR(int pin)
     #endif
 }
 
-/*
- * Constructor for the force sensitive resistor
- * Takes in the pin to use and sets it as an analog input
- * Calibration and readings are initialized to 0 
- */
-FSR::wirelessFSR(uint8_t addr, uint8_t reg, uint8_t len)
-{
-    _addr = addr;
-    _reg = reg;
-    _len = len;
-
-    _raw_reading = 0;
-    _calibrated_reading = 0;
-    
-    _last_do_calibrate = false; 
-    _start_time = 0;
-    _calibration_min = 0;
-    _calibration_max = 0;
-    
-    _state = false;
-    _last_do_refinement = false;
-    _step_count = 0;
-    _calibration_refinement_min = 0;
-    _calibration_refinement_max = 0;
-    
-    #ifdef FSR_DEBUG
-        logger::println("FSR:: Constructor : Exit");
-    #endif
-}
 
 bool FSR::calibrate(bool do_calibrate)
 {
@@ -188,6 +159,9 @@ float FSR::read()
     uint8_t temp_reading; 
     I2C::get_instance()->read_i2c(&temp_reading, _addr, _reg, _len);
     _raw_reading = temp_reading;
+
+    Serial.print("FSR reading: ");
+    Serial.print(_raw_reading);
 
     //Return the value using the calibrated refinement if it is done.
     if (_calibration_refinement_max > 0)
@@ -471,6 +445,221 @@ void FSR_Regressed::get_contact_thresholds(float &lower_threshold_percent_ground
 };
 
 void FSR_Regressed::set_contact_thresholds(float lower_threshold_percent_ground_contact, float upper_threshold_percent_ground_contact)
+{
+    _lower_threshold_percent_ground_contact = lower_threshold_percent_ground_contact;
+    _upper_threshold_percent_ground_contact = upper_threshold_percent_ground_contact;
+};
+
+/*
+ * Constructor for the force sensitive resistor
+ * Takes in the pin to use and sets it as an analog input
+ * Calibration and readings are initialized to 0 
+ */
+wirelessFSR::wirelessFSR(uint8_t addr, uint8_t reg, uint8_t len)
+{
+    I2C* instance = I2C::get_instance();
+
+    _addr = addr;
+    _reg = reg;
+    _len = len;
+
+    _raw_reading = 0;
+    _calibrated_reading = 0;
+    
+    _last_do_calibrate = false; 
+    _start_time = 0;
+    _calibration_min = 0;
+    _calibration_max = 0;
+    
+    _state = false;
+    _last_do_refinement = false;
+    _step_count = 0;
+    _calibration_refinement_min = 0;
+    _calibration_refinement_max = 0;
+    
+    #ifdef FSR_DEBUG
+        logger::println("FSR:: Constructor : Exit");
+    #endif
+}
+
+bool wirelessFSR::calibrate(bool do_calibrate)
+{
+    //Check for rising edge of do_calibrate and start the timer
+    if (do_calibrate > _last_do_calibrate)
+    {
+        // logger::print("FSR::calibrate : Starting Cal for pin - ");
+        // logger::println(_pin);
+        
+        _start_time = millis();
+
+        /* Set the Max & Min Values */
+        instance->read_i2c(&_calibration_max, _addr, _reg, _len);
+        _calibration_min = _calibration_max;
+    }
+    
+    //Check if we are within the time window and need to do the calibration
+    uint16_t delta = millis()-_start_time;
+    // logger::print("FSR::calibrate : delta - ");
+    // logger::println(delta);
+    
+    if((_cal_time >= (delta)) & do_calibrate)
+    {
+        // logger::print("FSR::calibrate : Continuing Cal for pin - ");
+        // logger::println(_pin);
+
+        uint8_t current_reading = 0;
+        instance->read_i2c(&current_reading, _addr, _reg, _len);
+
+        //Track the min and max.
+        _calibration_max = max(_calibration_max, current_reading);
+        _calibration_min = min(_calibration_min, current_reading);
+    } 
+
+    //The time window ran out so we are done.
+    else if (do_calibrate)
+    {
+        // logger::print("FSR::calibrate : FSR Cal Done for pin - ");
+        // logger::println(_pin);
+        // logger::print("FSR::calibrate : _calibration_max - ");
+        // logger::print(_calibration_max);
+        // logger::print("\n");
+        do_calibrate = false;
+    }
+        
+    //Store the reading for next time.
+    _last_do_calibrate = do_calibrate;
+    
+    return do_calibrate;
+};
+
+bool wirelessFSR::refine_calibration(bool do_refinement)
+{
+    if (do_refinement)
+    {
+        //Check for rising edge of do_calibrate
+        if (do_refinement > _last_do_refinement)
+        {
+            _step_count = 0;
+            
+            //Set the step max min to the middle value so the initial value is likely not used.
+            _step_max = (_calibration_max+_calibration_min)/2;
+            _step_min = (_calibration_max+_calibration_min)/2;
+
+            //Reset the sum that will be used for averaging
+            _step_max_sum = 0;
+            _step_min_sum = 0;
+        }
+        
+        //Check if we are done with the calibration
+        if (_step_count < _num_steps)
+        {
+            uint8_t current_reading = 0;
+            instance->read_i2c(&current_reading, _addr, _reg, _len);
+
+            //For each step find max and min for every step, keep a running record of the max and min for the step.
+            _step_max = max(_step_max, current_reading);
+            _step_min = min(_step_min, current_reading);
+            
+            //Store the current state so we can check for change
+            bool last_state = _state;
+            _state = utils::schmitt_trigger(current_reading, last_state, _lower_threshold_percent_calibration_refinement * (_calibration_max-_calibration_min) + _calibration_min, _upper_threshold_percent_calibration_refinement * (_calibration_max-_calibration_min) + _calibration_min); 
+            
+            //There is a new low -> high transition (next step), add the step max and min to their respective sums.
+            if (_state > last_state) 
+            {
+                _step_max_sum = _step_max_sum + _step_max;
+                _step_min_sum = _step_min_sum + _step_min;
+                
+                //Reset the step max/min tracker for the next step
+                _step_max = (_calibration_max+_calibration_min)/2;
+                _step_min = (_calibration_max+_calibration_min)/2;
+                
+                _step_count++;
+                
+                // logger::print("FSR::refine_calibration : New Step - ");
+            }
+
+        }
+        else //We are still at do_refinement but the _step_count is at the _num_steps
+        {
+            //Set the calibration as the average of the max values; average max and min, offset by min and normalize by (max-min), (val-avg_min)/(avg_max-avg_min)
+            _calibration_refinement_max = static_cast<decltype(_calibration_refinement_max)>(_step_max_sum)/_num_steps;     //Casting to the type of _calibration_refinement_max before division 
+            _calibration_refinement_min = static_cast<decltype(_calibration_refinement_min)>(_step_min_sum)/_num_steps;     //Casting to the type of _calibration_refinement_max before division 
+ 
+            //Refinement is done
+            do_refinement = false;
+        } 
+    }
+
+    //Store the value so we can check for a rising edge next time.
+    _last_do_refinement = do_refinement;
+    
+    return do_refinement;
+};
+
+float wirelessFSR::read()
+{
+    instance->read_i2c(&_raw_reading, _addr, _reg, _len);
+
+    Serial.print("FSR reading, FSR class: ");
+    Serial.println(_raw_reading);
+
+    //Return the value using the calibrated refinement if it is done.
+    if (_calibration_refinement_max > 0)
+    {
+        _calibrated_reading = ((float)_raw_reading - _calibration_refinement_min)/(_calibration_refinement_max-_calibration_refinement_min);
+    }
+
+    //If we haven't refined yet just use the regular calibration.
+    else if (_calibration_max > 0)
+    {
+        _calibrated_reading = ((float)_raw_reading - _calibration_min)/(_calibration_max-_calibration_min);
+    }
+
+    //If no calibrations are done just return the raw reading.
+    else
+    {
+        _calibrated_reading = _raw_reading;
+    }
+    
+    //Based on the readings update the ground contact state.
+    _calc_ground_contact();
+    
+    return  _calibrated_reading;
+
+};
+
+bool wirelessFSR::_calc_ground_contact()
+{
+    //Only do this if the refinement is done.
+    bool current_state_estimate = false;
+
+    if (_calibration_refinement_max > 0)
+    {
+        current_state_estimate = utils::schmitt_trigger(_calibrated_reading, _ground_contact, _lower_threshold_percent_ground_contact, _upper_threshold_percent_ground_contact);
+    }
+
+    _ground_contact = current_state_estimate;
+
+    return _ground_contact;
+};
+
+bool wirelessFSR::get_ground_contact()
+{
+    // logger::print("FSR::refine_calibration : FSR pin - ");
+    // logger::print(_pin);
+    // logger::print("\t _ground_contact -");
+    // logger::println(_ground_contact);
+    return _ground_contact;
+};
+
+void wirelessFSR::get_contact_thresholds(float &lower_threshold_percent_ground_contact, float &upper_threshold_percent_ground_contact)
+{
+    lower_threshold_percent_ground_contact = _lower_threshold_percent_ground_contact;
+    upper_threshold_percent_ground_contact = _upper_threshold_percent_ground_contact;
+};
+
+void wirelessFSR::set_contact_thresholds(float lower_threshold_percent_ground_contact, float upper_threshold_percent_ground_contact)
 {
     _lower_threshold_percent_ground_contact = lower_threshold_percent_ground_contact;
     _upper_threshold_percent_ground_contact = upper_threshold_percent_ground_contact;
