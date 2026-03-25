@@ -33,14 +33,14 @@ inline const char* getColumnHeader(uint8_t column_index, uint8_t* config_to_send
         {
             // Inner switch: Selects the specific column name for this mode (0-based)
             switch (column_index) {
-                case 0:  return "Unused";
-                case 1:  return "Ankle Angle";
-                case 2:  return "Unused";
-                case 3:  return "Measured Torque (R)";
-                case 4:  return "Unused";
-                case 5:  return "Unused";
-                case 6:  return "Toe FSR (R)";
-                case 7:  return "Heel FSR (R)";
+                case 0:  return "Desired Torque";//"PWM Signal";
+                case 1:  return "Measured Torque";//"Ankle Angle";
+                case 2:  return "Toe FSR";//"Desired Torque (R)";
+                case 3:  return "Heel FSR";//"Measured Torque (R)";
+                case 4:  return "PID Signal";//"Unused";
+                case 5:  return "Ankle Angle";//"Stance Phase (R)";
+                case 6:  return "Power";//"Toe FSR (R)";
+                case 7:  return "Stance Phase";//"Heel FSR (R)";
                 case 8:  return "Channel 8";
                 case 9:  return "Exoskeleton time (seconds)";
                 case 10: return "Battery Level (Volts)";
