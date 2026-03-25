@@ -41,7 +41,7 @@ inline const char* getColumnHeader(uint8_t column_index, uint8_t* config_to_send
                 case 5:  return "Ankle Angle";//"Stance Phase (R)";
                 case 6:  return "Power";//"Toe FSR (R)";
                 case 7:  return "Stance Phase";//"Heel FSR (R)";
-                case 8:  return "Channel 8";
+                case 8:  return "Battery Level (Volts)";
                 case 9:  return "Exoskeleton time (seconds)";
                 case 10: return "Battery Level (Volts)";
                 default: return "INVALID_COL";

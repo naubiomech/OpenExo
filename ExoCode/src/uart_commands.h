@@ -405,7 +405,7 @@ namespace UART_command_handlers
             rx_msg.data[6] = exo_data->get_batt_info(1);//exo_data->right_side.toe_fsr;
 			//rx_msg.data[7] = exo_data->right_side.toe_stance;
 			rx_msg.data[7] = exo_data->right_side.toe_stance;//exo_data->right_side.heel_fsr;
-			rx_msg.data[8] = 8;
+			rx_msg.data[8] = exo_data->get_batt_info(0);
 			rx_msg.data[9] = (float)millis()/1000;
 			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
 			break;
