@@ -1,5 +1,7 @@
 from typing import List
 import time
+import logging
+import traceback
 
 try:
     from PySide6 import QtCore
@@ -25,6 +27,11 @@ class RtBridge(QtCore.QObject):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        
+        # Setup logger
+        self.logger = logging.getLogger("OpenExo.RtBridge")
+        self.logger.info("Initializing RtBridge...")
+        
         # Name/controller state
         self._handshake = False
         self._collecting_names = True
@@ -95,7 +102,9 @@ class RtBridge(QtCore.QObject):
         
         try:
             s = data.decode("utf-8")
-        except Exception:
+        except Exception as e:
+            self.logger.error(f"Failed to decode received data: {e}")
+            self.logger.debug(traceback.format_exc())
             return
 
         # Handshake
@@ -291,7 +300,9 @@ class RtBridge(QtCore.QObject):
                 return
             try:
                 self._data_length = int(m.captured(0))
-            except Exception:
+            except Exception as e:
+                self.logger.error(f"Failed to parse data length: {e}, captured: {m.captured(0) if m else 'None'}")
+                self.logger.debug(traceback.format_exc())
                 return
 
             event_without_count = f"{event_info[0]}{event_info[1]}{event_data}"
@@ -308,7 +319,9 @@ class RtBridge(QtCore.QObject):
                         token = ''.join(self._buffer)
                         try:
                             val = float(token) / 100.0
-                        except Exception:
+                        except Exception as e:
+                            self.logger.error(f"Failed to parse float value from token '{token}': {e}")
+                            self.logger.debug(traceback.format_exc())
                             val = None
                         self._buffer.clear()
                         if val is not None:

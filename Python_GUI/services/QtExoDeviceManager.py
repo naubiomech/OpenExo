@@ -83,7 +83,14 @@ class QtExoDeviceManager(QtCore.QObject):
             self.logger.handlers.clear()
             
             # File handler with detailed formatting
-            file_handler = logging.FileHandler(log_file, encoding='utf-8')
+            # Create custom handler that flushes on ERROR/CRITICAL
+            class FlushingFileHandler(logging.FileHandler):
+                def emit(self, record):
+                    super().emit(record)
+                    if record.levelno >= logging.ERROR:
+                        self.flush()
+            
+            file_handler = FlushingFileHandler(log_file, encoding='utf-8')
             file_handler.setLevel(logging.DEBUG)
             formatter = logging.Formatter(
                 '%(asctime)s.%(msecs)03d | %(levelname)-8s | %(funcName)-25s | %(message)s',
