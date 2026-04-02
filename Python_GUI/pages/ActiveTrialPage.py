@@ -45,21 +45,53 @@ class ActiveTrialPage(QtWidgets.QWidget):
         self._init_state()
     
     def resizeEvent(self, event):
-        """Dynamically adjust font sizes based on window width"""
+        """Dynamically adjust font sizes and button heights."""
         super().resizeEvent(event)
-        # Scale font based on window width (base: 900px)
-        width = self.width()
-        scale_factor = max(0.7, min(1.5, width / 900.0))  # Keep between 70% and 150%
-        
-        # Update button font sizes
-        new_font_size = int(self._base_button_font_size * scale_factor)
-        for btn in [self.btn_toggle_points, self.btn_end_trial, self.btn_save_csv,
-                    self.btn_set_preamble, self.btn_update_controller, self.btn_bio_feedback,
-                    self.btn_ml, self.btn_recal_fsr, self.btn_send_preset_fsr, self.btn_recal_torque,
-                    self.btn_mark, self.btn_pause_play]:
+        self._apply_responsive_layout()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        QtCore.QTimer.singleShot(0, self._apply_responsive_layout)
+
+    def _apply_responsive_layout(self):
+        width = max(1, self.width())
+        height = max(1, self.height())
+        scale_w = width / 900.0
+        scale_h = height / 700.0
+        scale_factor = max(0.7, min(1.35, min(scale_w, scale_h)))
+
+        new_font_size = max(9, int(self._base_button_font_size * scale_factor))
+        new_btn_height = max(32, int(UIConfig.BTN_HEIGHT_SMALL * scale_factor))
+
+        buttons = [
+            self.btn_toggle_points, self.btn_end_trial, self.btn_save_csv,
+            self.btn_set_preamble, self.btn_update_controller, self.btn_bio_feedback,
+            self.btn_ml, self.btn_recal_fsr, self.btn_send_preset_fsr, self.btn_recal_torque,
+            self.btn_mark, self.btn_pause_play,
+        ]
+        target_width = None
+        try:
+            if hasattr(self, "_controls_scroll") and self._controls_scroll:
+                target_width = max(160, self._controls_scroll.viewport().width() - 12)
+        except Exception:
+            target_width = None
+
+        for btn in buttons:
             f = btn.font()
             f.setPointSize(new_font_size)
             btn.setFont(f)
+            btn.setMinimumHeight(new_btn_height)
+            if target_width:
+                btn.setFixedWidth(target_width)
+            base_style = ""
+            try:
+                base_style = self._button_base_styles.get(btn, "")
+            except Exception:
+                base_style = ""
+            btn.setStyleSheet(f"{base_style} font-size: {new_font_size}pt;")
+
+        self.btn_end_trial.setMinimumHeight(int(new_btn_height * 1.25))
+        self.btn_pause_play.setMinimumHeight(int(new_btn_height * 1.1))
 
     def _build_ui(self):
         # Main horizontal layout: left controls, right plots
@@ -85,18 +117,18 @@ class ActiveTrialPage(QtWidgets.QWidget):
         
         logo_row.addStretch(1)
         
-        # Battery level label on the right
-        self.lbl_battery = QtWidgets.QLabel("Battery: --")
-        self.lbl_battery.setStyleSheet(f"font-size: {UIConfig.FONT_SMALL}pt; color: {UIConfig.COLOR_SUCCESS}; font-weight: bold;")
-        self.lbl_battery.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-        logo_row.addWidget(self.lbl_battery)
-        
         controls.addLayout(logo_row)
         controls.addSpacing(UIConfig.SPACING_SMALL)
         
         title = QtWidgets.QLabel("Active Trial")
         f = title.font(); f.setPointSize(UIConfig.FONT_SUBTITLE); title.setFont(f)
         controls.addWidget(title)
+
+        self.lbl_battery = QtWidgets.QLabel("Battery: --")
+        self.lbl_battery.setStyleSheet(f"font-size: {UIConfig.FONT_SMALL}pt; color: {UIConfig.COLOR_SUCCESS}; font-weight: bold;")
+        self.lbl_battery.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        controls.addWidget(self.lbl_battery)
+
         controls.addSpacing(UIConfig.MARGIN_PAGE)
 
         # ═══════ PRIORITY: CRITICAL CONTROLS ═══════
@@ -105,7 +137,7 @@ class ActiveTrialPage(QtWidgets.QWidget):
         controls.addWidget(self.btn_end_trial)
         
         # Add more spacing between End Trial and Pause
-        controls.addSpacing(UIConfig.SPACING_XXLARGE)
+        controls.addSpacing(0)
         
         # Pause/Play button
         self.btn_pause_play = QtWidgets.QPushButton("Pause")
@@ -208,10 +240,19 @@ class ActiveTrialPage(QtWidgets.QWidget):
         # Wrap controls in a widget
         controls_widget = QtWidgets.QWidget()
         controls_widget.setLayout(controls)
-        # No max width - let it grow with window
-        
+
+        # Scrollable container to prevent overlap on small windows
+        controls_scroll = QtWidgets.QScrollArea()
+        controls_scroll.setWidgetResizable(True)
+        controls_scroll.setFrameShape(QtWidgets.QFrame.NoFrame)
+        controls_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        controls_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        controls_scroll.setWidget(controls_widget)
+        controls_widget.setMinimumWidth(200)
+        self._controls_scroll = controls_scroll
+
         # Assemble - controls and plots both expand proportionally
-        main.addWidget(controls_widget, 1)  # Stretch factor 1 - controls can grow
+        main.addWidget(controls_scroll, 1)  # Stretch factor 1 - controls can grow
         main.addLayout(plots_col, 3)  # Stretch factor 3 - plots get more space
 
         # Wiring (device control; sim controls available via methods if needed)
@@ -248,17 +289,21 @@ class ActiveTrialPage(QtWidgets.QWidget):
         f.setPointSize(UIConfig.FONT_MEDIUM)
         f.setBold(True)
         self.btn_end_trial.setFont(f)
-        self.btn_end_trial.setMinimumHeight(UIConfig.BTN_HEIGHT_LARGE)
+        self.btn_end_trial.setMinimumHeight(int(UIConfig.BTN_HEIGHT_LARGE * 1.2))
         self.btn_end_trial.setStyleSheet(
             f"background-color: {UIConfig.COLOR_CRITICAL}; color: white; padding: 10px; "
-            "margin-bottom: 4px; font-weight: bold; border-radius: 4px;"
+            "margin-bottom: 0px; font-weight: bold; border-radius: 4px;"
         )
         
         # Special styling for Pause button - make it blue
+        self.btn_pause_play.setMinimumHeight(int(UIConfig.BTN_HEIGHT_LARGE * 1.05))
         self.btn_pause_play.setStyleSheet(
             f"background-color: {UIConfig.COLOR_ACTION}; color: white; padding: 8px; "
-            "margin-bottom: 4px; font-weight: bold; border-radius: 4px;"
+            "margin-bottom: 0px; font-weight: bold; border-radius: 4px;"
         )
+
+        # Capture base styles for resizing updates
+        self._button_base_styles = {btn: btn.styleSheet() for btn in buttons}
 
     def _init_state(self):
         # Fixed-size buffers for plotting (seconds-window * rate)

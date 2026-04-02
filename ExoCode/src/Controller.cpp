@@ -3047,8 +3047,8 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
 float AngleBased::calc_motor_cmd()
 {
     //Serial.println("Running Angle Based calc cmd");
-    //if (millis() - prev_time > 100)
-    //{
+    if (millis() - prev_time > 75)
+    {
         
         // Pull in user defined parameters
         float stance_extension_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_extension_setpoint_idx];
@@ -3404,8 +3404,8 @@ float AngleBased::calc_motor_cmd()
         prev_cmd = cmd;
         prev_state = state;
         return cmd;
-    //    prev_time = millis();
-    //}
+        prev_time = millis();
+    }
 }
 void AngleBased::calibrate_encoders()
 {
