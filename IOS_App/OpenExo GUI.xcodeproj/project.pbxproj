@@ -1,0 +1,618 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1CB085DB2F69DF900039435C /* OpenExo_GUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB085DA2F69DF900039435C /* OpenExo_GUIApp.swift */; };
+		1CB085DD2F69DF900039435C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB085DC2F69DF900039435C /* ContentView.swift */; };
+		1CB085DF2F69DF930039435C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1CB085DE2F69DF930039435C /* Assets.xcassets */; };
+		1CB085E22F69DF930039435C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1CB085E12F69DF930039435C /* Preview Assets.xcassets */; };
+		1CB085EC2F69DF930039435C /* OpenExo_GUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB085EB2F69DF930039435C /* OpenExo_GUITests.swift */; };
+		1CB085F62F69DF930039435C /* OpenExo_GUIUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB085F52F69DF930039435C /* OpenExo_GUIUITests.swift */; };
+		1CB085F82F69DF930039435C /* OpenExo_GUIUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB085F72F69DF930039435C /* OpenExo_GUIUITestsLaunchTests.swift */; };
+		1CB086052F69DF900039435C /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB086042F69DF900039435C /* BLEManager.swift */; };
+		1CB086072F69DF900039435C /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB086062F69DF900039435C /* Models.swift */; };
+		1CB086092F69DF900039435C /* CSVLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB086082F69DF900039435C /* CSVLogger.swift */; };
+		1CB0860B2F69DF900039435C /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB0860A2F69DF900039435C /* ScanView.swift */; };
+		1CB0860D2F69DF900039435C /* ActiveTrialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB0860C2F69DF900039435C /* ActiveTrialView.swift */; };
+		1CB0860F2F69DF900039435C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB0860E2F69DF900039435C /* SettingsView.swift */; };
+		1CB086112F69DF900039435C /* BioFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB086102F69DF900039435C /* BioFeedbackView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1CB085E82F69DF930039435C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1CB085CF2F69DF900039435C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1CB085D62F69DF900039435C;
+			remoteInfo = "OpenExo GUI";
+		};
+		1CB085F22F69DF930039435C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1CB085CF2F69DF900039435C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1CB085D62F69DF900039435C;
+			remoteInfo = "OpenExo GUI";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1CB085D72F69DF900039435C /* OpenExo GUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "OpenExo GUI.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1CB085DA2F69DF900039435C /* OpenExo_GUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenExo_GUIApp.swift; sourceTree = "<group>"; };
+		1CB085DC2F69DF900039435C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1CB085DE2F69DF930039435C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1CB085E12F69DF930039435C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		1CB085E72F69DF930039435C /* OpenExo GUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OpenExo GUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1CB085EB2F69DF930039435C /* OpenExo_GUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenExo_GUITests.swift; sourceTree = "<group>"; };
+		1CB085F12F69DF930039435C /* OpenExo GUIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OpenExo GUIUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1CB085F52F69DF930039435C /* OpenExo_GUIUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenExo_GUIUITests.swift; sourceTree = "<group>"; };
+		1CB085F72F69DF930039435C /* OpenExo_GUIUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenExo_GUIUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		1CB086042F69DF900039435C /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
+		1CB086062F69DF900039435C /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		1CB086082F69DF900039435C /* CSVLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVLogger.swift; sourceTree = "<group>"; };
+		1CB0860A2F69DF900039435C /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
+		1CB0860C2F69DF900039435C /* ActiveTrialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveTrialView.swift; sourceTree = "<group>"; };
+		1CB0860E2F69DF900039435C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		1CB086102F69DF900039435C /* BioFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioFeedbackView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1CB085D42F69DF900039435C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1CB085E42F69DF930039435C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1CB085EE2F69DF930039435C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1CB085CE2F69DF900039435C = {
+			isa = PBXGroup;
+			children = (
+				1CB085D92F69DF900039435C /* OpenExo GUI */,
+				1CB085EA2F69DF930039435C /* OpenExo GUITests */,
+				1CB085F42F69DF930039435C /* OpenExo GUIUITests */,
+				1CB085D82F69DF900039435C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1CB085D82F69DF900039435C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1CB085D72F69DF900039435C /* OpenExo GUI.app */,
+				1CB085E72F69DF930039435C /* OpenExo GUITests.xctest */,
+				1CB085F12F69DF930039435C /* OpenExo GUIUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1CB085D92F69DF900039435C /* OpenExo GUI */ = {
+			isa = PBXGroup;
+			children = (
+				1CB085DA2F69DF900039435C /* OpenExo_GUIApp.swift */,
+				1CB085DC2F69DF900039435C /* ContentView.swift */,
+				1CB086062F69DF900039435C /* Models.swift */,
+				1CB086042F69DF900039435C /* BLEManager.swift */,
+				1CB086082F69DF900039435C /* CSVLogger.swift */,
+				1CB0860A2F69DF900039435C /* ScanView.swift */,
+				1CB0860C2F69DF900039435C /* ActiveTrialView.swift */,
+				1CB0860E2F69DF900039435C /* SettingsView.swift */,
+				1CB086102F69DF900039435C /* BioFeedbackView.swift */,
+				1CB085DE2F69DF930039435C /* Assets.xcassets */,
+				1CB085E02F69DF930039435C /* Preview Content */,
+			);
+			path = "OpenExo GUI";
+			sourceTree = "<group>";
+		};
+		1CB085E02F69DF930039435C /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				1CB085E12F69DF930039435C /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		1CB085EA2F69DF930039435C /* OpenExo GUITests */ = {
+			isa = PBXGroup;
+			children = (
+				1CB085EB2F69DF930039435C /* OpenExo_GUITests.swift */,
+			);
+			path = "OpenExo GUITests";
+			sourceTree = "<group>";
+		};
+		1CB085F42F69DF930039435C /* OpenExo GUIUITests */ = {
+			isa = PBXGroup;
+			children = (
+				1CB085F52F69DF930039435C /* OpenExo_GUIUITests.swift */,
+				1CB085F72F69DF930039435C /* OpenExo_GUIUITestsLaunchTests.swift */,
+			);
+			path = "OpenExo GUIUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1CB085D62F69DF900039435C /* OpenExo GUI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1CB085FB2F69DF930039435C /* Build configuration list for PBXNativeTarget "OpenExo GUI" */;
+			buildPhases = (
+				1CB085D32F69DF900039435C /* Sources */,
+				1CB085D42F69DF900039435C /* Frameworks */,
+				1CB085D52F69DF900039435C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "OpenExo GUI";
+			productName = "OpenExo GUI";
+			productReference = 1CB085D72F69DF900039435C /* OpenExo GUI.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1CB085E62F69DF930039435C /* OpenExo GUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1CB085FE2F69DF930039435C /* Build configuration list for PBXNativeTarget "OpenExo GUITests" */;
+			buildPhases = (
+				1CB085E32F69DF930039435C /* Sources */,
+				1CB085E42F69DF930039435C /* Frameworks */,
+				1CB085E52F69DF930039435C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1CB085E92F69DF930039435C /* PBXTargetDependency */,
+			);
+			name = "OpenExo GUITests";
+			productName = "OpenExo GUITests";
+			productReference = 1CB085E72F69DF930039435C /* OpenExo GUITests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		1CB085F02F69DF930039435C /* OpenExo GUIUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1CB086012F69DF930039435C /* Build configuration list for PBXNativeTarget "OpenExo GUIUITests" */;
+			buildPhases = (
+				1CB085ED2F69DF930039435C /* Sources */,
+				1CB085EE2F69DF930039435C /* Frameworks */,
+				1CB085EF2F69DF930039435C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1CB085F32F69DF930039435C /* PBXTargetDependency */,
+			);
+			name = "OpenExo GUIUITests";
+			productName = "OpenExo GUIUITests";
+			productReference = 1CB085F12F69DF930039435C /* OpenExo GUIUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1CB085CF2F69DF900039435C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1410;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					1CB085D62F69DF900039435C = {
+						CreatedOnToolsVersion = 14.1;
+					};
+					1CB085E62F69DF930039435C = {
+						CreatedOnToolsVersion = 14.1;
+						TestTargetID = 1CB085D62F69DF900039435C;
+					};
+					1CB085F02F69DF930039435C = {
+						CreatedOnToolsVersion = 14.1;
+						TestTargetID = 1CB085D62F69DF900039435C;
+					};
+				};
+			};
+			buildConfigurationList = 1CB085D22F69DF900039435C /* Build configuration list for PBXProject "OpenExo GUI" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1CB085CE2F69DF900039435C;
+			productRefGroup = 1CB085D82F69DF900039435C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1CB085D62F69DF900039435C /* OpenExo GUI */,
+				1CB085E62F69DF930039435C /* OpenExo GUITests */,
+				1CB085F02F69DF930039435C /* OpenExo GUIUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1CB085D52F69DF900039435C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1CB085E22F69DF930039435C /* Preview Assets.xcassets in Resources */,
+				1CB085DF2F69DF930039435C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1CB085E52F69DF930039435C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1CB085EF2F69DF930039435C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1CB085D32F69DF900039435C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1CB085DD2F69DF900039435C /* ContentView.swift in Sources */,
+				1CB085DB2F69DF900039435C /* OpenExo_GUIApp.swift in Sources */,
+				1CB086072F69DF900039435C /* Models.swift in Sources */,
+				1CB086052F69DF900039435C /* BLEManager.swift in Sources */,
+				1CB086092F69DF900039435C /* CSVLogger.swift in Sources */,
+				1CB0860B2F69DF900039435C /* ScanView.swift in Sources */,
+				1CB0860D2F69DF900039435C /* ActiveTrialView.swift in Sources */,
+				1CB0860F2F69DF900039435C /* SettingsView.swift in Sources */,
+				1CB086112F69DF900039435C /* BioFeedbackView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1CB085E32F69DF930039435C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1CB085EC2F69DF930039435C /* OpenExo_GUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1CB085ED2F69DF930039435C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1CB085F62F69DF930039435C /* OpenExo_GUIUITests.swift in Sources */,
+				1CB085F82F69DF930039435C /* OpenExo_GUIUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1CB085E92F69DF930039435C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1CB085D62F69DF900039435C /* OpenExo GUI */;
+			targetProxy = 1CB085E82F69DF930039435C /* PBXContainerItemProxy */;
+		};
+		1CB085F32F69DF930039435C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1CB085D62F69DF900039435C /* OpenExo GUI */;
+			targetProxy = 1CB085F22F69DF930039435C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1CB085F92F69DF930039435C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1CB085FA2F69DF930039435C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1CB085FC2F69DF930039435C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"OpenExo GUI/Preview Content\"";
+				DEVELOPMENT_TEAM = J73P59N8MW;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "OpenExo needs Bluetooth to connect to and control the exoskeleton.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.OpenExo-GUI";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1CB085FD2F69DF930039435C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"OpenExo GUI/Preview Content\"";
+				DEVELOPMENT_TEAM = J73P59N8MW;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "OpenExo needs Bluetooth to connect to and control the exoskeleton.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.OpenExo-GUI";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1CB085FF2F69DF930039435C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PKCJQQZ8ZW;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.OpenExo-GUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpenExo GUI.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OpenExo GUI";
+			};
+			name = Debug;
+		};
+		1CB086002F69DF930039435C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PKCJQQZ8ZW;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.OpenExo-GUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpenExo GUI.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OpenExo GUI";
+			};
+			name = Release;
+		};
+		1CB086022F69DF930039435C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PKCJQQZ8ZW;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.OpenExo-GUIUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "OpenExo GUI";
+			};
+			name = Debug;
+		};
+		1CB086032F69DF930039435C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PKCJQQZ8ZW;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.OpenExo-GUIUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "OpenExo GUI";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1CB085D22F69DF900039435C /* Build configuration list for PBXProject "OpenExo GUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1CB085F92F69DF930039435C /* Debug */,
+				1CB085FA2F69DF930039435C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1CB085FB2F69DF930039435C /* Build configuration list for PBXNativeTarget "OpenExo GUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1CB085FC2F69DF930039435C /* Debug */,
+				1CB085FD2F69DF930039435C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1CB085FE2F69DF930039435C /* Build configuration list for PBXNativeTarget "OpenExo GUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1CB085FF2F69DF930039435C /* Debug */,
+				1CB086002F69DF930039435C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1CB086012F69DF930039435C /* Build configuration list for PBXNativeTarget "OpenExo GUIUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1CB086022F69DF930039435C /* Debug */,
+				1CB086032F69DF930039435C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1CB085CF2F69DF900039435C /* Project object */;
+}
