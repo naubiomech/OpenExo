@@ -670,6 +670,18 @@ class MainWindow(QtWidgets.QMainWindow):
             self.logger.error(f"Failed to clear plots on connection: {e}")
             self.logger.debug(traceback.format_exc())
 
+    def _show_disconnect_warning(self):
+        """Show disconnect warning dialog (called after disconnect handling completes)."""
+        try:
+            QtWidgets.QMessageBox.warning(
+                self, 
+                "Device Disconnected", 
+                "The device has been unexpectedly disconnected.\n\nMotors have been turned off and the trial data has been saved."
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to show disconnect warning: {e}")
+            self.logger.debug(traceback.format_exc())
+
     @QtCore.Slot()
     def _on_dev_disconnected(self):
         """Handle unexpected disconnects (intentional disconnects don't trigger this)."""
@@ -684,19 +696,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.logger.error(f"Failed to disable calibrate torque button: {e}")
                 self.logger.debug(traceback.format_exc())
             
-            # This is an unexpected disconnect - show popup
+            # Device is already disconnected, no need to send commands
+            # (motorOff/stopTrial would fail with "Not connected" errors)
+            self.logger.info("Device already disconnected - skipping motor off/stop trial commands")
+            # Show non-blocking notification of unexpected disconnect
+            # Use QTimer to defer the dialog so disconnect handling completes first
             try:
-                self.qt_dev.motorOff()
-                self.qt_dev.stopTrial()
-                self.logger.info("Sent motor off and stop trial commands after disconnect")
+                QtCore.QTimer.singleShot(100, lambda: self._show_disconnect_warning())
             except Exception as e:
-                self.logger.error(f"Failed to send motor off/stop trial after disconnect: {e}")
-                self.logger.debug(traceback.format_exc())
-            # Popup dialog informing user of unexpected disconnect
-            try:
-                QtWidgets.QMessageBox.warning(self, "Device Disconnected", "The device has been unexpectedly disconnected.")
-            except Exception as e:
-                self.logger.error(f"Failed to show disconnect warning dialog: {e}")
+                self.logger.error(f"Failed to schedule disconnect warning dialog: {e}")
                 self.logger.debug(traceback.format_exc())
             # Navigate back to the Scan page on unexpected disconnect
             self.stack.setCurrentWidget(self.scan_page)
