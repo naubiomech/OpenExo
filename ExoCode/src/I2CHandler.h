@@ -27,21 +27,76 @@ class I2C
 
         void read_i2c(uint8_t* ret, uint8_t addr, uint8_t reg, uint8_t len)
         {
-            Serial.print("Reading from I2C device: ");
-            Serial.print(addr);
-            Serial.print(" at register: ");
-            Serial.print(reg);
-            Serial.print(" with length: ");
-            Serial.println(len);
+            // Serial.print("Reading from I2C device: ");
+            // Serial.print(addr);
+            // Serial.print(" at register: ");
+            // Serial.print(reg);
+            // Serial.print(" with length: ");
+            // Serial.println(len);
 
             Wire.beginTransmission(addr);
             Wire.write(reg);
-            Wire.endTransmission();
-            Wire.requestFrom(addr, len);
+            if(Wire.endTransmission() != 0)
+            {
+                Serial.print("Error: I2C device at address ");
+                Serial.print(addr);
+                Serial.println(" did not acknowledge the register address.");
+                return;
+            }
+
+            uint8_t bytesRead = Wire.requestFrom(addr, len);
+
+            if(bytesRead != len)
+            {
+                Serial.print("Error: Expected to read ");
+                Serial.print(len);
+                Serial.print(" bytes but only received ");
+                Serial.print(bytesRead);
+                Serial.println(" bytes from I2C device.");
+                return;
+            }
+
             for (uint8_t i=0; i<len; i++)
             {
                 ret[i] = Wire.read();
             }
+        }
+
+        void read_i2c_block(uint8_t* ret, uint8_t addr, uint8_t startReg, uint8_t len)
+        {
+            Wire.beginTransmission(addr);
+            Wire.write(startReg);
+            if (Wire.endTransmission() != 0)
+            {
+                Serial.println("Failed to set start register for block read.");
+                return;
+            }
+
+            // short delay to let slave prepare
+            delay(2);
+
+            uint8_t bytesRead = Wire.requestFrom(addr, len);
+            if (bytesRead != len)
+            {
+                Serial.print("Block read: expected "); Serial.print(len);
+                Serial.print(" bytes but got "); Serial.println(bytesRead);
+                return;
+            }
+
+            for (uint8_t i = 0; i < len; ++i) {
+                ret[i] = Wire.read();
+            }
+        }
+
+        float read_wireless(uint8_t addr, uint8_t reg, uint8_t len)
+        {
+            uint8_t dataBlock[16];
+            read_i2c_block(&dataBlock, addr, reg, sizeof(dataBlock));
+
+            float requestedVal = 0;
+            memcpy(&requestedVal, &dataBlock[reg], 4);
+
+            return requestedVal;
         }
 
         void write_i2c(uint8_t addr, uint8_t reg, uint8_t val)

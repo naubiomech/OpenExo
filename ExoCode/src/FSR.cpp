@@ -508,7 +508,7 @@ bool wirelessFSR::calibrate(bool do_calibrate)
         // logger::println(_pin);
 
         uint8_t current_reading = 0;
-        instance->read_i2c(&current_reading, _addr, _reg, _len);
+        I2C::get_instance()->read_i2c(&current_reading, _addr, _reg, _len);
 
         //Track the min and max.
         _calibration_max = max(_calibration_max, current_reading);
@@ -553,8 +553,7 @@ bool wirelessFSR::refine_calibration(bool do_refinement)
         //Check if we are done with the calibration
         if (_step_count < _num_steps)
         {
-            uint8_t current_reading = 0;
-            instance->read_i2c(&current_reading, _addr, _reg, _len);
+            uint8_t current_reading = I2C::get_instance->read_wireless(_addr, _reg, _len);
 
             //For each step find max and min for every step, keep a running record of the max and min for the step.
             _step_max = max(_step_max, current_reading);
@@ -599,7 +598,7 @@ bool wirelessFSR::refine_calibration(bool do_refinement)
 
 float wirelessFSR::read()
 {
-    instance->read_i2c(&_raw_reading, _addr, _reg, _len);
+    _raw_reading = I2C::get_instance()->read_wireless(_addr, _reg, _len);
 
     Serial.print("FSR reading, FSR class: ");
     Serial.println(_raw_reading);
