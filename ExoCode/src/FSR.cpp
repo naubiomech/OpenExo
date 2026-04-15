@@ -438,4 +438,346 @@ void FSR_Regressed::set_contact_thresholds(float lower_threshold_percent_ground_
     _lower_threshold_percent_ground_contact = lower_threshold_percent_ground_contact;
     _upper_threshold_percent_ground_contact = upper_threshold_percent_ground_contact;
 };
+
+/*
+ * Wireless duplicates of FSR methods
+ */
+FSR_Wireless::FSR_Wireless(uint8_t addr, uint8_t reg, uint8_t len)
+{
+    _addr = addr;
+    _reg = reg;
+    _len = len;
+    
+    _raw_reading = 0;
+    _calibrated_reading = 0;
+    
+    _last_do_calibrate = false; 
+    _start_time = 0;
+    _calibration_min = 0;
+    _calibration_max = 0;
+    
+    _state = false;
+    _last_do_refinement = false;
+    _step_count = 0;
+    _calibration_refinement_min = 0;
+    _calibration_refinement_max = 0;
+    
+    #ifdef FSR_DEBUG
+        logger::println("FSR_Wireless:: Constructor : Exit");
+    #endif
+}
+
+bool FSR_Wireless::calibrate(bool do_calibrate)
+{
+    if (do_calibrate > _last_do_calibrate)
+    {
+        _start_time = millis();
+
+        _calibration_max = analogRead(_pin);
+        _calibration_min = _calibration_max;
+    }
+    
+    uint16_t delta = millis()-_start_time;
+    
+    if((_cal_time >= (delta)) & do_calibrate)
+    {
+        uint16_t current_reading = analogRead(_pin);
+
+        _calibration_max = max(_calibration_max, current_reading);
+        _calibration_min = min(_calibration_min, current_reading);
+    } 
+
+    else if (do_calibrate)
+    {
+        do_calibrate = false;
+    }
+        
+    _last_do_calibrate = do_calibrate;
+    
+    return do_calibrate;
+};
+
+bool FSR_Wireless::refine_calibration(bool do_refinement)
+{
+    if (do_refinement)
+    {
+        if (do_refinement > _last_do_refinement)
+        {
+            _step_count = 0;
+            _step_max = (_calibration_max+_calibration_min)/2;
+            _step_min = (_calibration_max+_calibration_min)/2;
+            _step_max_sum = 0;
+            _step_min_sum = 0;
+        }
+        
+        if (_step_count < _num_steps)
+        {
+            uint16_t current_reading = analogRead(_pin);
+
+            _step_max = max(_step_max, current_reading);
+            _step_min = min(_step_min, current_reading);
+            
+            bool last_state = _state;
+            _state = utils::schmitt_trigger(current_reading, last_state, _lower_threshold_percent_calibration_refinement * (_calibration_max-_calibration_min) + _calibration_min, _upper_threshold_percent_calibration_refinement * (_calibration_max-_calibration_min) + _calibration_min); 
+            
+            if (_state > last_state) 
+            {
+                _step_max_sum = _step_max_sum + _step_max;
+                _step_min_sum = _step_min_sum + _step_min;
+                
+                _step_max = (_calibration_max+_calibration_min)/2;
+                _step_min = (_calibration_max+_calibration_min)/2;
+                
+                _step_count++;
+            }
+
+        }
+        else
+        {
+            _calibration_refinement_max = static_cast<decltype(_calibration_refinement_max)>(_step_max_sum)/_num_steps;
+            _calibration_refinement_min = static_cast<decltype(_calibration_refinement_min)>(_step_min_sum)/_num_steps;
+            do_refinement = false;
+        } 
+    }
+
+    _last_do_refinement = do_refinement;
+    
+    return do_refinement;
+};
+
+float FSR_Wireless::read()
+{
+    _raw_reading = analogRead(_pin);
+
+    if (_calibration_refinement_max > 0)
+    {
+        _calibrated_reading = ((float)_raw_reading - _calibration_refinement_min)/(_calibration_refinement_max-_calibration_refinement_min);
+    }
+    else if (_calibration_max > 0)
+    {
+        _calibrated_reading = ((float)_raw_reading - _calibration_min)/(_calibration_max-_calibration_min);
+    }
+    else
+    {
+        _calibrated_reading = _raw_reading;
+    }
+    
+    _calc_ground_contact();
+    
+    return  _calibrated_reading;
+
+};
+
+bool FSR_Wireless::_calc_ground_contact()
+{
+    bool current_state_estimate = false;
+
+    if (_calibration_refinement_max > 0)
+    {
+        current_state_estimate = utils::schmitt_trigger(_calibrated_reading, _ground_contact, _lower_threshold_percent_ground_contact, _upper_threshold_percent_ground_contact);
+    }
+
+    _ground_contact = current_state_estimate;
+
+    return _ground_contact;
+};
+
+bool FSR_Wireless::get_ground_contact()
+{
+    return _ground_contact;
+};
+
+void FSR_Wireless::get_contact_thresholds(float &lower_threshold_percent_ground_contact, float &upper_threshold_percent_ground_contact)
+{
+    lower_threshold_percent_ground_contact = _lower_threshold_percent_ground_contact;
+    upper_threshold_percent_ground_contact = _upper_threshold_percent_ground_contact;
+};
+
+void FSR_Wireless::set_contact_thresholds(float lower_threshold_percent_ground_contact, float upper_threshold_percent_ground_contact)
+{
+    _lower_threshold_percent_ground_contact = lower_threshold_percent_ground_contact;
+    _upper_threshold_percent_ground_contact = upper_threshold_percent_ground_contact;
+};
+
+/*
+ * Wireless duplicates of FSR_Regressed methods
+ */
+FSR_Regressed_Wireless::FSR_Regressed_Wireless(uint8_t addr, uint8_t reg, uint8_t len)
+{
+    _addr = addr;
+    _reg = reg;
+    _len = len;
+    
+    _raw_reading = 0;
+    _calibrated_reading = 0;
+    
+    _last_do_calibrate = false; 
+    _start_time = 0;
+    _calibration_min = 0;
+    _calibration_max = 0;
+    
+    _state = false;
+    _last_do_refinement = false;
+    _step_count = 0;
+    _calibration_refinement_min = 0;
+    _calibration_refinement_max = 0;
+    
+    #ifdef FSR_DEBUG
+        logger::println("FSR_Regressed_Wireless:: Constructor : Exit");
+    #endif
+}
+
+bool FSR_Regressed_Wireless::calibrate(bool do_calibrate)
+{
+    if (do_calibrate > _last_do_calibrate)
+    {
+        _start_time = millis();
+
+        double p[4] = { 0.0787, -0.8471, 20.599, -22.670 };
+        float Vo = 10 * 3.3 * analogRead(_pin) / 4095;
+        Vo = (Vo) / (87.43 * pow((Vo), (-0.6721)) - 7.883);
+        Vo = p[0] * Vo * Vo * Vo + p[1] * Vo * Vo + p[2] * Vo + p[3];
+        Vo = (Vo < 0.2) ? (0) : (Vo);
+        _calibration_max = Vo;
+        _calibration_min = _calibration_max;
+    }
+
+    uint16_t delta = millis() - _start_time;
+
+    if ((_cal_time >= (delta)) & do_calibrate)
+    {
+        double p[4] = { 0.0787, -0.8471, 20.599, -22.670 };
+        float Vo = 10 * 3.3 * analogRead(_pin) / 4095;
+        Vo = (Vo) / (87.43 * pow((Vo), (-0.6721)) - 7.883);
+        Vo = p[0] * Vo * Vo * Vo + p[1] * Vo * Vo + p[2] * Vo + p[3];
+        Vo = (Vo < 0.2) ? (0) : (Vo);
+        float current_reading = Vo;
+
+        _calibration_max = max(_calibration_max, current_reading);
+        _calibration_min = min(_calibration_min, current_reading);
+    }
+
+    else if (do_calibrate)
+    {
+        do_calibrate = false;
+    }
+
+    _last_do_calibrate = do_calibrate;
+
+    return do_calibrate;
+};
+
+bool FSR_Regressed_Wireless::refine_calibration(bool do_refinement)
+{
+    if (do_refinement)
+    {
+        if (do_refinement > _last_do_refinement)
+        {
+            _step_count = 0;
+            _step_max = (_calibration_max + _calibration_min) / 2;
+            _step_min = (_calibration_max + _calibration_min) / 2;
+            _step_max_sum = 0;
+            _step_min_sum = 0;
+        }
+
+        if (_step_count < _num_steps)
+        {
+            double p[4] = { 0.0787, -0.8471, 20.599, -22.670 };
+            float Vo = 10 * 3.3 * analogRead(_pin) / 4095;
+            Vo = (Vo) / (87.43 * pow((Vo), (-0.6721)) - 7.883);
+            Vo = p[0] * Vo * Vo * Vo + p[1] * Vo * Vo + p[2] * Vo + p[3];
+            Vo = (Vo < 0.2) ? (0) : (Vo);
+            float current_reading = Vo;
+
+            _step_max = max(_step_max, current_reading);
+            _step_min = min(_step_min, current_reading);
+
+            bool last_state = _state;
+            _state = utils::schmitt_trigger(current_reading, last_state, _lower_threshold_percent_calibration_refinement * (_calibration_max - _calibration_min) + _calibration_min, _upper_threshold_percent_calibration_refinement * (_calibration_max - _calibration_min) + _calibration_min);
+
+            if (_state > last_state)
+            {
+                _step_max_sum = _step_max_sum + _step_max;
+                _step_min_sum = _step_min_sum + _step_min;
+
+                _step_max = (_calibration_max + _calibration_min) / 2;
+                _step_min = (_calibration_max + _calibration_min) / 2;
+
+                _step_count++;
+            }
+
+        }
+        else
+        {
+            _calibration_refinement_max = static_cast<decltype(_calibration_refinement_max)>(_step_max_sum) / _num_steps;
+            _calibration_refinement_min = static_cast<decltype(_calibration_refinement_min)>(_step_min_sum) / _num_steps;
+
+            do_refinement = false;
+        }
+    }
+
+    _last_do_refinement = do_refinement;
+
+    return do_refinement;
+};
+
+
+float FSR_Regressed_Wireless::read()
+{
+    double p[4] = { 0.0787, -0.8471, 20.599, -22.670 };
+    float Vo = 10 * 3.3 * analogRead(_pin) / 4095;
+    Vo = (Vo) / (87.43 * pow((Vo), (-0.6721)) - 7.883);
+    Vo = p[0] * Vo * Vo * Vo + p[1] * Vo * Vo + p[2] * Vo + p[3];
+    Vo = (Vo < 0.2) ? (0) : (Vo);
+    float _raw_reading = Vo;
+
+    if (_calibration_refinement_max > 0)
+    {
+        _calibrated_reading = ((float)_raw_reading - _calibration_refinement_min) / (_calibration_refinement_max - _calibration_refinement_min);
+    }
+    else if (_calibration_max > 0)
+    {
+        _calibrated_reading = ((float)_raw_reading - _calibration_min) / (_calibration_max - _calibration_min);
+    }
+    else
+    {
+        _calibrated_reading = _raw_reading;
+    }
+
+    _calc_ground_contact();
+
+    return  _calibrated_reading;
+};
+
+bool FSR_Regressed_Wireless::_calc_ground_contact()
+{
+    bool current_state_estimate = false;
+
+    if (_calibration_refinement_max > 0)
+    {
+        current_state_estimate = utils::schmitt_trigger(_calibrated_reading, _ground_contact, _lower_threshold_percent_ground_contact, _upper_threshold_percent_ground_contact);
+    }
+
+    _ground_contact = current_state_estimate;
+
+    return _ground_contact;
+};
+
+
+bool FSR_Regressed_Wireless::get_ground_contact()
+{
+    return _ground_contact;
+};
+
+void FSR_Regressed_Wireless::get_contact_thresholds(float &lower_threshold_percent_ground_contact, float &upper_threshold_percent_ground_contact)
+{
+    lower_threshold_percent_ground_contact = _lower_threshold_percent_ground_contact;
+    upper_threshold_percent_ground_contact = _upper_threshold_percent_ground_contact;
+};
+
+void FSR_Regressed_Wireless::set_contact_thresholds(float lower_threshold_percent_ground_contact, float upper_threshold_percent_ground_contact)
+{
+    _lower_threshold_percent_ground_contact = lower_threshold_percent_ground_contact;
+    _upper_threshold_percent_ground_contact = upper_threshold_percent_ground_contact;
+};
 #endif
