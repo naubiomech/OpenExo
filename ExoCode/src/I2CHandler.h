@@ -37,12 +37,50 @@ class I2C
             Wire.beginTransmission(addr);
             Wire.write(reg);
             Wire.endTransmission();
-            Wire.requestFrom(addr, 2, false);
+            Wire.requestFrom(addr, len, false);
             for (uint8_t i=0; i<len; i++)
             {
                 ret[i] = Wire.read();
             }
-            Wire.endTransmission();
+        }
+
+        void read_i2c_block(uint8_t* ret, uint8_t addr, uint8_t startReg, uint8_t len)
+        {
+            Wire.beginTransmission(addr);
+            Wire.write(startReg);
+            if (Wire.endTransmission() != 0)
+            {
+                Serial.println("Failed to set start register for block read.");
+                return;
+            }
+
+            uint8_t bytesRead = Wire.requestFrom(addr, len);
+
+            if (bytesRead != len)
+            {
+                Serial.print("Block read: expected "); Serial.print(len);
+                Serial.print(" bytes but got "); Serial.println(bytesRead);
+                return;
+            }
+
+            for (uint8_t i = 0; i < len; ++i) {
+                ret[i] = Wire.read();
+            }
+        }
+
+        float read_wireless(uint8_t addr, uint8_t reg, uint8_t len)
+        {
+            uint8_t dataBlock[len];                        // initialize temporary array to store values, size = len
+            read_i2c_block(dataBlock, addr, 0x00, len);    // read block of data over i2c (starting at zero), store in dataBlock
+
+            float requestedVal = 0;                        // initialize temporary float to store requested data point
+            memcpy(&requestedVal, &dataBlock[reg], 4);     // copy data from requested register in dataBlock over to requestedVal
+            // debug option to print values within read_wireless
+            // Serial.print("Requested register "); Serial.print(reg);
+            // Serial.print(", fetched value: "); Serial.print(requestedVal);
+            // Serial.println();
+
+            return requestedVal;
         }
 
         void write_i2c(uint8_t addr, uint8_t reg, uint8_t val)
@@ -131,6 +169,27 @@ namespace i2c_cmds
         {
             const uint8_t reg = 0x03;
             const uint8_t len = 2;
+        }
+    }
+    namespace wireless_fsr
+    {
+        const uint8_t len = 4; 
+        const uint8_t esp_addr = 0x08;
+        namespace left_foot_heel
+        {
+            const uint8_t reg = 0x00;   
+        }
+        namespace left_foot_toe
+        {
+            const uint8_t reg = 0x04;
+        }
+        namespace right_foot_heel
+        {
+            const uint8_t reg = 0x08;
+        }
+        namespace right_foot_toe
+        {
+            const uint8_t reg = 0x0C;
         }
     }
 }
