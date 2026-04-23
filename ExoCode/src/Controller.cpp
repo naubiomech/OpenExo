@@ -3047,7 +3047,7 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
 float AngleBased::calc_motor_cmd()
 {
     //Serial.println("Running Angle Based calc cmd");
-    if (millis() - prev_time > 75)
+    if (millis() - prev_time > 50)
     {
         
         // Pull in user defined parameters
