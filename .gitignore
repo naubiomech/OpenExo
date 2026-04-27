@@ -1,10 +1,62 @@
-# other image files
-#.emf
-#.png
-ExoCode/src/.vscode/settings.json
-ExoCode/src/.vs
+# =============================================================================
+# Editor / IDE state
+# =============================================================================
 .vscode
 .vs
 ExoCode/.vscode
+ExoCode/src/.vscode/settings.json
+ExoCode/src/.vs
 */.vs
+*.swp
+*~
+
+# =============================================================================
+# OS clutter
+# =============================================================================
+.DS_Store
+**/.DS_Store
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# =============================================================================
+# Python
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# =============================================================================
+# Python GUI - per-user runtime data (NOT source)
+# These files are written by the GUI at runtime and are user/machine-specific.
+# Keeping them out of git avoids merge noise on every trial run.
+# =============================================================================
+Python_GUI/Saved_Data/saved_device.txt
+Python_GUI/Saved_Data/gui_settings.txt
+Python_GUI/Saved_Data/trial_*.csv
+Python_GUI/Saved_Data/*.log
+
+# =============================================================================
+# iOS / Xcode user-specific state
+# (project.pbxproj IS still tracked - only user-state is ignored)
+# =============================================================================
+**/xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+*.moved-aside
+DerivedData/
+build/
+
+# =============================================================================
+# Misc
+# =============================================================================
 Libraries/ArduinoBLE/extras/arduino-ble-parser.py
