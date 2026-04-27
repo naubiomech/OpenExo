@@ -4,6 +4,7 @@ import CoreBluetooth
 struct ScanView: View {
     @EnvironmentObject private var ble: BLEManager
     @EnvironmentObject private var logger: CSVLogger
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var navPath: NavigationPath
 
     @State private var selectedDevice: DiscoveredDevice?
@@ -12,6 +13,22 @@ struct ScanView: View {
     private var canConnect: Bool    { selectedDevice != nil && !ble.isConnected }
     private var canCalibrate: Bool  { ble.isConnected && !ble.torqueCalibrated }
     private var canStartTrial: Bool { ble.isConnected && ble.torqueCalibrated }
+
+    private var leftLogoMaxWidth: CGFloat {
+        if horizontalSizeClass == .regular {
+            return 280
+        }
+
+        return 220
+    }
+
+    private var rightLogoMaxWidth: CGFloat {
+        if horizontalSizeClass == .regular {
+            return 180
+        }
+
+        return 140
+    }
 
     var body: some View {
         ZStack {
@@ -38,20 +55,29 @@ struct ScanView: View {
 
     // MARK: - Header
     private var header: some View {
-        VStack(spacing: 4) {
-            HStack {
-                Image(systemName: "figure.walk.motion")
-                    .font(.system(size: 28, weight: .semibold))
-                    .foregroundStyle(.blue)
-                Text("OpenExo")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+        HStack(alignment: .center, spacing: 16) {
+            Link(destination: URL(string: "https://theopenexo.nau.edu")!) {
+                Image("top_left_openexo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: leftLogoMaxWidth, alignment: .leading)
+                    .accessibilityLabel("OpenExo website")
             }
-            Text("Exoskeleton Controller")
-                .font(.subheadline)
-                .foregroundStyle(.gray)
+            .buttonStyle(.plain)
+
+            Spacer(minLength: 16)
+
+            Link(destination: URL(string: "https://biomech.nau.edu")!) {
+                Image("top_right_lab")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: rightLogoMaxWidth, alignment: .trailing)
+                    .accessibilityLabel("NAU Biomechanics Lab website")
+            }
+            .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity)
+        .padding(.horizontal, 16)
         .padding(.vertical, 20)
         .background(Color(.systemGray6).opacity(0.15))
     }

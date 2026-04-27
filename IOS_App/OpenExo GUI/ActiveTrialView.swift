@@ -139,7 +139,7 @@ struct ActiveTrialView: View {
                     }
 
                     sectionLabel("DATA")
-                    ControlButton(title: showAltBlock ? "Show Main Block" : "Show Alt Block",
+                    ControlButton(title: showAltBlock ? "Toggle plotting channels" : "Toggle plotting channels",
                                   icon: "chart.xyaxis.line") {
                         showAltBlock.toggle()
                     }
@@ -147,7 +147,7 @@ struct ActiveTrialView: View {
                         csvPrefixInput = GUISettings.load().csvPrefix
                         showPrefixSheet = true
                     }
-                    ControlButton(title: "Save & New CSV", icon: "doc.badge.plus") {
+                    ControlButton(title: "Save New CSV", icon: "doc.badge.plus") {
                         logger.rollover(prefix: GUISettings.load().csvPrefix)
                     }
                 }
@@ -247,8 +247,7 @@ struct ActiveTrialView: View {
     // MARK: - Pause/Play
     private var pausePlayButton: some View {
         Button(action: { ble.isPaused ? ble.motorsOn() : ble.motorsOff() }) {
-            Label(ble.isPaused ? "Resume" : "Pause",
-                  systemImage: ble.isPaused ? "play.fill" : "pause.fill")
+            Image(systemName: ble.isPaused ? "play.fill" : "pause.fill")
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 20)
