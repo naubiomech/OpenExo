@@ -264,18 +264,34 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                     self.combo_joint.blockSignals(False)
                     dprint(f"[Settings] Joint '{joint_name}' not found in dropdown")
             
-            # Restore controller selection.  If the saved selection is missing
-            # or doesn't exist for the current joint, fall back to the default
-            # controller declared in SDCard/config.ini for that joint family.
+            # Controller-selection priority:
+            #   1. config.ini default for this joint family — ALWAYS wins when
+            #      present.  This is what the operator declared in
+            #      SDCard/config.ini (e.g. hipDefaultController = step) and
+            #      per the original spec must be pre-selected on entry.
+            #   2. saved last controller name (only used when config.ini has
+            #      no default for the joint family)
+            #
+            # If we override the saved controller with the config.ini default,
+            # we also reset the parameter index and value: the saved param/
+            # value belong to the *previous* controller and would not map
+            # cleanly onto the new controller's parameter list.
             controller_name = self._last_selection.get("controller")
             controller_idx = -1
-            if controller_name:
+            overrode_with_config_default = False
+            default_idx = self._index_of_default_controller()
+            if default_idx >= 0:
+                controller_idx = default_idx
+                default_name = self.combo_controller.itemText(default_idx)
+                if controller_name and default_name != controller_name:
+                    overrode_with_config_default = True
+                    dprint(f"[Settings] Overriding saved controller "
+                          f"'{controller_name}' with config.ini default "
+                          f"'{default_name}'")
+            elif controller_name:
                 controller_idx = self.combo_controller.findText(controller_name)
                 if controller_idx < 0:
-                    dprint(f"[Settings] Controller '{controller_name}' not found in dropdown; "
-                          f"trying config.ini default")
-            if controller_idx < 0:
-                controller_idx = self._index_of_default_controller()
+                    dprint(f"[Settings] Controller '{controller_name}' not found")
             if controller_idx >= 0:
                 self.combo_controller.blockSignals(True)
                 self.combo_controller.setCurrentIndex(controller_idx)
@@ -285,20 +301,28 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                       f"'{self.combo_controller.itemText(controller_idx)}' "
                       f"at index {controller_idx}")
             
-            # Restore parameter selection
-            param_idx = self._last_selection.get("parameter", 0)
-            if param_idx is None:
+            # Restore parameter selection (skipped when controller was
+            # overridden by config.ini default, since saved index is for a
+            # different controller)
+            if overrode_with_config_default:
                 param_idx = 0
+            else:
+                param_idx = self._last_selection.get("parameter", 0)
+                if param_idx is None:
+                    param_idx = 0
             self.combo_param.blockSignals(True)
             if param_idx < self.combo_param.count() and param_idx >= 0:
                 self.combo_param.setCurrentIndex(param_idx)
                 dprint(f"[Settings] Restored parameter index: {param_idx}")
             self.combo_param.blockSignals(False)
             
-            # Restore value
-            value = self._last_selection.get("value", 0.0)
-            if value is None:
+            # Restore value (also skipped when controller was overridden)
+            if overrode_with_config_default:
                 value = 0.0
+            else:
+                value = self._last_selection.get("value", 0.0)
+                if value is None:
+                    value = 0.0
             self.spin_value.setValue(float(value))
             
             dprint(f"[Settings] Successfully restored last selection")

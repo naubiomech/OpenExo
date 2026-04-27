@@ -427,7 +427,12 @@ struct SettingsView: View {
         let s = GUISettings.load()
         isBilateral = s.bilateral
 
-        // Advanced mode: restore by name first, fall back to index
+        // Track whether we picked the controller from config.ini (overriding
+        // the user's saved selection). When that happens we also reset the
+        // param/value fields, since the saved param/value belong to the
+        // *previous* controller and don't make sense for the new one.
+        var overrodeWithConfigDefault = false
+
         if !joints.isEmpty {
             if !s.lastJointName.isEmpty,
                let jIdx = joints.firstIndex(where: { $0.name == s.lastJointName }) {
@@ -439,22 +444,30 @@ struct SettingsView: View {
             let joint = joints[selectedJointIndex]
             let controllers = joint.controllers
             if !controllers.isEmpty {
-                // Pick controller in this priority order:
-                //   1. the saved name if it still exists for this joint
-                //   2. the default declared in config.ini for the joint family
+                // Priority order:
+                //   1. config.ini default for this joint family — ALWAYS wins
+                //      when present.  This is what the operator declared in
+                //      SDCard/config.ini (e.g. hipDefaultController = step)
+                //      and per the original spec must be pre-selected.
+                //   2. the saved name (only used if config.ini has no default)
                 //   3. the saved numeric index (clamped)
-                if !s.lastControllerName.isEmpty,
-                   let cIdx = controllers.firstIndex(where: { $0.name == s.lastControllerName }) {
+                if let defaultName = ExoConfig.defaultControllerName(for: joint.name),
+                   let cIdx = controllers.firstIndex(where: { $0.name == defaultName }) {
                     selectedControllerIndex = cIdx
-                } else if let defaultName = ExoConfig.defaultControllerName(for: joint.name),
-                          let cIdx = controllers.firstIndex(where: { $0.name == defaultName }) {
-                    selectedControllerIndex = cIdx
+                    overrodeWithConfigDefault = (defaultName != s.lastControllerName)
                     dprint("[SettingsView] Pre-selecting config.ini default controller '\(defaultName)' for \(joint.name)")
+                } else if !s.lastControllerName.isEmpty,
+                          let cIdx = controllers.firstIndex(where: { $0.name == s.lastControllerName }) {
+                    selectedControllerIndex = cIdx
                 } else {
                     selectedControllerIndex = min(max(s.lastControllerIndex, 0), controllers.count - 1)
                 }
                 let params = controllers[selectedControllerIndex].params
-                selectedParamIndex = params.isEmpty ? 0 : min(max(s.lastParamIndex, 0), params.count - 1)
+                if overrodeWithConfigDefault {
+                    selectedParamIndex = 0
+                } else {
+                    selectedParamIndex = params.isEmpty ? 0 : min(max(s.lastParamIndex, 0), params.count - 1)
+                }
             } else {
                 selectedControllerIndex = 0
                 selectedParamIndex = 0
@@ -465,7 +478,7 @@ struct SettingsView: View {
             selectedParamIndex = s.lastParamIndex
         }
 
-        paramValue = s.lastValue
+        paramValue = overrodeWithConfigDefault ? 0 : s.lastValue
         basicJointID = s.lastBasicJointID
         basicControllerID = s.lastBasicControllerID
         basicParamIndex = s.lastBasicParamIndex
