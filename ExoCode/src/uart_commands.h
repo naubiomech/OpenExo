@@ -255,11 +255,11 @@ namespace UART_command_handlers
         tx_msg.data[config_defs::arm_2_flip_angle_dir_idx] = exo_data->config[config_defs::arm_2_flip_angle_dir_idx];
 
         handler->UART_msg(tx_msg);
-        // logger::println("UART_command_handlers::get_config->sent updated config");
+        logger::println("UART_command_handlers::get_config->sent updated config");
     }
     inline static void update_config(UARTHandler *handler, ExoData *exo_data, UART_msg_t msg)
     {
-        // logger::println("UART_command_handlers::update_config->got message: ");
+        logger::println("UART_command_handlers::update_config->got message: ");
         UART_msg_t_utils::print_msg(msg);
         exo_data->config[config_defs::board_name_idx] = msg.data[config_defs::board_name_idx];
         exo_data->config[config_defs::battery_idx] = msg.data[config_defs::battery_idx];
@@ -369,8 +369,8 @@ namespace UART_command_handlers
         rx_msg.joint_id = 0;
         rx_msg.len = (uint8_t)rt_data::BILATERAL_ANKLE_RT_LEN; 
 
-        // logger::println("config[config_defs::exo_name_idx] :: "); //Uncomment if you want to check that system is receiving correct config info
-        // logger::println(config[config_defs::exo_name_idx]);
+        logger::println("config[config_defs::exo_name_idx] :: "); //Print to check that system is receiving correct config info
+        logger::println(config[config_defs::exo_name_idx]);
 
         //Plotting Guide [Mapping data value (o,1,2,etc.) to the color and tab of the Python GUI; Rule of Thumb: Even = Blue, Odd = Orange). 
         //Tab One

@@ -95,7 +95,7 @@ class CSVLogger: ObservableObject {
             currentFileName = sanitized + ".csv"
             return true
         } catch {
-            print("[CSVLogger] Rename failed: \(error)")
+            dprint("[CSVLogger] Rename failed: \(error)")
             return false
         }
     }

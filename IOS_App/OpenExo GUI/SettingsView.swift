@@ -112,9 +112,22 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .tint(.blue)
-                    .onChange(of: selectedJointIndex) { _ in
+                    .onChange(of: selectedJointIndex) { newIndex in
                         guard !isRestoringState else { return }
-                        selectedControllerIndex = 0
+                        guard joints.indices.contains(newIndex) else {
+                            selectedControllerIndex = 0
+                            selectedParamIndex = 0
+                            return
+                        }
+                        let joint = joints[newIndex]
+                        // Default to the controller named in config.ini for the
+                        // newly-selected joint family; otherwise just reset.
+                        if let name = ExoConfig.defaultControllerName(for: joint.name),
+                           let idx = joint.controllers.firstIndex(where: { $0.name == name }) {
+                            selectedControllerIndex = idx
+                        } else {
+                            selectedControllerIndex = 0
+                        }
                         selectedParamIndex = 0
                     }
                 }
@@ -420,19 +433,28 @@ struct SettingsView: View {
                let jIdx = joints.firstIndex(where: { $0.name == s.lastJointName }) {
                 selectedJointIndex = jIdx
             } else {
-                selectedJointIndex = min(s.lastJointIndex, joints.count - 1)
+                selectedJointIndex = min(max(s.lastJointIndex, 0), joints.count - 1)
             }
 
-            let controllers = joints[selectedJointIndex].controllers
+            let joint = joints[selectedJointIndex]
+            let controllers = joint.controllers
             if !controllers.isEmpty {
+                // Pick controller in this priority order:
+                //   1. the saved name if it still exists for this joint
+                //   2. the default declared in config.ini for the joint family
+                //   3. the saved numeric index (clamped)
                 if !s.lastControllerName.isEmpty,
                    let cIdx = controllers.firstIndex(where: { $0.name == s.lastControllerName }) {
                     selectedControllerIndex = cIdx
+                } else if let defaultName = ExoConfig.defaultControllerName(for: joint.name),
+                          let cIdx = controllers.firstIndex(where: { $0.name == defaultName }) {
+                    selectedControllerIndex = cIdx
+                    dprint("[SettingsView] Pre-selecting config.ini default controller '\(defaultName)' for \(joint.name)")
                 } else {
-                    selectedControllerIndex = min(s.lastControllerIndex, controllers.count - 1)
+                    selectedControllerIndex = min(max(s.lastControllerIndex, 0), controllers.count - 1)
                 }
-                let params = controllers[min(selectedControllerIndex, controllers.count - 1)].params
-                selectedParamIndex = params.isEmpty ? 0 : min(s.lastParamIndex, params.count - 1)
+                let params = controllers[selectedControllerIndex].params
+                selectedParamIndex = params.isEmpty ? 0 : min(max(s.lastParamIndex, 0), params.count - 1)
             } else {
                 selectedControllerIndex = 0
                 selectedParamIndex = 0

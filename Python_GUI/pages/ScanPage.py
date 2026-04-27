@@ -379,7 +379,7 @@ class ScanWindowQt(QtWidgets.QWidget):
                 if self._connected and self._qt_dev is not None:
                     self.btn_start_trial.setEnabled(True)
 
-            QtCore.QTimer.singleShot(1500, _enable_start_trial_if_connected)
+            QtCore.QTimer.singleShot(3000, _enable_start_trial_if_connected)
         except Exception as ex:
             self.status.setText(f"Torque calibration failed: {ex}")
 

@@ -11,6 +11,7 @@ except ImportError as e:
     raise SystemExit("PySide6 is required. Install with: pip install PySide6") from e
 
 from .config import UIConfig
+from .debug import dprint
 
 
 def get_base_dir():
@@ -70,10 +71,10 @@ def load_logo(image_name, width, height, alignment=None):
             
             return label
         else:
-            print(f"[UI] Failed to load logo from: {logo_path}")
+            dprint(f"[UI] Failed to load logo from: {logo_path}")
             return None
     except Exception as e:
-        print(f"[UI] Error loading logo '{image_name}': {e}")
+        dprint(f"[UI] Error loading logo '{image_name}': {e}")
         return None
 
 

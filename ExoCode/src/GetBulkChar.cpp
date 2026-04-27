@@ -32,8 +32,8 @@ RxState currentState = WAITING_FOR_F;
  */
 void readSingleMessageBlocking() {
 	long initialTime = millis();
-    //Serial.println("\n--- Entering Blocking Read Mode ---");
-    //Serial.println("System will halt execution until a full frame is received.");
+    Serial.println("\n--- Entering Blocking Read Mode ---");
+    Serial.println("System will halt execution until a full frame is received.");
     Serial1.begin(115200);
 	//delay(3000);
 	
@@ -43,7 +43,7 @@ void readSingleMessageBlocking() {
     // This is the most efficient method for large C-strings on Arduino.
     while (!Serial1.available()) {
 		Serial1.write(txBuffer_NanoReady, message_length);
-		//Serial.print("\nCharacter R sent.");
+		Serial.print("\nCharacter R sent.");
 		digitalWrite(LEDR, HIGH);
 		digitalWrite(LEDG, LOW);
 		digitalWrite(LEDB, HIGH);
@@ -61,9 +61,9 @@ void readSingleMessageBlocking() {
     while (!messageComplete) {
         // Only proceed if data is available in the UART buffer
         while (Serial1.available()) {
-			//Serial.print("\nSerial.available() > 0, incomingChar:");
+			Serial.print("\nSerial.available() > 0, incomingChar:");
             char incomingChar = Serial1.read();
-			//Serial.println(incomingChar);
+			Serial.println(incomingChar);
 
             // State 1: WAITING_FOR_F
             if (currentState == WAITING_FOR_F) {
@@ -92,7 +92,7 @@ void readSingleMessageBlocking() {
                     }
 					else {
                         // Buffer overflow protection: reset and wait again for 'f'
-                        //Serial.println("ERROR: Receive buffer overflow during start marker.");
+                        Serial.println("ERROR: Receive buffer overflow during start marker.");
                         currentState = WAITING_FOR_F;
                         rxIndex = 0;
                     }
@@ -109,7 +109,7 @@ void readSingleMessageBlocking() {
                 
                 // Check for buffer overflow first
                 if (rxIndex >= MAX_MESSAGE_SIZE - 1) {
-                    //Serial.println("ERROR: Receive buffer overflow.");
+                    Serial.println("ERROR: Receive buffer overflow.");
                     currentState = WAITING_FOR_F;
                     rxIndex = 0;
                     continue; // Skip processing this character

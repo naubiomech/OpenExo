@@ -304,7 +304,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 	
 	create_csv_message();
 	// The message is now ready for transmission/printing
-	/* Serial.println("--- Prepared CSV Message ---");
+	Serial.println("--- Prepared CSV Message ---");
 	Serial.println(txBuffer_bulkStr);
 	
 	Serial.print("\nNominal total number of csv: ");
@@ -312,7 +312,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 	Serial.print("\nNumber of row in stringArray: ");
 	Serial.print(row_idx+1);
 	Serial.print("\nNumber of failed 2 open csv: ");
-	Serial.print(failed2open); */
+	Serial.print(failed2open);
 }
 
 // --- Function to Read and Parse ---

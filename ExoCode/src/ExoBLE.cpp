@@ -9,7 +9,7 @@
 #include "Logger.h"
 #include "GetBulkChar.h"
 
-#define EXOBLE_DEBUG 0
+#define EXOBLE_DEBUG 1
 
 ExoBLE* ExoBLE::_instance = nullptr;
 

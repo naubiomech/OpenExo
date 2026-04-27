@@ -19,6 +19,8 @@ try:
 except Exception:
     BLE_AVAILABLE = False
 
+from utils.debug import dprint
+
 
 UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 UART_TX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"  # Write
@@ -123,7 +125,7 @@ class QtExoDeviceManager(QtCore.QObject):
             self.logger = logging.getLogger(f"QtExoDeviceManager_{id(self)}")
             self.logger.setLevel(logging.INFO)
             self._log_file_path = None
-            print(f"Warning: Could not setup file logging: {ex}")
+            dprint(f"Warning: Could not setup file logging: {ex}")
     
     def _install_exception_hooks(self):
         """Install hooks to catch unhandled exceptions."""
@@ -198,7 +200,7 @@ class QtExoDeviceManager(QtCore.QObject):
             try:
                 self.scanProgress.emit(0)
                 self.log.emit("Scanning for devices (UART UUID filter)…")
-                print(f"[QtExoDeviceManager] Starting BLE scan with UART service filter")
+                dprint(f"[QtExoDeviceManager] Starting BLE scan with UART service filter")
                 
                 # Simulate progress during scan with periodic updates
                 scan_duration = 10.0  # seconds
@@ -225,7 +227,7 @@ class QtExoDeviceManager(QtCore.QObject):
                 devices = await scan_task
                 self.scanProgress.emit(95)
                 
-                print(f"[QtExoDeviceManager] Scan found {len(devices)} device(s)")
+                dprint(f"[QtExoDeviceManager] Scan found {len(devices)} device(s)")
                 
                 # Filter and collect all matching devices
                 for device in devices:
@@ -233,9 +235,9 @@ class QtExoDeviceManager(QtCore.QObject):
                         # Double-check with our filter (belt and suspenders approach)
                         if device.address not in results:
                             results[device.address] = device.name or "Unknown"
-                            print(f"[QtExoDeviceManager] Found: {device.name} ({device.address})")
+                            dprint(f"[QtExoDeviceManager] Found: {device.name} ({device.address})")
                     except Exception as ex:
-                        print(f"[QtExoDeviceManager] Error processing device: {ex}")
+                        dprint(f"[QtExoDeviceManager] Error processing device: {ex}")
                 
                 self.scanProgress.emit(100)
                 
@@ -246,7 +248,7 @@ class QtExoDeviceManager(QtCore.QObject):
                     
             except Exception as ex:
                 self.error.emit(f"Scan error: {ex}")
-                print(f"[QtExoDeviceManager] scan error: {ex}")
+                dprint(f"[QtExoDeviceManager] scan error: {ex}")
                 self.scanProgress.emit(0)  # Reset on error
             finally:
                 # Convert to list format: [(name, address), ...]
@@ -276,7 +278,7 @@ class QtExoDeviceManager(QtCore.QObject):
             return
 
         self._is_connecting = True
-        print(f"[QtExoDeviceManager] connect requested -> mac={self._mac}")
+        dprint(f"[QtExoDeviceManager] connect requested -> mac={self._mac}")
         self.log.emit(f"Connecting to {self._mac}…")
         self.logger.info("Ensuring event loop is running")
         self._ensure_loop()
@@ -318,7 +320,7 @@ class QtExoDeviceManager(QtCore.QObject):
                             
                             device = await scan_task
                         except Exception as se:
-                            print(f"[QtExoDeviceManager] find_device_by_filter error: {se}")
+                            dprint(f"[QtExoDeviceManager] find_device_by_filter error: {se}")
 
                         if device:
                             # Device found - hide scanning bar, start connection bar
@@ -333,7 +335,7 @@ class QtExoDeviceManager(QtCore.QObject):
                                 self.connectScanProgress.emit(-1)  # Signal to hide scanning bar
                                 self.connectionProgress.emit(20)
                                 self.log.emit("Connecting to device…")
-                                print(f"[QtExoDeviceManager] connecting to {device.name} {device.address}")
+                                dprint(f"[QtExoDeviceManager] connecting to {device.name} {device.address}")
                                 def _disc_cb(_):
                                     try:
                                         self._mark_disconnected("link lost")
@@ -342,7 +344,7 @@ class QtExoDeviceManager(QtCore.QObject):
                                 client = BleakClient(device, disconnected_callback=_disc_cb)
                                 ok = await client.connect()
                                 self.connectionProgress.emit(50)
-                                print(f"[QtExoDeviceManager] connect() returned={ok}, is_connected={getattr(client, 'is_connected', False)}")
+                                dprint(f"[QtExoDeviceManager] connect() returned={ok}, is_connected={getattr(client, 'is_connected', False)}")
                                 if not getattr(client, "is_connected", False):
                                     # Cleanup and retry next attempt
                                     self.connectionProgress.emit(0)
@@ -381,7 +383,7 @@ class QtExoDeviceManager(QtCore.QObject):
                                     self._error_notify_enabled = True
                                 except Exception as ex:
                                     self.log.emit("Error characteristic not found; continuing with UART only.")
-                                    print(f"[QtExoDeviceManager] error char notify failed: {ex}")
+                                    dprint(f"[QtExoDeviceManager] error char notify failed: {ex}")
 
                                 self.connectionProgress.emit(90)
                                 self._client = client
@@ -390,7 +392,7 @@ class QtExoDeviceManager(QtCore.QObject):
                                 self.connected.emit(device.name or "", device.address)
                                 self.connectionProgress.emit(100)
                                 self.log.emit("Connected and notifications started")
-                                print("[QtExoDeviceManager] connected; notify started")
+                                dprint("[QtExoDeviceManager] connected; notify started")
                                 return
                         else:
                             self.log.emit("No device found.")
@@ -402,12 +404,12 @@ class QtExoDeviceManager(QtCore.QObject):
                 self.logger.error("Connection timeout after 40 seconds")
                 self.connectionProgress.emit(0)
                 self.error.emit("Connection timeout after 40 seconds")
-                print(f"[QtExoDeviceManager] connect timeout after 40 seconds")
+                dprint(f"[QtExoDeviceManager] connect timeout after 40 seconds")
             except Exception as ex:
                 self.logger.exception(f"Connection error: {ex}")
                 self.connectionProgress.emit(0)
                 self.error.emit(str(ex))
-                print(f"[QtExoDeviceManager] connect error: {ex}")
+                dprint(f"[QtExoDeviceManager] connect error: {ex}")
             finally:
                 self._is_connecting = False
                 self.logger.info("Connection attempt completed")
@@ -454,9 +456,9 @@ class QtExoDeviceManager(QtCore.QObject):
                         await client_to_disconnect.disconnect()
                     except Exception:
                         pass
-                print("[QtExoDeviceManager] Disconnect complete")
+                dprint("[QtExoDeviceManager] Disconnect complete")
             except Exception as ex:
-                print(f"[QtExoDeviceManager] Disconnect error: {ex}")
+                dprint(f"[QtExoDeviceManager] Disconnect error: {ex}")
 
         if self._loop:
             # Fire and forget - don't wait for disconnect to complete

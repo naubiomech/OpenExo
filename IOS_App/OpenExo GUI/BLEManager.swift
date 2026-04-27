@@ -163,7 +163,7 @@ class BLEManager: NSObject, ObservableObject {
     // MARK: - Commands
     // ─────────────────────────────────────────────
     func send(byte: Character) {
-        if MOCK_MODE { print("[MockBLE] → \(byte)"); return }
+        if MOCK_MODE { dprint("[MockBLE] → \(byte)"); return }
         sendRaw(Data([byte.asciiValue ?? 0]))
     }
 
@@ -200,63 +200,63 @@ class BLEManager: NSObject, ObservableObject {
     func beginTrial() {
         markCount = 0
         resetChartBuffers()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+
+        // Match the Python GUI's beginTrial path exactly: 1 s settle, then
+        // E, L, R, left-double, right-double, each in its own main-queue slot
+        // so CoreBluetooth's GATT queue can process one write before the next
+        // is enqueued. Each slot uses a `.withResponse` write to guarantee
+        // delivery (matches the original Ankle-hardware fix), but the slots
+        // are spaced apart instead of fired three-at-a-time inside a single
+        // helper, which is what was reordering R / L / E at the firmware.
+        //
+        // We deliberately do NOT auto-apply saved controller parameters here.
+        // Python only sends update_param when the user taps Apply on the
+        // Update Controller page, so iOS now does the same. Auto-replaying
+        // stale saved values (e.g. zero_torque with use_pid=5) was causing
+        // the firmware "Torque sensor not calibrated" warning.
+        let q = DispatchQueue.main
+        var t: Double = 1.0
+        q.asyncAfter(deadline: .now() + t) { [weak self] in
+            self?.sendReliable(Data([UInt8(ascii: "E")]))
+        }
+        t += 0.20
+        q.asyncAfter(deadline: .now() + t) { [weak self] in
+            self?.sendReliable(Data([UInt8(ascii: "L")]))
+        }
+        t += 0.20
+        q.asyncAfter(deadline: .now() + t) { [weak self] in
+            self?.sendReliable(Data([UInt8(ascii: "R")]))
+        }
+        t += 0.10
+        q.asyncAfter(deadline: .now() + t) { [weak self] in
+            var l: Double = 0.25
+            withUnsafeBytes(of: &l) { self?.sendReliable(Data($0)) }
+        }
+        t += 0.10
+        q.asyncAfter(deadline: .now() + t) { [weak self] in
+            var r: Double = 0.25
+            withUnsafeBytes(of: &r) { self?.sendReliable(Data($0)) }
+        }
+        t += 0.20
+        q.asyncAfter(deadline: .now() + t) { [weak self] in
             guard let self else { return }
-            self.send(byte: "E")
-            self.send(byte: "L")
-            self.sendFSRThresholds(left: 0.25, right: 0.25)
-            self.applySavedControllerSettings()
             self.isTrialActive = true
             self.isPaused = false
             if MOCK_MODE { self.startMockDataStream() }
         }
     }
 
-    /// Loads the last-applied controller settings from UserDefaults and sends
-    /// them to the device, so settings persist across trials (matches Python GUI behavior).
-    private func applySavedControllerSettings() {
-        let s = GUISettings.load()
-        guard s.hasAppliedSettings else { return }
-
-        if handshakeReceived && !joints.isEmpty {
-            // Resolve by name first, then by index
-            let jIdx: Int
-            if !s.lastJointName.isEmpty,
-               let idx = joints.firstIndex(where: { $0.name == s.lastJointName }) {
-                jIdx = idx
-            } else {
-                jIdx = min(s.lastJointIndex, joints.count - 1)
-            }
-            let joint = joints[jIdx]
-            guard !joint.controllers.isEmpty else { return }
-
-            let cIdx: Int
-            if !s.lastControllerName.isEmpty,
-               let idx = joint.controllers.firstIndex(where: { $0.name == s.lastControllerName }) {
-                cIdx = idx
-            } else {
-                cIdx = min(s.lastControllerIndex, joint.controllers.count - 1)
-            }
-            let ctrl = joint.controllers[cIdx]
-            let pIdx = ctrl.params.isEmpty ? 0 : min(s.lastParamIndex, ctrl.params.count - 1)
-
-            updateParam(
-                isBilateral: s.bilateral,
-                jointID: joint.jointID,
-                controllerID: ctrl.controllerID,
-                paramIndex: pIdx,
-                value: s.lastValue
-            )
-        } else {
-            updateParam(
-                isBilateral: s.bilateral,
-                jointID: s.lastBasicJointID,
-                controllerID: s.lastBasicControllerID,
-                paramIndex: s.lastBasicParamIndex,
-                value: s.lastBasicValue
-            )
-        }
-    }
+    // NOTE: `applySavedControllerSettings()` was removed intentionally. It used
+    // to fire on every Start Trial and replay whatever update_param the user
+    // had last applied (loaded from UserDefaults). That caused two problems:
+    //   1) If the saved controller was zero_torque with use_pid != 0, the
+    //      firmware would call its PID branch before torque calibration had
+    //      finished and print "Torque sensor not calibrated. Closed-loop torque
+    //      control disabled."
+    //   2) It diverges from the Python GUI, which never auto-replays
+    //      update_param on Start Trial.
+    // Saved settings still load when the user opens the Update Controller
+    // page; they're sent to the firmware only when the user taps Apply.
 
     func endTrial() {
         send(byte: "G")
@@ -278,9 +278,20 @@ class BLEManager: NSObject, ObservableObject {
         withUnsafeBytes(of: &r) { sendRaw(Data($0)) }
     }
 
+    /// Reliable variant of `sendFSRThresholds` used during trial start-up.
+    /// Writes the `R` header and the two doubles with `.withResponse` so the
+    /// firmware acks each before the next is dispatched.
+    func sendFSRThresholdsReliable(left: Double, right: Double) {
+        if MOCK_MODE { return }
+        sendReliable(Data([UInt8(ascii: "R")]))
+        var l = left, r = right
+        withUnsafeBytes(of: &l) { sendReliable(Data($0)) }
+        withUnsafeBytes(of: &r) { sendReliable(Data($0)) }
+    }
+
     func updateParam(isBilateral: Bool, jointID: Int, controllerID: Int, paramIndex: Int, value: Double) {
         if MOCK_MODE {
-            print("[MockBLE] updateParam joint=\(jointID) ctrl=\(controllerID) param=\(paramIndex) val=\(value)")
+            dprint("[MockBLE] updateParam joint=\(jointID) ctrl=\(controllerID) param=\(paramIndex) val=\(value)")
             return
         }
         let jointIDs = isBilateral ? [jointID, jointID ^ 0x60] : [jointID]
@@ -452,17 +463,20 @@ class BLEManager: NSObject, ObservableObject {
         //   "f,J,ID,C,CID,p1,...|J,ID,..." — pipe-delimited controller matrix
         // Or the entire thing may be a single line with pipes.
         let lines = text.components(separatedBy: .newlines)
-        print("[ExoBLE] Handshake has \(lines.count) lines")
+        dprint("[ExoBLE] Handshake has \(lines.count) lines")
 
         for line in lines {
             let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty, trimmed != "?", trimmed != "END" else { continue }
 
             if trimmed.hasPrefix("t,") {
+                // Firmware terminates this section with ",??" — drop empty entries
+                // and stray "?"/"??" tokens introduced by that end marker.
                 names = String(trimmed.dropFirst(2))
                     .components(separatedBy: ",")
                     .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                print("[ExoBLE] Parsed \(names.count) parameter names: \(names)")
+                    .filter { !$0.isEmpty && $0 != "?" && $0 != "??" }
+                dprint("[ExoBLE] Parsed \(names.count) parameter names: \(names)")
                 continue
             }
 
@@ -482,17 +496,19 @@ class BLEManager: NSObject, ObservableObject {
                     names = String(raw.dropFirst(2))
                         .components(separatedBy: ",")
                         .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                    print("[ExoBLE] Parsed \(names.count) parameter names: \(names)")
+                        .filter { !$0.isEmpty && $0 != "?" && $0 != "??" }
+                    dprint("[ExoBLE] Parsed \(names.count) parameter names: \(names)")
                     continue
                 }
 
                 let parts = raw.components(separatedBy: ",")
                     .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty && $0 != "?" && $0 != "??" }
 
                 guard parts.count >= 4,
                       let jointID = Int(parts[1]),
                       let controllerID = Int(parts[3]) else {
-                    print("[ExoBLE] Skipped entry (\(parts.count) parts): \(raw.prefix(60))")
+                    dprint("[ExoBLE] Skipped entry (\(parts.count) parts): \(raw.prefix(60))")
                     continue
                 }
 
@@ -507,16 +523,26 @@ class BLEManager: NSObject, ObservableObject {
                 } else {
                     jointsMap[jointID] = JointInfo(name: parts[0], jointID: jointID, controllers: [ctrl])
                 }
-                print("[ExoBLE] Parsed joint \(parts[0]) (ID \(jointID)), ctrl \(parts[2]) (ID \(controllerID)), \(ctrl.params.count) params")
+                dprint("[ExoBLE] Parsed joint \(parts[0]) (ID \(jointID)), ctrl \(parts[2]) (ID \(controllerID)), \(ctrl.params.count) params")
             }
         }
 
         if !names.isEmpty { parameterNames = names }
         if !jointsMap.isEmpty {
-            joints = jointsMap.values.sorted { $0.jointID < $1.jointID }
-            print("[ExoBLE] Handshake result: \(joints.count) joints, \(joints.reduce(0) { $0 + $1.controllers.count }) controllers total")
+            // Filter out joints that don't belong to the configured exo_name
+            // in config.ini.  This prevents a stray hipDefaultController from
+            // surfacing hip controllers when the device is configured as
+            // unilateral ankle, and mirrors the Python GUI's behaviour.
+            let allSorted = jointsMap.values.sorted { $0.jointID < $1.jointID }
+            let filtered = allSorted.filter { ExoConfig.isJointAllowed($0.name) }
+            if filtered.count != allSorted.count {
+                let dropped = allSorted.filter { !ExoConfig.isJointAllowed($0.name) }.map { $0.name }
+                dprint("[ExoBLE] Filtered joints by config.ini name (\(ExoConfig.rawExoName ?? "?")): hid \(dropped)")
+            }
+            joints = filtered
+            dprint("[ExoBLE] Handshake result: \(joints.count) joints, \(joints.reduce(0) { $0 + $1.controllers.count }) controllers total")
         } else {
-            print("[ExoBLE] WARNING: No joints/controllers parsed from handshake")
+            dprint("[ExoBLE] WARNING: No joints/controllers parsed from handshake")
         }
         handshakeReceived = true
         send(byte: "$")
@@ -712,7 +738,7 @@ extension BLEManager: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         guard let data = characteristic.value,
               let str = String(data: data, encoding: .utf8) else { return }
-        if characteristic.uuid == BLEUUID.errChar { print("[ExoBLE] error: \(str)"); return }
+        if characteristic.uuid == BLEUUID.errChar { dprint("[ExoBLE] error: \(str)"); return }
 
         if str.contains("READY") {
             isReceivingHandshake = true
@@ -726,15 +752,19 @@ extension BLEManager: CBPeripheralDelegate {
                     handshakeBuffer = remainder
                 }
             }
-            print("[ExoBLE] Handshake started, buffer so far: \(handshakeBuffer.prefix(200))")
+            dprint("[ExoBLE] Handshake started, buffer so far: \(handshakeBuffer.prefix(200))")
             return
         }
 
         if isReceivingHandshake {
             handshakeBuffer += str
-            if handshakeBuffer.contains("?") || handshakeBuffer.contains("END") {
+            // Firmware sends payload with internal newlines replaced by '|' and a single
+            // trailing '\n' as the terminator. Wait for that final newline so we don't
+            // parse partway through (which prevents the plotting-title `t,...` line from
+            // arriving and leaves chart labels blank).
+            if handshakeBuffer.contains("\n") {
                 isReceivingHandshake = false
-                print("[ExoBLE] Handshake complete, raw text (\(handshakeBuffer.count) chars):\n\(handshakeBuffer)")
+                dprint("[ExoBLE] Handshake complete, raw text (\(handshakeBuffer.count) chars):\n\(handshakeBuffer)")
                 parseHandshake(handshakeBuffer)
                 handshakeBuffer = ""
             }

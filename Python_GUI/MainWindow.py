@@ -19,6 +19,8 @@ from pages import (
     BioFeedbackPage,
 )
 from services import QtExoDeviceManager, RtBridge
+from utils import exo_config
+from utils.debug import dprint
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -130,14 +132,14 @@ class MainWindow(QtWidgets.QMainWindow):
         # Display log file location for debugging
         log_path = self.qt_dev.get_log_file_path()
         if log_path and log_path != "Log file not available":
-            print(f"\n{'='*80}")
-            print(f"Device Manager Log File: {log_path}")
-            print(f"{'='*80}\n")
+            dprint(f"\n{'='*80}")
+            dprint(f"Device Manager Log File: {log_path}")
+            dprint(f"{'='*80}\n")
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         size = self.size()
-        print(f"[MainWindow] size={size.width()}x{size.height()}")
+        dprint(f"[MainWindow] size={size.width()}x{size.height()}")
 
     def _go_trial(self):
         self.stack.setCurrentWidget(self.trial_page)
@@ -148,12 +150,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.trial_page.clear_plots()
         except Exception as e:
             self.logger.error(f"Failed to clear plots: {e}")
-            self.logger.debug(traceback.format_exc())
-        # Reset data rate monitoring
-        try:
-            self.rt_bridge.reset_monitoring()
-        except Exception as e:
-            self.logger.error(f"Failed to reset monitoring: {e}")
             self.logger.debug(traceback.format_exc())
         # Ensure CSV logging is started automatically with timestamped filename
         try:
@@ -230,7 +226,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_handshake(self, payload: str):
         try:
             self.logger.info("Handshake payload received")
-            print(f"MainWindow::_on_handshake -> Handshake payload received")
+            dprint(f"MainWindow::_on_handshake -> Handshake payload received")
         except Exception as e:
             self.logger.error(f"Failed to log handshake: {e}")
             self.logger.debug(traceback.format_exc())
@@ -286,7 +282,26 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_controller_matrix(self, matrix):
         # Save the 2D [ [controller, p1, p2], ... ] structure in memory
         try:
-            self._controller_matrix = list(matrix)
+            full_matrix = list(matrix)
+            # Filter out joints that don't belong to the configured exo_name
+            # in SDCard/config.ini.  This addresses the "hip showing up for a
+            # unilateral ankle" report: the firmware decides which joints to
+            # broadcast based on `_DefaultController` values, not on `name`,
+            # so a stray hipDefaultController = step in the ini will leak hip
+            # controllers into the handshake.  We hide those in the GUI.
+            allowed = exo_config.allowed_joint_types()
+            if allowed is not None:
+                filtered = [row for row in full_matrix
+                            if row and exo_config.is_joint_allowed(str(row[0]), allowed)]
+                if len(filtered) != len(full_matrix):
+                    self.logger.info(
+                        f"Filtered controller matrix from {len(full_matrix)} to "
+                        f"{len(filtered)} entries based on config.ini name "
+                        f"(allowed joints: {sorted(allowed)})"
+                    )
+                self._controller_matrix = filtered
+            else:
+                self._controller_matrix = full_matrix
             self.logger.info(f"Received controller matrix with {len(self._controller_matrix)} entries")
         except Exception as e:
             self.logger.error(f"Failed to store controller matrix: {e}")
@@ -331,7 +346,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Update CSV filename preamble."""
         self._csv_preamble = preamble
         self.logger.info(f"CSV preamble set to: {preamble}")
-        print(f"CSV preamble set to: {preamble}")
+        dprint(f"CSV preamble set to: {preamble}")
          # If we're currently logging, roll over immediately (no popup)
         if self._csv_file is not None:
             try:
@@ -410,13 +425,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_end_trial(self):
         try:
             self.logger.info("Ending trial...")
-            # Print trial summary diagnostics
-            try:
-                self.rt_bridge.print_trial_summary()
-            except Exception as e:
-                self.logger.error(f"Failed to print trial summary: {e}")
-                self.logger.debug(traceback.format_exc())
-            
             # Send stop trial and motor off commands immediately
             try:
                 self.qt_dev.write(b'G')  # Stop trial
@@ -526,7 +534,7 @@ class MainWindow(QtWidgets.QMainWindow):
             # Close current CSV if open
             if self._csv_file is not None:
                 self.logger.info("Saving current CSV and starting new one")
-                print("Saving current CSV and starting new one")
+                dprint("Saving current CSV and starting new one")
                 try:
                     self._csv_file.flush()
                     self._csv_file.close()
@@ -562,11 +570,11 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 self.logger.error(f"Failed to show CSV save confirmation: {e}")
                 self.logger.debug(traceback.format_exc())
-                print(f"Error showing confirmation: {e}")
+                dprint(f"Error showing confirmation: {e}")
         except Exception as e:
             self.logger.error(f"Failed in _on_save_csv: {e}")
             self.logger.debug(traceback.format_exc())
-            print(f"Error in _on_save_csv: {e}")
+            dprint(f"Error in _on_save_csv: {e}")
 
     @QtCore.Slot()
     def _on_update_controller(self):

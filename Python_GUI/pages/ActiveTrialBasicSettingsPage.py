@@ -7,6 +7,7 @@ from utils import (
     UIConfig, JointConfig, SettingsManager,
     style_button, style_combo_box, style_spinbox
 )
+from utils.debug import dprint
 
 
 class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
@@ -136,7 +137,7 @@ class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
                         if line.startswith("bilateral="):
                             self._bilateral_state = line.split("=")[1].strip() == "True"
                             self._last_selection["bilateral"] = self._bilateral_state
-                            print(f"[BasicSettings] Loaded bilateral state: {self._bilateral_state}")
+                            dprint(f"[BasicSettings] Loaded bilateral state: {self._bilateral_state}")
                         elif line.startswith("last_basic_joint_id="):
                             try:
                                 self._last_selection["joint_id"] = int(line.split("=")[1].strip())
@@ -174,7 +175,7 @@ class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
                             except:
                                 pass
         except Exception as e:
-            print(f"Error loading basic settings: {e}")
+            dprint(f"Error loading basic settings: {e}")
 
     def _save_settings(self):
         """Save all settings to file."""
@@ -204,9 +205,9 @@ class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
             with open(settings_file, 'w') as f:
                 for key, val in existing.items():
                     f.write(f"{key}={val}\n")
-            print(f"[BasicSettings] Saved settings to {settings_file}")
+            dprint(f"[BasicSettings] Saved settings to {settings_file}")
         except Exception as e:
-            print(f"Error saving settings: {e}")
+            dprint(f"Error saving settings: {e}")
     
     def _restore_last_selection(self):
         """Restore UI controls to last saved selection."""
@@ -239,9 +240,9 @@ class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
             value = self._last_selection.get("value", 0.0)
             self.spin_value.setValue(value)
             
-            print(f"[BasicSettings] Restored last selection: {self._last_selection}")
+            dprint(f"[BasicSettings] Restored last selection: {self._last_selection}")
         except Exception as e:
-            print(f"Error restoring last selection: {e}")
+            dprint(f"Error restoring last selection: {e}")
 
     @QtCore.Slot(int)
     def _on_bilateral_changed(self, state):

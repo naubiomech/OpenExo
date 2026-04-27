@@ -5,8 +5,10 @@ except ImportError as e:
 
 from utils import (
     UIConfig, JointConfig, SettingsManager,
-    style_button, style_combo_box, style_spinbox
+    style_button, style_combo_box, style_spinbox,
+    exo_config,
 )
+from utils.debug import dprint
 
 
 class ActiveTrialSettingsPage(QtWidgets.QWidget):
@@ -157,7 +159,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             # Restore last selection after populating
             self._restore_last_selection()
         except Exception as e:
-            print(f"Error populating joint combo: {e}")
+            dprint(f"Error populating joint combo: {e}")
             pass
 
     def _load_settings(self):
@@ -165,7 +167,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
         try:
             self._bilateral_state = SettingsManager.get_bool("bilateral", False)
             self._last_selection["bilateral"] = self._bilateral_state
-            print(f"[Settings] Loaded bilateral state: {self._bilateral_state}")
+            dprint(f"[Settings] Loaded bilateral state: {self._bilateral_state}")
             
             # Load last selection values
             joint = SettingsManager.get_setting("last_joint")
@@ -184,7 +186,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             if value is not None:
                 self._last_selection["value"] = value
         except Exception as e:
-            print(f"Error loading settings: {e}")
+            dprint(f"Error loading settings: {e}")
 
     def _save_settings(self):
         """Save settings to file."""
@@ -209,19 +211,39 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                 updates["last_value"] = str(value)
             
             SettingsManager.update_settings(updates)
-            print(f"[Settings] Saved settings")
+            dprint(f"[Settings] Saved settings")
         except Exception as e:
-            print(f"Error saving settings: {e}")
+            dprint(f"Error saving settings: {e}")
 
     def _on_bilateral_changed(self, state):
         """Save bilateral state when checkbox changes."""
         self._bilateral_state = bool(state)
         self._save_settings()
 
+    def _index_of_default_controller(self, joint_name: str = None) -> int:
+        """Return the controller-dropdown index of the config.ini default controller.
+
+        ``joint_name`` defaults to the currently-selected joint.  Returns -1
+        when ``config.ini`` has no default for the joint family or the
+        controller name is not present in the matrix for that joint.
+        """
+        try:
+            if joint_name is None:
+                joint_name = self.combo_joint.currentText()
+            default_name = exo_config.default_controller_for(joint_name)
+            if not default_name:
+                return -1
+            for i in range(self.combo_controller.count()):
+                if self.combo_controller.itemText(i) == default_name:
+                    return i
+        except Exception as e:
+            dprint(f"[Settings] _index_of_default_controller error: {e}")
+        return -1
+
     def _restore_last_selection(self):
         """Restore UI controls to last saved selection."""
         try:
-            print(f"[Settings] Attempting to restore last selection: {self._last_selection}")
+            dprint(f"[Settings] Attempting to restore last selection: {self._last_selection}")
             
             # Restore bilateral checkbox
             bilateral = self._last_selection.get("bilateral", False)
@@ -240,21 +262,28 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                     self._on_joint_changed(idx)
                 else:
                     self.combo_joint.blockSignals(False)
-                    print(f"[Settings] Joint '{joint_name}' not found in dropdown")
+                    dprint(f"[Settings] Joint '{joint_name}' not found in dropdown")
             
-            # Restore controller selection
+            # Restore controller selection.  If the saved selection is missing
+            # or doesn't exist for the current joint, fall back to the default
+            # controller declared in SDCard/config.ini for that joint family.
             controller_name = self._last_selection.get("controller")
+            controller_idx = -1
             if controller_name:
+                controller_idx = self.combo_controller.findText(controller_name)
+                if controller_idx < 0:
+                    dprint(f"[Settings] Controller '{controller_name}' not found in dropdown; "
+                          f"trying config.ini default")
+            if controller_idx < 0:
+                controller_idx = self._index_of_default_controller()
+            if controller_idx >= 0:
                 self.combo_controller.blockSignals(True)
-                idx = self.combo_controller.findText(controller_name)
-                if idx >= 0:
-                    self.combo_controller.setCurrentIndex(idx)
-                    self.combo_controller.blockSignals(False)
-                    self._on_controller_changed(idx)
-                    print(f"[Settings] Restored controller: {controller_name} at index {idx}")
-                else:
-                    self.combo_controller.blockSignals(False)
-                    print(f"[Settings] Controller '{controller_name}' not found in dropdown")
+                self.combo_controller.setCurrentIndex(controller_idx)
+                self.combo_controller.blockSignals(False)
+                self._on_controller_changed(controller_idx)
+                dprint(f"[Settings] Selected controller "
+                      f"'{self.combo_controller.itemText(controller_idx)}' "
+                      f"at index {controller_idx}")
             
             # Restore parameter selection
             param_idx = self._last_selection.get("parameter", 0)
@@ -263,7 +292,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             self.combo_param.blockSignals(True)
             if param_idx < self.combo_param.count() and param_idx >= 0:
                 self.combo_param.setCurrentIndex(param_idx)
-                print(f"[Settings] Restored parameter index: {param_idx}")
+                dprint(f"[Settings] Restored parameter index: {param_idx}")
             self.combo_param.blockSignals(False)
             
             # Restore value
@@ -272,11 +301,13 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                 value = 0.0
             self.spin_value.setValue(float(value))
             
-            print(f"[Settings] Successfully restored last selection")
+            dprint(f"[Settings] Successfully restored last selection")
         except Exception as e:
-            print(f"[Settings] Error restoring last selection: {e}")
-            import traceback
-            traceback.print_exc()
+            dprint(f"[Settings] Error restoring last selection: {e}")
+            from utils import debug as _debug
+            if _debug.DEBUG_PRINTS:
+                import traceback
+                traceback.print_exc()
 
     @QtCore.Slot()
     def _on_apply(self):
@@ -293,12 +324,12 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             parameter_name = self.combo_param.currentText()
             value = float(self.spin_value.value())
             
-            print(f"\n=== Apply Settings ===")
-            print(f"Joint: {joint_name} (dropdown idx: {joint_idx})")
-            print(f"Controller: {controller_name} (local idx: {controller_local_idx})")
-            print(f"Parameter: {parameter_name} (idx: {parameter_idx})")
-            print(f"Value: {value}")
-            print(f"Bilateral: {is_bilateral}")
+            dprint(f"\n=== Apply Settings ===")
+            dprint(f"Joint: {joint_name} (dropdown idx: {joint_idx})")
+            dprint(f"Controller: {controller_name} (local idx: {controller_local_idx})")
+            dprint(f"Parameter: {parameter_name} (idx: {parameter_idx})")
+            dprint(f"Value: {value}")
+            dprint(f"Bilateral: {is_bilateral}")
             
             # Get the actual controller matrix index
             if joint_name in self._joint_controllers:
@@ -321,24 +352,24 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                             try:
                                 joint_id_raw = int(row[1])
                             except (ValueError, IndexError):
-                                print(f"Warning: Could not parse joint ID from row[1]='{row[1]}'")
+                                dprint(f"Warning: Could not parse joint ID from row[1]='{row[1]}'")
                         
                         # Extract actual controller ID from row[3]
                         controller_id = controller_local_idx  # Default to local index if parsing fails
                         if len(row) > 3:
                             try:
                                 controller_id = int(row[3])
-                                print(f"Extracted controller ID {controller_id} from row[3]='{row[3]}'")
+                                dprint(f"Extracted controller ID {controller_id} from row[3]='{row[3]}'")
                             except (ValueError, TypeError):
-                                print(f"Warning: Could not parse controller ID from row[3]='{row[3]}', using local idx {controller_local_idx}")
+                                dprint(f"Warning: Could not parse controller ID from row[3]='{row[3]}', using local idx {controller_local_idx}")
                         else:
-                            print(f"Warning: Row too short (len={len(row)}), cannot extract controller ID from row[3]")
+                            dprint(f"Warning: Row too short (len={len(row)}), cannot extract controller ID from row[3]")
                         
                         # Use the actual joint_id_raw (like 65, 68) not the mapped joint_num
                         payload = [is_bilateral, joint_id_raw, controller_id, parameter_idx, value]
-                        print(f"Payload: is_bilateral={is_bilateral}, joint_id={joint_id_raw}, controller_id={controller_id}, param_idx={parameter_idx}, value={value}")
-                        print(f"Full row: {row}")
-                        print(f"======================\n")
+                        dprint(f"Payload: is_bilateral={is_bilateral}, joint_id={joint_id_raw}, controller_id={controller_id}, param_idx={parameter_idx}, value={value}")
+                        dprint(f"Full row: {row}")
+                        dprint(f"======================\n")
                         
                         # Save last selection for next time
                         self._last_selection = {
@@ -348,20 +379,22 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                             "parameter": parameter_idx,
                             "value": value,
                         }
-                        print(f"[Settings] Saving last selection: {self._last_selection}")
+                        dprint(f"[Settings] Saving last selection: {self._last_selection}")
                         self._save_settings()
                         
                         self.applyRequested.emit(payload)
                         return
             
             # Fallback if something goes wrong
-            print(f"Warning: Falling back to default payload")
+            dprint(f"Warning: Falling back to default payload")
             payload = [is_bilateral, 1, 0, 0, value]
             self.applyRequested.emit(payload)
         except Exception as e:
-            print(f"Error in _on_apply: {e}")
-            import traceback
-            traceback.print_exc()
+            dprint(f"Error in _on_apply: {e}")
+            from utils import debug as _debug
+            if _debug.DEBUG_PRINTS:
+                import traceback
+                traceback.print_exc()
 
     @QtCore.Slot(int, int)
     def _on_cell_clicked(self, row: int, column: int):
@@ -377,7 +410,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             param_index = max(0, int(column) - 1)
             self.combo_param.setCurrentIndex(param_index)
         except Exception as e:
-            print(f"Error in _on_cell_clicked: {e}")
+            dprint(f"Error in _on_cell_clicked: {e}")
             pass
 
     @QtCore.Slot(int)
@@ -436,6 +469,11 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                     self.combo_controller.addItems(controller_names)
                 else:
                     self.combo_controller.addItem("(none)")
+                # Pre-select the controller declared as default in config.ini
+                # for this joint family (e.g. hipDefaultController = step).
+                default_idx = self._index_of_default_controller(joint_name)
+                if default_idx >= 0:
+                    self.combo_controller.setCurrentIndex(default_idx)
                 self.combo_controller.blockSignals(False)
                 
                 # Trigger parameter update for first controller
@@ -453,7 +491,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                 self.combo_controller.blockSignals(False)
                 
         except Exception as e:
-            print(f"Error in _on_joint_changed: {e}")
+            dprint(f"Error in _on_joint_changed: {e}")
             pass
 
     @QtCore.Slot(int)
@@ -486,7 +524,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             else:
                 self.combo_param.addItem("(no params)")
         except Exception as e:
-            print(f"Error in _on_controller_changed: {e}")
+            dprint(f"Error in _on_controller_changed: {e}")
             pass
         finally:
             try:

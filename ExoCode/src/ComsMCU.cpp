@@ -13,7 +13,7 @@
 
 #if defined(ARDUINO_ARDUINO_NANO33BLE) | defined(ARDUINO_NANO_RP2040_CONNECT)
 
-#define COMSMCU_DEBUG 0
+#define COMSMCU_DEBUG 1
 
 ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
 {

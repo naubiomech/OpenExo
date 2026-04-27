@@ -21,6 +21,9 @@
 		1CB0860D2F69DF900039435C /* ActiveTrialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB0860C2F69DF900039435C /* ActiveTrialView.swift */; };
 		1CB0860F2F69DF900039435C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB0860E2F69DF900039435C /* SettingsView.swift */; };
 		1CB086112F69DF900039435C /* BioFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB086102F69DF900039435C /* BioFeedbackView.swift */; };
+		1CB086202F69DF900039435C /* ExoConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB086222F69DF900039435C /* ExoConfig.swift */; };
+		1CB086212F69DF900039435C /* config.ini in Resources */ = {isa = PBXBuildFile; fileRef = 1CB086232F69DF900039435C /* config.ini */; };
+		1CB086242F69DF900039435C /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB086252F69DF900039435C /* Debug.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +61,9 @@
 		1CB0860C2F69DF900039435C /* ActiveTrialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveTrialView.swift; sourceTree = "<group>"; };
 		1CB0860E2F69DF900039435C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		1CB086102F69DF900039435C /* BioFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioFeedbackView.swift; sourceTree = "<group>"; };
+		1CB086222F69DF900039435C /* ExoConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExoConfig.swift; sourceTree = "<group>"; };
+		1CB086232F69DF900039435C /* config.ini */ = {isa = PBXFileReference; lastKnownFileType = text; path = config.ini; sourceTree = "<group>"; };
+		1CB086252F69DF900039435C /* Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,11 +118,14 @@
 				1CB085DC2F69DF900039435C /* ContentView.swift */,
 				1CB086062F69DF900039435C /* Models.swift */,
 				1CB086042F69DF900039435C /* BLEManager.swift */,
+				1CB086222F69DF900039435C /* ExoConfig.swift */,
+				1CB086252F69DF900039435C /* Debug.swift */,
 				1CB086082F69DF900039435C /* CSVLogger.swift */,
 				1CB0860A2F69DF900039435C /* ScanView.swift */,
 				1CB0860C2F69DF900039435C /* ActiveTrialView.swift */,
 				1CB0860E2F69DF900039435C /* SettingsView.swift */,
 				1CB086102F69DF900039435C /* BioFeedbackView.swift */,
+				1CB086232F69DF900039435C /* config.ini */,
 				1CB085DE2F69DF930039435C /* Assets.xcassets */,
 				1CB085E02F69DF930039435C /* Preview Content */,
 			);
@@ -254,6 +263,7 @@
 			files = (
 				1CB085E22F69DF930039435C /* Preview Assets.xcassets in Resources */,
 				1CB085DF2F69DF930039435C /* Assets.xcassets in Resources */,
+				1CB086212F69DF900039435C /* config.ini in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,6 +292,8 @@
 				1CB085DB2F69DF900039435C /* OpenExo_GUIApp.swift in Sources */,
 				1CB086072F69DF900039435C /* Models.swift in Sources */,
 				1CB086052F69DF900039435C /* BLEManager.swift in Sources */,
+				1CB086202F69DF900039435C /* ExoConfig.swift in Sources */,
+				1CB086242F69DF900039435C /* Debug.swift in Sources */,
 				1CB086092F69DF900039435C /* CSVLogger.swift in Sources */,
 				1CB0860B2F69DF900039435C /* ScanView.swift in Sources */,
 				1CB0860D2F69DF900039435C /* ActiveTrialView.swift in Sources */,

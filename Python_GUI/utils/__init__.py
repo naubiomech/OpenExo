@@ -7,12 +7,19 @@ from .ui_helpers import (
     get_base_dir, create_separator, create_section_label,
     apply_button_style_batch, set_size_policy_expanding, set_size_policy_fixed_height
 )
+from . import exo_config
+from . import debug
+from .debug import dprint, DEBUG_PRINTS
 
 __all__ = [
     'UIConfig',
     'JointConfig',
     'PlotConfig',
     'SettingsManager',
+    'exo_config',
+    'debug',
+    'dprint',
+    'DEBUG_PRINTS',
     'load_logo',
     'style_button',
     'style_label',

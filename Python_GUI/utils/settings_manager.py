@@ -5,6 +5,8 @@ Handles loading and saving GUI settings to avoid code duplication.
 
 import os
 
+from .debug import dprint
+
 
 class SettingsManager:
     """Manages persistent GUI settings."""
@@ -42,7 +44,7 @@ class SettingsManager:
                             key, val = line.split('=', 1)
                             settings[key] = val
         except Exception as e:
-            print(f"[SettingsManager] Error loading settings: {e}")
+            dprint(f"[SettingsManager] Error loading settings: {e}")
         
         return settings
     
@@ -67,9 +69,9 @@ class SettingsManager:
                 for key, val in settings.items():
                     f.write(f"{key}={val}\n")
             
-            print(f"[SettingsManager] Saved settings to {settings_file}")
+            dprint(f"[SettingsManager] Saved settings to {settings_file}")
         except Exception as e:
-            print(f"[SettingsManager] Error saving settings: {e}")
+            dprint(f"[SettingsManager] Error saving settings: {e}")
     
     @staticmethod
     def update_settings(updates, filename=None):
