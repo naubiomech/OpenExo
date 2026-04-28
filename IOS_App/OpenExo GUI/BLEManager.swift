@@ -183,8 +183,8 @@ class BLEManager: NSObject, ObservableObject {
     func calibrateTorque() {
         send(byte: "H")
         torqueCalibrated = false
-        connectionStatus = "Calibrating… Start Trial unlocks in 3 s"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+        connectionStatus = "Calibrating… Start Trial unlocks in 1.5 s"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
             self?.torqueCalibrated = true
             self?.connectionStatus = "Calibrated ✓ — tap Start Trial"
         }
