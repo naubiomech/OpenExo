@@ -37,7 +37,7 @@ Made for Final Project (Part 1-3). Author: Landon Coonrod, w/ AI as 2nd team mem
 
 You need:
 - Android Studio (any recent version, tested on Hedgehog)
-- A real Android phone (api 26+) OR an emulator. **Real phone recommended cuz the
+- A real Android phone (api 26+) OR an emulator. **Real phone recommended because the
   emulator doesn't do BLE**
 - The OpenExo device powered on + nearby (for the ble part)
 
