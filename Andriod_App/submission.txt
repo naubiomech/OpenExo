@@ -1,0 +1,20 @@
+Final Project - Part 3 Submission
+==================================
+
+Group: Landon Coonrod (+ AI as 2nd team member)
+Course: Mobile App Development - Spring 2026
+
+GitHub Repo:
+  https://github.com/naubiomech/OpenExo
+
+Android App folder:
+  Andriod_App/
+
+Branch w/ the final android app:
+  major-feature/patch
+
+README:
+  Andriod_App/README.md
+
+Firebase project:
+  class-project-25e45 (auth + realtime db)

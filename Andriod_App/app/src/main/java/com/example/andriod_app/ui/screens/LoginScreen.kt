@@ -2,6 +2,7 @@ package com.example.andriod_app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -17,21 +18,41 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.andriod_app.ui.theme.*
+import com.example.andriod_app.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(onLogin: () -> Unit){
+fun LoginScreen(
+    auth: AuthViewModel,
+    onLogin: () -> Unit
+)
+{
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
     var isSignup by remember { mutableStateOf(false) }
-    var errorMsg by remember { mutableStateOf<String?>(null) }
+
+    val errMsg by auth.error.collectAsStateWithLifecycle()
+    val busy by auth.busy.collectAsStateWithLifecycle()
+
+    //pulled out the field colors so i dont have to repeat them on both feilds
+    val fieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = ExoBlue,
+        unfocusedBorderColor = GrayText.copy(alpha = 0.5f),
+        focusedTextColor = Color.White,
+        unfocusedTextColor = Color.White,
+        cursorColor = ExoBlue,
+        focusedLabelColor = ExoBlue,
+        unfocusedLabelColor = GrayText
+    )
 
     Column(
-        modifier = Modifier.fillMaxSize().background(DarkBg).padding(24.dp),
+        //systemBarsPadding keeps content clear of the status bar + gesture bar
+        modifier = Modifier.fillMaxSize().background(DarkBg).systemBarsPadding().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-    ){
+    ) {
         Icon(Icons.Default.DirectionsWalk, contentDescription = null,
             tint = ExoBlue, modifier = Modifier.size(64.dp))
         Spacer(Modifier.height(8.dp))
@@ -40,86 +61,84 @@ fun LoginScreen(onLogin: () -> Unit){
 
         Spacer(Modifier.height(40.dp))
 
-        //email
+        //email feild
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it; errorMsg = null },
+            onValueChange = { email = it; auth.clearError() },
             label = { Text("Email") },
             singleLine = true,
+            enabled = !busy,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = GrayText) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = ExoBlue,
-                unfocusedBorderColor = GrayText.copy(alpha = 0.5f),
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                cursorColor = ExoBlue,
-                focusedLabelColor = ExoBlue,
-                unfocusedLabelColor = GrayText
-            ),
+            colors = fieldColors,
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(12.dp))
 
-        //password
+        //password feild w/ show toggle
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it; errorMsg = null },
+            onValueChange = { password = it; auth.clearError() },
             label = { Text("Password") },
             singleLine = true,
+            enabled = !busy,
             visualTransformation = if(showPassword) VisualTransformation.None
                 else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = GrayText) },
             trailingIcon = {
-                IconButton(onClick = { showPassword = !showPassword }){
+                IconButton(onClick = { showPassword = !showPassword }) {
                     Icon(
                         if(showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                         contentDescription = null, tint = GrayText)
                 }
             },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = ExoBlue,
-                unfocusedBorderColor = GrayText.copy(alpha = 0.5f),
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                cursorColor = ExoBlue,
-                focusedLabelColor = ExoBlue,
-                unfocusedLabelColor = GrayText
-            ),
+            colors = fieldColors,
             modifier = Modifier.fillMaxWidth()
         )
 
-        //error
-        if(errorMsg != null){
+        //err msg
+        if(errMsg != null) {
             Spacer(Modifier.height(8.dp))
-            Text(errorMsg!!, color = ExoRed, fontSize = 13.sp)
+            Text(errMsg!!, color = ExoRed, fontSize = 13.sp)
         }
 
         Spacer(Modifier.height(24.dp))
 
-        //login/signup btn
+        //login or signup btn (depending on isSignup toggle)
         Button(
             onClick = {
-                if(email.isBlank() || password.isBlank()){
-                    errorMsg = "Please fill in all fields"
+                if(isSignup){
+                    auth.signUp(email, password){ ok -> if(ok) onLogin() }
                 } else {
-                    onLogin()
+                    auth.signIn(email, password) { ok -> if(ok) onLogin() }
                 }
             },
+            enabled = !busy,
             colors = ButtonDefaults.buttonColors(containerColor = ExoBlue),
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth().height(50.dp)
-        ){
-            Text(if(isSignup) "Create Account" else "Log In",
-                fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        ) {
+            if(busy) {
+                CircularProgressIndicator(Modifier.size(18.dp), color = Color.White, strokeWidth = 2.dp)
+            } else {
+                Text(if(isSignup) "Create Account" else "Log In",
+                    fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
 
-        //toggle login/signup
-        TextButton(onClick = { isSignup = !isSignup; errorMsg = null }){
+        //skip auth - only for offline testing
+        TextButton(onClick = { onLogin() }, enabled = !busy) {
+            Text("Continue without account", color = GrayText, fontSize = 12.sp)
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        //flip between login/signup mode
+        TextButton(onClick = { isSignup = !isSignup; auth.clearError() }, enabled = !busy){
             Text(
                 if(isSignup) "Already have an account? Log in"
                     else "Don't have an account? Sign up",

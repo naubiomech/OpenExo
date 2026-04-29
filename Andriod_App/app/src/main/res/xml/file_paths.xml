@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--AI ASSISTED - paths config for the FileProvider that backs the share/export
+    csv intent on the End Trial screen. csv export is an AI-assisted task per
+    Part 1 docs.-->
+<paths>
+    <!--exposes the trials/ subfolder under getExternalFilesDir() so the share intent can read it-->
+    <external-files-path name="trials" path="trials/" />
+    <files-path name="trials_internal" path="trials/" />
+</paths>

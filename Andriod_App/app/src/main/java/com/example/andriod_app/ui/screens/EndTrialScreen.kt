@@ -1,7 +1,10 @@
 package com.example.andriod_app.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -13,39 +16,69 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.andriod_app.ui.theme.*
+import com.example.andriod_app.viewmodel.AuthViewModel
+import com.example.andriod_app.viewmodel.BleViewModel
+import com.example.andriod_app.viewmodel.TrialViewModel
 
 @Composable
-fun EndTrialScreen(onReturn: () -> Unit){
-    var fileName by remember { mutableStateOf("mock_trial_20260407_120000") }
+fun EndTrialScreen(
+    bleVm: BleViewModel,
+    trial: TrialViewModel,
+    auth: AuthViewModel,
+    onReturn: () -> Unit
+)
+{
+    val ctx = LocalContext.current
+    val csvName by trial.csv.currentFileName.collectAsStateWithLifecycle()
+    val rowCount by trial.csv.rowCount.collectAsStateWithLifecycle()
+    val saveStatus by trial.saveStatus.collectAsStateWithLifecycle()
+    val markCount by bleVm.ble.markCount.collectAsStateWithLifecycle()
+    val user by auth.user.collectAsStateWithLifecycle()
+
+    var fileName by remember(csvName) { mutableStateOf(csvName.removeSuffix(".csv")) }
     var notes by remember { mutableStateOf("") }
     var showDiscard by remember { mutableStateOf(false) }
 
-    if (showDiscard) {
+    val durStr = remember(rowCount) { trial.csv.durationFormatted() }
+    val sizeStr = remember(rowCount) { trial.csv.lastFileSize() }
+
+    //confirm dialog before discarding
+    if(showDiscard){
         AlertDialog(
             onDismissRequest = { showDiscard = false },
             title = { Text("Discard Data?") },
             text = { Text("This will permanently delete the CSV file for this trial.") },
             confirmButton = {
-                TextButton(onClick = { showDiscard = false; onReturn() }){
-                    Text("Discard", color = ExoRed) }
+                TextButton(onClick = {
+                    showDiscard = false
+                    trial.discardTrial()
+                    onReturn()
+                }) { Text("Discard", color = ExoRed) }
             },
             dismissButton = {
-                TextButton(onClick = { showDiscard = false }) { Text("Keep") }
+                TextButton(onClick = { showDiscard = false }){ Text("Keep") }
             }
         )
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(DarkBg)){
+    Column(
+        modifier = Modifier.fillMaxSize().background(DarkBg).navigationBarsPadding()
+    ) {
 
-        //header
+        //header - colored bg extends behind status bar, content gets statusBarsPadding
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth().background(CardBg).padding(vertical = 24.dp)) {
+            modifier = Modifier.fillMaxWidth().background(CardBg).statusBarsPadding()
+                .padding(vertical = 24.dp)
+        ){
             Icon(Icons.Default.CheckCircle, contentDescription = null,
                 tint = ExoGreen, modifier = Modifier.size(48.dp))
             Spacer(Modifier.height(8.dp))
@@ -55,27 +88,27 @@ fun EndTrialScreen(onReturn: () -> Unit){
 
         Column(
             modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp)
-        ){
-            //file detials
+        ) {
+            //file detials card
             Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-                .background(CardBg).padding(14.dp)){
+                .background(CardBg).padding(14.dp)) {
                 Text("FILE DETAILS", color = GrayText, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(10.dp))
-                FileInfoRow("File", "mock_trial_20260407.csv")
-                FileInfoRow("Size", "245 KB")
-                FileInfoRow("Data Points", "12,847")
-                FileInfoRow("Marks", "5")
-                FileInfoRow("Duration", "04:32")
+                FileInfoRow("File", csvName.ifEmpty{ "(none)" })
+                FileInfoRow("Size", sizeStr)
+                FileInfoRow("Data Points", rowCount.toString())
+                FileInfoRow("Marks", markCount.toString())
+                FileInfoRow("Duration", durStr)
             }
 
             Spacer(Modifier.height(16.dp))
 
-            //rename
+            //rename feild
             Column(modifier = Modifier.fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp)).background(CardBg).padding(14.dp)){
                 Text("RENAME FILE", color = GrayText, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically){
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     OutlinedTextField(
                         value = fileName, onValueChange = { fileName = it },
                         textStyle = LocalTextStyle.current.copy(
@@ -88,9 +121,9 @@ fun EndTrialScreen(onReturn: () -> Unit){
 
             Spacer(Modifier.height(16.dp))
 
-            //notes
+            //notes box
             Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp))
-                .background(CardBg).padding(14.dp)){
+                .background(CardBg).padding(14.dp)) {
                 Text("TRIAL NOTES", color = GrayText, fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
@@ -104,8 +137,29 @@ fun EndTrialScreen(onReturn: () -> Unit){
 
             Spacer(Modifier.height(12.dp))
 
-            //share
-            Button(onClick = {},
+            //--- AI ASSISTED ---
+            //share / export csv via FileProvider intent (csv export = AI-assisted task
+            //per part 1 docs). AI wrote the FileProvider uri grant + ACTION_SEND chooser.
+            Button(onClick = {
+                    val f = trial.csv.lastFile() ?: return@Button
+                    try {
+                        val uri = FileProvider.getUriForFile(
+                            ctx, "${ctx.packageName}.fileprovider", f)
+                        val intent = Intent(Intent.ACTION_SEND).apply{
+                            type = "text/csv"
+                            putExtra(Intent.EXTRA_STREAM, uri)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        ctx.startActivity(Intent.createChooser(intent, "Share trial CSV"))
+                    } catch(e: Exception) {
+                        //fileprovider not configured - fall back to sending text
+                        val intent = Intent(Intent.ACTION_SEND).apply{
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, "Trial CSV: ${f.absolutePath}")
+                        }
+                        ctx.startActivity(Intent.createChooser(intent, "Share trial info"))
+                    }
+                },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = CardBg),
                 modifier = Modifier.fillMaxWidth()){
@@ -113,14 +167,30 @@ fun EndTrialScreen(onReturn: () -> Unit){
                 Spacer(Modifier.width(8.dp))
                 Text("Share / Export CSV", color = Color.White)
             }
+
+            //cloud save status txt
+            if(saveStatus != null) {
+                Spacer(Modifier.height(8.dp))
+                Text(saveStatus!!, color = GrayText, fontSize = 12.sp,
+                    modifier = Modifier.padding(horizontal = 4.dp))
+            }
         }
 
-        //bottom
+        //bottom save / discard buttons
         HorizontalDivider(color = GrayText.copy(alpha = 0.3f))
-        Column(modifier = Modifier.padding(16.dp)){
-            Button(onClick = onReturn, shape = RoundedCornerShape(12.dp),
+        Column(modifier = Modifier.padding(16.dp)) {
+            Button(onClick = {
+                    //rename if user changed it, then push to firebase
+                    if(fileName.isNotBlank() && fileName != csvName.removeSuffix(".csv")){
+                        trial.csv.renameLastFile(fileName)
+                    }
+                    trial.saveTrialToFirebase(user, notes, markCount)
+                    onReturn()
+                },
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ExoGreen),
-                modifier = Modifier.fillMaxWidth()){
+                modifier = Modifier.fillMaxWidth()
+            ){
                 Text("Save & Return", fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.height(10.dp))
@@ -133,9 +203,10 @@ fun EndTrialScreen(onReturn: () -> Unit){
     }
 }
 
+//small helper for the file details rows
 @Composable
-private fun FileInfoRow(label: String, value: String){
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)){
+private fun FileInfoRow(label: String, value: String) {
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
         Text(label, color = GrayText, fontSize = 14.sp, modifier = Modifier.weight(1f))
         Text(value, color = Color.White, fontSize = 14.sp, fontFamily = FontFamily.Monospace)
     }
