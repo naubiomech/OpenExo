@@ -393,29 +393,66 @@ public:
  *
  * See ControllerData.h for details on the parameters used.
  */
+
+// class Step : public _Controller
+// {
+// public:
+//     Step(config_defs::joint_id id, ExoData* exo_data);
+//     ~Step() {};
+
+//     int n;                          /* Keeps track of how many steps have been performed. */
+//     int start_flag;                 /* Flag that triggers the recording of the time that the step is first applied. */
+//     float start_time;               /* Time that the step was first applied. */
+//     float cmd_ff;                   /* Motor command. */
+//     float previous_time;            /* Stores time from previous iteration. */
+//     float end_time;                 /* Records time that step ended. */
+
+//     float previous_command;
+//     float previous_torque_reading;
+//     int flag;
+//     float difference;
+//     float turn;
+//     float flag_time;
+//     float change_time;
+
+//     float calc_motor_cmd();         /* Function that calculates the motor command. */
+
+// };
 class Step : public _Controller
 {
 public:
     Step(config_defs::joint_id id, ExoData* exo_data);
     ~Step() {};
 
-    int n;                          /* Keeps track of how many steps have been performed. */
-    int start_flag;                 /* Flag that triggers the recording of the time that the step is first applied. */
-    float start_time;               /* Time that the step was first applied. */
-    float cmd_ff;                   /* Motor command. */
-    float previous_time;            /* Stores time from previous iteration. */
-    float end_time;                 /* Records time that step ended. */
+    float calc_motor_cmd();
+
+private:
+
+    enum StepState
+    {
+        STEP_IDLE,
+        STEP_ACTIVE,
+        STEP_WAIT
+    };
+
+    StepState state;
+
+    int n;                  // repetition counter
+
+    float start_time;
+    float end_time;
+
+    float cmd_ff;
 
     float previous_command;
     float previous_torque_reading;
+
+    // optional debugging / filtering helpers
     int flag;
     float difference;
     float turn;
     float flag_time;
     float change_time;
-
-    float calc_motor_cmd();         /* Function that calculates the motor command. */
-
 };
 
 /**

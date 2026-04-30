@@ -623,10 +623,10 @@ _CANMotor(id, exo_data, enable_pin)
 AK60v3::AK60v3(config_defs::joint_id id, ExoData* exo_data, int enable_pin): //Constructor: type is the motor type
 _CANMotor(id, exo_data, enable_pin)
 {
-    _I_MAX = 10.3f;
-    _V_MAX = 48.0f;
+    _I_MAX = 12.0f;
+    _V_MAX = 24.0f;
 
-    float kt = 0.420*6;//corrected values
+    float kt = 0.13*8 ;//corrected values
     set_Kt(kt);
     exo_data->get_joint_with(static_cast<uint8_t>(id))->motor.kt = kt;
 
