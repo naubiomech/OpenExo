@@ -27,7 +27,16 @@
 #define FIXED_POINT_FACTOR 100
 #define UART_BAUD 256000
 
-#define MAX_RX_LEN 64       //Bytes
+// MAX_RX_LEN must be >= the largest decoded UART payload we ever send.
+// The biggest message is `update_config`, which now ships 71 keys
+// (ini_config::number_of_keys) as 2-byte fixed-point shorts plus 2 metadata
+// bytes -> 144 bytes raw.  The previous 64-byte cap silently truncated that
+// frame on the Nano side, so _unpack would compute msg.len = (64 - 2) / 2
+// = 31 and get_config looped forever on `msg.len != number_of_keys` until
+// it timed out.  We size the buffer to 200 bytes -- comfortably above 144
+// while staying under the uint8_t length limit (the function signatures
+// pass `len` as uint8_t, so the absolute ceiling is 255).
+#define MAX_RX_LEN 200      //Bytes
 #define RX_TIMEOUT_US 1000  //Microseconds
 
 /* SLIP special character codes */
@@ -114,10 +123,14 @@ class UARTHandler
 
         float _timeout_us = RX_TIMEOUT_US;
         
+        // _partial_packet_len is widened to uint16_t now that MAX_RX_LEN
+        // can exceed 128.  The accumulator (`_partial_packet_len += received`)
+        // would otherwise wrap on a single oversized frame and we'd lose
+        // bytes the next poll() reassembled.
         uint8_t _partial_packet[MAX_RX_LEN];
-        uint8_t _partial_packet_len = 0;
+        uint16_t _partial_packet_len = 0;
         uint8_t _msg_buffer[MAX_RX_LEN];
-        uint8_t _msg_buffer_len = 0;
+        uint16_t _msg_buffer_len = 0;
 
 };
 
