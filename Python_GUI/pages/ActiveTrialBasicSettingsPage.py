@@ -124,6 +124,30 @@ class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
         self.btn_apply.clicked.connect(self._on_apply)
         self.btn_cancel.clicked.connect(self.cancelRequested.emit)
 
+    def clear_device_session_preferences(self):
+        """Reset in-memory basic controller fields when switching BLE devices."""
+        self._bilateral_state = False
+        self._last_selection = {
+            "bilateral": False,
+            "joint": "Left hip",
+            "joint_id": 0,
+            "controller": 0,
+            "parameter": 0,
+            "value": 0.0,
+        }
+        try:
+            self.chk_bilateral.blockSignals(True)
+            self.chk_bilateral.setChecked(False)
+            self.chk_bilateral.blockSignals(False)
+            self.spin_joint_id.setValue(0)
+            self.combo_controller.setCurrentIndex(0)
+            self.combo_param.setCurrentIndex(0)
+            self.spin_value.blockSignals(True)
+            self.spin_value.setValue(0.0)
+            self.spin_value.blockSignals(False)
+        except Exception as e:
+            print(f"[BasicSettings] Error clearing device prefs UI: {e}")
+
     def _load_settings(self):
         """Load all settings from file."""
         import os

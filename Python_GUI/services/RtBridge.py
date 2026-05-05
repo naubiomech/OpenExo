@@ -23,6 +23,7 @@ class RtBridge(QtCore.QObject):
     parameterNamesReceived = QtCore.Signal(list)
     controllersReceived = QtCore.Signal(list, list)
     controllerMatrixReceived = QtCore.Signal(list)
+    controllerValuesReceived = QtCore.Signal(list)
     rtDataUpdated = QtCore.Signal(list)
 
     def __init__(self, parent=None):
@@ -137,6 +138,8 @@ class RtBridge(QtCore.QObject):
                 # Parse controllers and parameter headers from the payload blob
                 rows = [row.strip() for row in payload_line.split("\n") if row.strip()]
                 controller_rows = []
+                value_rows = []
+                controller_values = {}
                 param_names = []
                 self._rows_68 = []
                 self._rows_36 = []
@@ -159,6 +162,13 @@ class RtBridge(QtCore.QObject):
                     if prefix == 't':
                         param_names = [p.strip() for p in parts[1:] if p.strip()]
                         print(f"RtBridge::feed_bytes->Parameter names: {param_names}")
+                        continue
+                    if prefix == 'v':
+                        value_rows.append(parts)
+                        # Expected format: v,<joint_id>,<controller_id>,<v1>,<v2>,...
+                        if len(parts) >= 3:
+                            key = (parts[1], parts[2])
+                            controller_values[key] = parts[3:]
                         continue
                     if prefix == '?':
                         # End-of-handshake sentinel
@@ -234,6 +244,18 @@ class RtBridge(QtCore.QObject):
                     
                     if self._controller_matrix:
                         self.controllerMatrixReceived.emit(list(self._controller_matrix))
+
+                # Always emit (possibly empty) so MainWindow can replace stale DB and pad from matrix.
+                flat_values: List[list] = []
+                for (joint_id, controller_id), values in controller_values.items():
+                    flat_values.append([joint_id, controller_id] + list(values))
+                self.controllerValuesReceived.emit(flat_values)
+
+                print(
+                    "RtBridge::feed_bytes->Handshake summary: "
+                    f"bytes={len(line)} rows={len(rows)} "
+                    f"controller_rows={len(controller_rows)} value_rows={len(value_rows)}"
+                )
 
                 # Done collecting extended handshake
                 self._collecting_handshake_payload = False
@@ -386,6 +408,23 @@ class RtBridge(QtCore.QObject):
         self._num_count = 0
         self._payload.clear()
         self._buffer.clear()
+
+    def reset_for_new_ble_session(self):
+        """Drop handshake/name/controller parse state before data from the next link arrives."""
+        self._handshake = False
+        self._collecting_names = True
+        self._names.clear()
+        self._controllers.clear()
+        self._controller_params.clear()
+        self._temp_params.clear()
+        self._controllers_done = False
+        self._controller_matrix.clear()
+        self._rows_68.clear()
+        self._rows_36.clear()
+        self._rows_38.clear()
+        self._collecting_handshake_payload = False
+        self._handshake_payload_buf = ""
+        self._reset_stream()
     
     def print_trial_summary(self):
         """Print comprehensive trial summary with all statistics."""

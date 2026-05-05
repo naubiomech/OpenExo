@@ -10,6 +10,20 @@ class SettingsManager:
     """Manages persistent GUI settings."""
     
     DEFAULT_FILENAME = "gui_settings.txt"
+
+    # Keys removed when switching BLE devices or tearing down the controller DB
+    _BLE_DEVICE_CONTROLLER_PREF_KEYS = frozenset({
+        "bilateral",
+        "last_joint",
+        "last_controller",
+        "last_parameter",
+        "last_value",
+        "last_basic_joint_id",
+        "last_basic_joint",
+        "last_basic_controller",
+        "last_basic_parameter",
+        "last_basic_value",
+    })
     
     @staticmethod
     def get_settings_path(filename=None):
@@ -88,6 +102,19 @@ class SettingsManager:
         
         # Save back
         SettingsManager.save_settings(settings, filename)
+
+    @staticmethod
+    def purge_keys(keys_to_remove, filename=None):
+        """Remove keys from the settings file; other keys are kept."""
+        settings = SettingsManager.load_settings(filename)
+        for k in keys_to_remove:
+            settings.pop(k, None)
+        SettingsManager.save_settings(settings, filename)
+
+    @staticmethod
+    def purge_ble_device_controller_prefs(filename=None):
+        """Strip persisted Update Controller fields (main + basic settings) for a new/disconnected device."""
+        SettingsManager.purge_keys(SettingsManager._BLE_DEVICE_CONTROLLER_PREF_KEYS, filename)
     
     @staticmethod
     def get_setting(key, default=None, filename=None):

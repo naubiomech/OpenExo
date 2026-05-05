@@ -19,6 +19,7 @@ from pages import (
     BioFeedbackPage,
 )
 from services import QtExoDeviceManager, RtBridge
+from utils import SettingsManager
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -85,6 +86,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.rt_bridge.controllersReceived.connect(self._on_controllers)
         # Receive flattened 2D matrix of controllers and parameters
         self.rt_bridge.controllerMatrixReceived.connect(self._on_controller_matrix)
+        self.rt_bridge.controllerValuesReceived.connect(self._on_controller_values)
 
         # CSV logging state
         self._csv_file = None
@@ -97,6 +99,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._csv_preamble = ""  # Preamble for CSV filename
         # Store controller -> params 2D matrix
         self._controller_matrix = []
+        # Store controller values by (joint_id, controller_id)
+        self._controller_values = {}
         # Device control wiring from ActiveTrialPage
         self.trial_page.deviceStartRequested.connect(self._on_device_start)
         self.trial_page.deviceStopRequested.connect(self._on_device_stop_motors)
@@ -306,6 +310,54 @@ class MainWindow(QtWidgets.QMainWindow):
             self.logger.error(f"Failed to enable update controller button: {e}")
             self.logger.debug(traceback.format_exc())
 
+    def _normalized_controller_values(self, overlay: dict) -> dict:
+        """
+        Build a full value DB aligned to _controller_matrix: one entry per (joint_id, controller_id)
+        with list length matching the parameter name count (row[4:]). Missing overlay entries pad with "0";
+        excess overlay values are truncated.
+        """
+        out: dict = {}
+        overlay = overlay or {}
+        try:
+            for row in self._controller_matrix:
+                if len(row) < 4:
+                    continue
+                jid, cid = str(row[1]), str(row[3])
+                key = (jid, cid)
+                n_params = max(0, len(row) - 4)
+                raw = overlay.get(key, [])
+                vals = [str(v) for v in raw]
+                if len(vals) < n_params:
+                    vals.extend(["0"] * (n_params - len(vals)))
+                elif len(vals) > n_params:
+                    vals = vals[:n_params]
+                out[key] = vals
+        except Exception as e:
+            self.logger.error(f"Failed to normalize controller values: {e}")
+            self.logger.debug(traceback.format_exc())
+        return out
+
+    @QtCore.Slot(list)
+    def _on_controller_values(self, rows):
+        try:
+            overlay = {}
+            for row in rows:
+                if len(row) >= 2:
+                    key = (str(row[0]), str(row[1]))
+                    overlay[key] = [str(v) for v in row[2:]]
+            if self._controller_matrix:
+                self._controller_values = self._normalized_controller_values(overlay)
+            else:
+                self._controller_values = {k: list(v) for k, v in overlay.items()}
+            self.settings_page.set_controller_values(self._controller_values)
+            self.logger.info(
+                f"Controller value DB from device: {len(overlay)} raw keys, "
+                f"{len(self._controller_values)} entries after matrix alignment"
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to store controller value DB: {e}")
+            self.logger.debug(traceback.format_exc())
+
     @QtCore.Slot()
     def _on_device_start(self):
         # Resume motors (play functionality) - just turn motors back on
@@ -409,6 +461,7 @@ class MainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def _on_end_trial(self):
         try:
+            self._destroy_controller_db()
             self.logger.info("Ending trial...")
             # Print trial summary diagnostics
             try:
@@ -475,6 +528,7 @@ class MainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def _on_disconnect(self):
         try:
+            self._destroy_controller_db()
             self.logger.info("Manual disconnect requested")
             # Disconnect immediately (non-blocking, no popup)
             self.qt_dev.disconnect()
@@ -616,11 +670,47 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             self.logger.error(f"Failed to update torque values: {e}")
             self.logger.debug(traceback.format_exc())
+        try:
+            joint_id = str(payload[1])
+            controller_id = str(payload[2])
+            parameter_idx = int(payload[3])
+            value = payload[4]
+            key = (joint_id, controller_id)
+            values = list(self._controller_values.get(key, []))
+            while len(values) <= parameter_idx:
+                values.append("0")
+            values[parameter_idx] = str(value)
+            self._controller_values[key] = values
+            self.settings_page.set_controller_values(self._controller_values)
+        except Exception as e:
+            self.logger.error(f"Failed to mirror apply into controller value DB: {e}")
+            self.logger.debug(traceback.format_exc())
         # Return to trial page
         try:
             self.stack.setCurrentWidget(self.trial_page)
         except Exception as e:
             self.logger.error(f"Failed to navigate to trial page after settings: {e}")
+            self.logger.debug(traceback.format_exc())
+
+    def _destroy_controller_db(self):
+        try:
+            SettingsManager.purge_ble_device_controller_prefs()
+        except Exception as e:
+            self.logger.error(f"Failed to purge saved controller prefs: {e}")
+            self.logger.debug(traceback.format_exc())
+        try:
+            self.settings_page.clear_device_session_preferences()
+            self.basic_settings_page.clear_device_session_preferences()
+        except Exception as e:
+            self.logger.error(f"Failed to reset settings page device prefs: {e}")
+            self.logger.debug(traceback.format_exc())
+        try:
+            self._controller_matrix = []
+            self._controller_values = {}
+            self.settings_page.set_controller_matrix([])
+            self.settings_page.set_controller_values({})
+        except Exception as e:
+            self.logger.error(f"Failed to destroy controller DB: {e}")
             self.logger.debug(traceback.format_exc())
 
     @QtCore.Slot(str)
@@ -650,6 +740,22 @@ class MainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot(str, str)
     def _on_dev_connected(self, name: str, addr: str):
         self.logger.info(f"Device connected: {name} {addr}")
+        # New link = no controller metadata until this device's handshake arrives
+        try:
+            self._destroy_controller_db()
+        except Exception as e:
+            self.logger.error(f"Failed to clear controller DB on connect: {e}")
+            self.logger.debug(traceback.format_exc())
+        try:
+            self.rt_bridge.reset_for_new_ble_session()
+        except Exception as e:
+            self.logger.error(f"Failed to reset RtBridge for new session: {e}")
+            self.logger.debug(traceback.format_exc())
+        try:
+            self.trial_page.set_update_controller_enabled(False)
+        except Exception as e:
+            self.logger.error(f"Failed to disable update-controller until handshake: {e}")
+            self.logger.debug(traceback.format_exc())
         try:
             self.scan_page.status.setText(f"Connected: {name} {addr}")
             # Don't enable Save & Connect after connection - it's already connected
@@ -687,6 +793,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Handle unexpected disconnects (intentional disconnects don't trigger this)."""
         self.logger.warning("Device disconnected unexpectedly")
         try:
+            self._destroy_controller_db()
             self.scan_page.status.setText("Disconnected unexpectedly")
             self.scan_page.btn_save_connect.setEnabled(True)
             self.scan_page.btn_start_trial.setEnabled(False)

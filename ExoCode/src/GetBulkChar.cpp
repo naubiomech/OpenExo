@@ -109,30 +109,29 @@ void readSingleMessageBlocking() {
                 
                 // Check for buffer overflow first
                 if (rxIndex >= MAX_MESSAGE_SIZE - 1) {
-                    //Serial.println("ERROR: Receive buffer overflow.");
+                    Serial.print("\nGetBulkChar ERROR: receive buffer overflow at ");
+                    Serial.print(rxIndex);
+                    Serial.print(" bytes (MAX_MESSAGE_SIZE=");
+                    Serial.print(MAX_MESSAGE_SIZE);
+                    Serial.print(").");
                     currentState = WAITING_FOR_F;
                     rxIndex = 0;
                     continue; // Skip processing this character
                 }
                 
-                // --- 1. CHECK FOR END MARKER (",z") ---
-                // We check the incoming character against the previous one stored in the buffer.
-                if (incomingChar == '?' && rxBuffer_bulkStr[rxIndex - 1] == '?' && rxBuffer_bulkStr[rxIndex - 2] == ',') {
-                    
-                    // Store the 'z'
+                // --- 1. CHECK FOR END MARKER (",??") ---
+                // Detect after the third marker byte arrives, and store it once.
+                if (incomingChar == '?' &&
+                    rxIndex >= 2 &&
+                    rxBuffer_bulkStr[rxIndex - 1] == '?' &&
+                    rxBuffer_bulkStr[rxIndex - 2] == ',') {
                     rxBuffer_bulkStr[rxIndex++] = incomingChar;
-                    
-                    // Add the null terminator after 'z'
-                    rxBuffer_bulkStr[rxIndex] = '\0'; 
-                        
+                    rxBuffer_bulkStr[rxIndex] = '\0';
                     messageComplete = true; // Exit the blocking while loop
-                        
-                    // Continue to the processing block below
+                } else {
+                    // --- 2. STORE DATA ---
+                    rxBuffer_bulkStr[rxIndex++] = incomingChar;
                 }
-
-                // --- 2. STORE DATA ---
-                rxBuffer_bulkStr[rxIndex] = incomingChar;
-                rxIndex++;
             }
 			// 3. Immediately exit the inner 'while' loop if the message is complete
             if (messageComplete) {

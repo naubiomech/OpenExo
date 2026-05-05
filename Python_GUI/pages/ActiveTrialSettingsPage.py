@@ -21,6 +21,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
         super().__init__(parent)
         self.setObjectName("ActiveTrialSettingsPage")
         self._controller_matrix: list[list[str]] = []
+        self._controller_values: dict[tuple[str, str], list[str]] = {}
         self._joint_controllers: dict = {}  # Maps joint name to list of controller indices
         self._bilateral_state = False  # Store bilateral state
         self._last_selection = {
@@ -90,6 +91,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
         lpf = lbl_param.font(); lpf.setPointSize(UIConfig.FONT_LARGE); lbl_param.setFont(lpf)
         self.combo_param = QtWidgets.QComboBox()
         style_combo_box(self.combo_param, height=UIConfig.BTN_HEIGHT_XLARGE, font_size=UIConfig.FONT_LARGE)
+        self.combo_param.currentIndexChanged.connect(self._on_param_changed)
         form.addWidget(lbl_param, row, 0)
         form.addWidget(self.combo_param, row, 1)
         row += 1
@@ -159,6 +161,33 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
         except Exception as e:
             print(f"Error populating joint combo: {e}")
             pass
+
+    def set_controller_values(self, values_db: dict):
+        try:
+            self._controller_values = dict(values_db) if values_db else {}
+            self._refresh_value_from_db()
+        except Exception as e:
+            print(f"Error setting controller values: {e}")
+
+    def clear_device_session_preferences(self):
+        """Reset persisted Update Controller selections for a disconnected / new BLE device."""
+        self._bilateral_state = False
+        self._last_selection = {
+            "bilateral": False,
+            "joint": None,
+            "controller": None,
+            "parameter": None,
+            "value": 0.0,
+        }
+        try:
+            self.chk_bilateral.blockSignals(True)
+            self.chk_bilateral.setChecked(False)
+            self.chk_bilateral.blockSignals(False)
+            self.spin_value.blockSignals(True)
+            self.spin_value.setValue(0.0)
+            self.spin_value.blockSignals(False)
+        except Exception as e:
+            print(f"[Settings] Error clearing device prefs UI: {e}")
 
     def _load_settings(self):
         """Load saved settings from file."""
@@ -440,6 +469,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                 
                 # Trigger parameter update for first controller
                 self._on_controller_changed(0)
+                self._refresh_value_from_db()
             else:
                 # No controllers for this joint
                 self.table.clear()
@@ -493,5 +523,49 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                 self.combo_param.blockSignals(False)
             except Exception:
                 pass
+        self._refresh_value_from_db()
+
+    @QtCore.Slot(int)
+    def _on_param_changed(self, _idx: int):
+        self._refresh_value_from_db()
+
+    def _current_jid_cid(self):
+        try:
+            joint_name = self.combo_joint.currentText()
+            controller_idx = self.combo_controller.currentIndex()
+            if joint_name not in self._joint_controllers:
+                return None, None
+            controller_indices = self._joint_controllers[joint_name]
+            if controller_idx < 0 or controller_idx >= len(controller_indices):
+                return None, None
+            matrix_idx = controller_indices[controller_idx]
+            if matrix_idx >= len(self._controller_matrix):
+                return None, None
+            row = self._controller_matrix[matrix_idx]
+            if len(row) < 4:
+                return None, None
+            return str(row[1]), str(row[3])
+        except Exception:
+            return None, None
+
+    def _refresh_value_from_db(self):
+        try:
+            joint_id, controller_id = self._current_jid_cid()
+            if joint_id is None or controller_id is None:
+                return
+            values = self._controller_values.get((joint_id, controller_id), [])
+            param_idx = self.combo_param.currentIndex()
+            if param_idx < 0 or param_idx >= len(values):
+                return
+            raw = values[param_idx]
+            try:
+                val = float(raw)
+            except Exception:
+                val = 0.0
+            self.spin_value.blockSignals(True)
+            self.spin_value.setValue(val)
+            self.spin_value.blockSignals(False)
+        except Exception as e:
+            print(f"Error refreshing value from DB: {e}")
 
 
