@@ -33,6 +33,18 @@ struct ControllerInfo: Identifiable {
     let name: String
     let controllerID: Int
     let params: [String]
+    /// Default parameter values, keyed by the same index as `params`.
+    /// Stored as raw strings so the UI can decide int-vs-float per cell
+    /// (the firmware sends them as strings on the wire, line 6 of each
+    /// controller csv on the SD card).  Empty when no `v,` row arrived.
+    var paramValues: [String] = []
+}
+
+// MARK: - Controller Value Database
+/// Identifies a (joint, controller) pair for the in-memory parameter database.
+struct ControllerKey: Hashable {
+    let jointID: Int
+    let controllerID: Int
 }
 
 // MARK: - Known Joints (fallback for Basic Settings)

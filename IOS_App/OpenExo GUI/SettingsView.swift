@@ -34,6 +34,39 @@ struct SettingsView: View {
     private var currentController: ControllerInfo? { currentControllers.indices.contains(selectedControllerIndex) ? currentControllers[selectedControllerIndex] : nil }
     private var currentParams: [String] { currentController?.params ?? [] }
 
+    /// Look up the current value of the selected param in the in-memory DB.
+    /// Returns `nil` when the device hasn't sent a values row for this
+    /// (joint, controller) pair, or when the param index is out of range.
+    private func currentDBValue() -> Double? {
+        guard let joint = currentJoint, let ctrl = currentController else { return nil }
+        let key = ControllerKey(jointID: joint.jointID, controllerID: ctrl.controllerID)
+        let bag = ble.controllerValues[key] ?? ctrl.paramValues
+        guard selectedParamIndex >= 0, selectedParamIndex < bag.count else { return nil }
+        return parseValueString(bag[selectedParamIndex])
+    }
+
+    /// Convert a raw firmware csv cell into a Double, matching the
+    /// "send over as string, then determine if the value is a float or
+    /// integer" rule from the spec.
+    private func parseValueString(_ raw: String) -> Double? {
+        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        if s.isEmpty || s == "?" || s == "??" { return nil }
+        if s.contains(".") || s.lowercased().contains("e") {
+            return Double(s)
+        }
+        if let i = Int(s) { return Double(i) }
+        return Double(s)
+    }
+
+    /// Re-pull the value for the currently selected (joint, ctrl, param)
+    /// out of the in-memory DB and shove it into the visible field.
+    /// Falls back to the saved last-value when the DB has nothing for us.
+    private func refreshValueFromDB() {
+        if let v = currentDBValue() {
+            paramValue = v
+        }
+    }
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -53,7 +86,13 @@ struct SettingsView: View {
         }
         .navigationTitle("")
         .navigationBarHidden(true)
-        .onAppear { loadSavedState() }
+        .onAppear {
+            loadSavedState()
+            // After restoring user state, prefer the live DB value (it
+            // reflects what's actually on the device or what the user just
+            // applied last time).
+            DispatchQueue.main.async { refreshValueFromDB() }
+        }
     }
 
     // MARK: - Nav Bar
@@ -129,6 +168,7 @@ struct SettingsView: View {
                             selectedControllerIndex = 0
                         }
                         selectedParamIndex = 0
+                        refreshValueFromDB()
                     }
                 }
             }
@@ -143,6 +183,7 @@ struct SettingsView: View {
                             Button {
                                 selectedControllerIndex = i
                                 selectedParamIndex = 0
+                                refreshValueFromDB()
                             } label: {
                                 HStack(spacing: 10) {
                                     Image(systemName: selectedControllerIndex == i ? "largecircle.fill.circle" : "circle")
@@ -194,6 +235,7 @@ struct SettingsView: View {
                         .onChange(of: selectedControllerIndex) { _ in
                             guard !isRestoringState else { return }
                             selectedParamIndex = 0
+                            refreshValueFromDB()
                         }
                     }
                 }
@@ -213,6 +255,10 @@ struct SettingsView: View {
                         }
                         .pickerStyle(.menu)
                         .tint(.blue)
+                        .onChange(of: selectedParamIndex) { _ in
+                            guard !isRestoringState else { return }
+                            refreshValueFromDB()
+                        }
                     }
                 }
             }

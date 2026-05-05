@@ -461,13 +461,31 @@ class ScanWindowQt(QtWidgets.QWidget):
 
     @QtCore.Slot(str)
     def _on_error(self, message: str):
+        # A connect attempt failed (no device found, max attempts reached,
+        # timeout, etc.).  The page must fall all the way back to the pre-load
+        # state -- otherwise post-connect-only buttons (Calibrate Torque, Start
+        # Trial) stay enabled from any prior session and the user can't tell
+        # the link is actually down.
+        self._reset_after_failed_connect(message)
+
+    def _reset_after_failed_connect(self, message: str):
+        """Restore the page to its disconnected state after a failed connect."""
         self.status.setText(message)
+        # Hide every progress bar -- nothing is in flight anymore.
         self.scan_progress.setVisible(False)
         self.connect_scan_progress.setVisible(False)
         self.connection_progress.setVisible(False)
-        # Re-enable buttons on error
+        self._last_connection_progress = 0
+        # Forget any "we are connected" state from a previous session.
+        self._connected = False
+        # Buttons that only make sense after a real connection must be off.
+        self.btn_start_trial.setEnabled(False)
+        self.btn_calibrate_torque.setEnabled(False)
+        # Re-enable the entry-point buttons so the user can try again.
         self.btn_scan.setEnabled(True)
-        self.btn_save_connect.setEnabled(True)
+        # Save & Connect needs a selection in the device list -- only enable it
+        # if one is currently selected.
+        self.btn_save_connect.setEnabled(bool(self.selected_address))
         if os.path.exists(self.SETTINGS_FILE):
             self.btn_load.setEnabled(True)
 

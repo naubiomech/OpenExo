@@ -40,7 +40,16 @@
 
     namespace logging
     {
-        const LogLevel level = LogLevel::Release; //Release or Debug (Note: Enter Debug to have Logger print to serial monitor)
+        // Set to Debug on the Nano so the EXOBLE_DEBUG / COMSMCU_DEBUG
+        // logger::print(...) calls actually reach the USB serial monitor.
+        // The Teensy stays at Release (it already uses raw Serial.print
+        // for its diagnostics, and lower noise keeps the loop fast).
+        // Switch to Release here too once Nano-side BLE debugging is done.
+        #if defined(ARDUINO_ARDUINO_NANO33BLE) || defined(ARDUINO_NANO_RP2040_CONNECT)
+            const LogLevel level = LogLevel::Debug;
+        #else
+            const LogLevel level = LogLevel::Release; //Release or Debug (Note: Enter Debug to have Logger print to serial monitor)
+        #endif
         const int baud_rate = 115200;
     }
     

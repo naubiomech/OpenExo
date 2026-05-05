@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.andriod_app.data.ControllerKey
 import com.example.andriod_app.data.KNOWN_JOINTS
 import com.example.andriod_app.ui.theme.*
 import com.example.andriod_app.viewmodel.BleViewModel
@@ -44,6 +45,7 @@ fun SettingsScreen(
     var expandedParam by remember { mutableStateOf(false) }
 
     val joints by bleVm.ble.joints.collectAsStateWithLifecycle()
+    val controllerValues by bleVm.ble.controllerValues.collectAsStateWithLifecycle()
 
     //if handshake hasnt come in yet fall back to the hard coded list
     val jointNames = if(joints.isNotEmpty()){
@@ -61,6 +63,30 @@ fun SettingsScreen(
         controllers[selectedCtrl].params
     }else{
         emptyList()
+    }
+
+    //pull the live value out of the in-memory db whenever the user picks a
+    //different (joint, controller, parameter) combo.  Empty/missing entries
+    //leave the field unchanged so the user's draft isn't blown away.
+    LaunchedEffect(selectedJoint, selectedCtrl, selectedParam, controllerValues, joints){
+        if(joints.isEmpty() || selectedJoint >= joints.size) return@LaunchedEffect
+        val joint = joints[selectedJoint]
+        if(controllers.isEmpty() || selectedCtrl >= controllers.size) return@LaunchedEffect
+        val ctrl = controllers[selectedCtrl]
+        val key = ControllerKey(joint.jointID, ctrl.controllerID)
+        val row = controllerValues[key] ?: ctrl.paramValues
+        if(selectedParam < row.size) {
+            val raw = row[selectedParam].trim()
+            if(raw.isNotEmpty() && raw != "?" && raw != "??") {
+                //per spec: send as string, decide float vs int by inspecting it
+                paramVal = if(raw.contains('.') || raw.contains('e', ignoreCase = true)) raw
+                else {
+                    val asInt = raw.toIntOrNull()
+                    if(asInt != null) asInt.toString() else raw
+                }
+                applied = false
+            }
+        }
     }
 
     Column(

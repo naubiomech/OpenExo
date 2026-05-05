@@ -21,6 +21,7 @@ void send_bulk_char() {
 			//Serial.println(incomingChar);
 			if (incomingChar == 'R') {
 				Serial.print("\nNano confirmed to the Teensy that it’s ready to receive the controller parameter list.");
+				NanoReachedOut = true;
 				while (Serial8.available() > 0) {
 					incomingChar = Serial8.read();//clear the buffer, as the Nano might have sent many "R"
 				}
@@ -29,19 +30,33 @@ void send_bulk_char() {
 			}
 		}
 	}
-	// delay(5000);
-	// digitalWrite(13,LOW);
-	// delay(4000);
-	// digitalWrite(13,HIGH);
+	// CRITICAL: only transmit the bulk CSV if the Nano actually handshook.
+	//
+	// If the Teensy is plugged into USB AFTER the Nano has already booted,
+	// the Nano is no longer in readSingleMessageBlocking() -- it's in the
+	// main loop, with UARTHandler treating Serial1 RX as a binary command
+	// stream.  Spewing the 1700+ byte CSV at it under those conditions
+	// jams UARTHandler's parser (it interprets random bulk bytes as a
+	// command + payload that never completes), the main loop stalls, and
+	// BLE notifications stop -- which is exactly the "Nano stops
+	// transmitting BLE when Teensy is plugged in" symptom.  Bailing out
+	// here keeps the Nano running cleanly even when the boot order is
+	// reversed.  Reset the Nano if you want to populate the controller
+	// list after a late Teensy power-up.
+	if (!NanoReachedOut) {
+		Serial.println("\nsend_bulk_char: Nano did not handshake (already past boot?). Skipping bulk send.");
+		Serial8.end();
+		return;
+	}
     // 1. Check if the buffer is empty
     if (txBuffer_bulkStr[0] == '\0') {
         Serial.println("Warning: txBuffer_bulkStr is empty. Skipping UART send.");
         return;
     }
-    
+
     // Calculate the exact length of the message.
     size_t message_length = strlen(txBuffer_bulkStr);
-    
+
     // 2. Transmit the entire message in one burst using Serial.write().
     // This is the most efficient method for large C-strings on Arduino.
     Serial8.write(txBuffer_bulkStr, message_length);

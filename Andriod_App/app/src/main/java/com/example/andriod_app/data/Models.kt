@@ -17,11 +17,18 @@ data class JointInfo(
 )
 
 //AI ASSISTED - mirrors iOS ControllerInfo
+//paramValues holds the default values for each parameter (line 6 of the
+//controller csv on the SD card).  Stored as raw strings so the UI can decide
+//int vs float per cell (per spec the firmware sends them as strings).
 data class ControllerInfo(
     val name: String,
     val controllerID: Int,
-    val params: List<String>
+    val params: List<String>,
+    var paramValues: MutableList<String> = mutableListOf()
 )
+
+//Key into the controller-value database (jointID, controllerID).
+data class ControllerKey(val jointID: Int, val controllerID: Int)
 
 //hard coded fallback joints (same as ios KnownJoint)
 data class KnownJoint(val id: Int, val name: String)

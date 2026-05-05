@@ -197,10 +197,13 @@ void ExoBLE::advertising_onoff(bool onoff)
 
 bool ExoBLE::handle_updates()
 {
-    #if EXOBLE_DEBUG
-        logger::print("ExoBLE::handle_updates:Start");
-        logger::print("\n");
-    #endif
+    // NOTE: All per-loop tracing was removed -- this function gets called at
+    // hundreds of Hz, and the previous "Start", "Poll for updates...", and
+    // "queue size:" prints dumped ~3 lines/loop at 115200 baud.  That alone
+    // ate enough time per iteration to make the Nano look hung from the
+    // GUI's perspective (it would time out before we ever serviced an
+    // incoming write).  We now only log on real events (connect, disconnect,
+    // non-empty queue) and let the loop run free otherwise.
 
     static Time_Helper *t_helper = Time_Helper::get_instance();
     static float update_context = t_helper->generate_new_context();
@@ -210,31 +213,22 @@ bool ExoBLE::handle_updates()
     if (del_t > BLE_times::_update_delay)
     {
         del_t = 0;
-        #if EXOBLE_DEBUG
-            static float poll_context = t_helper->generate_new_context();
-            static float poll_time = 0;
-            static float connected_context = t_helper->generate_new_context();
-            static float connected_time = 0;
-        #endif
-
-        //Poll for updates and check connection status
-        #if EXOBLE_DEBUG
-            logger::print("Poll for updates and check connection status");
-            logger::print("\n");
-        #endif
 
         BLE.poll();
         int32_t current_status = BLE.connected();
 
         if (_connected == current_status)
         {
+            const size_t queued = ble_queue::size();
             #if EXOBLE_DEBUG
-                logger::print("ExoBLE::handle_updates:queue size:");
-                logger::print(ble_queue::size());
-                logger::print("\n");
+                if (queued > 0)
+                {
+                    logger::print("ExoBLE::handle_updates:queue size:");
+                    logger::print(queued);
+                    logger::print("\n");
+                }
             #endif
-
-            return ble_queue::size();
+            return queued;
         }
 
         //The BLE connection status changed
@@ -242,16 +236,14 @@ bool ExoBLE::handle_updates()
         {
             //Disconnection
             #if EXOBLE_DEBUG
-                logger::print("Disconnection");
-                logger::print("\n");
+                logger::print("Disconnection\n");
             #endif
         }
         else if (current_status > _connected)
         {
             //Connection
             #if EXOBLE_DEBUG
-                logger::print("Connection");
-                logger::print("\n");
+                logger::print("Connection\n");
             #endif
 
             // Mark connected and send the handshake payload to the GUI
@@ -272,13 +264,16 @@ bool ExoBLE::handle_updates()
         }
     }
 
+    const size_t queued = ble_queue::size();
     #if EXOBLE_DEBUG
-        logger::print("ExoBLE::handle_updates:queue size:");
-        logger::print(ble_queue::size());
-        logger::print("\n");
+        if (queued > 0)
+        {
+            logger::print("ExoBLE::handle_updates:queue size:");
+            logger::print(queued);
+            logger::print("\n");
+        }
     #endif
-
-    return ble_queue::size();
+    return queued;
 }
 
 void ExoBLE::send_message(BleMessage &msg)
@@ -288,9 +283,12 @@ void ExoBLE::send_message(BleMessage &msg)
         return; /* Don't bother sending anything if no one is listening */
     }
 
-    #if EXOBLE_DEBUG
-        BleMessage::print(msg);
-    #endif
+    // NOTE: We deliberately do NOT call BleMessage::print(msg) here.  This
+    // function is called for every real-time data sample (potentially hundreds
+    // of times per second), and BleMessage::print emits two lines per call.
+    // At 115200 baud that alone was enough to stall the loop and make the
+    // GUI think the Nano had dropped the link.  ComsMCU::update_gui prints a
+    // single throttled 1 Hz heartbeat with the chart-data stats instead.
 
     static const int k_preamble_length = 3;
     int max_payload_length = ((k_preamble_length + msg.expecting) * (MAX_PARSER_CHARACTERS + 1));
@@ -356,18 +354,14 @@ void ble_rx::on_rx_recieved(BLEDevice central, BLECharacteristic characteristic)
     }
     characteristic.readValue(data, len);
 
-        #if EXOBLE_DEBUG
-            logger::print("On Rx Recieved: ");
-            for (int i=0; i<len;i++)
-            {
-                logger::print(data[i]);
-                logger::print(", ");
-            }
-            logger::print("\n");
-        #endif
+    // NOTE: per-byte fragment printing was removed -- printing every byte of
+    // every BLE fragment (even before the message is complete) was both slow
+    // and confusing (showed garbage glyphs for binary float bytes).  We only
+    // log when we have a complete, parsed message that we're actually
+    // handing off to the queue.
 
     msg = parser->handle_raw_data(data, len);
-    
+
     if (msg->is_complete)
     {
         #if EXOBLE_DEBUG
@@ -377,10 +371,6 @@ void ble_rx::on_rx_recieved(BLEDevice central, BLECharacteristic characteristic)
 
         ble_queue::push(msg);
     }
-
-    #if EXOBLE_DEBUG
-        logger::print("on_rx_recieved->End\n");
-    #endif
 }
 
 #endif // defined(ARDUINO_ARDUINO_NANO33BLE) | defined(ARDUINO_NANO_RP2040_CONNECT)

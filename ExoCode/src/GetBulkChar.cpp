@@ -61,9 +61,13 @@ void readSingleMessageBlocking() {
     while (!messageComplete) {
         // Only proceed if data is available in the UART buffer
         while (Serial1.available()) {
-			Serial.print("\nSerial.available() > 0, incomingChar:");
+            // NOTE: Per-byte Serial.print debug logging was removed here.
+            // Logging every received byte caused the USB Serial output to
+            // run far slower than the 115200-baud Serial1 input, which
+            // overflowed the Nano's 64-byte hardware UART RX FIFO and
+            // dropped bytes mid-frame -- producing the scrambled rows
+            // (e.g. "csTlernpD,aG,n,,00") seen later in the message.
             char incomingChar = Serial1.read();
-			Serial.println(incomingChar);
 
             // State 1: WAITING_FOR_F
             if (currentState == WAITING_FOR_F) {
@@ -115,24 +119,24 @@ void readSingleMessageBlocking() {
                     continue; // Skip processing this character
                 }
                 
-                // --- 1. CHECK FOR END MARKER (",z") ---
-                // We check the incoming character against the previous one stored in the buffer.
-                if (incomingChar == '?' && rxBuffer_bulkStr[rxIndex - 1] == '?' && rxBuffer_bulkStr[rxIndex - 2] == ',') {
-                    
-                    // Store the 'z'
-                    rxBuffer_bulkStr[rxIndex++] = incomingChar;
-                    
-                    // Add the null terminator after 'z'
-                    rxBuffer_bulkStr[rxIndex] = '\0'; 
-                        
-                    messageComplete = true; // Exit the blocking while loop
-                        
-                    // Continue to the processing block below
-                }
+                // --- 1. CHECK FOR END MARKER (",??") ---
+                // We check the incoming character against the previous two stored in the buffer.
+                if (rxIndex >= 2
+                    && incomingChar == '?'
+                    && rxBuffer_bulkStr[rxIndex - 1] == '?'
+                    && rxBuffer_bulkStr[rxIndex - 2] == ',') {
 
-                // --- 2. STORE DATA ---
-                rxBuffer_bulkStr[rxIndex] = incomingChar;
-                rxIndex++;
+                    // Store the closing '?' exactly once, null-terminate, and stop.
+                    rxBuffer_bulkStr[rxIndex++] = incomingChar;
+                    rxBuffer_bulkStr[rxIndex] = '\0';
+
+                    messageComplete = true; // Exit the blocking while loop
+                }
+                else {
+                    // --- 2. STORE DATA ---
+                    rxBuffer_bulkStr[rxIndex] = incomingChar;
+                    rxIndex++;
+                }
             }
 			// 3. Immediately exit the inner 'while' loop if the message is complete
             if (messageComplete) {

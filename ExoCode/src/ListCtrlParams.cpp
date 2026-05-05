@@ -3,9 +3,34 @@
 #if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41)
 #include "ListCtrlParams.h"
 
-char txBuffer_bulkStr[MAX_MESSAGE_SIZE];
+// DMAMEM puts these large buffers in OCRAM (RAM2 on Teensy 4.x), keeping
+// them out of the tightly-coupled RAM1 that holds code + locals.  Without
+// this the doubled snapshot buffer (names + values rows) overflows RAM1.
+#ifndef DMAMEM
+#define DMAMEM
+#endif
+
+DMAMEM char txBuffer_bulkStr[MAX_MESSAGE_SIZE];
+
+DMAMEM char stringArray[MAX_SNAPSHOTS][MAX_COLUMNS][MAX_STRING_LENGTH];
+
+uint8_t failed2open;
+uint8_t joint_id_val;
+char jointName[10];
 
 void ctrl_param_array_gen(uint8_t* config_to_send) {
+	// IMPORTANT: stringArray and txBuffer_bulkStr live in DMAMEM (OCRAM /
+	// RAM2).  Unlike normal BSS, the Teensy 4.x startup code does NOT
+	// zero-initialize the DMAMEM section, so on boot these buffers
+	// contain whatever leftover bytes were in OCRAM from the previous
+	// power cycle (often flash/erase scratch -- you'll see "PK" headers
+	// and other garbage).  If we don't wipe them first, create_csv_message
+	// will strcat past cell boundaries (strcat reads until it finds a
+	// stray '\0', not until the end of a cell) and overflow
+	// txBuffer_bulkStr, which corrupts memory and reboots the Teensy.
+	memset(stringArray, 0, sizeof(stringArray));
+	memset(txBuffer_bulkStr, 0, sizeof(txBuffer_bulkStr));
+
 	//Begin SD card
 	if (!SD.begin(SD_SELECT)) {
 			while (1)
@@ -147,6 +172,10 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 		
 		int start_ctrl = 2; // Skip disabled controller for all joints.
 		for (int i_ctrl = start_ctrl; i_ctrl < csvCount; i_ctrl++) {
+			// Safety: leave room for both a names row and a values row this iteration.
+			if (row_idx + 1 >= MAX_SNAPSHOTS) {
+				break;
+			}
 			bool csvExists;
 			std::string filename;
 			char joint_id_string;
@@ -273,29 +302,28 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 			} 
 			
 			if (csvExists) { // condition is true if count is 1
-				//Serial.print("\n\nController ");
-				//Serial.print((int)i_ctrl);
-				//Serial.println(" has a csv.");
-
 				const char* filename_char = filename.c_str();
-				
-				// Call the function to read and parse the fifth row
-				int columnsRead = readAndParseFifthRow(filename_char, stringArray, MAX_COLUMNS, MAX_STRING_LENGTH, row_idx, i_ctrl);
-				
 
-				// Print the results
+				// 1) Names row: line 5 of the csv -> [JointName, JointID, ControllerName, ControllerID, name1, name2, ...]
+				int columnsRead = readAndParseFifthRow(filename_char, stringArray, MAX_COLUMNS, MAX_STRING_LENGTH, row_idx, i_ctrl);
+
 				if (columnsRead > 0) {
-					//Serial.println("\nFifth Row Data Saved:");
-					/* for (int i = 0; i < columnsRead; i++) {
-					  Serial.print("\nParam ");
-					  Serial.print(i + 1);
-					  Serial.print(": ");
-					  Serial.print(stringArray[row_idx][i]);
-					} */
 					row_idx++;
+					if (row_idx >= MAX_SNAPSHOTS) {
+						break;
+					}
+
+					// 2) Values row: line 6 of the csv -> [v, JointID, ControllerID, val1, val2, ...]
+					int valuesRead = readAndParseValuesRow(filename_char, stringArray, MAX_COLUMNS, MAX_STRING_LENGTH, row_idx, i_ctrl);
+					if (valuesRead > 0) {
+						row_idx++;
+					}
+					else {
+						// Clear the values slot so create_csv_message terminates cleanly
+						stringArray[row_idx][0][0] = '\0';
+					}
 				}
 				else {
-					//Serial.println("\nFailed to read or parse the fifth row.");
 					failed2open++;
 				}
 			}
@@ -500,7 +528,99 @@ void create_csv_message() {
         // Using '\n' (newline) is common; use "\r\n" for Windows/BLE compatibility if needed.
         strcat(txBuffer_bulkStr, "\n"); 
     }
-	strcat(txBuffer_bulkStr, ",?");
+	// End-of-message marker that the Nano blocking reader scans for: ',??'
+	strcat(txBuffer_bulkStr, ",??");
+}
+
+// Reads line 6 (the first data row) from a controller csv and stores it as a
+// "values" snapshot tagged with a leading 'v' column so the GUIs can pair it
+// with the controller they just received in the previous row.
+int readAndParseValuesRow(
+    const char* filename_char,
+    char arr[][MAX_COLUMNS][MAX_STRING_LENGTH],
+    int maxCols,
+    int maxLen,
+    uint8_t row_idx,
+    int i_ctrl)
+{
+    // Reserve 3 prefix columns: ['v', JointID, ControllerID, val0, val1, ...]
+    const int kValuePrefixCols = 3;
+    if (maxCols < kValuePrefixCols) {
+        return 0;
+    }
+
+    File dataFile = SD.open(filename_char);
+    if (!dataFile) {
+        return 0;
+    }
+
+    // Skip the first 5 lines, then capture line 6 (index 5).
+    int rowCount = 0;
+    String targetLine = "";
+    while (dataFile.available()) {
+        char c = dataFile.read();
+
+        if (rowCount == 5) { // Row 6 = first data row
+            targetLine += c;
+        }
+
+        if (c == '\n') {
+            rowCount++;
+            if (rowCount > 5) {
+                break;
+            }
+        }
+    }
+    dataFile.close();
+
+    if (rowCount < 5) {
+        return 0;
+    }
+
+    // Parse the line, writing data into columns starting at kValuePrefixCols
+    int colIndex = kValuePrefixCols;
+    int charIndex = 0;
+    int dataColsRead = 0;
+
+    for (int i = 0; i < (int)targetLine.length(); i++) {
+        char c = targetLine.charAt(i);
+
+        if (c == ',') {
+            arr[row_idx][colIndex][charIndex] = '\0';
+            dataColsRead++;
+            colIndex++;
+            charIndex = 0;
+            if (colIndex >= maxCols) break;
+        }
+        else if (c != '\r' && c != '\n') {
+            if (charIndex < maxLen - 1) {
+                arr[row_idx][colIndex][charIndex] = c;
+                charIndex++;
+            }
+        }
+    }
+
+    if (colIndex < maxCols && charIndex > 0) {
+        arr[row_idx][colIndex][charIndex] = '\0';
+        dataColsRead++;
+        colIndex++;
+    }
+    else if (colIndex < maxCols) {
+        arr[row_idx][colIndex][0] = '\0';
+    }
+
+    if (dataColsRead == 0) {
+        // Nothing to send for this controller; signal failure so caller skips the row.
+        return 0;
+    }
+
+    // Insert the prefix columns: ['v', JointID, ControllerID]
+    arr[row_idx][0][0] = 'v';
+    arr[row_idx][0][1] = '\0';
+    snprintf(arr[row_idx][1], maxLen, "%u", joint_id_val);
+    snprintf(arr[row_idx][2], maxLen, "%u", i_ctrl);
+
+    return kValuePrefixCols + dataColsRead;
 }
 
 /**

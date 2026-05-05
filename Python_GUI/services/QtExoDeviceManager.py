@@ -19,6 +19,23 @@ try:
 except Exception:
     BLE_AVAILABLE = False
 
+# Optional Windows-only adapter-state probe.  On Windows, bleak already pulls
+# in the `winrt` (or `bleak-winrt`) namespace package which exposes the
+# Radios API.  We use it to detect whether the user has Bluetooth turned OFF
+# in Windows Settings BEFORE we kick off a scan, so the GUI can give a clear
+# "Bluetooth is off" status instead of a generic timeout 10 s later.
+_WINRT_RADIOS_AVAILABLE = False
+if sys.platform == "win32":
+    try:
+        from winrt.windows.devices.radios import Radio, RadioKind, RadioState  # type: ignore
+        _WINRT_RADIOS_AVAILABLE = True
+    except Exception:
+        try:
+            from winsdk.windows.devices.radios import Radio, RadioKind, RadioState  # type: ignore
+            _WINRT_RADIOS_AVAILABLE = True
+        except Exception:
+            _WINRT_RADIOS_AVAILABLE = False
+
 from utils.debug import dprint
 
 
@@ -187,6 +204,37 @@ class QtExoDeviceManager(QtCore.QObject):
     def set_mac(self, mac: str):
         self._mac = mac
 
+    async def _check_bluetooth_state(self) -> tuple[bool, str]:
+        """Probe whether Bluetooth is powered on.
+
+        Returns ``(is_on, message)``. When ``is_on`` is ``False``, the
+        ``message`` is suitable for direct display in the GUI status line.
+        On platforms where we can't probe (non-Windows, or winrt missing),
+        we optimistically return ``(True, "")`` and rely on the scan/connect
+        error path to surface adapter problems.
+        """
+        if _WINRT_RADIOS_AVAILABLE:
+            try:
+                radios = await Radio.get_radios_async()
+                bluetooth_radios = [r for r in radios if r.kind == RadioKind.BLUETOOTH]
+                if not bluetooth_radios:
+                    return (False, "No Bluetooth adapter detected on this computer.")
+                radio = bluetooth_radios[0]
+                state = radio.state
+                if state == RadioState.ON:
+                    return (True, "")
+                if state == RadioState.OFF:
+                    return (False, "Bluetooth is OFF — enable it in Windows Settings, then try again.")
+                if state == RadioState.DISABLED:
+                    return (False, "Bluetooth adapter is disabled — enable it in Device Manager.")
+                return (False, f"Bluetooth is unavailable (state={state}).")
+            except Exception as ex:
+                dprint(f"[QtExoDeviceManager] Bluetooth state probe failed: {ex}")
+                # Don't block the user on a probe failure; let the scan
+                # itself surface any adapter problem.
+                return (True, "")
+        return (True, "")
+
     @QtCore.Slot()
     def scan(self):
         if not BLE_AVAILABLE:
@@ -198,6 +246,17 @@ class QtExoDeviceManager(QtCore.QObject):
         async def _run_scan():
             results = {}
             try:
+                # Pre-flight: refuse to spin up a 10-second scan if the
+                # Bluetooth adapter is off / disabled / missing.  Surface
+                # a clear status instead.
+                ble_ok, ble_msg = await self._check_bluetooth_state()
+                if not ble_ok:
+                    self.logger.warning(f"Scan aborted: {ble_msg}")
+                    self.error.emit(ble_msg)
+                    self.scanProgress.emit(0)
+                    self.scanResults.emit([])
+                    return
+
                 self.scanProgress.emit(0)
                 self.log.emit("Scanning for devices (UART UUID filter)…")
                 dprint(f"[QtExoDeviceManager] Starting BLE scan with UART service filter")
@@ -285,6 +344,17 @@ class QtExoDeviceManager(QtCore.QObject):
 
         async def _run_connect():
             try:
+                # Pre-flight: bail out immediately with a clear status if
+                # Bluetooth is off, instead of running through 4 × 10s scan
+                # attempts that will all fail.
+                ble_ok, ble_msg = await self._check_bluetooth_state()
+                if not ble_ok:
+                    self.logger.warning(f"Connect aborted: {ble_msg}")
+                    self.connectScanProgress.emit(-1)
+                    self.connectionProgress.emit(0)
+                    self.error.emit(ble_msg)
+                    return
+
                 self.connectScanProgress.emit(0)
                 self.connectionProgress.emit(0)
                 # Wrap entire connection process in timeout (40 seconds total - 4 attempts × 10s each)
@@ -397,16 +467,23 @@ class QtExoDeviceManager(QtCore.QObject):
                         else:
                             self.log.emit("No device found.")
 
-                    # If we exit loop without returning
+                    # If we exit loop without returning, every attempt failed
+                    # to find/connect to the device.  Tear the in-flight UI
+                    # progress down so the page can reset cleanly via
+                    # _on_error rather than leaving the scanning bar stuck.
                     self.logger.error("Connection failed - max attempts reached")
+                    self.connectScanProgress.emit(-1)
+                    self.connectionProgress.emit(0)
                     self.error.emit("Max attempts reached. Could not connect.")
             except asyncio.TimeoutError:
                 self.logger.error("Connection timeout after 40 seconds")
+                self.connectScanProgress.emit(-1)
                 self.connectionProgress.emit(0)
                 self.error.emit("Connection timeout after 40 seconds")
                 dprint(f"[QtExoDeviceManager] connect timeout after 40 seconds")
             except Exception as ex:
                 self.logger.exception(f"Connection error: {ex}")
+                self.connectScanProgress.emit(-1)
                 self.connectionProgress.emit(0)
                 self.error.emit(str(ex))
                 dprint(f"[QtExoDeviceManager] connect error: {ex}")
@@ -648,7 +725,18 @@ class QtExoDeviceManager(QtCore.QObject):
                         mirror_val = key ^ 0x60
 
                 while loopCount != totalLoops:
-                    await self._client.write_gatt_char(UART_TX_UUID, b"f", response=False)
+                    # Use response=True (write-with-response) on every byte of
+                    # this command sequence.  The Nano BLE parser is a state
+                    # machine: 'f' switches it into "waiting for 4 doubles"
+                    # mode, and the next 4 writes are interpreted as data
+                    # bytes.  If we fire the 5 writes back-to-back with
+                    # response=False, bleak pipelines unACKed writes faster
+                    # than the BLE stack and the Nano can drain, the queue
+                    # stalls, and the entire BLE event loop blocks -- which
+                    # freezes incoming RT-data notifications too (so plotting
+                    # stops along with everything else).  Round-trip ACKs
+                    # serialize the writes and keep the loop responsive.
+                    await self._client.write_gatt_char(UART_TX_UUID, b"f", response=True)
 
                     for i in range(1, len(float_values)):
                         if i == 1:
@@ -660,7 +748,7 @@ class QtExoDeviceManager(QtCore.QObject):
                             float_bytes = struct.pack("<d", float(val))
                         else:
                             float_bytes = struct.pack("<d", float(float_values[i]))
-                        await self._client.write_gatt_char(UART_TX_UUID, float_bytes, response=False)
+                        await self._client.write_gatt_char(UART_TX_UUID, float_bytes, response=True)
 
                     loopCount += 1
                 self.log.emit("Torque parameters updated")
@@ -678,10 +766,13 @@ class QtExoDeviceManager(QtCore.QObject):
             try:
                 self._curr_left_fsr_value = float(left_fsr)
                 self._curr_right_fsr_value = float(right_fsr)
-                await self._client.write_gatt_char(UART_TX_UUID, b"R", response=False)
+                # Same reasoning as updateTorqueValues: serialize this multi-
+                # byte command sequence with response=True so the BLE event
+                # loop doesn't stall on a pipeline-overrun.
+                await self._client.write_gatt_char(UART_TX_UUID, b"R", response=True)
                 for fsr_value in (self._curr_left_fsr_value, self._curr_right_fsr_value):
                     fsr_bytes = struct.pack("<d", float(fsr_value))
-                    await self._client.write_gatt_char(UART_TX_UUID, fsr_bytes, response=False)
+                    await self._client.write_gatt_char(UART_TX_UUID, fsr_bytes, response=True)
                 self.log.emit("FSR values sent")
             except Exception as ex:
                 self.error.emit(str(ex))

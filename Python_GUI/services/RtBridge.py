@@ -24,6 +24,12 @@ class RtBridge(QtCore.QObject):
     parameterNamesReceived = QtCore.Signal(list)
     controllersReceived = QtCore.Signal(list, list)
     controllerMatrixReceived = QtCore.Signal(list)
+    # Controller-parameter VALUES, shipped as a flat list rather than a dict
+    # because PySide6/Shiboken cannot marshal a dict whose keys are Python
+    # tuples through QVariant ("Cannot copy-convert ... (dict) to C++").
+    # Each entry is ``[joint_id:int, controller_id:int, [val_str, ...]]``;
+    # consumers rebuild the ``(jid, cid) -> values`` mapping locally.
+    controllerValuesReceived = QtCore.Signal(list)
     rtDataUpdated = QtCore.Signal(list)
 
     def __init__(self, parent=None):
@@ -98,6 +104,8 @@ class RtBridge(QtCore.QObject):
                 # Parse controllers and parameter headers from the payload blob
                 rows = [row.strip() for row in payload_line.split("\n") if row.strip()]
                 controller_rows = []
+                # (joint_id:int, controller_id:int) -> [value_str, ...]
+                controller_values: dict = {}
                 param_names = []
                 self._rows_68 = []
                 self._rows_36 = []
@@ -115,17 +123,38 @@ class RtBridge(QtCore.QObject):
                         # Legacy fetch command header; keep data if the row has content.
                         if len(parts) > 1:
                             parts = parts[1:]
+                            prefix = parts[0].lower() if parts else ''
                         else:
                             continue
                     if prefix == 't':
                         param_names = [p.strip() for p in parts[1:] if p.strip()]
                         dprint(f"RtBridge::feed_bytes->Parameter names: {param_names}")
                         continue
-                    if prefix == '?':
+                    if prefix == '?' or prefix == '??':
                         # End-of-handshake sentinel
                         continue
+
+                    # New: values row tagged with leading 'v'.
+                    # Format: [v, JointID, ControllerID, val1, val2, ...]
+                    if prefix == 'v':
+                        try:
+                            jid = int(parts[1])
+                            cid = int(parts[2])
+                        except (ValueError, IndexError):
+                            self.logger.warning(
+                                f"RtBridge::feed_bytes->Skipped malformed values row: {parts[:5]}"
+                            )
+                            continue
+                        # Drop trailing sentinels just in case
+                        vals = [v for v in parts[3:] if v not in ('?', '??')]
+                        controller_values[(jid, cid)] = vals
+                        dprint(
+                            f"RtBridge::feed_bytes->Controller values for "
+                            f"joint={jid} controller={cid}: {vals}"
+                        )
+                        continue
                     
-                    # Each row format: [JointName, JointID, ControllerName, ParamCount, ...params]
+                    # Each row format: [JointName, JointID, ControllerName, ControllerID, ...params]
                     # Example: ['Ankle(L)', '68', 'zeroTorqu', '2', 'use_pid', 'p_gain', 'i_gain', 'd_gain']
                     controller_rows.append(parts)
                     
@@ -195,6 +224,18 @@ class RtBridge(QtCore.QObject):
                     
                     if self._controller_matrix:
                         self.controllerMatrixReceived.emit(list(self._controller_matrix))
+
+                # Emit the values database AFTER the matrix so consumers can
+                # safely associate controller rows with their default values
+                # before any UI redraw kicks in.  Ship as a list of
+                # [jid, cid, [vals...]] triples -- a dict with tuple keys
+                # cannot be marshalled through PySide6's QVariant layer.
+                if controller_values:
+                    values_payload = [
+                        [int(jid), int(cid), list(vals)]
+                        for (jid, cid), vals in controller_values.items()
+                    ]
+                    self.controllerValuesReceived.emit(values_payload)
 
                 # Done collecting extended handshake
                 self._collecting_handshake_payload = False

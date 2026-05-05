@@ -61,10 +61,11 @@ ComsMCU::ComsMCU(ExoData* data, uint8_t* config_to_send):_data{data}
 
 void ComsMCU::handle_ble()
 {
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::handle_ble->Start");
-    #endif
-
+    // NOTE: Per-loop "Start"/"End" tracing removed -- the loop runs at
+    // hundreds of Hz and printing a dozen lines every iteration at
+    // 115200 baud was eating ~50 ms per loop, which made the BLE link
+    // appear hung even though it was healthy.  We now only print on
+    // genuine events (queue pop, command processed, errors).
     bool non_empty_ble_queue = _exo_ble->handle_updates();
 
     if (non_empty_ble_queue)
@@ -80,18 +81,11 @@ void ComsMCU::handle_ble()
             logger::println("ComsMCU::handle_ble->processed message");
         #endif
     }
-
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::handle_ble->End");
-    #endif
 }
 
 void ComsMCU::local_sample()
 {
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::local_sample->Start");
-    #endif
-
+    // Per-loop tracing removed; this fires every iteration.
     Time_Helper* t_helper = Time_Helper::get_instance();
     static const float context = t_helper->generate_new_context();
     static float del_t = 0;
@@ -108,18 +102,11 @@ void ComsMCU::local_sample()
 
     ComsLed::get_instance()->life_pulse();
     _maybe_system_reset();
-
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::local_sample->End");
-    #endif
 }
 
 void ComsMCU::update_UART()
 {
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::update_UART->Start");
-    #endif
-
+    // Per-loop tracing removed.
     static Time_Helper* t_helper = Time_Helper::get_instance();
     static const float _context = t_helper->generate_new_context();
     static float del_t = 0;
@@ -137,19 +124,12 @@ void ComsMCU::update_UART()
 
         del_t = 0;
     }
-
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::update_UART->End");
-    #endif
 }
 
 
 void ComsMCU::update_gui() 
 {
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::update_gui->Start");
-    #endif
-
+    // Per-loop tracing removed; this fires every iteration.
     static Time_Helper* t_helper = Time_Helper::get_instance();
     static float my_mark = _data->mark;
     static float* rt_floats = new float(rt_data::len);
@@ -158,13 +138,20 @@ void ComsMCU::update_gui()
     const bool new_rt_data = real_time_i2c::poll(rt_floats);
     static float del_t_no_msg = millis();
 
+    // 1 Hz chart-data heartbeat counters.  We aggregate over a full second
+    // and print one summary line, instead of printing per-sample.  Per-sample
+    // prints at the chart rate were starving the BLE stack and making the
+    // GUI think the Nano had dropped the link.
+    static uint32_t rt_sent_in_window = 0;
+    static uint32_t rt_skipped_in_window = 0;
+    static unsigned long last_rt_heartbeat_ms = millis();
+    static float last_rt_sample0 = 0.0f;
+    static float last_rt_sample1 = 0.0f;
+    static float last_rt_sample2 = 0.0f;
+
     if (new_rt_data || rt_data::new_rt_msg)
     {
         del_t_no_msg = millis();
-
-        #if COMSMCU_DEBUG
-            logger::println("ComsMCU::update_gui->new_rt_data");
-        #endif
 
         _life_pulse();
         rt_data::new_rt_msg = false;
@@ -190,12 +177,15 @@ void ComsMCU::update_gui()
 
         _exo_ble->send_message(rt_data_msg);
 
-        #if COMSMCU_DEBUG
-            logger::println("ComsMCU::update_gui->sent message");
-        #endif
+        rt_sent_in_window++;
+        if (rt_data::len > 0) last_rt_sample0 = rt_data_msg.data[0];
+        if (rt_data::len > 1) last_rt_sample1 = rt_data_msg.data[1];
+        if (rt_data::len > 2) last_rt_sample2 = rt_data_msg.data[2];
     } 
     else 
     {
+        rt_skipped_in_window++;
+
         //If we should be getting messages and we dont for 1 second, spin on error
         uint16_t exo_status = _data->get_status();
         const bool correct_status = (exo_status == status_defs::messages::trial_on) || 
@@ -219,16 +209,42 @@ void ComsMCU::update_gui()
         }
     }
 
+    // Print a single throttled summary every ~1 second so the user can
+    // watch the chart-data pipeline at a glance: how many RT samples were
+    // pushed to BLE in the last second, the most recent values, and whether
+    // a central is currently subscribed.
+    #if COMSMCU_DEBUG
+        unsigned long now_ms = millis();
+        if (now_ms - last_rt_heartbeat_ms >= 1000)
+        {
+            logger::print("ComsMCU::update_gui->rt_chart sent=");
+            logger::print(rt_sent_in_window);
+            logger::print(" skipped=");
+            logger::print(rt_skipped_in_window);
+            logger::print(" /sec  ble=");
+            logger::print(_exo_ble->is_connected() ? "yes" : "no");
+            logger::print("  status=");
+            logger::print(_data->get_status());
+            logger::print("  sample[0..2]=");
+            logger::print(last_rt_sample0);
+            logger::print(",");
+            logger::print(last_rt_sample1);
+            logger::print(",");
+            logger::print(last_rt_sample2);
+            logger::print("\n");
+
+            rt_sent_in_window = 0;
+            rt_skipped_in_window = 0;
+            last_rt_heartbeat_ms = now_ms;
+        }
+    #endif
+
     //Periodically send status information
     static float status_context = t_helper->generate_new_context(); 
     static float del_t_status = 0;
     del_t_status += t_helper->tick(status_context);
     if (del_t_status > BLE_times::_status_msg_delay)
     {
-        #if COMSMCU_DEBUG
-            logger::println("ComsMCU::update_gui->Sending status");
-        #endif
-
         //Send status data
         /* BleMessage batt_msg = BleMessage();
         batt_msg.command = ble_names::send_batt;
@@ -239,32 +255,26 @@ void ComsMCU::update_gui()
         del_t_status = 0;
 
         #if COMSMCU_DEBUG
-            logger::println("ComsMCU::update_gui->sent message");
+            logger::println("ComsMCU::update_gui->status_tick");
         #endif
     }
-
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::update_gui->End");
-    #endif
 }
 
 void ComsMCU::handle_errors()
 {
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::handle_errors->Start");
-    #endif
-
+    // Per-loop tracing removed; this fires every iteration.
     static ErrorCodes error_code = NO_ERROR;
 
     if (_data->error_code != static_cast<int>(error_code))
     {
         error_code = static_cast<ErrorCodes>(_data->error_code);
         _exo_ble->send_error(_data->error_code, _data->error_joint_id);
-    }
 
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::handle_errors->End");
-    #endif
+        #if COMSMCU_DEBUG
+            logger::print("ComsMCU::handle_errors->error_code changed to: ");
+            logger::println(_data->error_code);
+        #endif
+    }
 }
 
 void ComsMCU::_process_complete_gui_command(BleMessage* msg) 
@@ -355,10 +365,10 @@ void ComsMCU::_maybe_system_reset()
 
 void ComsMCU::_life_pulse()
 {
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::_life_pulse->Start");
-    #endif
-
+    // NOTE: This runs on every RT data send, so any logging here multiplies
+    // by the chart sample rate (potentially hundreds of Hz).  Kept silent
+    // intentionally -- the 1 Hz heartbeat in update_gui() already shows
+    // whether RT sends are happening.
     static int count = 0;
     count++;
 
@@ -367,9 +377,5 @@ void ComsMCU::_life_pulse()
         count = 0;
         digitalWrite(25, !digitalRead(25));
     }
-
-    #if COMSMCU_DEBUG
-        logger::println("ComsMCU::_life_pulse->End");
-    #endif
 }
 #endif

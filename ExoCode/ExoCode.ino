@@ -692,7 +692,10 @@ void loop()
 #include "src/WaistBarometer.h"
 #include "src/InclineDetector.h"
 
-#define MAIN_DEBUG 0
+// Bumped to 1 while debugging unexpected BLE disconnects -- this enables the
+// per-loop heartbeat ("...") and setup() trace prints so we can confirm the
+// Nano loop hasn't deadlocked.  Set back to 0 once debugging is done.
+#define MAIN_DEBUG 1
 
 //Create an array to store config
 namespace config_info

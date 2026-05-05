@@ -109,6 +109,13 @@ class BleManager(private val context: Context) {
     private val _paramNames = MutableStateFlow<List<String>>(emptyList())
     val paramNames: StateFlow<List<String>> = _paramNames.asStateFlow()
 
+    //in-memory database of controller parameter values.  seeded from the
+    //handshake (line 6 of each controller csv on the sd card) and mutated
+    //locally on every updateParam() call.  destroyed on endTrial/disconnect
+    //so a fresh handshake reseeds it on next connect.
+    private val _controllerValues = MutableStateFlow<Map<ControllerKey, List<String>>>(emptyMap())
+    val controllerValues: StateFlow<Map<ControllerKey, List<String>>> = _controllerValues.asStateFlow()
+
     //rt sample feed (latest 16 chans)
     private val _rtData = MutableStateFlow(DoubleArray(16))
     val rtData: StateFlow<DoubleArray> = _rtData.asStateFlow()
@@ -311,6 +318,7 @@ class BleManager(private val context: Context) {
         _connectionStatus.value = "Disconnected"
         stopChartTimer()
         clearWriteQueue()
+        destroyControllerDb("disconnect")
     }
 
     //----------------------------------
@@ -345,6 +353,7 @@ class BleManager(private val context: Context) {
                 txChar = null; rxChar = null; errChar = null
                 stopChartTimer()
                 clearWriteQueue()
+                destroyControllerDb("gattDisconnect")
                 if(wasActive) onUnexpectedDisconnect?.invoke()
             }
         }
@@ -445,6 +454,7 @@ class BleManager(private val context: Context) {
     private fun parseHandshake(text: String) {
         val names = mutableListOf<String>()
         val jointsMap = mutableMapOf<Int, JointInfo>()
+        val valueDB = mutableMapOf<ControllerKey, List<String>>()
 
         val lines = text.split('\n')
         for(rawLine in lines){
@@ -477,6 +487,17 @@ class BleManager(private val context: Context) {
                 val parts = raw.split(",")
                     .map{ it.trim() }
                     .filter{ it.isNotEmpty() && it != "?" && it != "??" }
+
+                //new: values row tagged with leading 'v'.
+                //format: [v, JointID, ControllerID, val1, val2, ...]
+                if(parts.isNotEmpty() && parts[0] == "v") {
+                    if(parts.size < 3) continue
+                    val jid = parts[1].toIntOrNull() ?: continue
+                    val cid = parts[2].toIntOrNull() ?: continue
+                    valueDB[ControllerKey(jid, cid)] = parts.drop(3)
+                    continue
+                }
+
                 if(parts.size < 4) continue
                 val jid = parts[1].toIntOrNull() ?: continue
                 val cid = parts[3].toIntOrNull() ?: continue
@@ -495,7 +516,20 @@ class BleManager(private val context: Context) {
             }
         }
 
+        //Splice the value db back into each ControllerInfo so the UI can
+        //pull defaults straight off the joint structures (matches iOS).
+        if(valueDB.isNotEmpty()){
+            for((jid, joint) in jointsMap){
+                for(ctrl in joint.controllers){
+                    val key = ControllerKey(jid, ctrl.controllerID)
+                    val vals = valueDB[key] ?: continue
+                    ctrl.paramValues = vals.toMutableList()
+                }
+            }
+        }
+
         if(names.isNotEmpty()) _paramNames.value = names
+        _controllerValues.value = valueDB
         if(jointsMap.isNotEmpty()){
             _joints.value = jointsMap.values.sortedBy{ it.jointID }
         }
@@ -755,8 +789,24 @@ class BleManager(private val context: Context) {
         sendRaw(byteArrayOf('w'.code.toByte()), withResponse = true)
         _isTrialActive.value = false
         stopMockData()
+        //destroy in-memory controller info per spec
+        destroyControllerDb("endTrial")
         //queue drains in ~100-200ms, then disconnect
         mainHandler.postDelayed({ disconnect() }, 600)
+    }
+
+    //wipes cached joint/controller/values so next handshake re-seeds them.
+    //called at end-of-trial and on every disconnect.
+    private fun destroyControllerDb(reason: String) {
+        if(_controllerValues.value.isNotEmpty() || _joints.value.isNotEmpty() ||
+           _paramNames.value.isNotEmpty()) {
+            Log.d(TAG, "destroyControllerDb($reason): joints=${_joints.value.size}, " +
+                "valueRows=${_controllerValues.value.size}, names=${_paramNames.value.size}")
+        }
+        _controllerValues.value = emptyMap()
+        _joints.value = emptyList()
+        _paramNames.value = emptyList()
+        _handshakeReceived.value = false
     }
 
     fun sendFsrThresholds(left: Double, right: Double) {
@@ -767,19 +817,54 @@ class BleManager(private val context: Context) {
     }
 
     //updateparam mirrors ios: f<jid_double><cid_double><pidx_double><val_double>
+    //also mirrors the new value into the in-memory db so the settings screen
+    //immediately shows it next time the user opens the page.
     fun updateParam(bilateral: Boolean, jointID: Int, controllerID: Int, paramIndex: Int, value: Double) {
-        if(MOCK_MODE){
-            Log.d(TAG, "[mock] updateParam joint=$jointID ctrl=$controllerID param=$paramIndex val=$value")
-            return
-        }
         val ids = if(bilateral) listOf(jointID, jointID xor 0x60) else listOf(jointID)
-        for(jid in ids){
-            send('f')
-            sendRaw(doubleToLeBytes(jid.toDouble()))
-            sendRaw(doubleToLeBytes(controllerID.toDouble()))
-            sendRaw(doubleToLeBytes(paramIndex.toDouble()))
-            sendRaw(doubleToLeBytes(value))
+
+        //1) Send to firmware
+        if(!MOCK_MODE){
+            for(jid in ids){
+                send('f')
+                sendRaw(doubleToLeBytes(jid.toDouble()))
+                sendRaw(doubleToLeBytes(controllerID.toDouble()))
+                sendRaw(doubleToLeBytes(paramIndex.toDouble()))
+                sendRaw(doubleToLeBytes(value))
+            }
+        } else {
+            Log.d(TAG, "[mock] updateParam joint=$jointID ctrl=$controllerID param=$paramIndex val=$value")
         }
+
+        //2) Mirror into the live db (and the embedded paramValues lists)
+        val valueStr = formatParamValue(value)
+        val newDb = _controllerValues.value.toMutableMap()
+        for(jid in ids){
+            val key = ControllerKey(jid, controllerID)
+            val row = newDb[key]?.toMutableList() ?: mutableListOf()
+            while(row.size <= paramIndex) row.add("")
+            row[paramIndex] = valueStr
+            newDb[key] = row
+
+            //also bake into the matching ControllerInfo so any consumer of
+            //joints sees the new value without re-reading the db.
+            val joint = _joints.value.firstOrNull{ it.jointID == jid } ?: continue
+            val ctrl = joint.controllers.firstOrNull{ it.controllerID == controllerID } ?: continue
+            while(ctrl.paramValues.size <= paramIndex) ctrl.paramValues.add("")
+            ctrl.paramValues[paramIndex] = valueStr
+        }
+        _controllerValues.value = newDb
+    }
+
+    //format a Double the way the firmware writes its csv cells: integers as
+    //plain ints, everything else with up to a few decimals.
+    private fun formatParamValue(v: Double): String {
+        if(v == Math.floor(v) && !v.isInfinite()){
+            return v.toLong().toString()
+        }
+        var s = String.format(java.util.Locale.US, "%.6f", v)
+        while(s.endsWith("0")) s = s.dropLast(1)
+        if(s.endsWith(".")) s = s.dropLast(1)
+        return s
     }
 
     private fun doubleToLeBytes(v: Double): ByteArray {
@@ -827,6 +912,7 @@ class BleManager(private val context: Context) {
         _torqueCalibrated.value = false
         _connectionStatus.value = "Disconnected"
         stopMockData()
+        destroyControllerDb("mockDisconnect")
         if(wasActive) onUnexpectedDisconnect?.invoke()
     }
 

@@ -73,6 +73,13 @@ class ExoBLE
          */
         void send_error(int error_code, int joint_id);
 
+        /**
+         * @brief Returns the current BLE connection state. Used by ComsMCU's
+         * 1 Hz "is the chart data flowing?" heartbeat so it can print whether
+         * a central is actually subscribed.
+         */
+        bool is_connected() const { return _connected > 0; }
+
     private:
 
         //BLE connection state

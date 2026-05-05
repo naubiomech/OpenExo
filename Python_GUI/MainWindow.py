@@ -87,6 +87,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.rt_bridge.controllersReceived.connect(self._on_controllers)
         # Receive flattened 2D matrix of controllers and parameters
         self.rt_bridge.controllerMatrixReceived.connect(self._on_controller_matrix)
+        # Receive controller -> default parameter values database
+        self.rt_bridge.controllerValuesReceived.connect(self._on_controller_values)
 
         # CSV logging state
         self._csv_file = None
@@ -99,6 +101,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self._csv_preamble = ""  # Preamble for CSV filename
         # Store controller -> params 2D matrix
         self._controller_matrix = []
+        # In-memory database of current controller parameter values:
+        #   { (joint_id:int, controller_id:int): [value_str, ...] }
+        # Seeded from the firmware handshake (line 6 of each controller csv),
+        # mutated locally whenever the user taps Apply, and DROPPED at the end
+        # of every trial so each new connection starts from device-of-truth.
+        self._controller_values = {}
         # Device control wiring from ActiveTrialPage
         self.trial_page.deviceStartRequested.connect(self._on_device_start)
         self.trial_page.deviceStopRequested.connect(self._on_device_stop_motors)
@@ -278,6 +286,72 @@ class MainWindow(QtWidgets.QMainWindow):
             self.logger.error(f"Failed to send ACK for controllers: {e}")
             self.logger.debug(traceback.format_exc())
 
+    @staticmethod
+    def _normalize_controller_value_key(k):
+        """Coerce an incoming controller_values key to ``(int, int)``.
+
+        Qt's queued signal/slot machinery can sometimes round-trip dict keys
+        in a form different from what the sender intended (e.g. ``(int, int)``
+        tuples may arrive as ``(str, str)``, lists, or even comma-joined
+        strings depending on QVariant marshalling).  This helper accepts any
+        of those and yields the canonical ``(joint_id, controller_id)`` tuple,
+        or ``None`` if the key is unparseable.
+        """
+        try:
+            if isinstance(k, str):
+                parts = [p.strip() for p in k.replace("(", "").replace(")", "").split(",") if p.strip()]
+            elif isinstance(k, (tuple, list)):
+                parts = list(k)
+            else:
+                return None
+            if len(parts) < 2:
+                return None
+            return (int(parts[0]), int(parts[1]))
+        except (ValueError, TypeError):
+            return None
+
+    @QtCore.Slot(list)
+    def _on_controller_values(self, values_list: list):
+        """Receive default parameter values for every (joint, controller).
+
+        ``values_list`` is a list of ``[joint_id:int, controller_id:int,
+        [val_str, ...]]`` triples (the dict-with-tuple-keys form cannot be
+        marshalled through PySide6's QVariant layer, so RtBridge ships a list
+        and we rebuild the keyed dict here).
+
+        These came from line 6 of each controller csv on the SD card and act
+        as the seed of the local database.  We forward them straight to the
+        settings page so it can render the current value for whatever the
+        user selects.
+        """
+        try:
+            normalized: dict = {}
+            for entry in (values_list or []):
+                if not isinstance(entry, (list, tuple)) or len(entry) < 3:
+                    continue
+                jid_raw, cid_raw, vals = entry[0], entry[1], entry[2]
+                try:
+                    jid = int(jid_raw)
+                    cid = int(cid_raw)
+                except (ValueError, TypeError):
+                    continue
+                normalized[(jid, cid)] = list(vals)
+            self._controller_values = normalized
+            self.logger.info(
+                f"Received controller values for {len(self._controller_values)} (joint, controller) pairs; "
+                f"sample_keys={list(self._controller_values.keys())[:5]}"
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to store controller values: {e}")
+            self.logger.debug(traceback.format_exc())
+            self._controller_values = {}
+        # Push the seed into the settings page if it's been built already.
+        try:
+            self.settings_page.set_controller_values(self._controller_values)
+        except Exception as e:
+            self.logger.error(f"Failed to forward controller values to settings page: {e}")
+            self.logger.debug(traceback.format_exc())
+
     @QtCore.Slot(list)
     def _on_controller_matrix(self, matrix):
         # Save the 2D [ [controller, p1, p2], ... ] structure in memory
@@ -433,7 +507,12 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 self.logger.error(f"CRITICAL: Failed to send stop/motor off commands: {e}")
                 self.logger.debug(traceback.format_exc())
-            
+
+            # Wipe the in-memory controller info DB so the next trial seeds
+            # fresh defaults from the firmware handshake (per spec: controller
+            # information must be destroyed at end of trial).
+            self._destroy_controller_db("end trial")
+
             # Reset scan page buttons immediately
             self.scan_page.btn_start_trial.setEnabled(False)
             self.scan_page.btn_calibrate_torque.setEnabled(False)
@@ -480,12 +559,35 @@ class MainWindow(QtWidgets.QMainWindow):
             self.logger.error(f"Failed to end trial: {e}")
             self.logger.debug(traceback.format_exc())
 
+    def _destroy_controller_db(self, reason: str = ""):
+        """Drop all cached controller metadata + parameter values.
+
+        Called whenever the trial ends or the link drops so the next session
+        always seeds itself fresh from the device.
+        """
+        if self._controller_values or self._controller_matrix:
+            self.logger.info(
+                f"Destroying controller DB ({reason}): "
+                f"matrix={len(self._controller_matrix)} entries, "
+                f"values={len(self._controller_values)} entries"
+            )
+        self._controller_values = {}
+        self._controller_matrix = []
+        try:
+            self.settings_page.set_controller_values({})
+            self.settings_page.set_controller_matrix([])
+        except Exception as e:
+            self.logger.error(f"Failed to clear settings page after DB destroy: {e}")
+            self.logger.debug(traceback.format_exc())
+
     @QtCore.Slot()
     def _on_disconnect(self):
         try:
             self.logger.info("Manual disconnect requested")
             # Disconnect immediately (non-blocking, no popup)
             self.qt_dev.disconnect()
+            # Drop cached controller info; a fresh handshake will repopulate.
+            self._destroy_controller_db("manual disconnect")
             
             # Navigate to scan page immediately
             self.stack.setCurrentWidget(self.scan_page)
@@ -617,18 +719,74 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot(list)
     def _on_apply_settings(self, payload):
-        # payload: [isBilateral, joint, controller, parameter, value]
+        # payload: [isBilateral, joint_id, controller_id, parameter_idx, value]
+        # Apply does TWO things, in order:
+        #   1) push the new value to the firmware over BLE
+        #   2) mirror the change into the local controller-value database
         self.logger.info(f"Applying settings: {payload}")
         try:
             self.qt_dev.updateTorqueValues(payload)
         except Exception as e:
             self.logger.error(f"Failed to update torque values: {e}")
             self.logger.debug(traceback.format_exc())
+
+        try:
+            is_bilateral, joint_id, controller_id, param_idx, value = payload
+            self._update_controller_value_db(
+                joint_id=int(joint_id) if joint_id is not None else None,
+                controller_id=int(controller_id),
+                param_idx=int(param_idx),
+                value=value,
+                bilateral=bool(is_bilateral),
+            )
+        except Exception as e:
+            self.logger.error(f"Failed to mirror update into controller value DB: {e}")
+            self.logger.debug(traceback.format_exc())
         # Return to trial page
         try:
             self.stack.setCurrentWidget(self.trial_page)
         except Exception as e:
             self.logger.error(f"Failed to navigate to trial page after settings: {e}")
+            self.logger.debug(traceback.format_exc())
+
+    def _update_controller_value_db(self, joint_id, controller_id, param_idx,
+                                    value, bilateral=False):
+        """Write a single parameter value into the local DB and refresh UI.
+
+        When ``bilateral`` is set we also mirror the write to the opposite
+        side joint (``joint_id ^ 0x60`` matches firmware/iOS behaviour).
+        Values are stored as strings so int-vs-float can be inferred at
+        render time (the firmware wire format is also string-based).
+        """
+        if joint_id is None:
+            return
+
+        joint_ids = [joint_id]
+        if bilateral:
+            joint_ids.append(joint_id ^ 0x60)
+
+        # Format the value the same way an integer-looking input would print
+        # (e.g. "5" stays "5", "0.25" stays "0.25").
+        if isinstance(value, (int,)) or (isinstance(value, float) and value.is_integer()):
+            value_str = str(int(value))
+        else:
+            value_str = str(value)
+
+        for jid in joint_ids:
+            key = (jid, controller_id)
+            row = self._controller_values.get(key)
+            if row is None:
+                row = []
+            # Pad with empty strings if the param index is beyond what we have
+            while len(row) <= param_idx:
+                row.append("")
+            row[param_idx] = value_str
+            self._controller_values[key] = row
+
+        try:
+            self.settings_page.set_controller_values(self._controller_values)
+        except Exception as e:
+            self.logger.error(f"Failed to refresh settings page after DB update: {e}")
             self.logger.debug(traceback.format_exc())
 
     @QtCore.Slot(str)
@@ -694,6 +852,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_dev_disconnected(self):
         """Handle unexpected disconnects (intentional disconnects don't trigger this)."""
         self.logger.warning("Device disconnected unexpectedly")
+        # The controller-info cache is tied to the live connection.
+        self._destroy_controller_db("unexpected disconnect")
         try:
             self.scan_page.status.setText("Disconnected unexpectedly")
             self.scan_page.btn_save_connect.setEnabled(True)

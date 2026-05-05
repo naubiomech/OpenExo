@@ -48,6 +48,12 @@ class BLEManager: NSObject, ObservableObject {
     @Published var handshakeReceived = false
     @Published var parameterNames: [String] = []
     @Published var joints: [JointInfo] = []
+    /// Live parameter-value DB keyed by (jointID, controllerID).
+    /// Seeded from the firmware handshake (line 6 of each controller csv) and
+    /// mutated locally on every `updateParam` call so the UI always shows the
+    /// current value for whatever controller the user is editing.  The DB is
+    /// **destroyed at end-of-trial** (see `endTrial`) per spec.
+    @Published var controllerValues: [ControllerKey: [String]] = [:]
 
     // MARK: RT Data
     @Published var rtData: [Double] = Array(repeating: 0, count: 16)
@@ -268,6 +274,24 @@ class BLEManager: NSObject, ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             self?.disconnect()
         }
+        // Drop the in-memory controller-info DB at end of trial, per spec.
+        // A fresh handshake on next connect will reseed it from the device.
+        destroyControllerDB(reason: "endTrial")
+    }
+
+    /// Remove all cached controller metadata + parameter values.
+    /// Called at end-of-trial and on every disconnect path so the next session
+    /// always starts from the device's current configuration instead of from
+    /// stale, possibly-edited values held in memory from the last run.
+    func destroyControllerDB(reason: String) {
+        if !controllerValues.isEmpty || !joints.isEmpty || !parameterNames.isEmpty {
+            dprint("[ExoBLE] Destroying controller DB (\(reason)): "
+                   + "joints=\(joints.count), valueRows=\(controllerValues.count), names=\(parameterNames.count)")
+        }
+        controllerValues = [:]
+        joints = []
+        parameterNames = []
+        handshakeReceived = false
     }
 
     func sendFSRThresholds(left: Double, right: Double) {
@@ -290,17 +314,59 @@ class BLEManager: NSObject, ObservableObject {
     }
 
     func updateParam(isBilateral: Bool, jointID: Int, controllerID: Int, paramIndex: Int, value: Double) {
-        if MOCK_MODE {
-            dprint("[MockBLE] updateParam joint=\(jointID) ctrl=\(controllerID) param=\(paramIndex) val=\(value)")
-            return
-        }
         let jointIDs = isBilateral ? [jointID, jointID ^ 0x60] : [jointID]
+
+        // 1) Send the new value over BLE (when not in mock mode).
+        if !MOCK_MODE {
+            for jid in jointIDs {
+                send(byte: "f")
+                for var v in [Double(jid), Double(controllerID), Double(paramIndex), value] {
+                    withUnsafeBytes(of: &v) { sendRaw(Data($0)) }
+                }
+            }
+        } else {
+            dprint("[MockBLE] updateParam joint=\(jointID) ctrl=\(controllerID) param=\(paramIndex) val=\(value)")
+        }
+
+        // 2) Mirror the change into the in-memory DB (and the embedded
+        // paramValues on each ControllerInfo) so the UI immediately reflects
+        // the new value without waiting for a fresh handshake.
+        let valueStr = formatParamValue(value)
         for jid in jointIDs {
-            send(byte: "f")
-            for var v in [Double(jid), Double(controllerID), Double(paramIndex), value] {
-                withUnsafeBytes(of: &v) { sendRaw(Data($0)) }
+            let key = ControllerKey(jointID: jid, controllerID: controllerID)
+            var row = controllerValues[key] ?? []
+            while row.count <= paramIndex { row.append("") }
+            row[paramIndex] = valueStr
+            controllerValues[key] = row
+
+            // Also bake into the matching ControllerInfo so settings views
+            // that pull straight from `joints` see the update.
+            if let jIdx = joints.firstIndex(where: { $0.jointID == jid }) {
+                if let cIdx = joints[jIdx].controllers.firstIndex(where: { $0.controllerID == controllerID }) {
+                    var updated = joints[jIdx].controllers[cIdx]
+                    while updated.paramValues.count <= paramIndex { updated.paramValues.append("") }
+                    updated.paramValues[paramIndex] = valueStr
+                    var joint = joints[jIdx]
+                    joint.controllers[cIdx] = updated
+                    joints[jIdx] = joint
+                }
             }
         }
+    }
+
+    /// Format a Double the same way the firmware writes its csv cells:
+    /// integers as plain ints, everything else with up to a few decimals.
+    /// Keeps the DB entries human-readable for display while still letting
+    /// callers convert back via `Double()`.
+    private func formatParamValue(_ v: Double) -> String {
+        if v.rounded() == v && abs(v) < 1e15 {
+            return String(Int(v))
+        }
+        // Strip trailing zeros from a fixed-precision render
+        var s = String(format: "%.6f", v)
+        while s.hasSuffix("0") { s.removeLast() }
+        if s.hasSuffix(".") { s.removeLast() }
+        return s
     }
 
     // ─────────────────────────────────────────────
@@ -457,10 +523,12 @@ class BLEManager: NSObject, ObservableObject {
     private func parseHandshake(_ text: String) {
         var names: [String] = []
         var jointsMap: [Int: JointInfo] = [:]
+        var valueDB: [ControllerKey: [String]] = [:]
 
         // Handshake may contain newline-separated sections:
         //   "t,param1,param2,..."          — parameter names
         //   "f,J,ID,C,CID,p1,...|J,ID,..." — pipe-delimited controller matrix
+        //   "v,JointID,CtrlID,val1,..."    — values row for the controller above
         // Or the entire thing may be a single line with pipes.
         let lines = text.components(separatedBy: .newlines)
         dprint("[ExoBLE] Handshake has \(lines.count) lines")
@@ -505,6 +573,21 @@ class BLEManager: NSObject, ObservableObject {
                     .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                     .filter { !$0.isEmpty && $0 != "?" && $0 != "??" }
 
+                // New: values row tagged with leading 'v'.
+                // Format: [v, JointID, ControllerID, val1, val2, ...]
+                if let first = parts.first, first == "v" {
+                    guard parts.count >= 3,
+                          let jointID = Int(parts[1]),
+                          let controllerID = Int(parts[2]) else {
+                        dprint("[ExoBLE] Skipped malformed values row: \(raw.prefix(60))")
+                        continue
+                    }
+                    let vals = Array(parts.dropFirst(3))
+                    valueDB[ControllerKey(jointID: jointID, controllerID: controllerID)] = vals
+                    dprint("[ExoBLE] Parsed values row joint=\(jointID) ctrl=\(controllerID), \(vals.count) values")
+                    continue
+                }
+
                 guard parts.count >= 4,
                       let jointID = Int(parts[1]),
                       let controllerID = Int(parts[3]) else {
@@ -527,7 +610,24 @@ class BLEManager: NSObject, ObservableObject {
             }
         }
 
+        // Splice the value DB back into the controller structs so the UI can
+        // grab a default value just from a `JointInfo` reference.
+        if !valueDB.isEmpty {
+            for (jid, var joint) in jointsMap {
+                for (idx, ctrl) in joint.controllers.enumerated() {
+                    let key = ControllerKey(jointID: jid, controllerID: ctrl.controllerID)
+                    if let vals = valueDB[key] {
+                        var updated = ctrl
+                        updated.paramValues = vals
+                        joint.controllers[idx] = updated
+                    }
+                }
+                jointsMap[jid] = joint
+            }
+        }
+
         if !names.isEmpty { parameterNames = names }
+        controllerValues = valueDB
         if !jointsMap.isEmpty {
             // Filter out joints that don't belong to the configured exo_name
             // in config.ini.  This prevents a stray hipDefaultController from
@@ -594,6 +694,7 @@ class BLEManager: NSObject, ObservableObject {
         torqueCalibrated = false
         connectionStatus = "Disconnected"
         stopMockDataStream()
+        destroyControllerDB(reason: "mockDisconnect")
         if wasActive { onUnexpectedDisconnect?() }
     }
 
@@ -712,6 +813,7 @@ extension BLEManager: CBCentralManagerDelegate {
         isTrialActive = false
         torqueCalibrated = false
         connectionStatus = "Disconnected"
+        destroyControllerDB(reason: "didDisconnectPeripheral")
         if wasActive { onUnexpectedDisconnect?() }
     }
 }
