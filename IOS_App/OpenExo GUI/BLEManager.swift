@@ -95,6 +95,35 @@ class BLEManager: NSObject, ObservableObject {
             bleState = .poweredOn
         }
         hasSavedDevice = UserDefaults.standard.string(forKey: "savedDeviceUUID") != nil
+        restoreCachedControllerMetadata()
+    }
+
+    /// Restore last handshake controller matrix from SQLite when the saved peripheral matches (offline UI / faster reconnect).
+    private func restoreCachedControllerMetadata() {
+        guard let uuid = UserDefaults.standard.string(forKey: "savedDeviceUUID"),
+              let snap = OpenExoDatabase.shared.loadControllerSnapshot(),
+              snap.deviceUUID == uuid,
+              !snap.matrix.isEmpty else { return }
+        if !snap.parameterNames.isEmpty {
+            parameterNames = snap.parameterNames
+        }
+        joints = ControllerSnapshot.joints(from: snap.matrix)
+    }
+
+    private func persistHandshakeSnapshot(joints js: [JointInfo], parameterNames names: [String], values: [String: [String]]) {
+        let uuid = connectedPeripheral?.identifier.uuidString
+            ?? UserDefaults.standard.string(forKey: "savedDeviceUUID")
+            ?? ""
+        guard !uuid.isEmpty else { return }
+        let matrix = ControllerSnapshot.buildMatrix(from: js)
+        let snap = ControllerSnapshot(
+            deviceUUID: uuid,
+            matrix: matrix,
+            values: values,
+            parameterNames: names,
+            updatedAt: Date().timeIntervalSince1970
+        )
+        OpenExoDatabase.shared.saveControllerSnapshot(snap)
     }
 
     // ─────────────────────────────────────────────
@@ -110,7 +139,8 @@ class BLEManager: NSObject, ObservableObject {
         isScanning = true
         connectionStatus = "Scanning…"
         central.scanForPeripherals(withServices: [BLEUUID.service], options: nil)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { [weak self] in
+        // Match Python GUI `QtExoDeviceManager` discover timeout (short scan).
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
             guard let self, self.isScanning else { return }
             self.stopScan()
         }
@@ -127,11 +157,18 @@ class BLEManager: NSObject, ObservableObject {
     func connect(_ device: DiscoveredDevice) {
         if MOCK_MODE { mockConnect(device); return }
         guard let peripheral = device.peripheral else { return }
+        let newId = peripheral.identifier.uuidString
+        if let snap = OpenExoDatabase.shared.loadControllerSnapshot(), snap.deviceUUID != newId {
+            OpenExoDatabase.shared.clearControllerSnapshot()
+            joints = []
+            parameterNames = []
+            handshakeReceived = false
+        }
         connectionStatus = "Connecting to \(device.name)…"
         central.stopScan()
         isScanning = false
         central.connect(peripheral, options: nil)
-        UserDefaults.standard.set(peripheral.identifier.uuidString, forKey: "savedDeviceUUID")
+        UserDefaults.standard.set(newId, forKey: "savedDeviceUUID")
         hasSavedDevice = true
     }
 
@@ -264,6 +301,9 @@ class BLEManager: NSObject, ObservableObject {
         stopMockDataStream()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.sendReliable(Data([UInt8(ascii: "w")]))
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            self?.send(byte: "Z")
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             self?.disconnect()
@@ -446,6 +486,7 @@ class BLEManager: NSObject, ObservableObject {
     private func parseHandshake(_ text: String) {
         var names: [String] = []
         var jointsMap: [Int: JointInfo] = [:]
+        var valueMap: [String: [String]] = [:]
 
         // Handshake may contain newline-separated sections:
         //   "t,param1,param2,..."          — parameter names
@@ -486,6 +527,16 @@ class BLEManager: NSObject, ObservableObject {
                     continue
                 }
 
+                if raw.lowercased().hasPrefix("v,") {
+                    let inner = String(raw.dropFirst(2))
+                    let segs = inner.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    guard segs.count >= 3,
+                          let jid = Int(segs[0]),
+                          let cid = Int(segs[1]) else { continue }
+                    valueMap["\(jid)_\(cid)"] = Array(segs.dropFirst(2))
+                    continue
+                }
+
                 let parts = raw.components(separatedBy: ",")
                     .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
 
@@ -514,6 +565,7 @@ class BLEManager: NSObject, ObservableObject {
         if !names.isEmpty { parameterNames = names }
         if !jointsMap.isEmpty {
             joints = jointsMap.values.sorted { $0.jointID < $1.jointID }
+            persistHandshakeSnapshot(joints: joints, parameterNames: parameterNames, values: valueMap)
             print("[ExoBLE] Handshake result: \(joints.count) joints, \(joints.reduce(0) { $0 + $1.controllers.count }) controllers total")
         } else {
             print("[ExoBLE] WARNING: No joints/controllers parsed from handshake")
@@ -530,7 +582,7 @@ class BLEManager: NSObject, ObservableObject {
         isScanning = true
         connectionStatus = "Scanning…"
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
             guard let self else { return }
             self.discoveredDevices = [
                 DiscoveredDevice(id: UUID(), name: "OpenExo Left Ankle"),
@@ -552,6 +604,7 @@ class BLEManager: NSObject, ObservableObject {
             self.connectedName = device.name
             self.connectionStatus = "Connected to \(device.name)"
             self.hasSavedDevice = true
+            UserDefaults.standard.set(device.id.uuidString, forKey: "savedDeviceUUID")
 
             // Simulate handshake after 1s
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -595,6 +648,7 @@ class BLEManager: NSObject, ObservableObject {
         handshakeReceived = true
         batteryVoltage = 11.7
         connectionStatus = "Handshake complete — ready to start trial"
+        persistHandshakeSnapshot(joints: joints, parameterNames: parameterNames, values: [:])
     }
 
     // MARK: Mock Data Stream (sine waves at 30 Hz)

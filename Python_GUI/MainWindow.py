@@ -131,17 +131,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.bio_feedback_page.recalibrateFSRRequested.connect(self._on_recal_fsr)
         self.bio_feedback_page.markTrialRequested.connect(self._on_mark)
         
-        # Display log file location for debugging
         log_path = self.qt_dev.get_log_file_path()
         if log_path and log_path != "Log file not available":
-            print(f"\n{'='*80}")
-            print(f"Device Manager Log File: {log_path}")
-            print(f"{'='*80}\n")
+            self.logger.info("Device manager log file: %s", log_path)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        size = self.size()
-        print(f"[MainWindow] size={size.width()}x{size.height()}")
 
     def _go_trial(self):
         self.stack.setCurrentWidget(self.trial_page)
@@ -234,7 +229,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_handshake(self, payload: str):
         try:
             self.logger.info("Handshake payload received")
-            print(f"MainWindow::_on_handshake -> Handshake payload received")
         except Exception as e:
             self.logger.error(f"Failed to log handshake: {e}")
             self.logger.debug(traceback.format_exc())
@@ -383,7 +377,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """Update CSV filename preamble."""
         self._csv_preamble = preamble
         self.logger.info(f"CSV preamble set to: {preamble}")
-        print(f"CSV preamble set to: {preamble}")
          # If we're currently logging, roll over immediately (no popup)
         if self._csv_file is not None:
             try:
@@ -474,7 +467,9 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 self.qt_dev.write(b'G')  # Stop trial
                 self.qt_dev.write(b'w')  # Motor off - CRITICAL SAFETY COMMAND
-                self.logger.info("Sent stop trial and motor off commands")
+                # Reset Nano/Teensy so next reconnect starts from clean firmware state.
+                self.qt_dev.write(b'Z')  # Firmware system reset command
+                self.logger.info("Sent stop trial, motor off, and reset commands")
             except Exception as e:
                 self.logger.error(f"CRITICAL: Failed to send stop/motor off commands: {e}")
                 self.logger.debug(traceback.format_exc())
@@ -482,7 +477,7 @@ class MainWindow(QtWidgets.QMainWindow):
             # Reset scan page buttons immediately
             self.scan_page.btn_start_trial.setEnabled(False)
             self.scan_page.btn_calibrate_torque.setEnabled(False)
-            self.scan_page.btn_save_connect.setEnabled(True)
+            self.scan_page.btn_save_connect.setEnabled(False)
             
             # Clear trial page plots
             try:
@@ -580,7 +575,6 @@ class MainWindow(QtWidgets.QMainWindow):
             # Close current CSV if open
             if self._csv_file is not None:
                 self.logger.info("Saving current CSV and starting new one")
-                print("Saving current CSV and starting new one")
                 try:
                     self._csv_file.flush()
                     self._csv_file.close()
@@ -616,11 +610,9 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 self.logger.error(f"Failed to show CSV save confirmation: {e}")
                 self.logger.debug(traceback.format_exc())
-                print(f"Error showing confirmation: {e}")
         except Exception as e:
             self.logger.error(f"Failed in _on_save_csv: {e}")
             self.logger.debug(traceback.format_exc())
-            print(f"Error in _on_save_csv: {e}")
 
     @QtCore.Slot()
     def _on_update_controller(self):
@@ -692,7 +684,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self.logger.error(f"Failed to navigate to trial page after settings: {e}")
             self.logger.debug(traceback.format_exc())
 
-    def _destroy_controller_db(self):
+    def _clear_ble_prefs_on_new_connection(self):
+        """Purge saved Update-Controller prefs and in-memory selections for a new link.
+
+        Does **not** clear ``_controller_matrix`` / ``_controller_values``. Handshake
+        payloads can be processed before the ``connected`` slot runs; wiping the matrix
+        here leaves ``has_matrix`` false and forces Basic settings forever.
+        """
         try:
             SettingsManager.purge_ble_device_controller_prefs()
         except Exception as e:
@@ -704,6 +702,9 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             self.logger.error(f"Failed to reset settings page device prefs: {e}")
             self.logger.debug(traceback.format_exc())
+
+    def _destroy_controller_db(self):
+        self._clear_ble_prefs_on_new_connection()
         try:
             self._controller_matrix = []
             self._controller_values = {}
@@ -726,7 +727,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logger.error(f"Device error: {msg}")
         try:
             self.scan_page.status.setText(f"Connection failed: {msg}")
-            self.scan_page.btn_save_connect.setEnabled(True)
+            has_manual_selection = bool(self.scan_page.list_devices.selectedItems())
+            self.scan_page.btn_save_connect.setEnabled(has_manual_selection)
             self.scan_page.btn_start_trial.setEnabled(False)
             try:
                 self.scan_page.btn_calibrate_torque.setEnabled(False)
@@ -740,21 +742,29 @@ class MainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot(str, str)
     def _on_dev_connected(self, name: str, addr: str):
         self.logger.info(f"Device connected: {name} {addr}")
-        # New link = no controller metadata until this device's handshake arrives
+        # Clear stale **saved** prefs only; do not wipe handshake matrix (handshake can
+        # arrive before this slot — _destroy_controller_db would erase it → Basic-only UI).
         try:
-            self._destroy_controller_db()
+            self._clear_ble_prefs_on_new_connection()
         except Exception as e:
-            self.logger.error(f"Failed to clear controller DB on connect: {e}")
+            self.logger.error(f"Failed to clear BLE prefs on connect: {e}")
             self.logger.debug(traceback.format_exc())
         try:
             self.rt_bridge.reset_for_new_ble_session()
         except Exception as e:
             self.logger.error(f"Failed to reset RtBridge for new session: {e}")
             self.logger.debug(traceback.format_exc())
+        # Keep Update Controller enabled. The old "disable until handshake" logic raced BLE:
+        # handshake + matrix can arrive before this slot runs, then we wiped state and left
+        # the button stuck disabled. Basic vs full settings still chosen in _on_update_controller.
         try:
-            self.trial_page.set_update_controller_enabled(False)
+            self.trial_page.set_update_controller_enabled(True)
+            QtCore.QTimer.singleShot(
+                0,
+                lambda: self.trial_page.set_update_controller_enabled(True),
+            )
         except Exception as e:
-            self.logger.error(f"Failed to disable update-controller until handshake: {e}")
+            self.logger.error(f"Failed to enable Update Controller after connect: {e}")
             self.logger.debug(traceback.format_exc())
         try:
             self.scan_page.status.setText(f"Connected: {name} {addr}")
@@ -774,6 +784,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.trial_page.clear_plots()
         except Exception as e:
             self.logger.error(f"Failed to clear plots on connection: {e}")
+            self.logger.debug(traceback.format_exc())
+        # If the handshake already ran, push matrix/values into the settings page.
+        try:
+            if self._controller_matrix:
+                self.settings_page.set_controller_matrix(self._controller_matrix)
+                self.settings_page.set_controller_values(self._controller_values)
+        except Exception as e:
+            self.logger.error(f"Failed to sync settings page after connect: {e}")
             self.logger.debug(traceback.format_exc())
 
     def _show_disconnect_warning(self):

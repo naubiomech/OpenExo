@@ -3,7 +3,10 @@ Centralized settings persistence manager.
 Handles loading and saving GUI settings to avoid code duplication.
 """
 
+import logging
 import os
+
+_logger = logging.getLogger(__name__)
 
 
 class SettingsManager:
@@ -56,7 +59,7 @@ class SettingsManager:
                             key, val = line.split('=', 1)
                             settings[key] = val
         except Exception as e:
-            print(f"[SettingsManager] Error loading settings: {e}")
+            _logger.warning("Error loading settings: %s", e)
         
         return settings
     
@@ -81,9 +84,9 @@ class SettingsManager:
                 for key, val in settings.items():
                     f.write(f"{key}={val}\n")
             
-            print(f"[SettingsManager] Saved settings to {settings_file}")
+            _logger.debug("Saved settings to %s", settings_file)
         except Exception as e:
-            print(f"[SettingsManager] Error saving settings: {e}")
+            _logger.warning("Error saving settings: %s", e)
     
     @staticmethod
     def update_settings(updates, filename=None):

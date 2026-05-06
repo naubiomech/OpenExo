@@ -3,7 +3,10 @@ UI helper functions for OpenExo Qt GUI.
 Reduces code duplication across page files.
 """
 
+import logging
 import os
+
+_logger = logging.getLogger(__name__)
 
 try:
     from PySide6 import QtCore, QtWidgets, QtGui
@@ -70,10 +73,10 @@ def load_logo(image_name, width, height, alignment=None):
             
             return label
         else:
-            print(f"[UI] Failed to load logo from: {logo_path}")
+            _logger.debug("Failed to load logo from: %s", logo_path)
             return None
     except Exception as e:
-        print(f"[UI] Error loading logo '{image_name}': {e}")
+        _logger.warning("Error loading logo %r: %s", image_name, e)
         return None
 
 

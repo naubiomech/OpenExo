@@ -58,8 +58,8 @@ class RtBridge(QtCore.QObject):
         # Handshake payload reassembly state
         self._collecting_handshake_payload = False
         
-        # Data rate monitoring
-        self.DEBUG_DATA_RATE = True  # Set to False to disable data rate printing
+        # Data rate monitoring (verbose console stats; use logging level DEBUG if enabled)
+        self.DEBUG_DATA_RATE = False
         self._data_packet_count = 0
         self._bytes_received = 0
         self._data_rate_timer = QtCore.QTimer()
@@ -110,7 +110,6 @@ class RtBridge(QtCore.QObject):
 
         # Handshake
         if s == "READY":
-            print("RtBridge::feed_bytes->Handshake header received")
             self._handshake = True
             # Begin collecting the initial long handshake payload split across notifications
             self._collecting_handshake_payload = True
@@ -125,12 +124,7 @@ class RtBridge(QtCore.QObject):
                 # Split by commas and drop empty entries
                 tokens = [tok.strip() for tok in line.split(",") if tok.strip()]
                 
-                # Print the payload in the same format as the Serial Monitor
                 payload_line = line.replace('|', '\n')
-                print("RtBridge::feed_bytes->Handshake payload received:")
-                for payload_row in payload_line.split('\n'):
-                    if payload_row.strip():
-                        print(f"    {payload_row}")
                 joined_tokens = ", ".join(tokens)
                 payload_str = "READY" if not joined_tokens else f"READY, {joined_tokens}"
                 self.handshakeReceived.emit(payload_str)
@@ -161,7 +155,6 @@ class RtBridge(QtCore.QObject):
                             continue
                     if prefix == 't':
                         param_names = [p.strip() for p in parts[1:] if p.strip()]
-                        print(f"RtBridge::feed_bytes->Parameter names: {param_names}")
                         continue
                     if prefix == 'v':
                         value_rows.append(parts)
@@ -215,13 +208,6 @@ class RtBridge(QtCore.QObject):
                     self._param_names = list(param_names)
                     self.parameterNamesReceived.emit(list(param_names))
 
-                for block in self._rows_68:
-                    print(f"RtBridge::feed_bytes->Rows with 68:\n{block}\n")
-                for block in self._rows_36:
-                    print(f"RtBridge::feed_bytes->Rows with 36:\n{block}\n")
-                for block in self._rows_38:
-                    print(f"RtBridge::feed_bytes->Rows with 38:\n{block}\n")
-
                 if controller_rows:
                     # Build matrix: [JointName, JointID, ControllerName, ControllerID, Param1, Param2, ...]
                     self._controller_matrix = []
@@ -250,12 +236,6 @@ class RtBridge(QtCore.QObject):
                 for (joint_id, controller_id), values in controller_values.items():
                     flat_values.append([joint_id, controller_id] + list(values))
                 self.controllerValuesReceived.emit(flat_values)
-
-                print(
-                    "RtBridge::feed_bytes->Handshake summary: "
-                    f"bytes={len(line)} rows={len(rows)} "
-                    f"controller_rows={len(controller_rows)} value_rows={len(value_rows)}"
-                )
 
                 # Done collecting extended handshake
                 self._collecting_handshake_payload = False
@@ -449,18 +429,18 @@ class RtBridge(QtCore.QObject):
         total_lost = max(0, expected_total - self._total_packets_received)
         loss_pct = (total_lost / expected_total * 100) if expected_total > 0 else 0
         
-        print("\n" + "="*60)
-        print("           TRIAL DATA COLLECTION SUMMARY")
-        print("="*60)
-        print(f"  Duration: {total_time:.1f} seconds ({total_time/60:.1f} minutes)")
-        print(f"  Total packets: {self._total_packets_received}")
-        print(f"  Average rate: {overall_hz:.1f} Hz")
-        print(f"  Expected rate: {self._expected_hz} Hz")
-        print(f"  Total data: {total_bytes:.0f} bytes ({total_kb:.2f} KB / {total_mb:.2f} MB)")
-        print(f"  Packet loss: {loss_pct:.2f}% (~{int(total_lost)} packets)")
+        self.logger.debug("\n" + "="*60)
+        self.logger.debug("           TRIAL DATA COLLECTION SUMMARY")
+        self.logger.debug("="*60)
+        self.logger.debug(f"  Duration: {total_time:.1f} seconds ({total_time/60:.1f} minutes)")
+        self.logger.debug(f"  Total packets: {self._total_packets_received}")
+        self.logger.debug(f"  Average rate: {overall_hz:.1f} Hz")
+        self.logger.debug(f"  Expected rate: {self._expected_hz} Hz")
+        self.logger.debug(f"  Total data: {total_bytes:.0f} bytes ({total_kb:.2f} KB / {total_mb:.2f} MB)")
+        self.logger.debug(f"  Packet loss: {loss_pct:.2f}% (~{int(total_lost)} packets)")
         
         if self._max_consecutive_drops > 0:
-            print(f"  Worst drop streak: {self._max_consecutive_drops} consecutive packets")
+            self.logger.debug(f"  Worst drop streak: {self._max_consecutive_drops} consecutive packets")
         
         # BLE reliability indicators
         if self._max_consecutive_drops == 0 and loss_pct < 1:
@@ -481,9 +461,9 @@ class RtBridge(QtCore.QObject):
         else:
             quality = "POOR - Significant packet loss"
         
-        print(f"  Data quality: {quality}")
-        print(f"  BLE reliability: {reliability}")
-        print("="*60 + "\n")
+        self.logger.debug(f"  Data quality: {quality}")
+        self.logger.debug(f"  BLE reliability: {reliability}")
+        self.logger.debug("="*60 + "\n")
     
     def reset_monitoring(self):
         """Reset data rate monitoring statistics (call when starting new trial)."""
@@ -501,8 +481,6 @@ class RtBridge(QtCore.QObject):
         self._max_consecutive_drops = 0
         self._stall_count = 0
         self._last_stall_time = None
-        
-        print("[RtBridge] Data rate monitoring reset")
 
     @QtCore.Slot()
     def _print_data_rate(self):
@@ -569,27 +547,29 @@ class RtBridge(QtCore.QObject):
                 max_chunk = max(self._ble_chunk_sizes) if self._ble_chunk_sizes else 0
                 chunks_per_packet = self._ble_chunk_count / self._data_packet_count if self._data_packet_count > 0 else 0
                 
-                print(f"\n[RtBridge] ===== Data Rate Stats =====")
-                print(f"  Rate: {hz} Hz (expected: {self._expected_hz} Hz)")
-                print(f"  Throughput: {bytes_per_sec} bytes/sec ({kb_per_sec:.2f} KB/s)")
-                print(f"  Avg packet: {avg_packet_size:.1f} bytes")
-                print(f"  Timing: avg={avg_interval:.1f}ms, min={min_interval:.1f}ms, max={max_interval:.1f}ms")
-                print(f"  Jitter: {jitter:.1f}ms")
-                print(f"  Packet loss: {packet_loss_pct:.1f}% (~{int(actual_drops)} packets this second)")
+                self.logger.debug("[RtBridge] ===== Data Rate Stats =====")
+                self.logger.debug(f"  Rate: {hz} Hz (expected: {self._expected_hz} Hz)")
+                self.logger.debug(f"  Throughput: {bytes_per_sec} bytes/sec ({kb_per_sec:.2f} KB/s)")
+                self.logger.debug(f"  Avg packet: {avg_packet_size:.1f} bytes")
+                self.logger.debug(f"  Timing: avg={avg_interval:.1f}ms, min={min_interval:.1f}ms, max={max_interval:.1f}ms")
+                self.logger.debug(f"  Jitter: {jitter:.1f}ms")
+                self.logger.debug(f"  Packet loss: {packet_loss_pct:.1f}% (~{int(actual_drops)} packets this second)")
                 if gap_detected_drops > 0:
-                    print(f"  Gap-detected drops: {gap_detected_drops} (from timing analysis)")
+                    self.logger.debug(f"  Gap-detected drops: {gap_detected_drops} (from timing analysis)")
                 if self._max_consecutive_drops > 0:
-                    print(f"  Max consecutive drops: {self._max_consecutive_drops} packets")
-                print(f"  BLE chunks: {self._ble_chunk_count} (avg {chunks_per_packet:.1f} per packet)")
-                print(f"  BLE chunk size: avg={avg_chunk_size:.1f}B, min={min_chunk}B, max={max_chunk}B")
+                    self.logger.debug(f"  Max consecutive drops: {self._max_consecutive_drops} packets")
+                self.logger.debug(f"  BLE chunks: {self._ble_chunk_count} (avg {chunks_per_packet:.1f} per packet)")
+                self.logger.debug(f"  BLE chunk size: avg={avg_chunk_size:.1f}B, min={min_chunk}B, max={max_chunk}B")
                 if self._stall_count > 0:
-                    print(f"  Data stalls: {self._stall_count} (>100ms gaps)")
-                print(f"  Overall: {self._total_packets_received} packets in {self._total_time_elapsed:.1f}s (avg {overall_hz:.1f} Hz)")
-                print(f"  Quality: {quality}")
-                print(f"================================\n")
+                    self.logger.debug(f"  Data stalls: {self._stall_count} (>100ms gaps)")
+                self.logger.debug(f"  Overall: {self._total_packets_received} packets in {self._total_time_elapsed:.1f}s (avg {overall_hz:.1f} Hz)")
+                self.logger.debug(f"  Quality: {quality}")
+                self.logger.debug("================================")
             else:
-                print(f"[RtBridge] Data rate: {hz} Hz | {bytes_per_sec} bytes/sec ({kb_per_sec:.2f} KB/s) | "
-                      f"Avg packet: {avg_packet_size:.1f} bytes")
+                self.logger.debug(
+                    f"[RtBridge] Data rate: {hz} Hz | {bytes_per_sec} bytes/sec ({kb_per_sec:.2f} KB/s) | "
+                    f"Avg packet: {avg_packet_size:.1f} bytes"
+                )
             
             # Reset per-second counters
             self._data_packet_count = 0

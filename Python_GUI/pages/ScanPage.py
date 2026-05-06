@@ -267,6 +267,9 @@ class ScanWindowQt(QtWidgets.QWidget):
                     addr = f.read().strip()
                 if addr:
                     self.status.setText(f"Saved device available: {addr}")
+                    # Keep saved address ready so Connect can be used quickly.
+                    self.selected_address = addr
+                    self.selected_name = "Saved device"
                     # Do not auto-enable connect until user selects or loads
                     return
         except Exception:
@@ -278,6 +281,8 @@ class ScanWindowQt(QtWidgets.QWidget):
         if self._scanner is None:
             self.status.setText("Scanner not ready")
             return
+        self._disconnect_active_device()
+        self._reset_for_new_scan()
         self.btn_scan.setEnabled(False)
         self.btn_load.setEnabled(False)
         self.btn_save_connect.setEnabled(False)
@@ -285,19 +290,50 @@ class ScanWindowQt(QtWidgets.QWidget):
         self.scan_progress.setValue(0)
         self.scan_progress.setVisible(True)
         self._pending_scan = True
-        if self._qt_dev is not None and self._connected:
-            try:
-                #Disconnect immediately
-                self._qt_dev.disconnect()
-                self._connected = False
-            except Exception:
-                self._connected = False
         
         # Start scan immediately without waiting for disconnect
         self._start_scan_now()
 
+    def _disconnect_active_device(self):
+        """Best-effort disconnect so scan/load always starts clean."""
+        if self._qt_dev is None:
+            return
+        try:
+            self._qt_dev.disconnect()
+        except Exception:
+            pass
+        self._connected = False
+
+    def _reset_for_new_scan(self):
+        """Reset UI/device state before a fresh scan."""
+        self._connected = False
+        self.selected_name = None
+        self.selected_address = None
+        self.btn_start_trial.setEnabled(False)
+        self.btn_calibrate_torque.setEnabled(False)
+        self.btn_save_connect.setEnabled(False)
+        self.connect_scan_progress.setVisible(False)
+        self.connect_scan_progress.setValue(0)
+        self.connection_progress.setVisible(False)
+        self.connection_progress.setValue(0)
+        self._last_connection_progress = 0
+
+    def _reset_for_load_saved(self):
+        """Reset UI state before attempting a saved-device reconnect."""
+        self._connected = False
+        self.btn_start_trial.setEnabled(False)
+        self.btn_calibrate_torque.setEnabled(False)
+        self.btn_save_connect.setEnabled(False)
+        self.connect_scan_progress.setVisible(False)
+        self.connect_scan_progress.setValue(0)
+        self.connection_progress.setVisible(False)
+        self.connection_progress.setValue(0)
+        self._last_connection_progress = 0
+
     @QtCore.Slot()
     def on_load_saved(self):
+        self._disconnect_active_device()
+        self._reset_for_load_saved()
         if os.path.exists(self.SETTINGS_FILE):
             try:
                 with open(self.SETTINGS_FILE, "r") as f:
@@ -311,16 +347,23 @@ class ScanWindowQt(QtWidgets.QWidget):
                     self.connect_scan_progress.setVisible(True)
                     self.connection_progress.setValue(0)
                     self.connection_progress.setVisible(False)  # Hidden until device found
-                    # Disable Load and Save & Connect buttons during connection
-                    # Keep Start Scan enabled so user can disconnect and start new scan
+                    # Disable scan/load/connect while trying saved-device connection.
+                    self.btn_scan.setEnabled(False)
                     self.btn_load.setEnabled(False)
                     self.btn_save_connect.setEnabled(False)
+                    try:
+                        if self._qt_dev is not None:
+                            # Hard cap saved-device connect attempt time.
+                            self._qt_dev.set_next_connect_timeout(3.0)
+                    except Exception:
+                        pass
                     # Auto-connect to saved device
                     self.connectRequested.emit(addr)
                     return
             except Exception:
                 pass
         self.status.setText("No saved device found")
+        self.btn_save_connect.setEnabled(bool(self.selected_address))
 
     @QtCore.Slot()
     def on_selected(self):
@@ -379,7 +422,7 @@ class ScanWindowQt(QtWidgets.QWidget):
                 if self._connected and self._qt_dev is not None:
                     self.btn_start_trial.setEnabled(True)
 
-            QtCore.QTimer.singleShot(1500, _enable_start_trial_if_connected)
+            QtCore.QTimer.singleShot(3000, _enable_start_trial_if_connected)
         except Exception as ex:
             self.status.setText(f"Torque calibration failed: {ex}")
 
@@ -403,21 +446,21 @@ class ScanWindowQt(QtWidgets.QWidget):
         self.scan_progress.setVisible(False)
         self.list_devices.clear()
         
-        # Re-enable Load button if saved device exists
-        if os.path.exists(self.SETTINGS_FILE):
-            self.btn_load.setEnabled(True)
-        
-        # Continue with existing logic
+        saved_addr = None
         if os.path.exists(self.SETTINGS_FILE):
             try:
                 with open(self.SETTINGS_FILE, "r") as f:
-                    if f.read().strip():
+                    saved_addr = f.read().strip()
+                    if saved_addr:
                         self.btn_load.setEnabled(True)
             except Exception:
                 pass
         
         if not results:
             self.status.setText("No devices found")
+            # Do not auto-enable Connect after an empty scan.
+            # User can still use "Load Saved Device" to reconnect quickly.
+            self.btn_save_connect.setEnabled(False)
             return
         self.status.setText("Scan complete")
         for name, addr in results:
@@ -431,6 +474,8 @@ class ScanWindowQt(QtWidgets.QWidget):
         self.connect_scan_progress.setVisible(False)
         self.connection_progress.setVisible(False)
         self.status.setText(f"Connected: {name} {address}")
+        self.btn_scan.setEnabled(True)
+        self.btn_load.setEnabled(True)
         self.btn_start_trial.setEnabled(True)
         # Keep Save & Connect disabled after connection
         self.btn_save_connect.setEnabled(False)
@@ -467,7 +512,8 @@ class ScanWindowQt(QtWidgets.QWidget):
         self.connection_progress.setVisible(False)
         # Re-enable buttons on error
         self.btn_scan.setEnabled(True)
-        self.btn_save_connect.setEnabled(True)
+        has_manual_selection = bool(self.list_devices.selectedItems())
+        self.btn_save_connect.setEnabled(has_manual_selection)
         if os.path.exists(self.SETTINGS_FILE):
             self.btn_load.setEnabled(True)
 
