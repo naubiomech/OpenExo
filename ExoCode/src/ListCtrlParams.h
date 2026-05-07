@@ -29,8 +29,9 @@
 // When 1 (and LIST_CTRL_PARAMS_SEND_MAX is 0): handshake lists only each joint's default controller CSV
 // (line 5 names + line 6 values via readAndParseValuesRow).
 // When 0: list all controllers for each joint that passes the gate above (still smaller than SEND_MAX).
+// Default to 0 so the Python GUI receives the complete controller list.
 #ifndef LIST_CTRL_PARAMS_SEND_DEFAULT_CONTROLLER_ONLY
-    #define LIST_CTRL_PARAMS_SEND_DEFAULT_CONTROLLER_ONLY 1
+    #define LIST_CTRL_PARAMS_SEND_DEFAULT_CONTROLLER_ONLY 0
 #endif
 
 	// Define the size of the array and the max length for each string

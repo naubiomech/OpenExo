@@ -14,7 +14,7 @@
 #include <cstddef> // Required for size_t
 #include <cstdint> // Required for uint8_t
 
-// Maximum buffer size estimate (must be large enough for "t," + 11 columns + 10 commas + ",z" + null terminator)
+// Maximum buffer size estimate (must be large enough for "t," + 11 columns + 10 commas + "\n,??" + null terminator)
 const size_t MAX_COMBINED_HEADER_LENGTH = 400; 
 
 // --- Definition of the Mapping Function (INLINE, DYNAMIC) ---
@@ -115,6 +115,5 @@ void create_plotting_titles(uint8_t* config_to_send);
 
 #endif
 #endif
-
 
 

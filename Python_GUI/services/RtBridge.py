@@ -163,7 +163,7 @@ class RtBridge(QtCore.QObject):
                             key = (parts[1], parts[2])
                             controller_values[key] = parts[3:]
                         continue
-                    if prefix == '?':
+                    if prefix.startswith('?'):
                         # End-of-handshake sentinel
                         continue
                     

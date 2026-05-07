@@ -31,7 +31,13 @@ RxState currentState = WAITING_FOR_F;
  * This function blocks indefinitely until a full message is received and processed.
  */
 void readSingleMessageBlocking() {
-	long initialTime = millis();
+	const unsigned long kReadyTimeoutMs = 10000;
+	const unsigned long kReceiveTimeoutMs = 8000;
+	unsigned long waitStartTime = millis();
+	rxBuffer_bulkStr[0] = '\0';
+	rxIndex = 0;
+	messageComplete = false;
+	currentState = WAITING_FOR_F;
     //Serial.println("\n--- Entering Blocking Read Mode ---");
     //Serial.println("System will halt execution until a full frame is received.");
     Serial1.begin(115200);
@@ -48,7 +54,7 @@ void readSingleMessageBlocking() {
 		digitalWrite(LEDG, LOW);
 		digitalWrite(LEDB, HIGH);
 		delay(20);
-		if (millis() - initialTime > 10000) {
+		if (millis() - waitStartTime > kReadyTimeoutMs) {
 			break;
 		}
 	}
@@ -57,12 +63,15 @@ void readSingleMessageBlocking() {
 	digitalWrite(LEDG, LOW);
 	digitalWrite(LEDB, LOW);
 	
+	unsigned long receiveStartTime = millis();
+
     // The loop runs indefinitely until the messageComplete flag is set to true.
     while (!messageComplete) {
         // Only proceed if data is available in the UART buffer
         while (Serial1.available()) {
 			//Serial.print("\nSerial.available() > 0, incomingChar:");
             char incomingChar = Serial1.read();
+			receiveStartTime = millis();
 			//Serial.println(incomingChar);
 
             // State 1: WAITING_FOR_F
@@ -77,6 +86,7 @@ void readSingleMessageBlocking() {
                         // Buffer overflow on first character
                         currentState = WAITING_FOR_F;
                         rxIndex = 0;
+						rxBuffer_bulkStr[0] = '\0';
                     }
                 }
             }
@@ -95,6 +105,7 @@ void readSingleMessageBlocking() {
                         //Serial.println("ERROR: Receive buffer overflow during start marker.");
                         currentState = WAITING_FOR_F;
                         rxIndex = 0;
+						rxBuffer_bulkStr[0] = '\0';
                     }
                 }
 				else {
@@ -116,6 +127,7 @@ void readSingleMessageBlocking() {
                     Serial.print(").");
                     currentState = WAITING_FOR_F;
                     rxIndex = 0;
+					rxBuffer_bulkStr[0] = '\0';
                     continue; // Skip processing this character
                 }
                 
@@ -138,7 +150,7 @@ void readSingleMessageBlocking() {
                 break;
             }
         }
-		if (millis() - initialTime > 8000) {
+		if (millis() - receiveStartTime > kReceiveTimeoutMs) {
 			break;
 		}
         // Optional: Introduce a small delay if no data is available to prevent watchdog timer resets on some boards.
@@ -146,6 +158,10 @@ void readSingleMessageBlocking() {
     } // End of while (!messageComplete)
 	
 	Serial1.end();
+	if (!messageComplete) {
+		Serial.print("\nGetBulkChar ERROR: did not receive a complete controller payload.");
+		rxBuffer_bulkStr[0] = '\0';
+	}
     // Reset the state machine to be ready for the *next* time this function is called (if ever)
     // Note: Since this is in setup(), we typically won't run again, but it's clean practice.
     // messageComplete = false; // We don't reset this, as it's the loop exit condition.

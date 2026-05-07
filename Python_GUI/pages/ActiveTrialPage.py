@@ -362,27 +362,28 @@ class ActiveTrialPage(QtWidgets.QWidget):
         """Clear all plot data and reset timing."""
         try:
             # Clear all data buffers
-            self.t_vals.clear()
-            self.top_cmd_vals.clear()
-            self.top_meas_vals.clear()
-            self.bot_a_vals.clear()
-            self.bot_b_vals.clear()
-            
-            # Reset timing
-            self._real_data_t0 = None
-            self.t0 = time.time()
+            self._clear_plot_buffers()
             
             # Reset pause state when clearing plots
             self.is_paused = False
             self.btn_pause_play.setText("Pause")
-            
-            # Update plots to show empty data
-            self.curve_top_cmd.setData([], [])
-            self.curve_top_meas.setData([], [])
-            self.curve_bot_a.setData([], [])
-            self.curve_bot_b.setData([], [])
         except Exception:
             pass
+
+    def _clear_plot_buffers(self):
+        self.t_vals.clear()
+        self.top_cmd_vals.clear()
+        self.top_meas_vals.clear()
+        self.bot_a_vals.clear()
+        self.bot_b_vals.clear()
+
+        self._real_data_t0 = None
+        self.t0 = time.time()
+
+        self.curve_top_cmd.setData([], [])
+        self.curve_top_meas.setData([], [])
+        self.curve_bot_a.setData([], [])
+        self.curve_bot_b.setData([], [])
 
     def set_channel_labels(self, param_names: list):
         """Update plot labels with dynamic parameter names from device handshake."""
@@ -395,18 +396,18 @@ class ActiveTrialPage(QtWidgets.QWidget):
 
     def _update_labels(self):
         """Update plot titles and legend names based on current block index."""
-        if not self._param_names or len(self._param_names) < 4:
-            return
-        
         base = 4 * self._block_index
-        # Ensure we have enough parameter names for the selected block
-        if len(self._param_names) < base + 4:
-            return
+
+        def channel_name(offset: int) -> str:
+            index = base + offset
+            if index < len(self._param_names) and self._param_names[index]:
+                return self._param_names[index]
+            return f"Ch{index}"
         
         try:
             # Update top plot title and curve names
-            top_cmd_name = self._param_names[base + 0] if base + 0 < len(self._param_names) else 'Top Cmd'
-            top_meas_name = self._param_names[base + 1] if base + 1 < len(self._param_names) else 'Top Meas'
+            top_cmd_name = channel_name(0)
+            top_meas_name = channel_name(1)
             self.plot_top.setTitle(f"{top_cmd_name} vs {top_meas_name}")
             
             # Update legend items
@@ -417,8 +418,8 @@ class ActiveTrialPage(QtWidgets.QWidget):
             self.plot_top.legend.addItem(self.curve_top_meas, top_meas_name)
             
             # Update bottom plot title and curve names
-            bot_a_name = self._param_names[base + 2] if base + 2 < len(self._param_names) else 'Bottom A'
-            bot_b_name = self._param_names[base + 3] if base + 3 < len(self._param_names) else 'Bottom B'
+            bot_a_name = channel_name(2)
+            bot_b_name = channel_name(3)
             self.plot_bottom.setTitle(f"{bot_a_name} vs {bot_b_name}")
             
             # Update legend items
@@ -481,6 +482,7 @@ class ActiveTrialPage(QtWidgets.QWidget):
         self.btn_toggle_points.setText(
             "Show Data 0-3" if self._block_index == 1 else "Show Data 4-7"
         )
+        self._clear_plot_buffers()
         # Update labels for the new block
         self._update_labels()
 
@@ -547,4 +549,3 @@ def _demo():
 
 if __name__ == "__main__":
     _demo()
-

@@ -5,8 +5,8 @@
 //#if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41)
 
 // Must be large enough to hold the full controller payload sent by Teensy.
-// Recent "send all controllers" payloads are ~8.5 KB, so keep headroom.
-const size_t MAX_MESSAGE_SIZE = 12000;
+// The names+values controller list is larger than the older names-only payload.
+const size_t MAX_MESSAGE_SIZE = 25000;
 extern char rxBuffer_bulkStr[MAX_MESSAGE_SIZE];
 void readSingleMessageBlocking();
 #endif
