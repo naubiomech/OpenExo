@@ -7,18 +7,16 @@
 
 /**
  * @brief Combines the 11 dynamic column header strings into a single, 
- * comma-delimited C-string with "t," prefix and ",z" suffix.
+ * comma-delimited row with "t," prefix and appends it to the bulk payload.
  *
- * @param output_buffer The destination buffer to store the result.
- * @param buffer_size The maximum size of the output_buffer.
- * @return true if the string was created successfully, false otherwise.
+ * @param config_to_send Active firmware configuration used to select labels.
  */
 void create_plotting_titles(uint8_t* config_to_send) {
 	char output_buffer[MAX_COMBINED_HEADER_LENGTH];
 	size_t buffer_size = sizeof(output_buffer);
     // Delimiter strings
-    const char START_MARKER[] = "\nt,";
-    const char END_MARKER[] = ",??";
+    const char START_MARKER[] = "t,";
+    const char END_MARKER[] = "\n,??";
     const size_t START_LEN = strlen(START_MARKER);
     const size_t END_LEN = strlen(END_MARKER);
     
@@ -26,15 +24,15 @@ void create_plotting_titles(uint8_t* config_to_send) {
     const size_t num_columns = 11; 
 
     // Initial check for minimum size including START and END markers
-    if (!output_buffer || buffer_size < MAX_COMBINED_HEADER_LENGTH) {
+    if (buffer_size < MAX_COMBINED_HEADER_LENGTH) {
         Serial.println("Error: Header buffer too small or null."); 
-        return false;
+        return;
     }
 
     // 1. Initialize the buffer with the start marker "t,"
     if (buffer_size < START_LEN + END_LEN + 1) { // Check minimum space for just markers
         Serial.println("Error: Cannot fit start and end markers.");
-        return false;
+        return;
     }
     
     // Copy "t," to the buffer and track the current length
@@ -58,7 +56,7 @@ void create_plotting_titles(uint8_t* config_to_send) {
         if (required_space_for_data > buffer_size) {
             Serial.println("Error: Header buffer overflow prevented during string combination.");
             output_buffer[0] = '\0'; // Clear buffer on failure
-            return false;
+            return;
         }
 
         // a. Append the column string
@@ -72,13 +70,35 @@ void create_plotting_titles(uint8_t* config_to_send) {
         }
     }
     
-    // 3. APPEND the end marker ",z"
+    // 3. Append the final payload end marker on its own row.
     strcat(output_buffer, END_MARKER);
-	
+
+    // ctrl_param_array_gen() already terminates the controller payload with ",??".
+    // Remove that terminator before appending the plotting titles so the Nano
+    // receives one complete frame instead of stopping before the title row.
+    size_t tx_len = strlen(txBuffer_bulkStr);
+    if (tx_len >= 3 &&
+        txBuffer_bulkStr[tx_len - 3] == ',' &&
+        txBuffer_bulkStr[tx_len - 2] == '?' &&
+        txBuffer_bulkStr[tx_len - 1] == '?') {
+        txBuffer_bulkStr[tx_len - 3] = '\0';
+        tx_len -= 3;
+    }
+
+    if (tx_len > 0 && txBuffer_bulkStr[tx_len - 1] != '\n') {
+        if (tx_len + 1 >= MAX_MESSAGE_SIZE) {
+            Serial.println("Error: Header buffer overflow prevented while adding row delimiter.");
+            return;
+        }
+        strcat(txBuffer_bulkStr, "\n");
+        tx_len += 1;
+    }
+
+    if (tx_len + strlen(output_buffer) >= MAX_MESSAGE_SIZE) {
+        Serial.println("Error: Header buffer overflow prevented while appending plotting titles.");
+        return;
+    }
 	strcat(txBuffer_bulkStr, output_buffer);
     
 }
 #endif // COLUMN_DEFS_H
-
-
-

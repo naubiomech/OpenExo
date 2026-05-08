@@ -1,6 +1,8 @@
 import Foundation
 import SQLite3
 
+private let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+
 /// Local SQLite store for GUI settings and cached controller metadata (matrix / values / param names).
 /// Mirrors Python `gui_settings.txt` + in-memory controller DB persistence across app launches.
 final class OpenExoDatabase {
@@ -254,10 +256,44 @@ final class OpenExoDatabase {
         }
     }
 
+    func updateControllerSnapshotValues(jointIDs: [Int], controllerID: Int, paramIndex: Int, value: Double) {
+        queue.sync {
+            openIfNeeded()
+            guard var snapshot = getJSON(ControllerSnapshot.self, forKey: Keys.controllerSnapshot) else {
+                return
+            }
+
+            let valueText = String(value)
+            for jointID in jointIDs {
+                let key = "\(jointID)_\(controllerID)"
+                var values = snapshot.values[key] ?? Array(
+                    repeating: "",
+                    count: max(controllerParamCount(in: snapshot, jointID: jointID, controllerID: controllerID), paramIndex + 1)
+                )
+
+                if values.count <= paramIndex {
+                    values.append(contentsOf: repeatElement("", count: paramIndex + 1 - values.count))
+                }
+
+                values[paramIndex] = valueText
+                snapshot.values[key] = values
+            }
+
+            snapshot.updatedAt = Date().timeIntervalSince1970
+            setJSON(snapshot, forKey: Keys.controllerSnapshot)
+        }
+    }
+
     private enum Keys {
         static let guiSettings = "gui_settings_v1"
         static let migratedFromUserDefaults = "migrated_from_user_defaults_v1"
         static let controllerSnapshot = "controller_snapshot_v1"
+    }
+
+    private func controllerParamCount(in snapshot: ControllerSnapshot, jointID: Int, controllerID: Int) -> Int {
+        snapshot.matrix.first {
+            $0.count >= 4 && $0[1] == String(jointID) && $0[3] == String(controllerID)
+        }?.dropFirst(4).count ?? 0
     }
 }
 

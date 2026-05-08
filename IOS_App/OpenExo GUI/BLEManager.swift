@@ -319,11 +319,18 @@ class BLEManager: NSObject, ObservableObject {
     }
 
     func updateParam(isBilateral: Bool, jointID: Int, controllerID: Int, paramIndex: Int, value: Double) {
+        let jointIDs = isBilateral ? [jointID, jointID ^ 0x60] : [jointID]
+        OpenExoDatabase.shared.updateControllerSnapshotValues(
+            jointIDs: jointIDs,
+            controllerID: controllerID,
+            paramIndex: paramIndex,
+            value: value
+        )
+
         if MOCK_MODE {
             print("[MockBLE] updateParam joint=\(jointID) ctrl=\(controllerID) param=\(paramIndex) val=\(value)")
             return
         }
-        let jointIDs = isBilateral ? [jointID, jointID ^ 0x60] : [jointID]
         for jid in jointIDs {
             send(byte: "f")
             for var v in [Double(jid), Double(controllerID), Double(paramIndex), value] {

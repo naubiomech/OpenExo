@@ -26,6 +26,7 @@ static bool append_to_tx_buffer(const char* s) {
 	return true;
 }
 
+#if LIST_CTRL_PARAMS_SEND_MAX
 static bool is_joint_side_allowed_for_config(int i_joint, uint8_t exo_side) {
 	const bool is_left_joint = (i_joint % 2) == 1;
 	if (exo_side == (uint8_t)config_defs::exo_side::bilateral) {
@@ -39,6 +40,7 @@ static bool is_joint_side_allowed_for_config(int i_joint, uint8_t exo_side) {
 	}
 	return false;
 }
+#endif
 
 void ctrl_param_array_gen(uint8_t* config_to_send) {
 	// DMAMEM is not guaranteed to be zeroed on boot; clear explicitly.
@@ -245,6 +247,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 		//Serial.print("\n\n\n\nTotal number of controllers: ");
 		//Serial.print(csvCount);
 
+#if !LIST_CTRL_PARAMS_SEND_MAX && LIST_CTRL_PARAMS_SEND_DEFAULT_CONTROLLER_ONLY
 		uint8_t default_ctrl_for_joint = 0;
 		switch (i_joint)
 		{
@@ -275,6 +278,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 			default:
 				break;
 		}
+#endif
 		
 		int start_ctrl = 2; // Skip disabled controller for all joints.
 		for (int i_ctrl = start_ctrl; i_ctrl < csvCount; i_ctrl++) {
@@ -285,7 +289,6 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 #endif
 			bool csvExists;
 			std::string filename;
-			char joint_id_string;
 			switch (i_joint)
 			{
 			case 1://left ankle
@@ -295,7 +298,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::ankle.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::ankle[i_ctrl];
+					filename = controller_parameter_filenames::ankle.at(i_ctrl);
 				}
 				break;
 			case 2://right ankle
@@ -305,7 +308,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::ankle.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::ankle[i_ctrl];
+					filename = controller_parameter_filenames::ankle.at(i_ctrl);
 				}
 				break;
 			case 3://left hip
@@ -315,7 +318,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::hip.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::hip[i_ctrl];
+					filename = controller_parameter_filenames::hip.at(i_ctrl);
 				}
 				break;
 			case 4://right hip
@@ -325,7 +328,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::hip.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::hip[i_ctrl];
+					filename = controller_parameter_filenames::hip.at(i_ctrl);
 				}
 				break;
 			case 5://left knee
@@ -335,7 +338,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::knee.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::knee[i_ctrl];
+					filename = controller_parameter_filenames::knee.at(i_ctrl);
 				}
 				break;
 			case 6://right knee
@@ -345,7 +348,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::knee.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::knee[i_ctrl];
+					filename = controller_parameter_filenames::knee.at(i_ctrl);
 				}
 				break;
 			case 7://left elbow
@@ -355,7 +358,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::elbow.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::elbow[i_ctrl];
+					filename = controller_parameter_filenames::elbow.at(i_ctrl);
 				}
 				break;
 			case 8://right elbow
@@ -367,7 +370,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::elbow.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::elbow[i_ctrl];
+					filename = controller_parameter_filenames::elbow.at(i_ctrl);
 				}
 				break;
 			case 9://left arm 1
@@ -376,7 +379,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::arm_1.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::arm_1[i_ctrl];
+					filename = controller_parameter_filenames::arm_1.at(i_ctrl);
 				}
 				break;
 			case 10://right arm 1
@@ -385,7 +388,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::arm_1.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::arm_1[i_ctrl];
+					filename = controller_parameter_filenames::arm_1.at(i_ctrl);
 				}
 				break;
 			case 11://left arm 2
@@ -394,7 +397,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::arm_2.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::arm_2[i_ctrl];
+					filename = controller_parameter_filenames::arm_2.at(i_ctrl);
 				}
 				break;
 			case 12://right arm 2
@@ -403,7 +406,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 				jointName[9] = '\0';
 				csvExists = controller_parameter_filenames::arm_2.count(i_ctrl);
 				if (csvExists) {
-					filename = controller_parameter_filenames::arm_2[i_ctrl];
+					filename = controller_parameter_filenames::arm_2.at(i_ctrl);
 				}
 				break;
 			} 
@@ -460,7 +463,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
 	Serial.print(strlen(txBuffer_bulkStr));
 	Serial.print("/");
 	Serial.print(MAX_MESSAGE_SIZE);
-	Serial.print(" ends_with_',??': ");
+	Serial.print(" end_marker_ok: ");
 	size_t payload_len = strlen(txBuffer_bulkStr);
 	bool has_end = (payload_len >= 3) &&
 		(txBuffer_bulkStr[payload_len - 3] == ',') &&
@@ -551,7 +554,7 @@ void ctrl_param_array_gen(uint8_t* config_to_send) {
     int charIndex = 0;
     int dataColsRead = 0; // Tracks columns successfully parsed from the file
 
-    for (int i = 0; i < targetLine.length(); i++) {
+    for (unsigned int i = 0; i < targetLine.length(); i++) {
         char c = targetLine.charAt(i);
 
         if (c == ',') {
@@ -715,7 +718,7 @@ int readAndParseValuesRow(
 	int charIndex = 0;
 	int dataColsRead = 0;
 
-	for (int i = 0; i < targetLine.length(); i++) {
+	for (unsigned int i = 0; i < targetLine.length(); i++) {
 		char c = targetLine.charAt(i);
 		if (c == ',') {
 			arr[row_idx][colIndex][charIndex] = '\0';
