@@ -35,6 +35,8 @@ struct SettingsView: View {
     private var currentControllers: [ControllerInfo] { currentJoint?.controllers ?? [] }
     private var currentController: ControllerInfo? { currentControllers.indices.contains(selectedControllerIndex) ? currentControllers[selectedControllerIndex] : nil }
     private var currentParams: [String] { currentController?.params ?? [] }
+    private var hasControllerMetadata: Bool { showAdvanced && !joints.isEmpty }
+    private var metadataSupportsBilateral: Bool { BLEManager.hasBilateralControllerPair(in: joints) }
 
     var body: some View {
         ZStack {
@@ -72,6 +74,14 @@ struct SettingsView: View {
         .onAppear {
             loadSavedState()
             dbWarningMessage = OpenExoDatabase.shared.lastErrorMessage()
+        }
+        .onReceive(ble.$joints) { newJoints in
+            guard showAdvanced, !newJoints.isEmpty else { return }
+            isBilateral = BLEManager.hasBilateralControllerPair(in: newJoints)
+        }
+        .onChange(of: showAdvanced) { isAdvanced in
+            guard isAdvanced, !joints.isEmpty else { return }
+            isBilateral = BLEManager.hasBilateralControllerPair(in: joints)
         }
     }
 
@@ -317,6 +327,7 @@ struct SettingsView: View {
                 }
             }
             .tint(.blue)
+            .disabled(hasControllerMetadata && !metadataSupportsBilateral)
         }
     }
 
@@ -437,7 +448,7 @@ struct SettingsView: View {
     private func loadSavedState() {
         isRestoringState = true
         let s = GUISettings.load()
-        isBilateral = s.bilateral
+        isBilateral = joints.isEmpty ? s.bilateral : BLEManager.hasBilateralControllerPair(in: joints)
 
         // Advanced mode: restore by name first, fall back to index
         if !joints.isEmpty {

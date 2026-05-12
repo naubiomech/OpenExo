@@ -21,6 +21,10 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
     applyRequested = QtCore.Signal(list)  # [isBilateral, joint, controller, parameter, value]
     cancelRequested = QtCore.Signal()
 
+    _SIDE_LEFT = 0x40
+    _SIDE_RIGHT = 0x20
+    _SIDE_MASK = _SIDE_LEFT | _SIDE_RIGHT
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ActiveTrialSettingsPage")
@@ -162,6 +166,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             self._on_joint_changed(0)
             # Restore last selection after populating
             self._restore_last_selection()
+            self._apply_bilateral_state_from_matrix()
         except Exception as e:
             _logger.warning("Error populating joint combo: %s", e)
 
@@ -185,12 +190,57 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
         try:
             self.chk_bilateral.blockSignals(True)
             self.chk_bilateral.setChecked(False)
+            self.chk_bilateral.setEnabled(True)
+            self.chk_bilateral.setToolTip("")
             self.chk_bilateral.blockSignals(False)
             self.spin_value.blockSignals(True)
             self.spin_value.setValue(0.0)
             self.spin_value.blockSignals(False)
         except Exception as e:
             _logger.warning("Error clearing device prefs UI: %s", e)
+
+    def _matrix_has_bilateral_pair(self) -> bool:
+        """Return true when received controller metadata contains a left/right pair."""
+        sides_by_joint_type: dict[int, set[int]] = {}
+        for row in self._controller_matrix:
+            if len(row) < 2:
+                continue
+            try:
+                joint_id = int(row[1])
+            except (TypeError, ValueError):
+                continue
+
+            side_bits = joint_id & self._SIDE_MASK
+            if side_bits not in (self._SIDE_LEFT, self._SIDE_RIGHT):
+                continue
+
+            joint_type = joint_id & ~self._SIDE_MASK
+            sides_by_joint_type.setdefault(joint_type, set()).add(side_bits)
+
+        return any(
+            self._SIDE_LEFT in sides and self._SIDE_RIGHT in sides
+            for sides in sides_by_joint_type.values()
+        )
+
+    def _apply_bilateral_state_from_matrix(self):
+        """Use the received controller rows as the source of truth for bilateral mode."""
+        has_bilateral_pair = self._matrix_has_bilateral_pair()
+        self._bilateral_state = has_bilateral_pair
+        self._last_selection["bilateral"] = has_bilateral_pair
+
+        try:
+            self.chk_bilateral.blockSignals(True)
+            self.chk_bilateral.setChecked(has_bilateral_pair)
+            self.chk_bilateral.setEnabled(has_bilateral_pair)
+            if has_bilateral_pair:
+                self.chk_bilateral.setToolTip("Bilateral mode inferred from received left/right controller metadata.")
+            else:
+                self.chk_bilateral.setToolTip("Bilateral mode unavailable: received controller metadata for only one side.")
+            self.chk_bilateral.blockSignals(False)
+        except Exception as e:
+            _logger.warning("Error applying inferred bilateral state: %s", e)
+
+        self._save_settings()
 
     def _load_settings(self):
         """Load saved settings from file."""
@@ -547,5 +597,4 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             self.spin_value.blockSignals(False)
         except Exception as e:
             _logger.warning("Error refreshing value from DB: %s", e)
-
 

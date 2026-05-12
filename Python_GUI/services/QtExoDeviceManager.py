@@ -328,102 +328,130 @@ class QtExoDeviceManager(QtCore.QObject):
                 client = BleakClient(target, disconnected_callback=_disc_cb)
                 try:
                     ok = await client.connect()
+
+                    self.connectionProgress.emit(50)
+                    self.logger.debug(
+                        "connect() returned=%s, is_connected=%s",
+                        ok,
+                        getattr(client, "is_connected", False),
+                    )
+                    if not getattr(client, "is_connected", False):
+                        self.connectionProgress.emit(0)
+                        try:
+                            await client.disconnect()
+                        except Exception:
+                            pass
+                        return False
+
+                    # Register the live client before notifications can deliver handshake bytes.
+                    self._client = client
+                    self._is_connected = True
+
+                    # Touch services to populate cache
+                    self.connectionProgress.emit(65)
+                    _ = client.services
+
+                    def _on_rx(sender, data: bytearray):
+                        try:
+                            self.dataReceived.emit(bytes(data))
+                        except Exception:
+                            pass
+
+                    def _on_error(sender, data: bytearray):
+                        try:
+                            msg = bytes(data).decode("utf-8", errors="ignore").strip("\x00").strip()
+                            if msg:
+                                self.deviceErrorReceived.emit(msg)
+                        except Exception:
+                            pass
+
+                    self.connectionProgress.emit(75)
+                    self.log.emit("Starting notifications…")
+                    await client.start_notify(UART_RX_UUID, _on_rx)
+                    self._error_notify_enabled = False
+                    try:
+                        await client.start_notify(ERROR_CHAR_UUID, _on_error)
+                        self._error_notify_enabled = True
+                    except Exception as ex:
+                        self.log.emit("Error characteristic not found; continuing with UART only.")
+                        self.logger.warning("Error characteristic notify failed: %s", ex)
+
+                    connected_name = (name_hint or "").strip() or "Unknown"
+                    connected_address = address_hint or getattr(client, "address", "") or self._mac
+                    self.connectionProgress.emit(90)
+                    self.logger.info("Successfully connected to %s (%s)", connected_name, connected_address)
+                    self.connected.emit(connected_name, connected_address)
+                    self.connectionProgress.emit(100)
+                    self.log.emit("Connected and notifications started")
+                    self.logger.info("Connected; UART notifications started")
+                    return True
+                except asyncio.CancelledError:
+                    self.logger.warning("Connect attempt cancelled for %s", address_hint or str(target))
+                    self.connectionProgress.emit(0)
+                    if self._client is client:
+                        self._client = None
+                        self._is_connected = False
+                    try:
+                        await client.disconnect()
+                    except Exception:
+                        pass
+                    raise
                 except Exception as conn_ex:
                     self.logger.warning("Connect attempt failed for %s: %s", address_hint or str(target), conn_ex)
                     self.connectionProgress.emit(0)
+                    if self._client is client:
+                        self._client = None
+                        self._is_connected = False
                     try:
                         await client.disconnect()
                     except Exception:
                         pass
                     return False
-
-                self.connectionProgress.emit(50)
-                self.logger.debug(
-                    "connect() returned=%s, is_connected=%s",
-                    ok,
-                    getattr(client, "is_connected", False),
-                )
-                if not getattr(client, "is_connected", False):
-                    self.connectionProgress.emit(0)
-                    try:
-                        await client.disconnect()
-                    except Exception:
-                        pass
-                    return False
-
-                # Touch services to populate cache
-                self.connectionProgress.emit(65)
-                _ = client.services
-
-                def _on_rx(sender, data: bytearray):
-                    try:
-                        self.dataReceived.emit(bytes(data))
-                    except Exception:
-                        pass
-
-                def _on_error(sender, data: bytearray):
-                    try:
-                        msg = bytes(data).decode("utf-8", errors="ignore").strip("\x00").strip()
-                        if msg:
-                            self.deviceErrorReceived.emit(msg)
-                    except Exception:
-                        pass
-
-                self.connectionProgress.emit(75)
-                self.log.emit("Starting notifications…")
-                await client.start_notify(UART_RX_UUID, _on_rx)
-                self._error_notify_enabled = False
-                try:
-                    await client.start_notify(ERROR_CHAR_UUID, _on_error)
-                    self._error_notify_enabled = True
-                except Exception as ex:
-                    self.log.emit("Error characteristic not found; continuing with UART only.")
-                    self.logger.warning("Error characteristic notify failed: %s", ex)
-
-                connected_name = (name_hint or "").strip() or "Unknown"
-                connected_address = address_hint or getattr(client, "address", "") or self._mac
-                self.connectionProgress.emit(90)
-                self._client = client
-                self._is_connected = True
-                self.logger.info("Successfully connected to %s (%s)", connected_name, connected_address)
-                self.connected.emit(connected_name, connected_address)
-                self.connectionProgress.emit(100)
-                self.log.emit("Connected and notifications started")
-                self.logger.info("Connected; UART notifications started")
-                return True
 
             try:
                 self.connectScanProgress.emit(0)
                 self.connectionProgress.emit(0)
 
+                def _filter_requested_exo(device, adv) -> bool:
+                    if not self._filter_exo(device, adv):
+                        return False
+                    if not self._mac:
+                        return True
+                    return (device.address or "").lower() == self._mac.lower()
+
+                scan_timeout_s = connect_timeout_s if one_shot_timeout is not None else 40.0
+
+                scan_first = one_shot_timeout is not None and sys.platform == "darwin"
+
                 # Fast path: if a saved MAC is known, try direct connect first.
-                if self._mac:
+                # On macOS, CoreBluetooth/Bleak is more reliable when reconnecting
+                # from a freshly discovered BLEDevice than from the raw saved UUID.
+                if self._mac and not scan_first:
                     self.log.emit("Trying saved device address…")
+                    direct_timeout_s = connect_timeout_s
+                    if one_shot_timeout is not None:
+                        direct_timeout_s = min(connect_timeout_s, 8.0)
                     try:
-                        async with asyncio.timeout(connect_timeout_s):
+                        async with asyncio.timeout(direct_timeout_s):
                             if await _connect_target(self._mac, name_hint="Saved device", address_hint=self._mac):
                                 return
                     except asyncio.TimeoutError:
-                        self.logger.warning("Direct connect timed out after %.1f seconds", connect_timeout_s)
-                        self.log.emit(f"Could not find saved device within {connect_timeout_s:.0f}s")
-
-                    # For one-shot timeout mode (used by Load Saved), do not fall back to long scan retries.
-                    if one_shot_timeout is not None:
-                        self.connectionProgress.emit(0)
-                        self.connectScanProgress.emit(0)
-                        self.error.emit(f"Could not connect within {connect_timeout_s:.0f} seconds")
-                        return
+                        self.logger.warning("Direct connect timed out after %.1f seconds", direct_timeout_s)
+                        self.log.emit("Direct reconnect timed out. Scanning for saved device…")
 
                     self.log.emit("Direct connect failed. Falling back to scan…")
                     self.connectionProgress.emit(0)
                     self.connectScanProgress.emit(0)
+                elif self._mac:
+                    self.log.emit("Scanning for saved device…")
 
-                # Wrap entire connection process in timeout (40 seconds total - 4 attempts × 10s each)
-                async with asyncio.timeout(40):
-                    attempts = 4
+                # Wrap scan fallback in a bounded timeout.
+                async with asyncio.timeout(scan_timeout_s):
+                    attempts = 4 if one_shot_timeout is None else max(1, int(scan_timeout_s // 3))
                     for attempt in range(attempts):
-                        # Scanning phase progress: each attempt gets 25% (0-100%)
+                        # Scanning phase progress is spread across all attempts.
                         scan_base = int((attempt / attempts) * 100)
+                        scan_span = int(100 / attempts)
                         self.connectScanProgress.emit(scan_base)
                         
                         self.log.emit(f"Attempt {attempt+1} of {attempts}")
@@ -437,15 +465,15 @@ class QtExoDeviceManager(QtCore.QObject):
                             
                             # Start scanning in background
                             scan_task = asyncio.create_task(
-                                BleakScanner.find_device_by_filter(self._filter_exo, timeout=scan_duration)
+                                BleakScanner.find_device_by_filter(_filter_requested_exo, timeout=scan_duration)
                             )
                             
                             # Update progress while scanning
                             while not scan_task.done():
                                 elapsed = asyncio.get_event_loop().time() - scan_start
                                 scan_progress = min(elapsed / scan_duration, 1.0)
-                                # Map to current attempt's 25% range
-                                progress = scan_base + int(scan_progress * 25)
+                                # Map to current attempt's progress range.
+                                progress = scan_base + int(scan_progress * scan_span)
                                 self.connectScanProgress.emit(progress)
                                 await asyncio.sleep(0.2)  # Update every 200ms
                             
@@ -476,11 +504,14 @@ class QtExoDeviceManager(QtCore.QObject):
 
                     # If we exit loop without returning
                     self.logger.error("Connection failed - max attempts reached")
-                    self.error.emit("Max attempts reached. Could not connect.")
+                    if one_shot_timeout is not None:
+                        self.error.emit("Could not connect to saved device.")
+                    else:
+                        self.error.emit("Max attempts reached. Could not connect.")
             except asyncio.TimeoutError:
-                self.logger.error("Connection timeout after 40 seconds")
+                self.logger.error("Connection timeout after %.0f seconds", scan_timeout_s)
                 self.connectionProgress.emit(0)
-                self.error.emit("Connection timeout after 40 seconds")
+                self.error.emit(f"Connection timeout after {scan_timeout_s:.0f} seconds")
             except Exception as ex:
                 self.logger.exception(f"Connection error: {ex}")
                 self.connectionProgress.emit(0)

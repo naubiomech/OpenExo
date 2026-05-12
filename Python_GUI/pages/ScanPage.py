@@ -122,7 +122,7 @@ class ScanWindowQt(QtWidgets.QWidget):
         btn_row.setSpacing(UIConfig.SPACING_MEDIUM)
         btn_row.setContentsMargins(0, 0, 0, 0)
         self.btn_scan = QtWidgets.QPushButton("1. Start Scan")
-        self.btn_load = QtWidgets.QPushButton("Load Saved Device")
+        self.btn_load = QtWidgets.QPushButton("Connect Last Device")
         btn_row.addWidget(self.btn_scan)
         btn_row.addWidget(self.btn_load)
         layout.addLayout(btn_row)
@@ -353,8 +353,8 @@ class ScanWindowQt(QtWidgets.QWidget):
                     self.btn_save_connect.setEnabled(False)
                     try:
                         if self._qt_dev is not None:
-                            # Hard cap saved-device connect attempt time.
-                            self._qt_dev.set_next_connect_timeout(3.0)
+                            # Saved-device reconnect can take several seconds while notifications initialize.
+                            self._qt_dev.set_next_connect_timeout(12.0)
                     except Exception:
                         pass
                     # Auto-connect to saved device
@@ -459,7 +459,7 @@ class ScanWindowQt(QtWidgets.QWidget):
         if not results:
             self.status.setText("No devices found")
             # Do not auto-enable Connect after an empty scan.
-            # User can still use "Load Saved Device" to reconnect quickly.
+            # User can still use "Connect Last Device" to reconnect quickly.
             self.btn_save_connect.setEnabled(False)
             return
         self.status.setText("Scan complete")

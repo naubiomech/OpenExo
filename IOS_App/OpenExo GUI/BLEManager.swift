@@ -27,6 +27,9 @@ private enum BLEUUID {
 class BLEManager: NSObject, ObservableObject {
 
     static let shared = BLEManager()
+    private static let leftSideBit = 0x40
+    private static let rightSideBit = 0x20
+    private static let sideMask = leftSideBit | rightSideBit
 
     // MARK: Connection State
     @Published var bleState: CBManagerState = .unknown
@@ -96,6 +99,22 @@ class BLEManager: NSObject, ObservableObject {
         }
         hasSavedDevice = UserDefaults.standard.string(forKey: "savedDeviceUUID") != nil
         restoreCachedControllerMetadata()
+    }
+
+    static func hasBilateralControllerPair(in joints: [JointInfo]) -> Bool {
+        var sidesByJointType: [Int: Set<Int>] = [:]
+
+        for joint in joints {
+            let sideBits = joint.jointID & sideMask
+            guard sideBits == leftSideBit || sideBits == rightSideBit else { continue }
+
+            let jointType = joint.jointID & ~sideMask
+            sidesByJointType[jointType, default: []].insert(sideBits)
+        }
+
+        return sidesByJointType.values.contains { sides in
+            sides.contains(leftSideBit) && sides.contains(rightSideBit)
+        }
     }
 
     /// Restore last handshake controller matrix from SQLite when the saved peripheral matches (offline UI / faster reconnect).
@@ -242,56 +261,9 @@ class BLEManager: NSObject, ObservableObject {
             self.send(byte: "E")
             self.send(byte: "L")
             self.sendFSRThresholds(left: 0.25, right: 0.25)
-            self.applySavedControllerSettings()
             self.isTrialActive = true
             self.isPaused = false
             if MOCK_MODE { self.startMockDataStream() }
-        }
-    }
-
-    /// Loads the last-applied controller settings from UserDefaults and sends
-    /// them to the device, so settings persist across trials (matches Python GUI behavior).
-    private func applySavedControllerSettings() {
-        let s = GUISettings.load()
-        guard s.hasAppliedSettings else { return }
-
-        if handshakeReceived && !joints.isEmpty {
-            // Resolve by name first, then by index
-            let jIdx: Int
-            if !s.lastJointName.isEmpty,
-               let idx = joints.firstIndex(where: { $0.name == s.lastJointName }) {
-                jIdx = idx
-            } else {
-                jIdx = min(s.lastJointIndex, joints.count - 1)
-            }
-            let joint = joints[jIdx]
-            guard !joint.controllers.isEmpty else { return }
-
-            let cIdx: Int
-            if !s.lastControllerName.isEmpty,
-               let idx = joint.controllers.firstIndex(where: { $0.name == s.lastControllerName }) {
-                cIdx = idx
-            } else {
-                cIdx = min(s.lastControllerIndex, joint.controllers.count - 1)
-            }
-            let ctrl = joint.controllers[cIdx]
-            let pIdx = ctrl.params.isEmpty ? 0 : min(s.lastParamIndex, ctrl.params.count - 1)
-
-            updateParam(
-                isBilateral: s.bilateral,
-                jointID: joint.jointID,
-                controllerID: ctrl.controllerID,
-                paramIndex: pIdx,
-                value: s.lastValue
-            )
-        } else {
-            updateParam(
-                isBilateral: s.bilateral,
-                jointID: s.lastBasicJointID,
-                controllerID: s.lastBasicControllerID,
-                paramIndex: s.lastBasicParamIndex,
-                value: s.lastBasicValue
-            )
         }
     }
 
