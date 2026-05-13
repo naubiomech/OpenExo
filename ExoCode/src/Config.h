@@ -82,7 +82,7 @@
     namespace BLE_times
     {
         const float _status_msg_delay = 2000000;    //Microseconds
-        const float _real_time_msg_delay = 14285;   //Microseconds
+        const float _real_time_msg_delay = 9000;    //Microseconds (~111 Hz target, expect ~100 Hz actual)
         const float _update_delay = 1000;           //Microseconds
         const float _poll_timeout = 4;              //Milliseconds
     }
