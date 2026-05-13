@@ -1,0 +1,5 @@
+bilateral=False
+last_joint=Ankle(R) (36)
+last_controller=spv2
+last_parameter=12
+last_value=1.0

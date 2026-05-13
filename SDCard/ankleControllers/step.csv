@@ -2,5 +2,5 @@
 9,"parameter number, the number of parameters to read per line",,,,,,,
 ,Parameter list for the  Sine controller,,,,,,,
 ,Parameter order:,,,,,,,
-Amplitdue,Duration,Repetitions,Spacing,PID Flag,P Gain,I Gain,D Gain,Alpha 
+Amplitude,Duration,Repetitions,Spacing,PID Flag,P Gain,I Gain,D Gain,Alpha 
 0,0,0,0,0,0,0,0,100
