@@ -1,3 +1,5 @@
+import logging
+
 try:
     from PySide6 import QtCore, QtWidgets
 except ImportError as e:
@@ -8,6 +10,8 @@ from utils import (
     style_button, style_combo_box, style_spinbox
 )
 
+_logger = logging.getLogger(__name__)
+
 
 class ActiveTrialSettingsPage(QtWidgets.QWidget):
     """Settings page to manually enter controller/parameter/value without text fields.
@@ -17,10 +21,15 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
     applyRequested = QtCore.Signal(list)  # [isBilateral, joint, controller, parameter, value]
     cancelRequested = QtCore.Signal()
 
+    _SIDE_LEFT = 0x40
+    _SIDE_RIGHT = 0x20
+    _SIDE_MASK = _SIDE_LEFT | _SIDE_RIGHT
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ActiveTrialSettingsPage")
         self._controller_matrix: list[list[str]] = []
+        self._controller_values: dict[tuple[str, str], list[str]] = {}
         self._joint_controllers: dict = {}  # Maps joint name to list of controller indices
         self._bilateral_state = False  # Store bilateral state
         self._last_selection = {
@@ -90,6 +99,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
         lpf = lbl_param.font(); lpf.setPointSize(UIConfig.FONT_LARGE); lbl_param.setFont(lpf)
         self.combo_param = QtWidgets.QComboBox()
         style_combo_box(self.combo_param, height=UIConfig.BTN_HEIGHT_XLARGE, font_size=UIConfig.FONT_LARGE)
+        self.combo_param.currentIndexChanged.connect(self._on_param_changed)
         form.addWidget(lbl_param, row, 0)
         form.addWidget(self.combo_param, row, 1)
         row += 1
@@ -156,16 +166,87 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             self._on_joint_changed(0)
             # Restore last selection after populating
             self._restore_last_selection()
+            self._apply_bilateral_state_from_matrix()
         except Exception as e:
-            print(f"Error populating joint combo: {e}")
-            pass
+            _logger.warning("Error populating joint combo: %s", e)
+
+    def set_controller_values(self, values_db: dict):
+        try:
+            self._controller_values = dict(values_db) if values_db else {}
+            self._refresh_value_from_db()
+        except Exception as e:
+            _logger.warning("Error setting controller values: %s", e)
+
+    def clear_device_session_preferences(self):
+        """Reset persisted Update Controller selections for a disconnected / new BLE device."""
+        self._bilateral_state = False
+        self._last_selection = {
+            "bilateral": False,
+            "joint": None,
+            "controller": None,
+            "parameter": None,
+            "value": 0.0,
+        }
+        try:
+            self.chk_bilateral.blockSignals(True)
+            self.chk_bilateral.setChecked(False)
+            self.chk_bilateral.setEnabled(True)
+            self.chk_bilateral.setToolTip("")
+            self.chk_bilateral.blockSignals(False)
+            self.spin_value.blockSignals(True)
+            self.spin_value.setValue(0.0)
+            self.spin_value.blockSignals(False)
+        except Exception as e:
+            _logger.warning("Error clearing device prefs UI: %s", e)
+
+    def _matrix_has_bilateral_pair(self) -> bool:
+        """Return true when received controller metadata contains a left/right pair."""
+        sides_by_joint_type: dict[int, set[int]] = {}
+        for row in self._controller_matrix:
+            if len(row) < 2:
+                continue
+            try:
+                joint_id = int(row[1])
+            except (TypeError, ValueError):
+                continue
+
+            side_bits = joint_id & self._SIDE_MASK
+            if side_bits not in (self._SIDE_LEFT, self._SIDE_RIGHT):
+                continue
+
+            joint_type = joint_id & ~self._SIDE_MASK
+            sides_by_joint_type.setdefault(joint_type, set()).add(side_bits)
+
+        return any(
+            self._SIDE_LEFT in sides and self._SIDE_RIGHT in sides
+            for sides in sides_by_joint_type.values()
+        )
+
+    def _apply_bilateral_state_from_matrix(self):
+        """Use the received controller rows as the source of truth for bilateral mode."""
+        has_bilateral_pair = self._matrix_has_bilateral_pair()
+        self._bilateral_state = has_bilateral_pair
+        self._last_selection["bilateral"] = has_bilateral_pair
+
+        try:
+            self.chk_bilateral.blockSignals(True)
+            self.chk_bilateral.setChecked(has_bilateral_pair)
+            self.chk_bilateral.setEnabled(has_bilateral_pair)
+            if has_bilateral_pair:
+                self.chk_bilateral.setToolTip("Bilateral mode inferred from received left/right controller metadata.")
+            else:
+                self.chk_bilateral.setToolTip("Bilateral mode unavailable: received controller metadata for only one side.")
+            self.chk_bilateral.blockSignals(False)
+        except Exception as e:
+            _logger.warning("Error applying inferred bilateral state: %s", e)
+
+        self._save_settings()
 
     def _load_settings(self):
         """Load saved settings from file."""
         try:
             self._bilateral_state = SettingsManager.get_bool("bilateral", False)
             self._last_selection["bilateral"] = self._bilateral_state
-            print(f"[Settings] Loaded bilateral state: {self._bilateral_state}")
             
             # Load last selection values
             joint = SettingsManager.get_setting("last_joint")
@@ -184,7 +265,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             if value is not None:
                 self._last_selection["value"] = value
         except Exception as e:
-            print(f"Error loading settings: {e}")
+            _logger.warning("Error loading settings: %s", e)
 
     def _save_settings(self):
         """Save settings to file."""
@@ -209,9 +290,8 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                 updates["last_value"] = str(value)
             
             SettingsManager.update_settings(updates)
-            print(f"[Settings] Saved settings")
         except Exception as e:
-            print(f"Error saving settings: {e}")
+            _logger.warning("Error saving settings: %s", e)
 
     def _on_bilateral_changed(self, state):
         """Save bilateral state when checkbox changes."""
@@ -221,8 +301,6 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
     def _restore_last_selection(self):
         """Restore UI controls to last saved selection."""
         try:
-            print(f"[Settings] Attempting to restore last selection: {self._last_selection}")
-            
             # Restore bilateral checkbox
             bilateral = self._last_selection.get("bilateral", False)
             self.chk_bilateral.blockSignals(True)
@@ -240,7 +318,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                     self._on_joint_changed(idx)
                 else:
                     self.combo_joint.blockSignals(False)
-                    print(f"[Settings] Joint '{joint_name}' not found in dropdown")
+                    _logger.debug("Joint %r not found in dropdown", joint_name)
             
             # Restore controller selection
             controller_name = self._last_selection.get("controller")
@@ -251,10 +329,9 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                     self.combo_controller.setCurrentIndex(idx)
                     self.combo_controller.blockSignals(False)
                     self._on_controller_changed(idx)
-                    print(f"[Settings] Restored controller: {controller_name} at index {idx}")
                 else:
                     self.combo_controller.blockSignals(False)
-                    print(f"[Settings] Controller '{controller_name}' not found in dropdown")
+                    _logger.debug("Controller %r not found in dropdown", controller_name)
             
             # Restore parameter selection
             param_idx = self._last_selection.get("parameter", 0)
@@ -263,7 +340,6 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             self.combo_param.blockSignals(True)
             if param_idx < self.combo_param.count() and param_idx >= 0:
                 self.combo_param.setCurrentIndex(param_idx)
-                print(f"[Settings] Restored parameter index: {param_idx}")
             self.combo_param.blockSignals(False)
             
             # Restore value
@@ -271,12 +347,8 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             if value is None:
                 value = 0.0
             self.spin_value.setValue(float(value))
-            
-            print(f"[Settings] Successfully restored last selection")
         except Exception as e:
-            print(f"[Settings] Error restoring last selection: {e}")
-            import traceback
-            traceback.print_exc()
+            _logger.exception("Error restoring last selection: %s", e)
 
     @QtCore.Slot()
     def _on_apply(self):
@@ -292,13 +364,6 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             parameter_idx = self.combo_param.currentIndex()
             parameter_name = self.combo_param.currentText()
             value = float(self.spin_value.value())
-            
-            print(f"\n=== Apply Settings ===")
-            print(f"Joint: {joint_name} (dropdown idx: {joint_idx})")
-            print(f"Controller: {controller_name} (local idx: {controller_local_idx})")
-            print(f"Parameter: {parameter_name} (idx: {parameter_idx})")
-            print(f"Value: {value}")
-            print(f"Bilateral: {is_bilateral}")
             
             # Get the actual controller matrix index
             if joint_name in self._joint_controllers:
@@ -321,24 +386,24 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                             try:
                                 joint_id_raw = int(row[1])
                             except (ValueError, IndexError):
-                                print(f"Warning: Could not parse joint ID from row[1]='{row[1]}'")
+                                _logger.warning("Could not parse joint ID from row[1]=%r", row[1])
                         
                         # Extract actual controller ID from row[3]
                         controller_id = controller_local_idx  # Default to local index if parsing fails
                         if len(row) > 3:
                             try:
                                 controller_id = int(row[3])
-                                print(f"Extracted controller ID {controller_id} from row[3]='{row[3]}'")
                             except (ValueError, TypeError):
-                                print(f"Warning: Could not parse controller ID from row[3]='{row[3]}', using local idx {controller_local_idx}")
+                                _logger.warning(
+                                    "Could not parse controller ID from row[3]=%r, using local idx %s",
+                                    row[3] if len(row) > 3 else None,
+                                    controller_local_idx,
+                                )
                         else:
-                            print(f"Warning: Row too short (len={len(row)}), cannot extract controller ID from row[3]")
+                            _logger.warning("Row too short (len=%s), cannot read controller ID from row[3]", len(row))
                         
                         # Use the actual joint_id_raw (like 65, 68) not the mapped joint_num
                         payload = [is_bilateral, joint_id_raw, controller_id, parameter_idx, value]
-                        print(f"Payload: is_bilateral={is_bilateral}, joint_id={joint_id_raw}, controller_id={controller_id}, param_idx={parameter_idx}, value={value}")
-                        print(f"Full row: {row}")
-                        print(f"======================\n")
                         
                         # Save last selection for next time
                         self._last_selection = {
@@ -348,20 +413,17 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                             "parameter": parameter_idx,
                             "value": value,
                         }
-                        print(f"[Settings] Saving last selection: {self._last_selection}")
                         self._save_settings()
                         
                         self.applyRequested.emit(payload)
                         return
             
             # Fallback if something goes wrong
-            print(f"Warning: Falling back to default payload")
+            _logger.warning("Falling back to default controller payload")
             payload = [is_bilateral, 1, 0, 0, value]
             self.applyRequested.emit(payload)
         except Exception as e:
-            print(f"Error in _on_apply: {e}")
-            import traceback
-            traceback.print_exc()
+            _logger.exception("Error in _on_apply: %s", e)
 
     @QtCore.Slot(int, int)
     def _on_cell_clicked(self, row: int, column: int):
@@ -377,8 +439,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             param_index = max(0, int(column) - 1)
             self.combo_param.setCurrentIndex(param_index)
         except Exception as e:
-            print(f"Error in _on_cell_clicked: {e}")
-            pass
+            _logger.warning("Error in _on_cell_clicked: %s", e)
 
     @QtCore.Slot(int)
     def _on_joint_changed(self, idx: int):
@@ -440,6 +501,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                 
                 # Trigger parameter update for first controller
                 self._on_controller_changed(0)
+                self._refresh_value_from_db()
             else:
                 # No controllers for this joint
                 self.table.clear()
@@ -453,8 +515,7 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
                 self.combo_controller.blockSignals(False)
                 
         except Exception as e:
-            print(f"Error in _on_joint_changed: {e}")
-            pass
+            _logger.warning("Error in _on_joint_changed: %s", e)
 
     @QtCore.Slot(int)
     def _on_controller_changed(self, idx: int):
@@ -486,12 +547,54 @@ class ActiveTrialSettingsPage(QtWidgets.QWidget):
             else:
                 self.combo_param.addItem("(no params)")
         except Exception as e:
-            print(f"Error in _on_controller_changed: {e}")
-            pass
+            _logger.warning("Error in _on_controller_changed: %s", e)
         finally:
             try:
                 self.combo_param.blockSignals(False)
             except Exception:
                 pass
+        self._refresh_value_from_db()
 
+    @QtCore.Slot(int)
+    def _on_param_changed(self, _idx: int):
+        self._refresh_value_from_db()
+
+    def _current_jid_cid(self):
+        try:
+            joint_name = self.combo_joint.currentText()
+            controller_idx = self.combo_controller.currentIndex()
+            if joint_name not in self._joint_controllers:
+                return None, None
+            controller_indices = self._joint_controllers[joint_name]
+            if controller_idx < 0 or controller_idx >= len(controller_indices):
+                return None, None
+            matrix_idx = controller_indices[controller_idx]
+            if matrix_idx >= len(self._controller_matrix):
+                return None, None
+            row = self._controller_matrix[matrix_idx]
+            if len(row) < 4:
+                return None, None
+            return str(row[1]), str(row[3])
+        except Exception:
+            return None, None
+
+    def _refresh_value_from_db(self):
+        try:
+            joint_id, controller_id = self._current_jid_cid()
+            if joint_id is None or controller_id is None:
+                return
+            values = self._controller_values.get((joint_id, controller_id), [])
+            param_idx = self.combo_param.currentIndex()
+            if param_idx < 0 or param_idx >= len(values):
+                return
+            raw = values[param_idx]
+            try:
+                val = float(raw)
+            except Exception:
+                val = 0.0
+            self.spin_value.blockSignals(True)
+            self.spin_value.setValue(val)
+            self.spin_value.blockSignals(False)
+        except Exception as e:
+            _logger.warning("Error refreshing value from DB: %s", e)
 

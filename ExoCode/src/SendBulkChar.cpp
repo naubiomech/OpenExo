@@ -41,6 +41,14 @@ void send_bulk_char() {
     
     // Calculate the exact length of the message.
     size_t message_length = strlen(txBuffer_bulkStr);
+	Serial.print("\nsend_bulk_char::payload_bytes=");
+	Serial.print(message_length);
+	Serial.print(" end_marker_ok=");
+	bool marker_ok = (message_length >= 3) &&
+		(txBuffer_bulkStr[message_length - 3] == ',') &&
+		(txBuffer_bulkStr[message_length - 2] == '?') &&
+		(txBuffer_bulkStr[message_length - 1] == '?');
+	Serial.print(marker_ok ? "yes" : "no");
     
     // 2. Transmit the entire message in one burst using Serial.write().
     // This is the most efficient method for large C-strings on Arduino.

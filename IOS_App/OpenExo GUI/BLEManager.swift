@@ -27,6 +27,9 @@ private enum BLEUUID {
 class BLEManager: NSObject, ObservableObject {
 
     static let shared = BLEManager()
+    private static let leftSideBit = 0x40
+    private static let rightSideBit = 0x20
+    private static let sideMask = leftSideBit | rightSideBit
 
     // MARK: Connection State
     @Published var bleState: CBManagerState = .unknown
@@ -95,6 +98,51 @@ class BLEManager: NSObject, ObservableObject {
             bleState = .poweredOn
         }
         hasSavedDevice = UserDefaults.standard.string(forKey: "savedDeviceUUID") != nil
+        restoreCachedControllerMetadata()
+    }
+
+    static func hasBilateralControllerPair(in joints: [JointInfo]) -> Bool {
+        var sidesByJointType: [Int: Set<Int>] = [:]
+
+        for joint in joints {
+            let sideBits = joint.jointID & sideMask
+            guard sideBits == leftSideBit || sideBits == rightSideBit else { continue }
+
+            let jointType = joint.jointID & ~sideMask
+            sidesByJointType[jointType, default: []].insert(sideBits)
+        }
+
+        return sidesByJointType.values.contains { sides in
+            sides.contains(leftSideBit) && sides.contains(rightSideBit)
+        }
+    }
+
+    /// Restore last handshake controller matrix from SQLite when the saved peripheral matches (offline UI / faster reconnect).
+    private func restoreCachedControllerMetadata() {
+        guard let uuid = UserDefaults.standard.string(forKey: "savedDeviceUUID"),
+              let snap = OpenExoDatabase.shared.loadControllerSnapshot(),
+              snap.deviceUUID == uuid,
+              !snap.matrix.isEmpty else { return }
+        if !snap.parameterNames.isEmpty {
+            parameterNames = snap.parameterNames
+        }
+        joints = ControllerSnapshot.joints(from: snap.matrix)
+    }
+
+    private func persistHandshakeSnapshot(joints js: [JointInfo], parameterNames names: [String], values: [String: [String]]) {
+        let uuid = connectedPeripheral?.identifier.uuidString
+            ?? UserDefaults.standard.string(forKey: "savedDeviceUUID")
+            ?? ""
+        guard !uuid.isEmpty else { return }
+        let matrix = ControllerSnapshot.buildMatrix(from: js)
+        let snap = ControllerSnapshot(
+            deviceUUID: uuid,
+            matrix: matrix,
+            values: values,
+            parameterNames: names,
+            updatedAt: Date().timeIntervalSince1970
+        )
+        OpenExoDatabase.shared.saveControllerSnapshot(snap)
     }
 
     // ─────────────────────────────────────────────
@@ -110,7 +158,8 @@ class BLEManager: NSObject, ObservableObject {
         isScanning = true
         connectionStatus = "Scanning…"
         central.scanForPeripherals(withServices: [BLEUUID.service], options: nil)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { [weak self] in
+        // Match Python GUI `QtExoDeviceManager` discover timeout (short scan).
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
             guard let self, self.isScanning else { return }
             self.stopScan()
         }
@@ -127,11 +176,18 @@ class BLEManager: NSObject, ObservableObject {
     func connect(_ device: DiscoveredDevice) {
         if MOCK_MODE { mockConnect(device); return }
         guard let peripheral = device.peripheral else { return }
+        let newId = peripheral.identifier.uuidString
+        if let snap = OpenExoDatabase.shared.loadControllerSnapshot(), snap.deviceUUID != newId {
+            OpenExoDatabase.shared.clearControllerSnapshot()
+            joints = []
+            parameterNames = []
+            handshakeReceived = false
+        }
         connectionStatus = "Connecting to \(device.name)…"
         central.stopScan()
         isScanning = false
         central.connect(peripheral, options: nil)
-        UserDefaults.standard.set(peripheral.identifier.uuidString, forKey: "savedDeviceUUID")
+        UserDefaults.standard.set(newId, forKey: "savedDeviceUUID")
         hasSavedDevice = true
     }
 
@@ -205,56 +261,9 @@ class BLEManager: NSObject, ObservableObject {
             self.send(byte: "E")
             self.send(byte: "L")
             self.sendFSRThresholds(left: 0.25, right: 0.25)
-            self.applySavedControllerSettings()
             self.isTrialActive = true
             self.isPaused = false
             if MOCK_MODE { self.startMockDataStream() }
-        }
-    }
-
-    /// Loads the last-applied controller settings from UserDefaults and sends
-    /// them to the device, so settings persist across trials (matches Python GUI behavior).
-    private func applySavedControllerSettings() {
-        let s = GUISettings.load()
-        guard s.hasAppliedSettings else { return }
-
-        if handshakeReceived && !joints.isEmpty {
-            // Resolve by name first, then by index
-            let jIdx: Int
-            if !s.lastJointName.isEmpty,
-               let idx = joints.firstIndex(where: { $0.name == s.lastJointName }) {
-                jIdx = idx
-            } else {
-                jIdx = min(s.lastJointIndex, joints.count - 1)
-            }
-            let joint = joints[jIdx]
-            guard !joint.controllers.isEmpty else { return }
-
-            let cIdx: Int
-            if !s.lastControllerName.isEmpty,
-               let idx = joint.controllers.firstIndex(where: { $0.name == s.lastControllerName }) {
-                cIdx = idx
-            } else {
-                cIdx = min(s.lastControllerIndex, joint.controllers.count - 1)
-            }
-            let ctrl = joint.controllers[cIdx]
-            let pIdx = ctrl.params.isEmpty ? 0 : min(s.lastParamIndex, ctrl.params.count - 1)
-
-            updateParam(
-                isBilateral: s.bilateral,
-                jointID: joint.jointID,
-                controllerID: ctrl.controllerID,
-                paramIndex: pIdx,
-                value: s.lastValue
-            )
-        } else {
-            updateParam(
-                isBilateral: s.bilateral,
-                jointID: s.lastBasicJointID,
-                controllerID: s.lastBasicControllerID,
-                paramIndex: s.lastBasicParamIndex,
-                value: s.lastBasicValue
-            )
         }
     }
 
@@ -264,6 +273,9 @@ class BLEManager: NSObject, ObservableObject {
         stopMockDataStream()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.sendReliable(Data([UInt8(ascii: "w")]))
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            self?.send(byte: "Z")
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             self?.disconnect()
@@ -279,11 +291,18 @@ class BLEManager: NSObject, ObservableObject {
     }
 
     func updateParam(isBilateral: Bool, jointID: Int, controllerID: Int, paramIndex: Int, value: Double) {
+        let jointIDs = isBilateral ? [jointID, jointID ^ 0x60] : [jointID]
+        OpenExoDatabase.shared.updateControllerSnapshotValues(
+            jointIDs: jointIDs,
+            controllerID: controllerID,
+            paramIndex: paramIndex,
+            value: value
+        )
+
         if MOCK_MODE {
             print("[MockBLE] updateParam joint=\(jointID) ctrl=\(controllerID) param=\(paramIndex) val=\(value)")
             return
         }
-        let jointIDs = isBilateral ? [jointID, jointID ^ 0x60] : [jointID]
         for jid in jointIDs {
             send(byte: "f")
             for var v in [Double(jid), Double(controllerID), Double(paramIndex), value] {
@@ -446,6 +465,7 @@ class BLEManager: NSObject, ObservableObject {
     private func parseHandshake(_ text: String) {
         var names: [String] = []
         var jointsMap: [Int: JointInfo] = [:]
+        var valueMap: [String: [String]] = [:]
 
         // Handshake may contain newline-separated sections:
         //   "t,param1,param2,..."          — parameter names
@@ -486,6 +506,16 @@ class BLEManager: NSObject, ObservableObject {
                     continue
                 }
 
+                if raw.lowercased().hasPrefix("v,") {
+                    let inner = String(raw.dropFirst(2))
+                    let segs = inner.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    guard segs.count >= 3,
+                          let jid = Int(segs[0]),
+                          let cid = Int(segs[1]) else { continue }
+                    valueMap["\(jid)_\(cid)"] = Array(segs.dropFirst(2))
+                    continue
+                }
+
                 let parts = raw.components(separatedBy: ",")
                     .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
 
@@ -514,6 +544,7 @@ class BLEManager: NSObject, ObservableObject {
         if !names.isEmpty { parameterNames = names }
         if !jointsMap.isEmpty {
             joints = jointsMap.values.sorted { $0.jointID < $1.jointID }
+            persistHandshakeSnapshot(joints: joints, parameterNames: parameterNames, values: valueMap)
             print("[ExoBLE] Handshake result: \(joints.count) joints, \(joints.reduce(0) { $0 + $1.controllers.count }) controllers total")
         } else {
             print("[ExoBLE] WARNING: No joints/controllers parsed from handshake")
@@ -530,7 +561,7 @@ class BLEManager: NSObject, ObservableObject {
         isScanning = true
         connectionStatus = "Scanning…"
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
             guard let self else { return }
             self.discoveredDevices = [
                 DiscoveredDevice(id: UUID(), name: "OpenExo Left Ankle"),
@@ -552,6 +583,7 @@ class BLEManager: NSObject, ObservableObject {
             self.connectedName = device.name
             self.connectionStatus = "Connected to \(device.name)"
             self.hasSavedDevice = true
+            UserDefaults.standard.set(device.id.uuidString, forKey: "savedDeviceUUID")
 
             // Simulate handshake after 1s
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -595,6 +627,7 @@ class BLEManager: NSObject, ObservableObject {
         handshakeReceived = true
         batteryVoltage = 11.7
         connectionStatus = "Handshake complete — ready to start trial"
+        persistHandshakeSnapshot(joints: joints, parameterNames: parameterNames, values: [:])
     }
 
     // MARK: Mock Data Stream (sine waves at 30 Hz)

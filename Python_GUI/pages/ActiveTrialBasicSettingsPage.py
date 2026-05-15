@@ -1,3 +1,5 @@
+import logging
+
 try:
     from PySide6 import QtCore, QtWidgets
 except ImportError as e:
@@ -7,6 +9,8 @@ from utils import (
     UIConfig, JointConfig, SettingsManager,
     style_button, style_combo_box, style_spinbox
 )
+
+_logger = logging.getLogger(__name__)
 
 
 class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
@@ -124,6 +128,30 @@ class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
         self.btn_apply.clicked.connect(self._on_apply)
         self.btn_cancel.clicked.connect(self.cancelRequested.emit)
 
+    def clear_device_session_preferences(self):
+        """Reset in-memory basic controller fields when switching BLE devices."""
+        self._bilateral_state = False
+        self._last_selection = {
+            "bilateral": False,
+            "joint": "Left hip",
+            "joint_id": 0,
+            "controller": 0,
+            "parameter": 0,
+            "value": 0.0,
+        }
+        try:
+            self.chk_bilateral.blockSignals(True)
+            self.chk_bilateral.setChecked(False)
+            self.chk_bilateral.blockSignals(False)
+            self.spin_joint_id.setValue(0)
+            self.combo_controller.setCurrentIndex(0)
+            self.combo_param.setCurrentIndex(0)
+            self.spin_value.blockSignals(True)
+            self.spin_value.setValue(0.0)
+            self.spin_value.blockSignals(False)
+        except Exception as e:
+            _logger.warning("Error clearing device prefs UI: %s", e)
+
     def _load_settings(self):
         """Load all settings from file."""
         import os
@@ -136,7 +164,6 @@ class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
                         if line.startswith("bilateral="):
                             self._bilateral_state = line.split("=")[1].strip() == "True"
                             self._last_selection["bilateral"] = self._bilateral_state
-                            print(f"[BasicSettings] Loaded bilateral state: {self._bilateral_state}")
                         elif line.startswith("last_basic_joint_id="):
                             try:
                                 self._last_selection["joint_id"] = int(line.split("=")[1].strip())
@@ -174,7 +201,7 @@ class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
                             except:
                                 pass
         except Exception as e:
-            print(f"Error loading basic settings: {e}")
+            _logger.warning("Error loading basic settings: %s", e)
 
     def _save_settings(self):
         """Save all settings to file."""
@@ -204,9 +231,8 @@ class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
             with open(settings_file, 'w') as f:
                 for key, val in existing.items():
                     f.write(f"{key}={val}\n")
-            print(f"[BasicSettings] Saved settings to {settings_file}")
         except Exception as e:
-            print(f"Error saving settings: {e}")
+            _logger.warning("Error saving basic settings: %s", e)
     
     def _restore_last_selection(self):
         """Restore UI controls to last saved selection."""
@@ -238,10 +264,8 @@ class ActiveTrialBasicSettingsPage(QtWidgets.QWidget):
             # Restore value
             value = self._last_selection.get("value", 0.0)
             self.spin_value.setValue(value)
-            
-            print(f"[BasicSettings] Restored last selection: {self._last_selection}")
         except Exception as e:
-            print(f"Error restoring last selection: {e}")
+            _logger.warning("Error restoring last selection: %s", e)
 
     @QtCore.Slot(int)
     def _on_bilateral_changed(self, state):

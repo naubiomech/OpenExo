@@ -58,13 +58,47 @@ namespace
         sanitized_payload[write_index] = '\0';
 
         size_t offset = 0;
+        size_t chunk_count = 0;
         while (offset < write_index)
         {
             size_t chunk_len = ((write_index - offset) > kHandshakeChunkSize) ? kHandshakeChunkSize : (write_index - offset);
             characteristic.writeValue((const uint8_t *)(sanitized_payload + offset), chunk_len);
             delay(20);
             offset += chunk_len;
+            chunk_count++;
         }
+
+        #ifdef SIMPLE_DEBUG
+        size_t row_count = 0;
+        size_t value_row_count = 0;
+        bool row_start = true;
+        for (size_t i = 0; i < write_index; ++i)
+        {
+            const char c = sanitized_payload[i];
+            if (row_start)
+            {
+                if (c == 'v')
+                {
+                    value_row_count++;
+                }
+                row_start = false;
+            }
+            if (c == '|')
+            {
+                row_count++;
+                row_start = true;
+            }
+        }
+
+        Serial.print("\nExoBLE::handshake_payload bytes=");
+        Serial.print(write_index);
+        Serial.print(" chunks=");
+        Serial.print(chunk_count);
+        Serial.print(" rows=");
+        Serial.print(row_count);
+        Serial.print(" value_rows=");
+        Serial.print(value_row_count);
+        #endif
 
         return true;
     }
@@ -254,20 +288,26 @@ bool ExoBLE::handle_updates()
                 logger::print("\n");
             #endif
 
-            // Mark connected and send the handshake payload to the GUI
+            // Mark connected; wait for TX subscribe before sending handshake.
             _connected = current_status;
-            const bool delivered = send_handshake_payload(_gatt_db.TXChar);
-            _handshake_payload_pending = !delivered;
+            _tx_subscribed = false;
+            _handshake_sent_this_connection = false;
+            _handshake_payload_pending = true;
         }
 
         advertising_onoff(current_status == 0);
         _connected = current_status;
     }
 
-    if (_connected > 0 && _handshake_payload_pending && rxBuffer_bulkStr[0] != '\0')
+    if (_connected > 0 &&
+        _tx_subscribed &&
+        !_handshake_sent_this_connection &&
+        _handshake_payload_pending &&
+        rxBuffer_bulkStr[0] != '\0')
     {
         if (send_handshake_payload(_gatt_db.TXChar))
         {
+            _handshake_sent_this_connection = true;
             _handshake_payload_pending = false;
         }
     }
@@ -335,8 +375,18 @@ void ExoBLE::_on_tx_subscribed(BLEDevice /*central*/, BLECharacteristic characte
 
 void ExoBLE::_handle_tx_subscribed(BLECharacteristic characteristic)
 {
+    _tx_subscribed = true;
+    if (_connected <= 0 || _handshake_sent_this_connection)
+    {
+        return;
+    }
+
     const bool delivered = send_handshake_payload(characteristic);
     _handshake_payload_pending = !delivered;
+    if (delivered)
+    {
+        _handshake_sent_this_connection = true;
+    }
 }
 
 void ble_rx::on_rx_recieved(BLEDevice central, BLECharacteristic characteristic)

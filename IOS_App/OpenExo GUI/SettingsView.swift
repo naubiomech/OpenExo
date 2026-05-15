@@ -14,7 +14,7 @@ struct SettingsView: View {
     @State private var paramValue: Double = 0
 
     // Basic Settings State
-    @State private var basicJointID: Int = 68
+    @State private var basicJointID: Int = 65
     @State private var basicControllerID: Int = 0
     @State private var basicParamIndex: Int = 0
     @State private var basicValue: Double = 0
@@ -22,10 +22,12 @@ struct SettingsView: View {
     @State private var isBilateral: Bool = false
     @State private var appliedSuccessfully = false
     @State private var isRestoringState = false
+    @State private var dbWarningMessage: String?
 
     init(navPath: Binding<NavigationPath>) {
         _navPath = navPath
-        _showAdvanced = State(initialValue: BLEManager.shared.handshakeReceived && !BLEManager.shared.joints.isEmpty)
+        // Advanced mode whenever we have controller metadata (live handshake or SQLite cache).
+        _showAdvanced = State(initialValue: !BLEManager.shared.joints.isEmpty)
     }
 
     private var joints: [JointInfo] { ble.joints }
@@ -33,6 +35,8 @@ struct SettingsView: View {
     private var currentControllers: [ControllerInfo] { currentJoint?.controllers ?? [] }
     private var currentController: ControllerInfo? { currentControllers.indices.contains(selectedControllerIndex) ? currentControllers[selectedControllerIndex] : nil }
     private var currentParams: [String] { currentController?.params ?? [] }
+    private var hasControllerMetadata: Bool { showAdvanced && !joints.isEmpty }
+    private var metadataSupportsBilateral: Bool { BLEManager.hasBilateralControllerPair(in: joints) }
 
     var body: some View {
         ZStack {
@@ -41,6 +45,20 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 navBar
                 modePicker
+                if let dbWarningMessage, !dbWarningMessage.isEmpty {
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.yellow)
+                            .font(.caption)
+                        Text(dbWarningMessage)
+                            .font(.caption)
+                            .foregroundStyle(.yellow)
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 6)
+                }
                 ScrollView {
                     if showAdvanced && !joints.isEmpty {
                         advancedForm
@@ -53,7 +71,18 @@ struct SettingsView: View {
         }
         .navigationTitle("")
         .navigationBarHidden(true)
-        .onAppear { loadSavedState() }
+        .onAppear {
+            loadSavedState()
+            dbWarningMessage = OpenExoDatabase.shared.lastErrorMessage()
+        }
+        .onReceive(ble.$joints) { newJoints in
+            guard showAdvanced, !newJoints.isEmpty else { return }
+            isBilateral = BLEManager.hasBilateralControllerPair(in: newJoints)
+        }
+        .onChange(of: showAdvanced) { isAdvanced in
+            guard isAdvanced, !joints.isEmpty else { return }
+            isBilateral = BLEManager.hasBilateralControllerPair(in: joints)
+        }
     }
 
     // MARK: - Nav Bar
@@ -116,6 +145,7 @@ struct SettingsView: View {
                         guard !isRestoringState else { return }
                         selectedControllerIndex = 0
                         selectedParamIndex = 0
+                        syncParamValueFromSnapshotIfAvailable()
                     }
                 }
             }
@@ -181,6 +211,7 @@ struct SettingsView: View {
                         .onChange(of: selectedControllerIndex) { _ in
                             guard !isRestoringState else { return }
                             selectedParamIndex = 0
+                            syncParamValueFromSnapshotIfAvailable()
                         }
                     }
                 }
@@ -200,6 +231,10 @@ struct SettingsView: View {
                         }
                         .pickerStyle(.menu)
                         .tint(.blue)
+                        .onChange(of: selectedParamIndex) { _ in
+                            guard !isRestoringState else { return }
+                            syncParamValueFromSnapshotIfAvailable()
+                        }
                     }
                 }
             }
@@ -292,6 +327,7 @@ struct SettingsView: View {
                 }
             }
             .tint(.blue)
+            .disabled(hasControllerMetadata && !metadataSupportsBilateral)
         }
     }
 
@@ -412,7 +448,7 @@ struct SettingsView: View {
     private func loadSavedState() {
         isRestoringState = true
         let s = GUISettings.load()
-        isBilateral = s.bilateral
+        isBilateral = joints.isEmpty ? s.bilateral : BLEManager.hasBilateralControllerPair(in: joints)
 
         // Advanced mode: restore by name first, fall back to index
         if !joints.isEmpty {
@@ -443,13 +479,37 @@ struct SettingsView: View {
             selectedParamIndex = s.lastParamIndex
         }
 
-        paramValue = s.lastValue
+        if let snapshotValue = currentSnapshotParamValue() {
+            paramValue = snapshotValue
+        } else {
+            paramValue = s.lastValue
+        }
         basicJointID = s.lastBasicJointID
         basicControllerID = s.lastBasicControllerID
         basicParamIndex = s.lastBasicParamIndex
         basicValue = s.lastBasicValue
 
         DispatchQueue.main.async { isRestoringState = false }
+    }
+
+    private func currentSnapshotParamValue() -> Double? {
+        guard !joints.isEmpty,
+              joints.indices.contains(selectedJointIndex),
+              currentControllers.indices.contains(selectedControllerIndex) else {
+            return nil
+        }
+        let controller = currentControllers[selectedControllerIndex]
+        let key = "\(joints[selectedJointIndex].jointID)_\(controller.controllerID)"
+        guard let values = OpenExoDatabase.shared.loadControllerSnapshot()?.values[key],
+              values.indices.contains(selectedParamIndex) else {
+            return nil
+        }
+        return Double(values[selectedParamIndex])
+    }
+
+    private func syncParamValueFromSnapshotIfAvailable() {
+        guard showAdvanced, let snapshotValue = currentSnapshotParamValue() else { return }
+        paramValue = snapshotValue
     }
 
     private func saveState() {
