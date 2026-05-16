@@ -10,6 +10,6 @@ Check out the [Documentation Folder](/Documentation) for more details and C++ in
 
 Documentation on the software can be found on our [read the docs page](https://theopenexo.readthedocs.io/en/latest/index.html).
 
-Documentation on the hardware can be found on our [wiki](https://youneedawiki.com/app/page/14AIGjap02Wv8jPJxyezvfYJYFVIJIoO1?p=14AIGjap02Wv8jPJxyezvfYJYFVIJIoO1).
+Documentation on the hardware can be found on our [wiki](https://wiki.theopenexo.org).
 
 Video walkthroughs on getting started and indepth looks at different aspects of the system can be found on the OpenExo [YouTube page](https://www.youtube.com/@TheOpenExo). 
