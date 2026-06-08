@@ -536,6 +536,7 @@ public:
     AngleBased(config_defs::joint_id id, ExoData* exo_data);
     ~AngleBased() {};    
     float encoder_angle;            /* Stores current encoder angle, after being normalized to the calibrated offset. */
+    float prev_encoder_angle;       /* Stores previous iteration encoder angle*/
     float combined_fsr;             /* Stores the combined(toeand heel) fsr value. */
     float correction_factor[3];        /* Correction factor for the encoders when torque is being applied by the motor*/
     float limit_rate;               /* The max rate (in rads) at which the encode angle is allowed to change per ms*/
@@ -548,7 +549,11 @@ public:
     float intended_encoder_offset;  /* Stores the goal encoder offset while the rate limit begins to chage the actual encoder offset */
     float encoder_offset_0;         /* Stores original encoder offset*/
     bool skip_intended_encoder_offset; /* Flag to skip the intended encoder offset calculation. */
-    bool first_loop;                /* Flag to initiate encoder calibration at the initiation of the trial.*/
+    bool first_loop;                /* Flag to indicate the start of the controller.*/
+    bool second_loop;               /* Flag to indicate if the encoder calibration has ended*/
+    long start_controller_time;
+    int iterations;                 /* mod 4 of number of iterations the controller has run to determine which encoder delay to use */
+    float encoder_offset_delay_arr[4];    /* array to store the encoder offset to create a delay to account for torque transmitting to the soft tissue*/
     
     float stance_moment;            /* Estimate stance moment by multiplying hip angle by combined fsr. */
     float normalized_stance_moment; /* Normalized stance_moment to - 1 to 1 range. */
