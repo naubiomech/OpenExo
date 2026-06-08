@@ -2986,17 +2986,20 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
     }
     */
     encoder_angle = 0.0;
+    prev_encoder_angle = encoder_angle;
     combined_fsr = 0.0;
     encoder_offset = _joint_data->position;
     intended_encoder_offset = 0.0;
     limit_rate = 0.025;
     offset_alpha = 0.0875; //I expect alpha should be between 0.08 and 0.1
     last_update_time = millis();
+    start_controller_time = millis();
     //correction_factor[0] = 2.8870;
     //correction_factor[1] = 0.0519;
     //correction_factor[2] = -0.0133;
     skip_intended_encoder_offset = false;
     first_loop = true;
+    second_loop = false;
     stance_moment = 0.0;
     normalized_stance_moment = 0.0;
     max_stance_moment = -100.0;
@@ -3047,8 +3050,8 @@ AngleBased::AngleBased(config_defs::joint_id id, ExoData *exo_data)
 float AngleBased::calc_motor_cmd()
 {
     //Serial.println("Running Angle Based calc cmd");
-    if (millis() - prev_time > 50)
-    {
+    //if (millis() - prev_time > 50)
+    //{
         
         // Pull in user defined parameters
         float stance_extension_setpoint = _controller_data->parameters[controller_defs::angle_based::stance_extension_setpoint_idx];
@@ -3060,41 +3063,55 @@ float AngleBased::calc_motor_cmd()
         int recal_angle_flag = _controller_data->parameters[controller_defs::angle_based::recalibrate_angle_idx];
         float lower_toe_threshold = _controller_data->parameters[controller_defs::angle_based::lower_toe_threshold_idx];
         float upper_toe_threshold = _controller_data->parameters[controller_defs::angle_based::upper_toe_threshold_idx];
-        //Serial.print("lower_toe_threshold: ");
-        //Serial.println(lower_toe_threshold);
-        //Serial.print("upper_toe_threshold: ");
-        //Serial.println(upper_toe_threshold);
         correction_factor[0] = _controller_data->parameters[controller_defs::angle_based::correction_factor_0_idx];
-        correction_factor[0] = correction_factor[0] / 1000.0;
+        //correction_factor[0] = correction_factor[0]/100.0;
         correction_factor[1] = _controller_data->parameters[controller_defs::angle_based::correction_factor_1_idx];
-        correction_factor[1] = correction_factor[1] / 1000.0;
+        //correction_factor[1] = correction_factor[1]/100.0;
         correction_factor[2] = _controller_data->parameters[controller_defs::angle_based::correction_factor_2_idx];
-        correction_factor[2] = correction_factor[2] / 1000.0;
+        correction_factor[2] = correction_factor[2]/100.0;
         offset_alpha = _controller_data->parameters[controller_defs::angle_based::offset_alpha_idx];
-        offset_alpha = offset_alpha / 1000.0;
+        offset_alpha = offset_alpha / 100.0;
         // Pull in FSR values (double check that Toe FSR, located in Side.h, is not drawing from the FSR_Regressed Function)
         float raw_heel_fsr = _side_data->heel_fsr;
         raw_toe_fsr = _side_data->toe_fsr;
         local_toe_stance = local_toe_stance_schmitt(); //utils::schmitt_trigger(raw_toe_fsr, local_toe_stance, lower_toe_threshold, upper_toe_threshold);
         _controller_data->local_toe_stance = local_toe_stance; // Store the local toe stance for plotting
         // If we just started, calculate the offset for the angle encoders
-        if (first_loop & (_joint_data->position != 0.0))
+        if(first_loop & (_joint_data->motor.enabled))
         {
-            calibrate_encoders();
             first_loop = false;
+            start_controller_time = millis();
+            Serial.println("First conditional passed");
+            second_loop = true;
+            Serial.print("joint position first loop: ");
+            Serial.println(_joint_data->position);
+        }
+        if ((millis()-start_controller_time > 75) & second_loop & (_joint_data->motor.p != 0.0))
+        {
+            Serial.print("joint position second loop: ");
+            Serial.println(_joint_data->position);
+            calibrate_encoders();
+            Serial.print("joint position post cal: ");
+            Serial.println(_joint_data->position);
+            Serial.print("encoder_offset_0: ");
+            Serial.println(encoder_offset_0);
+            Serial.print("encoder_angle: ");
+            Serial.println(encoder_angle);
+            prev_encoder_angle = encoder_angle;
+            encoder_offset_delay_arr[0] = encoder_offset_0;
+            encoder_offset_delay_arr[1] = encoder_offset_0;
+            encoder_offset_delay_arr[2] = encoder_offset_0;
+            encoder_offset_delay_arr[3] = encoder_offset_0;
+            second_loop = false;
             _controller_data->encoder_offset = encoder_offset;
             intended_encoder_offset = encoder_offset;
+            _controller_data->state = 5;
+            Serial.println("Second conditional passed");
+            Serial.println(!first_loop & !second_loop);
         }
-        // Handle the Angle Data
-        /*if(_joint_data->is_left)
-        {
-            encoder_angle = -1*_joint_data->position - encoder_offset;
-        }
-        else
-        {
-            encoder_angle = _joint_data->position - encoder_offset;
-        }*/
-       encoder_angle = _joint_data->position - encoder_offset;
+    if(!first_loop & !second_loop)
+    {
+        encoder_angle = _joint_data->position - encoder_offset;
         
         //encoder_angle = utils::ewma(intended_encoder_angle, encoder_angle, 0.85); // if using the ewma you must change the if statement above (if(abs(cmd_ff)) >=1) to set intended_encoder_angle rather than encoder_angle
         _controller_data->encoder_angle = utils::radians_to_degrees(encoder_angle);
@@ -3303,10 +3320,12 @@ float AngleBased::calc_motor_cmd()
             }
         }
         _controller_data->control_state = state;
+        /*
         Serial.print("Percent Gait: ");
         Serial.println(_side_data->percent_gait);
         Serial.print("State: ");
         Serial.println(state);
+        */
         // Determine Torque Setpoint
         if (state == 1) // If we are in early stance
         {
@@ -3370,26 +3389,98 @@ float AngleBased::calc_motor_cmd()
         {
             cmd_ff = -1 * max_torque;
         }
-        //Handle the offset created due to motor lash back and soft tissue deformation   
-        float intended_encoder_offset_deg = utils::radians_to_degrees(encoder_offset_0) + prev_cmd * correction_factor[0] + prev_cmd*prev_cmd * correction_factor[1] + prev_cmd*prev_cmd*prev_cmd * correction_factor[2];
-        intended_encoder_offset = utils::degrees_to_radians(intended_encoder_offset_deg);
-        // Filter the offset to prevent spikes and noise
-        encoder_offset = utils::ewma(intended_encoder_offset, encoder_offset, offset_alpha); 
+        
         filt_cmd_ff = utils::ewma(cmd_ff, filt_cmd_ff, torque_alpha);
-        _controller_data->max_torque = (state == 1) && (prev_state == 3);
+        if (filt_cmd_ff - prev_cmd < -2.0)
+        {
+            Serial.println("BIG JUMP DOWN!!!");
+            Serial.print("cmd_ff: ");
+            Serial.println(filt_cmd_ff);
+            Serial.print("prev_cmd: ");
+            Serial.println(prev_cmd);
+            filt_cmd_ff = prev_cmd - 2.0;
+            Serial.print("new cmd");
+            Serial.println(filt_cmd_ff);
+        }
+        else if (filt_cmd_ff - prev_cmd > 2.0)
+        {
+            Serial.println("BIG JUMP UP!!!");
+            Serial.print("cmd_ff: ");
+            Serial.println(filt_cmd_ff);
+            Serial.print("prev_cmd: ");
+            Serial.println(prev_cmd);
+            filt_cmd_ff = prev_cmd + 2.0;
+            Serial.print("new cmd");
+            Serial.println(filt_cmd_ff);
+        }
+
+        //Handle the offset created due to motor lash back and soft tissue deformation 
+        /*
+        if(_side_data->is_left == true) 
+        {
+            Serial.println("Left");
+        }
+        else
+        {
+            Serial.println("Right");
+        }
+        */
+        //Serial.print("prev cmd: ");
+        //Serial.println(prev_cmd); 
+        //float intended_encoder_offset_deg = tanh(prev_cmd / 11.0) * -0.078; //utils::radians_to_degrees(encoder_offset_0) + prev_cmd * correction_factor[0] + prev_cmd*prev_cmd * correction_factor[1] + prev_cmd*prev_cmd*prev_cmd * correction_factor[2];
+        //Serial.print("intended encoder offset deg: ");
+        //Serial.println(intended_encoder_offset_deg);
+        intended_encoder_offset = tanh(filt_cmd_ff / correction_factor[0]) * correction_factor[1]; //utils::degrees_to_radians(intended_encoder_offset_deg);
+        //correction_factor[0] = 11.0
+        //correction_factor[1] = -0.078
+        /*
+        Serial.print("intended encoder offset rad (*10): ");
+        Serial.println(intended_encoder_offset * 10.0);
+        Serial.print("correction_factor[0]: ");
+        Serial.println(correction_factor[0]);
+        Serial.print("correction_factor[1]: ");
+        Serial.println(correction_factor[1]);
+        */
+        // Filter the offset to prevent spikes and noise
+        encoder_offset = utils::ewma(intended_encoder_offset, encoder_offset - encoder_offset_0, offset_alpha) + encoder_offset_0;
+        Serial.print("Calculated encoder offset: ");
+        Serial.println(encoder_offset);
+        float temp_encoder_offset = encoder_offset_delay_arr[iterations];
+        encoder_offset_delay_arr[iterations] = encoder_offset;
+        encoder_offset = temp_encoder_offset;
+        Serial.print("Delay encoder offset: ");
+        Serial.println(encoder_offset);
+        if(iterations >= 3)
+        {
+            iterations = 0;
+        }
+        else
+        {
+            iterations++;
+        }
+        Serial.print("iteration: ");
+        Serial.println(iterations);
+        /* 
+        Serial.print("encoder offset * 10: ");
+        Serial.println(encoder_offset * 10);
+        */
+        /*
         if((state == 1) && (prev_state == 3))
         {
             //Serial.println("Skipping intended encoder offset");
             skip_intended_encoder_offset = false; // Reset the skip intended encoder offset flag for the next iteration
-            encoder_offset = encoder_offset_0; // If we are skipping the intended encoder offset, we just use the initial encoder offset
+            encoder_offset = encoder_angle-prev_encoder_angle + encoder_offset_0; // If we are skipping the intended encoder offset, we just use the initial encoder offset
         }
+        */
+
         // Store the intended encoder offset for plotting
-        _controller_data->intended_encoder_offset = intended_encoder_offset;
+        _controller_data->intended_encoder_offset = intended_encoder_offset*100;
         // Store the encoder offset for plotting
-        _controller_data->encoder_offset = encoder_offset;
+        _controller_data->encoder_offset = (encoder_offset - encoder_offset_0)*100.0;
+        _controller_data->max_torque = encoder_offset_0;
         // Store the feed-forward setpoint for plotting
-        _controller_data->ff_setpoint = cmd_ff;
-        _controller_data->desired_torque = cmd_ff;
+        _controller_data->ff_setpoint = filt_cmd_ff;
+        _controller_data->desired_torque = filt_cmd_ff;
         // Store the filtered command for plotting
         _controller_data->filt_cmd_ff = filt_cmd_ff;
         // Set the motor command to be equal to the feed-foward setpoint (Note: if doing closed-loop control, this is where you would do PID)
@@ -3403,9 +3494,15 @@ float AngleBased::calc_motor_cmd()
         prev_step = steps;
         prev_cmd = cmd;
         prev_state = state;
+        prev_encoder_angle = encoder_angle;
         return cmd;
-        prev_time = millis();
     }
+    else
+    {
+        return 0.0;
+    }
+        prev_time = millis();
+    //}
 }
 void AngleBased::calibrate_encoders()
 {
