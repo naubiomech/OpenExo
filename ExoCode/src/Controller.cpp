@@ -3450,7 +3450,7 @@ float AngleBased::calc_motor_cmd()
         encoder_offset = temp_encoder_offset;
         Serial.print("Delay encoder offset: ");
         Serial.println(encoder_offset);
-        if(iterations >= 3)
+        if(iterations >= num_iterations - 1)
         {
             iterations = 0;
         }

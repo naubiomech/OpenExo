@@ -552,8 +552,9 @@ public:
     bool first_loop;                /* Flag to indicate the start of the controller.*/
     bool second_loop;               /* Flag to indicate if the encoder calibration has ended*/
     long start_controller_time;
-    int iterations;                 /* mod 4 of number of iterations the controller has run to determine which encoder delay to use */
-    float encoder_offset_delay_arr[4];    /* array to store the encoder offset to create a delay to account for torque transmitting to the soft tissue*/
+    const static int num_iterations = 7;             /* the number of iterations that the enocder offset is being delayed */
+    int iterations;                 /* mod num_iterations of number of iterations the controller has run to determine which encoder delay to use */
+    float encoder_offset_delay_arr[num_iterations];    /* array to store the encoder offset to create a delay to account for torque transmitting to the soft tissue*/
     
     float stance_moment;            /* Estimate stance moment by multiplying hip angle by combined fsr. */
     float normalized_stance_moment; /* Normalized stance_moment to - 1 to 1 range. */
