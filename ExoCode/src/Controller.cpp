@@ -2975,4 +2975,36 @@ float PJMC_PLUS::calc_motor_cmd()
     
 	return cmd;
 }
+
+FSRless::FSRless(config_defs::joint_id id, ExoData* _exo_data)
+: _Controller(id, _exo_data)
+{
+    #ifdef CONTROLLER_DEBUG
+        logger::println("FSRless::Constructor");
+    #endif
+}
+
+float FSRless::calc_motor_cmd()
+{
+    float cmd_ff = 0.0;
+	float cmd;
+	
+    //PID on Motor Command
+    cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::fsr_less::kp_idx], _controller_data->parameters[controller_defs::fsr_less::ki_idx], _controller_data->parameters[controller_defs::fsr_less::kd_idx]);
+
+    #ifdef CONTROLLER_DEBUG
+    logger::println("pjmcPlus::calc_motor_cmd : stop");
+    #endif
+	
+	//Establish Setpoints
+	_controller_data->ff_setpoint = cmd_ff; 
+	_controller_data->setpoint = cmd;
+    _controller_data->filtered_setpoint = cmd;
+	
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = _controller_data->ff_setpoint;
+    
+	return cmd;
+}
+
 #endif

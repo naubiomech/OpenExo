@@ -241,6 +241,20 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t num_parameter = 17;
     }
 
+    namespace fsr_less
+    {
+        const uint8_t mass_idx = 0;
+        const uint8_t extension_setpoint_idx = 1;
+        const uint8_t flexion_setpoint_idx = 2;
+        const uint8_t I_idx = 3;
+        const uint8_t c_idx = 4;
+        const uint8_t k_idx = 5;
+        const uint8_t kp_idx = 6;
+        const uint8_t kd_idx = 7;
+        const uint8_t ki_idx = 8;
+        const uint8_t num_parameter = 9;
+    }
+
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
 }
 

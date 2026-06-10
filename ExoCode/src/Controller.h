@@ -523,5 +523,23 @@ private:
 
 };
 
+/**
+ * @brief FSRless controller
+ * This controller is for the Hip Joint
+ *
+ * See ControllerData.h for details on the parameters used.
+ */
+class FSRless: public _Controller
+{
+    public:
+        FSRless(config_defs::joint_id id, ExoData* exo_data);
+        ~FSRless(){};
+       
+        float calc_motor_cmd();
+        
+    private:
+       
+};
+
 #endif
 #endif
