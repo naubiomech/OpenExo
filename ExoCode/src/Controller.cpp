@@ -2982,12 +2982,85 @@ FSRless::FSRless(config_defs::joint_id id, ExoData* _exo_data)
     #ifdef CONTROLLER_DEBUG
         logger::println("FSRless::Constructor");
     #endif
+
+    first_loop = true;
+    second_loop = false;
+
+    encoder_offset = 0.0;
+    encoder_angle = 0.0;
+    prev_encoder_angle = 0.0;
+
+    encoder_vel = 0.0;
+    prev_encoder_vel = 0.0;
+
+    encoder_acc = 0.0;
 }
 
 float FSRless::calc_motor_cmd()
 {
     float cmd_ff = 0.0;
 	float cmd;
+
+    float mass = _controller_data->parameters[controller_defs::fsr_less::mass_idx];
+    float extension_setpoint = _controller_data->parameters[controller_defs::fsr_less::extension_setpoint_idx];
+    float flexion_setpoint = _controller_data->parameters[controller_defs::fsr_less::flexion_setpoint_idx];
+	float I = _controller_data->parameters[controller_defs::fsr_less::I_idx];
+    float c = _controller_data->parameters[controller_defs::fsr_less::c_idx];
+    float k = _controller_data->parameters[controller_defs::fsr_less::k_idx];
+
+    unsigned long curr_time;
+
+    if(first_loop & (_joint_data->motor.enabled))
+        {
+            start_controller_time = millis();
+            //Serial.println("First conditional passed");
+            first_loop = false;
+            second_loop = true;
+            //Serial.print("joint position first loop: ");
+            //Serial.println(_joint_data->position);
+        }
+        if ((millis()-start_controller_time > 75) & second_loop & (_joint_data->motor.p != 0.0))
+        {
+            //Serial.print("joint position second loop: ");
+            //Serial.println(_joint_data->position);
+            calibrate_encoders();
+            //Serial.print("joint position post cal: ");
+            //Serial.println(_joint_data->position);
+            //Serial.print("encoder_offset_0: ");
+            //Serial.println(encoder_offset_0);
+            //Serial.print("encoder_angle: ");
+            //Serial.println(encoder_angle);
+            encoder_angle = _joint_data->position - encoder_offset;
+            prev_encoder_angle = encoder_angle;
+            second_loop = false;
+            //_controller_data->encoder_offset = encoder_offset;
+            //Serial.println("Second conditional passed");
+            //Serial.println(!first_loop & !second_loop);
+        }
+    if(!first_loop & !second_loop)
+    {
+        //real code goes in here
+        curr_time = millis();
+        unsigned long delta_time = prev_time - curr_time;
+        encoder_vel = (encoder_angle - prev_encoder_angle) / delta_time / 1000.0;
+        encoder_acc = (encoder_vel - prev_encoder_vel) / delta_time / 1000.0;
+
+        cmd = I * encoder_acc + c * encoder_vel + k * encoder_angle;
+        if(encoder_vel < 0)
+        {
+            cmd = cmd * extension_setpoint;
+        }
+        else
+        {
+            cmd = cmd * flexion_setpoint;
+        }
+        cmd = cmd * mass;
+
+        //set prev vars to curr vars before next loop
+        prev_time = curr_time; 
+        prev_encoder_angle = encoder_angle;
+        prev_encoder_vel = encoder_vel;
+    }
 	
     //PID on Motor Command
     cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::fsr_less::kp_idx], _controller_data->parameters[controller_defs::fsr_less::ki_idx], _controller_data->parameters[controller_defs::fsr_less::kd_idx]);
@@ -3005,6 +3078,15 @@ float FSRless::calc_motor_cmd()
     _controller_data->desired_torque = _controller_data->ff_setpoint;
     
 	return cmd;
+}
+void FSRless::calibrate_encoders()
+{
+    float sum_encoder_readings = 0.0;                                        
+    for (int i = 0; i < 5; i++)
+    {
+       sum_encoder_readings += _joint_data->position;
+    }
+    encoder_offset = sum_encoder_readings/5;
 }
 
 #endif

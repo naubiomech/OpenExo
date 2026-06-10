@@ -538,6 +538,23 @@ class FSRless: public _Controller
         float calc_motor_cmd();
         
     private:
+        void FSRless::calibrate_encoders();
+
+        bool first_loop;
+        bool second_loop;
+
+        float encoder_angle;
+        float encoder_offset;
+        float prev_encoder_angle;
+
+        float encoder_vel;
+        float prev_encoder_vel;
+
+        float encoder_acc;
+
+        unsigned long prev_time;
+
+        unsigned long start_controller_time;
        
 };
 
