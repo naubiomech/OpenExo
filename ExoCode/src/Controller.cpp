@@ -3443,6 +3443,7 @@ float AngleBased::calc_motor_cmd()
         */
         // Filter the offset to prevent spikes and noise
         encoder_offset = utils::ewma(intended_encoder_offset, encoder_offset - encoder_offset_0, offset_alpha) + encoder_offset_0;
+        /*/
         Serial.print("Calculated encoder offset: ");
         Serial.println(encoder_offset);
         float temp_encoder_offset = encoder_offset_delay_arr[iterations];
@@ -3460,6 +3461,8 @@ float AngleBased::calc_motor_cmd()
         }
         Serial.print("iteration: ");
         Serial.println(iterations);
+        */
+       
         /* 
         Serial.print("encoder offset * 10: ");
         Serial.println(encoder_offset * 10);
