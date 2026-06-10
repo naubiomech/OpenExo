@@ -3111,7 +3111,7 @@ float AngleBased::calc_motor_cmd()
         }
     if(!first_loop & !second_loop)
     {
-        encoder_angle = _joint_data->position - encoder_offset;
+        encoder_angle = sin(_joint_data->position - encoder_offset);
         
         //encoder_angle = utils::ewma(intended_encoder_angle, encoder_angle, 0.85); // if using the ewma you must change the if statement above (if(abs(cmd_ff)) >=1) to set intended_encoder_angle rather than encoder_angle
         _controller_data->encoder_angle = utils::radians_to_degrees(encoder_angle);
