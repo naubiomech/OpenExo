@@ -546,7 +546,7 @@ public:
     float torque_alpha;             /* The alpha value used in the exponential weighted moving average equation for torque*/
     float filt_cmd_ff;          /* Stores the filtered torque value */
     float encoder_offset;           /* Store the encoder offset from the calibarition phase at the initation of the trial. */
-    float intended_encoder_offset;  /* Stores the goal encoder offset while the rate limit begins to chage the actual encoder offset */
+    float prev_encoder_offset;  /* Stores the goal encoder offset while the rate limit begins to chage the actual encoder offset */
     float encoder_offset_0;         /* Stores original encoder offset*/
     bool skip_intended_encoder_offset; /* Flag to skip the intended encoder offset calculation. */
     bool first_loop;                /* Flag to indicate the start of the controller.*/
@@ -599,7 +599,7 @@ public:
     float sum_min;
     int starting_angle;
     int starting_step;
-    long prev_time;
+    unsigned long prev_time;
     float prev_cmd;
     bool calibrating;
     //Functions
