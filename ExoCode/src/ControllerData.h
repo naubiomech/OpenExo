@@ -448,6 +448,11 @@ class ControllerData {
         //Variables for the PHMC Controller
         float fs;
         float state;
+
+        //Variables for FSRless Controller
+        float encoder_angle;
+        float encoder_vel;
+        float encoder_acc;
 };      
 
 #endif

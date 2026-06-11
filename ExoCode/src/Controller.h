@@ -545,6 +545,7 @@ class FSRless: public _Controller
 
         float encoder_angle;
         float encoder_offset;
+        float encoder_offset_0;
         float prev_encoder_angle;
 
         float encoder_vel;
