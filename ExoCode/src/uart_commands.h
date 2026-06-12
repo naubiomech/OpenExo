@@ -418,12 +418,12 @@ namespace UART_command_handlers
             rx_msg.data[1] = exo_data->right_side.hip.position;
             rx_msg.data[2] = exo_data->left_side.hip.controller.desired_torque;
             rx_msg.data[3] = exo_data->left_side.hip.position;
-            rx_msg.data[4] = exo_data->left_side.hip.controller.encoder_offset;
-            rx_msg.data[5] = exo_data->left_side.hip.controller.encoder_angle; //hip.controller.normalized_stance_moment;
-            rx_msg.data[6] = exo_data->left_side.hip.controller.normalized_angle; //
-            rx_msg.data[7] = exo_data->left_side.hip.controller.combined_fsr; //hip.controller.encoder_angle;
-            rx_msg.data[8] = exo_data->left_side.hip.controller.prev_encoder_offset; //
-            rx_msg.data[9] = exo_data->left_side.hip.controller.normalized_stance_moment;
+            rx_msg.data[4] = exo_data->right_side.hip.controller.encoder_offset;
+            rx_msg.data[5] = exo_data->right_side.hip.controller.encoder_angle; //hip.controller.normalized_stance_moment;
+            rx_msg.data[6] = exo_data->right_side.hip.controller.max_torque*1000.0; //
+            rx_msg.data[7] = exo_data->right_side.hip.controller.combined_fsr; //hip.controller.encoder_angle;
+            rx_msg.data[8] = exo_data->right_side.hip.controller.prev_encoder_offset; //
+            rx_msg.data[9] = millis();
 			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
             break;
 		}

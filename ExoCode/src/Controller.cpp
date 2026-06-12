@@ -3039,7 +3039,7 @@ float AngleBased::calc_motor_cmd()
         correction_factor[1] = _controller_data->parameters[controller_defs::angle_based::correction_factor_1_idx]; //consider this B
         //correction_factor[1] = correction_factor[1]/100.0;
         correction_factor[2] = _controller_data->parameters[controller_defs::angle_based::correction_factor_2_idx];
-        correction_factor[2] = correction_factor[2]/100.0;
+        //correction_factor[2] = correction_factor[2]/100.0;
         offset_alpha = _controller_data->parameters[controller_defs::angle_based::offset_alpha_idx];
         offset_alpha = offset_alpha / 100.0;
         // Pull in FSR values (double check that Toe FSR, located in Side.h, is not drawing from the FSR_Regressed Function)
@@ -3387,7 +3387,8 @@ float AngleBased::calc_motor_cmd()
         //     Serial.println(filt_cmd_ff);
         // }
         
-        prev_encoder_offset = encoder_offset - encoder_offset_0; 
+        prev_encoder_offset = encoder_offset - encoder_offset_0;
+        prev_encoder_offset = prev_encoder_offset / correction_factor[2];
         Serial.print("curr time: ");
         Serial.println(millis());
         float delta_time = millis() - prev_time;
@@ -3415,7 +3416,9 @@ float AngleBased::calc_motor_cmd()
         encoder_offset = encoder_offset * delta_time;
         Serial.print("tau - K * delta Theta / B * dt: ");
         Serial.println(encoder_offset);
-        encoder_offset = encoder_offset * 10.0 + encoder_offset_0;
+        
+        encoder_offset = encoder_offset * correction_factor[2];
+        encoder_offset = encoder_offset + encoder_offset_0;
         Serial.print("encoder_offset: ");
         Serial.println(encoder_offset);
 
@@ -3423,7 +3426,7 @@ float AngleBased::calc_motor_cmd()
         _controller_data->prev_encoder_offset = prev_encoder_offset*100;
         // Store the encoder offset for plotting
         _controller_data->encoder_offset = (encoder_offset - encoder_offset_0)*100.0;
-        _controller_data->max_torque = encoder_offset_0;
+        _controller_data->max_torque = delta_time;
         // Store the feed-forward setpoint for plotting
         _controller_data->ff_setpoint = filt_cmd_ff;
         _controller_data->desired_torque = filt_cmd_ff;
