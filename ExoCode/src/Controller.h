@@ -543,6 +543,8 @@ class FSRless: public _Controller
         bool first_loop;
         bool second_loop;
 
+        float dt;
+
         float encoder_angle;
         float encoder_offset;
         float encoder_offset_0;

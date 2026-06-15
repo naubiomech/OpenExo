@@ -2976,6 +2976,8 @@ float PJMC_PLUS::calc_motor_cmd()
 	return cmd;
 }
 
+//**************************************************
+
 FSRless::FSRless(config_defs::joint_id id, ExoData* _exo_data)
 : _Controller(id, _exo_data)
 {
@@ -3044,13 +3046,24 @@ float FSRless::calc_motor_cmd()
         //real code goes in here
         encoder_angle = _joint_data->position - encoder_offset;
         curr_time = millis();
-        unsigned long delta_time = prev_time - curr_time;
-        encoder_vel = (encoder_angle - prev_encoder_angle) / delta_time / 1000.0;
+        Serial.print("prev time: ");
+        Serial.println(prev_time);
+        Serial.print("curr time: ");
+        Serial.println(prev_time);
+        dt = prev_time - curr_time;
+        dt = dt / 1000.0;
+        Serial.print("dt: ");
+        Serial.println(dt);
+        Serial.print("prev angle: ");
+        Serial.println(prev_encoder_angle*100);
+        Serial.print("curr angle: ");
+        Serial.println(encoder_angle*100);
+        encoder_vel = (encoder_angle - prev_encoder_angle) / dt;
         Serial.print("vel: ");
-        Serial.println(encoder_vel);
-        encoder_acc = (encoder_vel - prev_encoder_vel) / delta_time / 1000.0;
+        Serial.println(encoder_vel*1000);
+        encoder_acc = (encoder_vel - prev_encoder_vel) / dt;
         Serial.print("acc: ");
-        Serial.println(encoder_acc);
+        Serial.println(encoder_acc*1000);
 
         cmd = I * encoder_acc + c * encoder_vel + k * encoder_angle;
         if(encoder_vel < 0)
