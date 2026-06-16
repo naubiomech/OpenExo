@@ -1730,6 +1730,20 @@ Step::Step(config_defs::joint_id id, ExoData* exo_data)
     flag_time = 0;
     change_time = 0;
 
+    // remove later
+    encoder_angle = _joint_data->position;
+    encoder_offset = _joint_data->position;
+    prev_encoder_offset = 0.0;
+
+    
+        correction_factor[0] = 12;
+        correction_factor[1] = 0.3;
+        correction_factor[2] = 3.5;
+        ewma_alpha = 0.15;
+
+    first_loop = true;
+
+
 }
 
 float Step::calc_motor_cmd()
@@ -1781,6 +1795,69 @@ float Step::calc_motor_cmd()
     {
         cmd_ff = 0;
     }
+
+    // remove later
+
+        if(_joint_data->motor.enabled && first_loop)
+        {
+            first_loop = false;
+            float sum_encoder_readings = 0.0;                                        
+            for (int i = 0; i < 5; i++)
+            {
+                sum_encoder_readings += _joint_data->position;
+            }
+            encoder_offset = sum_encoder_readings/5;
+            encoder_offset_0 = sum_encoder_readings/5;
+            Serial.println("made first loop step controller");
+        }
+        
+
+
+        encoder_angle = _joint_data->position - encoder_offset;
+
+        prev_encoder_offset = encoder_offset - encoder_offset_0;
+        prev_encoder_offset = prev_encoder_offset / correction_factor[2];
+        Serial.print("curr time: ");
+        Serial.println(millis());
+        float delta_time = millis() - prev_time;
+        delta_time = delta_time / 1000.0;
+        Serial.print("prev time: ");
+        Serial.println(prev_time);
+        Serial.print("detla time: ");
+        Serial.println(delta_time);
+        Serial.print("K: ");
+        Serial.println(correction_factor[0]);
+        Serial.print("B: ");
+        Serial.println(correction_factor[1]);
+        Serial.print("torque: ");
+        Serial.println(cmd_ff);
+        // Filter the offset to prevent spikes and noise?
+        encoder_offset = correction_factor[0] * prev_encoder_offset;
+        Serial.print("K * delta Theta: ");
+        Serial.println(encoder_offset);
+        encoder_offset = cmd_ff - encoder_offset;
+        Serial.print("Tau - K * delta Theta: ");
+        Serial.println(encoder_offset);
+        encoder_offset = encoder_offset / correction_factor[1];
+        Serial.print("tau - K * delta Theta / B: ");
+        Serial.println(encoder_offset);
+        encoder_offset = encoder_offset * delta_time;
+        Serial.print("tau - K * delta Theta / B * dt: ");
+        Serial.println(encoder_offset);
+        encoder_offset = utils::ewma(encoder_offset, prev_encoder_offset, ewma_alpha);
+        Serial.print("unscaled encoder offset: ");
+        Serial.println(encoder_offset);
+        
+        encoder_offset = encoder_offset * correction_factor[2];
+        encoder_offset = encoder_offset + encoder_offset_0;
+        Serial.print("encoder_offset: ");
+        Serial.println(encoder_offset);
+
+        _controller_data->encoder_offset = encoder_offset;
+        _controller_data->max_torque = delta_time;
+        _controller_data->encoder_angle = encoder_angle;
+        _controller_data->prev_encoder_offset = prev_encoder_offset;
+        // end of remove later
 
     //Real-Time Torque Filtering if Using Torque Transducer
     //if (cmd_ff != previous_command)
@@ -3407,7 +3484,7 @@ float AngleBased::calc_motor_cmd()
         encoder_offset = correction_factor[0] * prev_encoder_offset;
         Serial.print("K * delta Theta: ");
         Serial.println(encoder_offset);
-        encoder_offset = -1 * encoder_offset + filt_cmd_ff;
+        encoder_offset = filt_cmd_ff - encoder_offset;
         Serial.print("Tau - K * delta Theta: ");
         Serial.println(encoder_offset);
         encoder_offset = encoder_offset / correction_factor[1];
@@ -3415,6 +3492,9 @@ float AngleBased::calc_motor_cmd()
         Serial.println(encoder_offset);
         encoder_offset = encoder_offset * delta_time;
         Serial.print("tau - K * delta Theta / B * dt: ");
+        Serial.println(encoder_offset);
+        encoder_offset = utils::ewma(encoder_offset, prev_encoder_offset, _controller_data->parameters[controller_defs::angle_based::offset_alpha_idx]);
+        Serial.print("unscaled encoder offset: ");
         Serial.println(encoder_offset);
         
         encoder_offset = encoder_offset * correction_factor[2];
@@ -3445,7 +3525,7 @@ float AngleBased::calc_motor_cmd()
         prev_state = state;
         prev_encoder_angle = encoder_angle;
         prev_time = millis();
-        return cmd;
+        return 0.0;// cmd;
     }
     else
     {

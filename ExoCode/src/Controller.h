@@ -416,6 +416,18 @@ public:
 
     float calc_motor_cmd();         /* Function that calculates the motor command. */
 
+    // remove later
+    float encoder_offset;
+    float encoder_angle;
+    float encoder_offset_0;
+    float prev_encoder_offset;
+
+    float correction_factor[3];
+    float ewma_alpha;
+    
+    unsigned long prev_time;
+    bool first_loop;
+
 };
 
 /**
