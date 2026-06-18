@@ -539,9 +539,14 @@ class FSRless: public _Controller
         
     private:
         void FSRless::calibrate_encoders();
+        void FSRless::normalize_angle();
+        void FSRless::normalize_vel();
+        void FSRless::normalize_acc();
+        void FSRless::calc_norms();
 
         bool first_loop;
         bool second_loop;
+        long long_dt;
 
         float dt;
 
@@ -549,15 +554,28 @@ class FSRless: public _Controller
         float encoder_offset;
         float encoder_offset_0;
         float prev_encoder_angle;
+        float norm_angle;
+        float prev_norm_angle;
+        float max_angle;
+        float min_angle;
 
         float encoder_vel;
         float prev_encoder_vel;
+        float norm_vel;
+        float prev_norm_vel;
+        float max_vel;
+        float min_vel;
 
         float encoder_acc;
+        float norm_acc;
+        float max_acc;
+        float min_acc;
 
         unsigned long prev_time;
 
         unsigned long start_controller_time;
+
+
        
 };
 

@@ -2991,11 +2991,22 @@ FSRless::FSRless(config_defs::joint_id id, ExoData* _exo_data)
     encoder_offset = 0.0;
     encoder_angle = 0.0;
     prev_encoder_angle = 0.0;
+    norm_angle = 0.0;
+    prev_norm_angle = 0.0;
+    max_angle = 0.0;
+    min_angle = 0.0;
 
     encoder_vel = 0.0;
     prev_encoder_vel = 0.0;
+    norm_vel = 0.0;
+    prev_norm_vel = 0.0;
+    max_vel = 0.0;
+    min_vel = 0.0;
 
     encoder_acc = 0.0;
+    norm_acc = 0.0;
+    max_acc = 0.0;
+    min_acc = 0.0;
 
     Serial.println("FSRless Contructor");
 }
@@ -3023,11 +3034,14 @@ float FSRless::calc_motor_cmd()
             //Serial.print("joint position first loop: ");
             //Serial.println(_joint_data->position);
         }
-    if ((millis()-start_controller_time > 75) & second_loop & (_joint_data->motor.p != 0.0))
+    if (/*(millis()-start_controller_time > 75) & */second_loop & (_joint_data->motor.p != 0.0))
         {
             //Serial.print("joint position second loop: ");
             //Serial.println(_joint_data->position);
             calibrate_encoders();
+            normalize_angle();
+            normalize_vel();
+            normalize_acc();
             //Serial.print("joint position post cal: ");
             //Serial.println(_joint_data->position);
             //Serial.print("encoder_offset_0: ");
@@ -3040,73 +3054,181 @@ float FSRless::calc_motor_cmd()
             //_controller_data->encoder_offset = encoder_offset;
             Serial.println("Second conditional passed");
             Serial.println(!first_loop & !second_loop);
+            prev_time = millis();
         }
     if(!first_loop & !second_loop)
     {
-        //real code goes in here
-        encoder_angle = _joint_data->position - encoder_offset;
-        curr_time = millis();
-        Serial.print("prev time: ");
-        Serial.println(prev_time);
-        Serial.print("curr time: ");
-        Serial.println(prev_time);
-        dt = prev_time - curr_time;
-        dt = dt / 1000.0;
-        Serial.print("dt: ");
-        Serial.println(dt);
-        Serial.print("prev angle: ");
-        Serial.println(prev_encoder_angle*100);
-        Serial.print("curr angle: ");
-        Serial.println(encoder_angle*100);
-        encoder_vel = (encoder_angle - prev_encoder_angle) / dt;
-        Serial.print("vel: ");
-        Serial.println(encoder_vel*1000);
-        encoder_acc = (encoder_vel - prev_encoder_vel) / dt;
-        Serial.print("acc: ");
-        Serial.println(encoder_acc*1000);
-
-        cmd = I * encoder_acc + c * encoder_vel + k * encoder_angle;
-        if(encoder_vel < 0)
+        if(10000 >= millis() - start_controller_time)
         {
-            cmd = cmd * extension_setpoint;
+            encoder_angle = _joint_data->position - encoder_offset;
+            curr_time = millis();
+            long_dt = curr_time - prev_time;
+            dt = (float) long_dt;
+            dt = dt / 1000.0;
+            encoder_vel = (encoder_angle - prev_encoder_angle) / dt;
+            encoder_acc = (encoder_vel - prev_encoder_vel) / dt;
+            normalize_angle();
+            normalize_vel();
+            normalize_acc();
+            calc_norms();
+            prev_time = curr_time;
+            _controller_data->norm_angle = norm_angle;
+            _controller_data->norm_vel = norm_vel;
+            _controller_data->norm_acc = norm_acc;
+            _controller_data->encoder_angle = encoder_angle;
+            _controller_data->encoder_vel = encoder_vel;
+            _controller_data->encoder_acc = encoder_acc;
+            _controller_data->ff_setpoint = 0.0; 
+            Serial.println("Only calibrating");
+            Serial.print("max angle: ");
+            Serial.println(max_angle);
+            Serial.print("max vel: ");
+            Serial.println(max_vel);
+            Serial.print("max acc: ");
+            Serial.println(max_acc);
+
+            return 0.0;
         }
+        else if((millis() - prev_time) >= 5)
+        {
+            
+            //real code goes in here
+            encoder_angle = _joint_data->position - encoder_offset;
+            curr_time = millis();
+            long_dt = curr_time - prev_time;
+            dt = (float) long_dt;
+            dt = dt / 1000.0;
+            encoder_vel = (encoder_angle - prev_encoder_angle) / dt;
+            encoder_acc = (encoder_vel - prev_encoder_vel) / dt;
+            calc_norms();
+
+            // do some printing for debugging
+            if(_side_data->is_left)
+            {
+                Serial.print("I: ");
+                Serial.println(I);
+                Serial.print("C: ");
+                Serial.println(c);
+                Serial.print("k: ");
+                Serial.println(k);
+                Serial.print("prev time: ");
+                Serial.println(prev_time);
+                Serial.print("curr time: ");
+                Serial.println(prev_time);
+                Serial.print("long dt: ");
+                Serial.println(long_dt);
+                Serial.print("dt * 1000: ");
+                Serial.println(dt * 1000);
+                Serial.print("prev angle: ");
+                Serial.println(prev_encoder_angle*100);
+                Serial.print("curr angle: ");
+                Serial.println(encoder_angle*100);
+                Serial.print("vel: ");
+                Serial.println(encoder_vel);
+                Serial.print("acc: ");
+                Serial.println(encoder_acc);
+                Serial.print("I acc: ");
+                Serial.println(I*encoder_acc);
+                Serial.print("C vel");
+                Serial.println(c*encoder_vel);
+                Serial.print("k angle");
+                Serial.println(k*encoder_angle);
+                Serial.print("torque?");
+                Serial.println( I * encoder_acc + c * encoder_vel + k * encoder_angle);
+            }
+
+
+
+            // Define our torque setpoint
+            cmd = I * norm_acc + c * norm_vel - k * norm_angle;
+            
+            if(_side_data->is_left)
+            {
+                Serial.print("cmd b4 setpoint: ");
+                Serial.println(cmd);
+            }
+
+            if(cmd < 0.0)
+            {
+                cmd = cmd * extension_setpoint;
+            }
+            else
+            {
+                cmd = cmd * flexion_setpoint;
+            }
+            cmd = cmd * mass; //cast to float?
+            
+
+            //set prev vars to curr vars before next loop
+            prev_time = curr_time; 
+            prev_encoder_angle = encoder_angle;
+            prev_encoder_vel = encoder_vel;
+
+            //PID on Motor Command
+            //cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::fsr_less::kp_idx], _controller_data->parameters[controller_defs::fsr_less::ki_idx], _controller_data->parameters[controller_defs::fsr_less::kd_idx]);
+            
+            if(_side_data->is_left)
+            {
+                Serial.print("cmd b4 max torque * 1000: ");
+                Serial.println(cmd*1000.0);
+                Serial.print("cmd > 21.0?: ");
+                Serial.println(cmd > 21.0);
+                Serial.print("cmd < -21.0?: ");
+                Serial.println(cmd < -21.0);
+            }
+
+            if(cmd > 21.0)
+            {
+                cmd = 21.0;
+            }
+            if(cmd < -21.0)
+            {
+                cmd = -21.0;
+            }
+            
+            if(_side_data->is_left)
+            {
+                Serial.print("cmd after max torque: ");
+                Serial.println(cmd);
+            }
+
+            #ifdef CONTROLLER_DEBUG
+            logger::println("FSRless::calc_motor_cmd : stop");
+            #endif
+
+            //update plotting params
+            _controller_data->ff_setpoint = cmd_ff; 
+            _controller_data->setpoint = cmd;
+            _controller_data->filtered_setpoint = cmd;
+            _controller_data->encoder_angle = encoder_angle;
+            _controller_data->encoder_vel = encoder_vel;
+            _controller_data->encoder_acc = encoder_acc;
+            _controller_data->desired_torque = cmd;
+            _controller_data->dt = dt * 1000.0;
+            _controller_data->norm_angle = norm_angle;
+            _controller_data->norm_vel = norm_vel;
+            _controller_data->norm_acc = norm_acc;
+
+            if(_side_data->is_left)
+            {
+                Serial.print("cmd: ");
+                Serial.println(cmd);
+            }
+
+            return cmd;
+        
+        }  
         else
         {
-            cmd = cmd * flexion_setpoint;
+            if(_side_data->is_left)
+            {
+                Serial.print("cmd if millis timer not met: ");
+                Serial.println(cmd);
+            }
+            return _controller_data->ff_setpoint;
         }
-        cmd = cmd * mass;
-
-        //set prev vars to curr vars before next loop
-        prev_time = curr_time; 
-        prev_encoder_angle = encoder_angle;
-        prev_encoder_vel = encoder_vel;
         
-        _controller_data->desired_torque = sin(millis()/1000.0)*5;
-        Serial.print("sin(millis): ");
-        Serial.println(_controller_data->desired_torque);
         
-        Serial.println("Outside calcs loop");
-        //PID on Motor Command
-        cmd = cmd_ff; // + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::fsr_less::kp_idx], _controller_data->parameters[controller_defs::fsr_less::ki_idx], _controller_data->parameters[controller_defs::fsr_less::kd_idx]);
-
-        #ifdef CONTROLLER_DEBUG
-        logger::println("FSRless::calc_motor_cmd : stop");
-        #endif
-	
-	    //Establish Setpoints
-	    _controller_data->ff_setpoint = cmd_ff; 
-	    _controller_data->setpoint = cmd;
-        _controller_data->filtered_setpoint = cmd;
-        _controller_data->encoder_angle = encoder_angle;
-        _controller_data->encoder_vel = encoder_vel;
-        _controller_data->encoder_acc = encoder_acc;
-	
-        //Sets the desired torque for plotting
-        _controller_data->desired_torque = _controller_data->ff_setpoint;
-
-        Serial.println("about to return cmd");
-    
-	    return cmd;
     }
     else
     {
@@ -3123,6 +3245,70 @@ void FSRless::calibrate_encoders()
     }
     encoder_offset_0 = sum_encoder_readings/5;
     encoder_offset = encoder_offset_0;
+}
+
+void FSRless::normalize_angle()
+{
+    if (encoder_angle > max_angle)
+    {
+        max_angle = encoder_angle;
+    }
+    if (encoder_angle < min_angle)
+    {
+        min_angle = encoder_angle;
+    }
+}
+
+void FSRless::normalize_vel()
+{
+    if (encoder_vel > max_vel)
+    {
+        max_vel = encoder_vel;
+    }
+    if (encoder_vel < min_vel)
+    {
+        min_vel = encoder_vel;
+    }
+}
+
+void FSRless::normalize_acc()
+{
+    if (encoder_acc > max_acc)
+    {
+        max_acc = encoder_acc;
+    }
+    if (encoder_acc < min_acc)
+    {
+        min_acc = encoder_acc;
+    }
+}
+
+void FSRless::calc_norms()
+{
+    if (encoder_angle > 0.0)
+    {
+        norm_angle = encoder_angle/max_angle;
+    }
+    if (encoder_angle <= 0.0)
+    {
+        norm_angle = -1*encoder_angle/min_angle;
+    }
+    if (encoder_vel > 0.0)
+    {
+        norm_vel = encoder_vel/max_vel;
+    }
+    if (encoder_vel <= 0.0)
+    {
+        norm_vel = -1*encoder_vel/min_vel;
+    }
+    if (encoder_acc > 0.0)
+    {
+        norm_acc = -1*encoder_acc/max_acc;
+    }
+    if (encoder_acc <= 0.0)
+    {
+        norm_acc = encoder_acc/min_acc;
+    }
 }
 
 #endif

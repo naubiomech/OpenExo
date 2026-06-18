@@ -453,6 +453,10 @@ class ControllerData {
         float encoder_angle;
         float encoder_vel;
         float encoder_acc;
+        float dt;
+        float norm_angle;
+        float norm_vel;
+        float norm_acc;
 };      
 
 #endif
