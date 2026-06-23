@@ -523,5 +523,24 @@ private:
 
 };
 
+/**
+ * @brief swing/stance Controller
+ * 
+ * NOTE: THIS CONTROLLER IS STILL UNDER DEVELOPMENT 
+ * 
+ * See ControllerData.h for details on the parameters used.
+ */
+class swingstanceFSRless : public _Controller
+{
+public:
+    swingstanceFSRless(config_defs::joint_id id, ExoData* exo_data);
+    ~swingstanceFSRLess() {};
+
+    float calc_motor_cmd();
+
+private:
+
+};
+
 #endif
 #endif

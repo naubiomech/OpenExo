@@ -241,6 +241,16 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t num_parameter = 17;
     }
 
+    namespace pjmc_plus 
+    {
+        const uint8_t mass_idx = 0;
+        const uint8_t stance_setpoint_idx = 1;
+        const uint8_t swing_setpoint_idx = 2;
+        const uint8_t rising_time_idx = 3;
+        const uint8_t velocity_threshold_idx = 4;
+        const uint8_t num_parameter = 5;
+    }
+
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
 }
 

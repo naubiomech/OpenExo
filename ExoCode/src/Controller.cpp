@@ -2991,4 +2991,21 @@ float PJMC_PLUS::calc_motor_cmd()
     
 	return cmd;
 }
+
+//****************************************************
+
+swingstanceFSRless::swingstanceFSRless(config_defs::joint_id id, ExoData* exo_data)
+: _Controller(id, exo_data)
+{
+    #ifdef CONTROLLER_DEBUG
+        logger::println("swingstanceFSRless::Constructor");
+    #endif
+}
+
+float swingstanceFSRless::calc_motor_cmd()
+{
+    // return to do the work
+    return 0.0;
+}
+
 #endif
