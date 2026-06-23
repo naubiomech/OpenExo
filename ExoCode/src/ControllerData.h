@@ -241,6 +241,13 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t num_parameter = 17;
     }
 
+    namespace angleRead
+    {
+        const uint8_t amplitude_idx = 0;                //Magnitude of the applied torque, in Nm
+        const uint8_t direction_idx = 1;                //Flag to flip the direction of the applied torque 
+        const uint8_t num_parameter = 2;
+    }
+
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
 }
 
@@ -442,6 +449,9 @@ class ControllerData {
         //Variables for the PHMC Controller
         float fs;
         float state;
+
+        //Variables for angleRead Controller
+        float motor_angle;
 };      
 
 #endif

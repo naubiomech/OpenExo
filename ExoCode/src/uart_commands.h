@@ -511,13 +511,14 @@ namespace UART_command_handlers
         case (uint8_t)config_defs::exo_name::bilateral_arm:
 		{
             rx_msg.len = (uint8_t)rt_data::BILATERAL_ARM_RT_LEN;
-            rx_msg.data[0] = exo_data->right_side.arm_1.controller.filtered_torque_reading;
+            /*rx_msg.data[0] = exo_data->right_side.arm_1.controller.filtered_torque_reading;*/
+            rx_msg.data[0] = exo_data->right_side.arm_1.controller.motor_angle;
             rx_msg.data[1] = exo_data->right_side.arm_1.controller.desired_torque;
-            rx_msg.data[2] = exo_data->left_side.arm_1.controller.filtered_torque_reading;
+            rx_msg.data[2] = exo_data->left_side.arm_1.controller.motor_angle; //was filtered_torque_reading
             rx_msg.data[3] = exo_data->left_side.arm_1.controller.desired_torque;
-            rx_msg.data[4] = exo_data->right_side.arm_2.controller.filtered_torque_reading;
+            rx_msg.data[4] = exo_data->right_side.arm_2.controller.motor_angle; //was filtered_torque_reading
             rx_msg.data[5] = exo_data->right_side.arm_2.controller.desired_torque;
-            rx_msg.data[6] = exo_data->left_side.arm_2.controller.filtered_torque_reading;
+            rx_msg.data[6] = exo_data->left_side.arm_2.controller.motor_angle; //was filtered_torque_reading
             rx_msg.data[7] = exo_data->left_side.arm_2.controller.desired_torque;
             rx_msg.data[8] = exo_data->right_side.percent_gait / 100;
             rx_msg.data[9] = exo_data->left_side.percent_gait / 100;

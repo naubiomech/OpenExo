@@ -2991,4 +2991,51 @@ float PJMC_PLUS::calc_motor_cmd()
     
 	return cmd;
 }
+
+//****************************************************
+
+angleRead::angleRead(config_defs::joint_id id, ExoData* exo_data)
+    : _Controller(id, exo_data)
+{
+#ifdef CONTROLLER_DEBUG
+    logger::println("angleRead::Constructor");
+#endif
+
+    //Initializes variables upon startup
+    motor_angle = 0;
+
+}
+
+float angleRead::calc_motor_cmd()
+{
+
+    //Creates the cmd variable and initializes it to 0;
+    float cmd_ff = 0;     
+
+    if (_side_data->do_calibration_toe_fsr)          //If the FSRs are being calibrated or if the toe fsr is 0, send a command of zero
+    {
+        cmd_ff = 0;
+    }
+    else
+    {
+        cmd_ff = _controller_data->parameters[controller_defs::constant_torque::amplitude_idx];         //Send a command at the specified amplitude
+    }
+
+    //Set the feed-forward setpoint
+    _controller_data->ff_setpoint = cmd_ff;
+
+    float cmd = 0;
+
+    cmd = cmd_ff
+
+    //Sets the desired torque for plotting
+    _controller_data->desired_torque = cmd_ff;
+
+
+
+    //sets the angle for plotting
+    _controller_data->motor_angle = _joint_data->position;; //Need to go back and change this so that it equals the motor angle read by the motor, what connor showed me
+
+    return cmd;
+}
 #endif

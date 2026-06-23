@@ -523,5 +523,28 @@ private:
 
 };
 
+/**
+ * @brief Motor Angle Reading Controller
+ * This controller is for the arm_1 and arm_2 joints
+ * Currently only reads and prints the angle of the motor
+ *
+ * See ControllerData.h for details on the parameters used.
+ */
+class angleRead : public _Controller
+{
+public:
+    angleRead(config_defs::joint_id id, ExoData* exo_data);
+    ~angleRead() {};
+
+    float calc_motor_cmd();
+    float motor_angle;
+
+    /*float previous_command;         /* Stores Previous Loop's Torque Command */
+    /*float previous_torque_reading;  /* Stores Previous Loop's Measured Torque */
+    /*int flag;                       /* Flag that Determines Filter Status */
+    /*float difference;               /* Stores Difference in Command when Changed */
+
+};
+
 #endif
 #endif
