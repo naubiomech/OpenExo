@@ -567,6 +567,7 @@ class FSRless: public _Controller
         float min_vel;
 
         float encoder_acc;
+        float prev_encoder_acc;
         float norm_acc;
         float max_acc;
         float min_acc;
@@ -574,6 +575,11 @@ class FSRless: public _Controller
         unsigned long prev_time;
 
         unsigned long start_controller_time;
+
+        float angle_setpoint;
+        bool is_flexion;
+
+        unsigned long last_switch;
 
 
        

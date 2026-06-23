@@ -3004,9 +3004,15 @@ FSRless::FSRless(config_defs::joint_id id, ExoData* _exo_data)
     min_vel = 0.0;
 
     encoder_acc = 0.0;
+    prev_encoder_acc = 0.0;
     norm_acc = 0.0;
     max_acc = 0.0;
     min_acc = 0.0;
+
+    angle_setpoint = 0.9;
+    is_flexion = false;
+
+    last_switch = millis();
 
     Serial.println("FSRless Contructor");
 }
@@ -3016,16 +3022,20 @@ float FSRless::calc_motor_cmd()
     float cmd_ff = 0.0;
 	float cmd;
 
-    float mass = _controller_data->parameters[controller_defs::fsr_less::mass_idx];
-    float extension_setpoint = _controller_data->parameters[controller_defs::fsr_less::extension_setpoint_idx];
-    float flexion_setpoint = _controller_data->parameters[controller_defs::fsr_less::flexion_setpoint_idx];
-	float I = _controller_data->parameters[controller_defs::fsr_less::I_idx];
-    float c = _controller_data->parameters[controller_defs::fsr_less::c_idx];
-    float k = _controller_data->parameters[controller_defs::fsr_less::k_idx];
+    float mass = 5.0;// _controller_data->parameters[controller_defs::fsr_less::mass_idx];
+    float extension_setpoint = 1; //_controller_data->parameters[controller_defs::fsr_less::extension_setpoint_idx];
+    float flexion_setpoint = 1; //_controller_data->parameters[controller_defs::fsr_less::flexion_setpoint_idx];
+	float I = 1;//_controller_data->parameters[controller_defs::fsr_less::I_idx];
+    float c = 0.35;//_controller_data->parameters[controller_defs::fsr_less::c_idx];
+    float k = 1;//_controller_data->parameters[controller_defs::fsr_less::k_idx];
+    float angle_alpha = 0.9;//_controller_data->parameters[controller_defs::fsr_less::angle_alpha_idx];
+    float vel_alpha = 0.5;//_controller_data->parameters[controller_defs::fsr_less::vel_alpha_idx];
+    float acc_alpha = 0.5;//_controller_data->parameters[controller_defs::fsr_less::acc_alpha_idx];
+    float max_torque = 21.0;//_controller_data->parameters[controller_defs::fsr_less::max_torque_idx];
 
     unsigned long curr_time;
 
-    if(first_loop & (_joint_data->motor.enabled))
+    if(first_loop & (_joint_data->motor.enabled)) // check motor is enabled before begining
         {
             start_controller_time = millis();
             Serial.println("First conditional passed");
@@ -3034,7 +3044,7 @@ float FSRless::calc_motor_cmd()
             //Serial.print("joint position first loop: ");
             //Serial.println(_joint_data->position);
         }
-    if (/*(millis()-start_controller_time > 75) & */second_loop & (_joint_data->motor.p != 0.0))
+    if (/*(millis()-start_controller_time > 75) & */second_loop & (_joint_data->motor.p != 0.0)) // calibrate encoders
         {
             //Serial.print("joint position second loop: ");
             //Serial.println(_joint_data->position);
@@ -3058,20 +3068,47 @@ float FSRless::calc_motor_cmd()
         }
     if(!first_loop & !second_loop)
     {
-        if(10000 >= millis() - start_controller_time)
+        if((10000 >= millis() - start_controller_time) && ((millis() - prev_time) >= 5))
         {
+            // calibrate angle and derivatives and normalize
             encoder_angle = _joint_data->position - encoder_offset;
+            encoder_angle = utils::ewma(encoder_angle, prev_encoder_angle, angle_alpha);
             curr_time = millis();
             long_dt = curr_time - prev_time;
             dt = (float) long_dt;
             dt = dt / 1000.0;
             encoder_vel = (encoder_angle - prev_encoder_angle) / dt;
+            /*if(_side_data->is_left)
+            {
+                Serial.print("vel no filt: ");
+                Serial.println(encoder_vel);
+            }
+                */
+            encoder_vel = utils::ewma(encoder_vel, prev_encoder_vel, vel_alpha);
+            /*if(_side_data->is_left)
+            {
+                Serial.print("vel filt: ");
+                Serial.println(encoder_vel);
+            }
+                */
             encoder_acc = (encoder_vel - prev_encoder_vel) / dt;
+            /*if(_side_data->is_left)
+            {
+                Serial.print("acc no filt: ");
+                Serial.println(encoder_acc);
+            }
+                */
+            encoder_acc = utils::ewma(encoder_acc, prev_encoder_acc, acc_alpha);
+            /*if(_side_data->is_left)
+            {
+                Serial.print("acc no filt: ");
+                Serial.println(encoder_acc);
+            }
+                */
             normalize_angle();
             normalize_vel();
             normalize_acc();
             calc_norms();
-            prev_time = curr_time;
             _controller_data->norm_angle = norm_angle;
             _controller_data->norm_vel = norm_vel;
             _controller_data->norm_acc = norm_acc;
@@ -3079,32 +3116,142 @@ float FSRless::calc_motor_cmd()
             _controller_data->encoder_vel = encoder_vel;
             _controller_data->encoder_acc = encoder_acc;
             _controller_data->ff_setpoint = 0.0; 
-            Serial.println("Only calibrating");
-            Serial.print("max angle: ");
-            Serial.println(max_angle);
-            Serial.print("max vel: ");
-            Serial.println(max_vel);
-            Serial.print("max acc: ");
-            Serial.println(max_acc);
+            _controller_data->dt = dt * 1000.0;
+
+            if(_side_data->is_left)
+            {
+                Serial.println("calibrating");
+                Serial.print("max_vel * 10: ");
+                Serial.println(max_vel * 10);
+                Serial.print("vel * 10: ");
+                Serial.println(encoder_vel * 10);
+                Serial.print("norm vel * 10: ");
+                Serial.println(norm_vel * 10);
+            }
+
+            
+            //set prev vars to curr vars before next loop
+            prev_time = curr_time; 
+            prev_encoder_angle = encoder_angle;
+            prev_encoder_vel = encoder_vel;
+            prev_encoder_acc = encoder_acc;
 
             return 0.0;
         }
         else if((millis() - prev_time) >= 5)
         {
             
-            //real code goes in here
+            // set up angle and derivatives and normalize
             encoder_angle = _joint_data->position - encoder_offset;
+            encoder_angle = utils::ewma(encoder_angle, prev_encoder_angle, 0.95);
             curr_time = millis();
             long_dt = curr_time - prev_time;
             dt = (float) long_dt;
             dt = dt / 1000.0;
             encoder_vel = (encoder_angle - prev_encoder_angle) / dt;
+            /*if(_side_data->is_left)
+            {
+                Serial.print("vel no filt: ");
+                Serial.println(encoder_vel);
+            }
+                */
+            encoder_vel = utils::ewma(encoder_vel, prev_encoder_vel, 0.5);
+            if(_side_data->is_left)
+            {
+                Serial.println(millis());
+                Serial.print("max_vel: ");
+                Serial.println(max_vel);
+                Serial.print("min_vel: ");
+                Serial.println(min_vel);
+                Serial.print("vel filt: ");
+                Serial.println(encoder_vel);
+            }
+
             encoder_acc = (encoder_vel - prev_encoder_vel) / dt;
+            /*if(_side_data->is_left)
+            {
+                Serial.print("acc no filt: ");
+                Serial.println(encoder_acc);
+            }
+                */
+            encoder_acc = utils::ewma(encoder_acc, prev_encoder_acc, 0.5);
+            /*if(_side_data->is_left)
+            {
+                Serial.print("acc filt: ");
+                Serial.println(encoder_acc);
+            }
+                */
             calc_norms();
+            if(_side_data->is_left)
+            {
+                Serial.print("norm vel: ");
+                Serial.println(norm_vel);
+            }
+
+            // State Machine Time!!!
+            /*
+            if(_side_data->is_left)
+            {
+                Serial.print("is flexion b4 trigger");
+                Serial.println(is_flexion);
+            }
+                */
+            is_flexion = utils::schmitt_trigger(norm_vel, is_flexion, -0.15, 0.15);
+            /*if(_side_data->is_left)
+            {
+                Serial.print("is flexion after trigger");
+                Serial.println(is_flexion);
+                Serial.print("anglesetpoint: ");
+                Serial.println(angle_setpoint);
+                Serial.print("norm vel: ");
+                Serial.println(norm_vel);
+            }
+                */
+            if (is_flexion)
+            {
+                if((millis() - last_switch >= 250))
+                {
+                    angle_setpoint = 1.2;
+                    last_switch = millis();
+                    /*if(_side_data->is_left)
+                    {
+                        Serial.println("switched angle setpoints");
+                        Serial.print("anglesetpoint: ");
+                        Serial.println(angle_setpoint);
+                    }
+                        */
+                }
+            }
+            else
+            {
+                if(millis() - last_switch >= 250)
+                {
+                    angle_setpoint = -1.2;
+                    last_switch = millis();
+                    /*if(_side_data->is_left)
+                    {
+                        Serial.println("switched angle setpoints");
+                        Serial.print("anglesetpoint: ");
+                        Serial.println(angle_setpoint);
+                    }
+                        */
+                }
+            }
+            _controller_data->angle_setpoint = angle_setpoint;
+            
+            float angle_diff = norm_angle - angle_setpoint;
+
+            /*if(_side_data->is_left)
+            {
+                Serial.print("angle dif: ");
+                Serial.println(angle_diff);
+            }
+                */
 
             // do some printing for debugging
             if(_side_data->is_left)
             {
+                /*
                 Serial.print("I: ");
                 Serial.println(I);
                 Serial.print("C: ");
@@ -3133,20 +3280,18 @@ float FSRless::calc_motor_cmd()
                 Serial.println(c*encoder_vel);
                 Serial.print("k angle");
                 Serial.println(k*encoder_angle);
-                Serial.print("torque?");
-                Serial.println( I * encoder_acc + c * encoder_vel + k * encoder_angle);
+                */
             }
-
-
 
             // Define our torque setpoint
-            cmd = I * norm_acc + c * norm_vel - k * norm_angle;
-            
-            if(_side_data->is_left)
+            cmd = k * angle_diff + c * norm_vel ; //I * norm_acc 
+
+            /*if(_side_data->is_left)
             {
-                Serial.print("cmd b4 setpoint: ");
+                Serial.print("cmd: ");
                 Serial.println(cmd);
             }
+                */
 
             if(cmd < 0.0)
             {
@@ -3156,41 +3301,34 @@ float FSRless::calc_motor_cmd()
             {
                 cmd = cmd * flexion_setpoint;
             }
-            cmd = cmd * mass; //cast to float?
+            cmd = -1 * cmd * mass; 
             
 
             //set prev vars to curr vars before next loop
             prev_time = curr_time; 
             prev_encoder_angle = encoder_angle;
             prev_encoder_vel = encoder_vel;
+            prev_encoder_acc = encoder_acc;
 
             //PID on Motor Command
             //cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::fsr_less::kp_idx], _controller_data->parameters[controller_defs::fsr_less::ki_idx], _controller_data->parameters[controller_defs::fsr_less::kd_idx]);
-            
-            if(_side_data->is_left)
-            {
-                Serial.print("cmd b4 max torque * 1000: ");
-                Serial.println(cmd*1000.0);
-                Serial.print("cmd > 21.0?: ");
-                Serial.println(cmd > 21.0);
-                Serial.print("cmd < -21.0?: ");
-                Serial.println(cmd < -21.0);
-            }
+            float filt_cmd = utils::ewma(cmd, _controller_data->desired_torque, 0.8);
 
-            if(cmd > 21.0)
+            if(cmd > 21.0) //max_torque)
             {
-                cmd = 21.0;
+                cmd = 21.0; //max_torque;
             }
-            if(cmd < -21.0)
+            if(cmd < -1 * 21.0) //max_torque)
             {
-                cmd = -21.0;
+                cmd = -1 * 21.0; //max_torque;
             }
-            
+            /*
             if(_side_data->is_left)
             {
-                Serial.print("cmd after max torque: ");
+                Serial.print("cmd b4 sending: ");
                 Serial.println(cmd);
             }
+                */
 
             #ifdef CONTROLLER_DEBUG
             logger::println("FSRless::calc_motor_cmd : stop");
@@ -3199,32 +3337,36 @@ float FSRless::calc_motor_cmd()
             //update plotting params
             _controller_data->ff_setpoint = cmd_ff; 
             _controller_data->setpoint = cmd;
-            _controller_data->filtered_setpoint = cmd;
+            _controller_data->filtered_setpoint = filt_cmd;
             _controller_data->encoder_angle = encoder_angle;
             _controller_data->encoder_vel = encoder_vel;
             _controller_data->encoder_acc = encoder_acc;
-            _controller_data->desired_torque = cmd;
+            _controller_data->desired_torque = filt_cmd;
             _controller_data->dt = dt * 1000.0;
             _controller_data->norm_angle = norm_angle;
             _controller_data->norm_vel = norm_vel;
             _controller_data->norm_acc = norm_acc;
+            _controller_data->angle_diff = angle_diff;
 
             if(_side_data->is_left)
             {
-                Serial.print("cmd: ");
-                Serial.println(cmd);
+                Serial.println("after plotting update");
+                Serial.println(millis());
+                Serial.print("max_vel: ");
+                Serial.println(max_vel);
+                Serial.print("min_vel: ");
+                Serial.println(min_vel);
+                Serial.print("vel filt: ");
+                Serial.println(encoder_vel);
+                Serial.print("norm vel: ");
+                Serial.println(norm_vel);
             }
 
-            return cmd;
+            return filt_cmd;
         
         }  
         else
         {
-            if(_side_data->is_left)
-            {
-                Serial.print("cmd if millis timer not met: ");
-                Serial.println(cmd);
-            }
             return _controller_data->ff_setpoint;
         }
         
@@ -3269,6 +3411,8 @@ void FSRless::normalize_vel()
     {
         min_vel = encoder_vel;
     }
+    _controller_data->max_vel = max_vel;
+    _controller_data->min_vel = min_vel;
 }
 
 void FSRless::normalize_acc()

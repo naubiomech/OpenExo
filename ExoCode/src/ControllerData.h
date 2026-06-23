@@ -252,7 +252,11 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t kp_idx = 6;
         const uint8_t kd_idx = 7;
         const uint8_t ki_idx = 8;
-        const uint8_t num_parameter = 9;
+        const uint8_t angle_alpha_idx = 9;
+        const uint8_t vel_alpha_idx = 10;
+        const uint8_t acc_alpha_idx = 11;
+        const uint8_t max_torque_idx = 12;
+        const uint8_t num_parameter = 13;
     }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
@@ -457,6 +461,12 @@ class ControllerData {
         float norm_angle;
         float norm_vel;
         float norm_acc;
+        float angle_setpoint;
+        float angle_diff;
+
+        float max_vel;
+        float min_vel;
+
 };      
 
 #endif
