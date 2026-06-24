@@ -1434,7 +1434,7 @@ Arm1Joint::Arm1Joint(config_defs::joint_id id, ExoData* exo_data)
 , _zero_torque(id, exo_data)
 , _spline(id, exo_data)
 , _constant_torque(id, exo_data)
-, _angleread(id, exo_data)
+, _angle_read(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
@@ -1540,8 +1540,8 @@ void Arm1Joint::set_controller(uint8_t controller_id)
         case (uint8_t)config_defs::arm_1_controllers::spline:
             _controller = &_spline;
             break;
-        case (uint8_t)config_defs::arm_1_controllers::angleread:
-            _controller = &_angleread;
+        case (uint8_t)config_defs::arm_1_controllers::angleRead:
+            _controller = &_angle_read;
             break;
         default:
             logger::print("Unkown Controller!\n", LogLevel::Error);
@@ -1556,7 +1556,7 @@ Arm2Joint::Arm2Joint(config_defs::joint_id id, ExoData* exo_data)
 , _zero_torque(id, exo_data)
 , _spline(id, exo_data)
 , _constant_torque(id, exo_data)
-, _angleread(id, exo_data)
+, _angle_read(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
@@ -1662,8 +1662,8 @@ void Arm2Joint::set_controller(uint8_t controller_id)
         case (uint8_t)config_defs::arm_2_controllers::spline:
             _controller = &_spline;
             break;
-        case (uint8_t)config_defs::arm_1_controllers::angleread:
-            _controller = &_angleread;
+        case (uint8_t)config_defs::arm_2_controllers::angleRead:
+            _controller = &_angle_read;
             break;
         default:
             logger::print("Unkown Controller!\n", LogLevel::Error);

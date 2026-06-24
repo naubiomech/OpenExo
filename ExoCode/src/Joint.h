@@ -299,7 +299,7 @@ protected:
     ZeroTorque _zero_torque;        /**< Zero torque controller */
     Spline _spline;                 /**< Spline controller */
     ConstantTorque _constant_torque;/**< Constant torque controller */
-    angleRead _angleread;            /**< Angle Read controller */
+    angleRead _angle_read;            /**< Angle Read controller */
 };
 
 /**
@@ -327,7 +327,7 @@ protected:
     ZeroTorque _zero_torque;        /**< Zero torque controller */
     Spline _spline;                 /**< Spline controller */
     ConstantTorque _constant_torque;/**< Constant torque controller */
-    angleRead _angleread;            /**< Angle Read controller */
+    angleRead _angle_read;            /**< Angle Read controller */
 };
 
 #endif

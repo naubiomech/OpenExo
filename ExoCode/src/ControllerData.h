@@ -451,7 +451,7 @@ class ControllerData {
         float state;
 
         //Variables for angleRead Controller
-        float motor_angle;
+        float motor_angle = 0;
 };      
 
 #endif

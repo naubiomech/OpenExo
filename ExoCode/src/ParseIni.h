@@ -552,7 +552,7 @@ namespace config_defs
             {"zeroTorque", (uint8_t)config_defs::arm_2_controllers::zero_torque},
             {"constantTorque", (uint8_t)config_defs::arm_2_controllers::constant_torque},
             {"spline", (uint8_t)config_defs::arm_2_controllers::spline},
-            {"angleRead", (uint8_t)config_defs::arm_1_controllers::angleRead},
+            {"angleRead", (uint8_t)config_defs::arm_2_controllers::angleRead},
         };
         
         const IniKeyCode use_torque_sensor

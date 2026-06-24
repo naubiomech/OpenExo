@@ -267,6 +267,12 @@ namespace
         param_bound(true, 0.0f, 10000.0f, true),    // 16 maxon_outOfOffice_itr
     };
 
+    const ParameterBoundConfig angle_read_bounds[controller_defs::angleRead::num_parameter] =
+    {
+        param_bound(false, -100.0f, 100.0f, false), // 0 amplitude
+        param_bound(false, 0.0f, 1.0f, true),       // 1 direction
+    };
+
     bool bounds_for_zero_torque(uint8_t parameter_index, float* min_out, float* max_out, bool* integer_only_out)
     {
         return read_parameter_bound(zero_torque_bounds, PARAM_BOUND_COUNT(zero_torque_bounds), parameter_index, min_out, max_out, integer_only_out);
@@ -335,6 +341,11 @@ namespace
     bool bounds_for_pjmc_plus(uint8_t parameter_index, float* min_out, float* max_out, bool* integer_only_out)
     {
         return read_parameter_bound(pjmc_plus_bounds, PARAM_BOUND_COUNT(pjmc_plus_bounds), parameter_index, min_out, max_out, integer_only_out);
+    }
+
+    bool bounds_for_angle_read(uint8_t parameter_index, float* min_out, float* max_out, bool* integer_only_out)
+    {
+        return read_parameter_bound(angle_read_bounds, PARAM_BOUND_COUNT(angle_read_bounds), parameter_index, min_out, max_out, integer_only_out);
     }
 }
 
@@ -558,6 +569,8 @@ uint8_t ControllerData::get_parameter_length_for(config_defs::JointType joint, u
                     return controller_defs::constant_torque::num_parameter;
                 case (uint8_t)config_defs::arm_1_controllers::spline:
                     return controller_defs::spline::num_parameter;
+                case (uint8_t)config_defs::arm_1_controllers::angleRead:
+                    return controller_defs::angleRead::num_parameter;
                 default:
                     return 0;
             }
@@ -573,6 +586,8 @@ uint8_t ControllerData::get_parameter_length_for(config_defs::JointType joint, u
                     return controller_defs::constant_torque::num_parameter;
                 case (uint8_t)config_defs::arm_2_controllers::spline:
                     return controller_defs::spline::num_parameter;
+                case (uint8_t)config_defs::arm_2_controllers::angleRead:
+                    return controller_defs::angleRead::num_parameter;
                 default:
                     return 0;
             }
@@ -697,6 +712,8 @@ bool ControllerData::get_parameter_bounds_for(
                     return bounds_for_constant_torque(parameter_index, min_value, max_value, integer_only);
                 case (uint8_t)config_defs::arm_1_controllers::spline:
                     return bounds_for_spline(parameter_index, min_value, max_value, integer_only);
+                case (uint8_t)config_defs::arm_1_controllers::angleRead:
+                    return bounds_for_angle_read(parameter_index, min_value, max_value, integer_only);
                 default:
                     return false;
             }
@@ -712,6 +729,8 @@ bool ControllerData::get_parameter_bounds_for(
                     return bounds_for_constant_torque(parameter_index, min_value, max_value, integer_only);
                 case (uint8_t)config_defs::arm_2_controllers::spline:
                     return bounds_for_spline(parameter_index, min_value, max_value, integer_only);
+                case (uint8_t)config_defs::arm_2_controllers::angleRead:
+                    return bounds_for_angle_read(parameter_index, min_value, max_value, integer_only);
                 default:
                     return false;
             }
@@ -720,3 +739,4 @@ bool ControllerData::get_parameter_bounds_for(
             return false;
     }
 }
+  

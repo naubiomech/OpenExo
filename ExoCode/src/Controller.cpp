@@ -3008,7 +3008,6 @@ angleRead::angleRead(config_defs::joint_id id, ExoData* exo_data)
 
 float angleRead::calc_motor_cmd()
 {
-
     //Creates the cmd variable and initializes it to 0;
     float cmd_ff = 0;     
 
@@ -3018,7 +3017,9 @@ float angleRead::calc_motor_cmd()
     }
     else
     {
-        cmd_ff = _controller_data->parameters[controller_defs::constant_torque::amplitude_idx];         //Send a command at the specified amplitude
+        //cmd_ff = _controller_data->parameters[controller_defs::constant_torque::amplitude_idx];         //Send a command at the specified amplitude
+        cmd_ff = 0;
+        logger::println("Angle Read Controller Running");
     }
 
     //Set the feed-forward setpoint
@@ -3026,7 +3027,7 @@ float angleRead::calc_motor_cmd()
 
     float cmd = 0;
 
-    cmd = cmd_ff
+    cmd = cmd_ff;
 
     //Sets the desired torque for plotting
     _controller_data->desired_torque = cmd_ff;
@@ -3034,7 +3035,14 @@ float angleRead::calc_motor_cmd()
 
 
     //sets the angle for plotting
-    _controller_data->motor_angle = _joint_data->position;; //Need to go back and change this so that it equals the motor angle read by the motor, what connor showed me
+    _controller_data->motor_angle = _joint_data->position; 
+
+    //debug to see if joint data position is changing 
+    //logger::print("Motor angle: ");
+    
+    Serial.println("Angle Read Controller Running");
+    Serial.print("Motor Angle: ");
+    Serial.println(_joint_data -> position);
 
     return cmd;
 }
