@@ -3040,9 +3040,23 @@ float angleRead::calc_motor_cmd()
     //debug to see if joint data position is changing 
     //logger::print("Motor angle: ");
     
-    Serial.println("Angle Read Controller Running");
-    Serial.print("Motor Angle: ");
-    Serial.println(_joint_data -> position);
+    unsigned long current_time = millis();
+
+    if (current_time - last_print_time >= 500){
+        last_print_time = current_time;
+
+        Serial.println("Angle Read Controller Running");
+        Serial.print("Motor Angle: ");
+        Serial.println(_joint_data -> position);
+
+        //For troubleshooting angleRead controller
+        /*
+        Serial.print("do_zero: ");
+        Serial.print(_joint_data->motor.do_zero);
+        */
+        
+    }
+    
 
     return cmd;
 }

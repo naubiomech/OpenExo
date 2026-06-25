@@ -538,6 +538,7 @@ public:
 
     float calc_motor_cmd();
     float motor_angle;
+    unsigned long last_print_time =0;
 
     /*float previous_command;         /* Stores Previous Loop's Torque Command */
     /*float previous_torque_reading;  /* Stores Previous Loop's Measured Torque */

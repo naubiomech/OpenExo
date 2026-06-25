@@ -112,10 +112,21 @@ void _Joint::check_calibration()
 
     //logger::print("_Joint::check_calibration\n"); 
     
+
     if (_joint_data->motor.do_zero)
     {
         _motor->zero();
     }
+    
+    //For troubleshooting angleRead controller
+    /*
+    if(_joint_data->motor.do_zero){
+        Serial.print("***ZERO COMMAND SENT, joint ID: ");
+        Serial.println((uint8_t)_joint_data->id);
+
+        _motor->zero();
+    }
+    */
 };
 
 unsigned int _Joint::get_torque_sensor_pin(config_defs::joint_id id, ExoData* exo_data)
@@ -1519,8 +1530,27 @@ void Arm1Joint::run_joint()
     {
         _motor->enable();
     }
+    //Replaced the below line with the following block for angle reading 
+    //_motor->transaction(_joint_data->controller.setpoint / _joint_data->motor.gearing);
+    //Start Block
+    float motor_cmd = _joint_data->controller.setpoint / _joint_data->motor.gearing; 
 
-    _motor->transaction(_joint_data->controller.setpoint / _joint_data->motor.gearing);
+    if(_joint_data->controller.controller == (uint8_t)config_defs::arm_1_controllers::angleRead){
+        _motor->transaction(motor_cmd);
+        delayMicroseconds(500); //delay for CAN response
+        _motor->transaction(motor_cmd);
+        delayMicroseconds(500); //delay for CAN response  
+        _motor->transaction(motor_cmd); //second transaction reads first transaction response
+
+        //refresh values for plotting
+        _joint_data->position = _joint_data->motor.p / _joint_data->motor.gearing;
+        _joint_data->controller.motor_angle = _joint_data->position;
+
+    }
+    else{
+        _motor->transaction(motor_cmd);
+    }
+
 };
 
 void Arm1Joint::set_controller(uint8_t controller_id)
@@ -1642,7 +1672,26 @@ void Arm2Joint::run_joint()
         _motor->enable();
     }
 
-    _motor->transaction(_joint_data->controller.setpoint / _joint_data->motor.gearing);
+    //Replaced the below line with the following block for angle reading 
+    //_motor->transaction(_joint_data->controller.setpoint / _joint_data->motor.gearing);
+    //Start Block
+    float motor_cmd = _joint_data->controller.setpoint / _joint_data->motor.gearing; 
+
+    if(_joint_data->controller.controller == (uint8_t)config_defs::arm_2_controllers::angleRead){
+        _motor->transaction(motor_cmd);
+        delayMicroseconds(500); //delay for CAN response
+        _motor->transaction(motor_cmd);
+        delayMicroseconds(500); //delay for CAN response  
+        _motor->transaction(motor_cmd); //second transaction reads first transaction response
+
+        //refresh values for plotting
+        _joint_data->position = _joint_data->motor.p / _joint_data->motor.gearing;
+        _joint_data->controller.motor_angle = _joint_data->position;
+
+    }
+    else{
+        _motor->transaction(motor_cmd);
+    }
 };
 
 void Arm2Joint::set_controller(uint8_t controller_id)
