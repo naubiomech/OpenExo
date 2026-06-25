@@ -3072,6 +3072,9 @@ arm_assist1::arm_assist1(config_defs::joint_id id, ExoData* exo_data)
 
     //Initializes variables upon startup
     motor_angle = 0;
+    startup_motor_angle = 0;
+    motor_angle_zeroed = false;
+    motor_angle_zero_time = 0;
 
 }
 
@@ -3101,28 +3104,93 @@ float arm_assist1::calc_motor_cmd()
     //Sets the desired torque for plotting
     _controller_data->desired_torque = cmd_ff;
 
+    //Zeros motor angle at startup
+    float raw_motor_angle = _joint_data->position;
 
+    uint16_t exo_status = _data->get_status();
+    bool trial_status = (exo_status == status_defs::messages::trial_on)||(exo_status == status_defs::messages::fsr_calibration)||(exo_status == status_defs::messages::fsr_refinement);
+    //Serial.print("Trial Status: ");
+    //Serial.println(trial_status);
 
-    //sets the angle for plotting
-    _controller_data->motor_angle = _joint_data->position; 
+    if (!trial_status)
+    {
+        motor_angle = 0;
+        _controller_data->motor_angle = motor_angle;
+        motor_angle_zero_time = 0;
+    }
+    else if(!motor_angle_zeroed)
+    {
+        motor_angle = 0;
+        _controller_data->motor_angle = motor_angle;
+
+        if(motor_angle_zero_time == 0)
+        {
+            motor_angle_zero_time = millis();
+        }
+        if(millis() - motor_angle_zero_time > 500)
+        {
+            startup_motor_angle = raw_motor_angle; 
+            motor_angle_zeroed = true;
+            Serial.println("Motor Angle Zero Complete");
+        }
+        
+    }
+    else
+    {
+        //Serial.println("running main loop");
+        motor_angle = raw_motor_angle - startup_motor_angle;
+        _controller_data->motor_angle = motor_angle;
+    }
 
     //debug to see if joint data position is changing 
     //logger::print("Motor angle: ");
     
     unsigned long current_time = millis();
-
-    if (current_time - last_print_time >= 500){
+    
+    if (current_time - last_print_time >= 500)
+    {
         last_print_time = current_time;
 
         Serial.println("Angle Read Controller Running");
+
+        //Print Motor ID
+        Serial.print("Joint: ");
+        if (_id == config_defs::joint_id::left_arm_1)
+        {
+            Serial.print("left_arm_1");
+        }
+        else if (_id == config_defs::joint_id::right_arm_1)
+        {
+            Serial.print("right_arm_1");
+        }
+        else if (_id == config_defs::joint_id::left_arm_2)
+        {
+            Serial.print("left_arm_2");
+        }
+        else if (_id == config_defs::joint_id::right_arm_2)
+        {
+            Serial.print("right_arm_2");
+        }
+        else
+        {
+            Serial.print((uint8_t)_id);
+        }
+        
+
         Serial.print("Motor Angle: ");
-        Serial.println(_joint_data -> position);
+        Serial.println(motor_angle);
+
+        Serial.print("Raw Motor Angle: ");
+        Serial.println(raw_motor_angle);
+
+        Serial.print("Startup Motor Angle: ");
+        Serial.println(startup_motor_angle);
 
         //For troubleshooting angleRead controller
-        /*
-        Serial.print("do_zero: ");
-        Serial.print(_joint_data->motor.do_zero);
-        */
+        
+        //Serial.print("do_zero: ");
+        //Serial.print(_joint_data->motor.do_zero);
+        
         
     }
     

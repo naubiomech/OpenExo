@@ -1504,7 +1504,12 @@ void Arm1Joint::run_joint()
 {
     set_controller(_joint_data->controller.controller);
 
-    _joint_data->controller.setpoint = _controller->calc_motor_cmd();
+    //_joint_data->controller.setpoint = _controller->calc_motor_cmd();
+    bool is_arm_assist1 = _joint_data->controller.controller == (uint8_t)config_defs::arm_1_controllers::arm_assist1;
+    if(!is_arm_assist1)
+    {
+        _joint_data->controller.setpoint = _controller->calc_motor_cmd();
+    }
 
     const uint16_t exo_status = _data->get_status();
     const bool correct_status = (exo_status == status_defs::messages::trial_on) ||
@@ -1557,7 +1562,10 @@ void Arm1Joint::run_joint()
 
         //refresh values for plotting
         _joint_data->position = _joint_data->motor.p / _joint_data->motor.gearing;
-        _joint_data->controller.motor_angle = _joint_data->position;
+        _joint_data->controller.setpoint = _controller->calc_motor_cmd();
+        motor_cmd = _joint_data->controller.setpoint / _joint_data->motor.gearing;
+        _motor->transaction(motor_cmd);
+        //_joint_data->controller.motor_angle = _joint_data->position;
 
     }
     else{
@@ -1661,7 +1669,13 @@ void Arm2Joint::run_joint()
 {
     set_controller(_joint_data->controller.controller);
 
-    _joint_data->controller.setpoint = _controller->calc_motor_cmd();
+    bool is_arm_assist1 = _joint_data->controller.controller == (uint8_t)config_defs::arm_2_controllers::arm_assist1;
+    if(!is_arm_assist1)
+    {
+        _joint_data->controller.setpoint = _controller->calc_motor_cmd();
+    }
+
+    //_joint_data->controller.setpoint = _controller->calc_motor_cmd();
 
     const uint16_t exo_status = _data->get_status();
     const bool correct_status = (exo_status == status_defs::messages::trial_on) ||
@@ -1715,7 +1729,10 @@ void Arm2Joint::run_joint()
 
         //refresh values for plotting
         _joint_data->position = _joint_data->motor.p / _joint_data->motor.gearing;
-        _joint_data->controller.motor_angle = _joint_data->position;
+        _joint_data->controller.setpoint = _controller->calc_motor_cmd();
+        motor_cmd = _joint_data->controller.setpoint / _joint_data->motor.gearing;
+        _motor->transaction(motor_cmd);
+        //_joint_data->controller.motor_angle = _joint_data->position;
 
     }
     else{
