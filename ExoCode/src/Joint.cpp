@@ -1446,6 +1446,7 @@ Arm1Joint::Arm1Joint(config_defs::joint_id id, ExoData* exo_data)
 , _spline(id, exo_data)
 , _constant_torque(id, exo_data)
 , _angle_read(id, exo_data)
+, _arm_assist1(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
@@ -1547,6 +1548,18 @@ void Arm1Joint::run_joint()
         _joint_data->controller.motor_angle = _joint_data->position;
 
     }
+    else if(_joint_data->controller.controller == (uint8_t)config_defs::arm_1_controllers::arm_assist1){
+        _motor->transaction(motor_cmd);
+        delayMicroseconds(500); //delay for CAN response
+        _motor->transaction(motor_cmd);
+        delayMicroseconds(500); //delay for CAN response  
+        _motor->transaction(motor_cmd); //second transaction reads first transaction response
+
+        //refresh values for plotting
+        _joint_data->position = _joint_data->motor.p / _joint_data->motor.gearing;
+        _joint_data->controller.motor_angle = _joint_data->position;
+
+    }
     else{
         _motor->transaction(motor_cmd);
     }
@@ -1573,6 +1586,9 @@ void Arm1Joint::set_controller(uint8_t controller_id)
         case (uint8_t)config_defs::arm_1_controllers::angleRead:
             _controller = &_angle_read;
             break;
+        case (uint8_t)config_defs::arm_1_controllers::arm_assist1:
+            _controller = &_arm_assist1;
+            break;
         default:
             logger::print("Unkown Controller!\n", LogLevel::Error);
             _controller = &_zero_torque;
@@ -1587,6 +1603,7 @@ Arm2Joint::Arm2Joint(config_defs::joint_id id, ExoData* exo_data)
 , _spline(id, exo_data)
 , _constant_torque(id, exo_data)
 , _angle_read(id, exo_data)
+, _arm_assist1(id, exo_data)
 {
     #ifdef JOINT_DEBUG
         logger::print(_is_left ? "Left " : "Right ");
@@ -1689,6 +1706,18 @@ void Arm2Joint::run_joint()
         _joint_data->controller.motor_angle = _joint_data->position;
 
     }
+    else if(_joint_data->controller.controller == (uint8_t)config_defs::arm_2_controllers::arm_assist1){
+        _motor->transaction(motor_cmd);
+        delayMicroseconds(500); //delay for CAN response
+        _motor->transaction(motor_cmd);
+        delayMicroseconds(500); //delay for CAN response  
+        _motor->transaction(motor_cmd); //second transaction reads first transaction response
+
+        //refresh values for plotting
+        _joint_data->position = _joint_data->motor.p / _joint_data->motor.gearing;
+        _joint_data->controller.motor_angle = _joint_data->position;
+
+    }
     else{
         _motor->transaction(motor_cmd);
     }
@@ -1713,6 +1742,9 @@ void Arm2Joint::set_controller(uint8_t controller_id)
             break;
         case (uint8_t)config_defs::arm_2_controllers::angleRead:
             _controller = &_angle_read;
+            break;
+        case (uint8_t)config_defs::arm_2_controllers::arm_assist1:
+            _controller = &_arm_assist1;
             break;
         default:
             logger::print("Unkown Controller!\n", LogLevel::Error);

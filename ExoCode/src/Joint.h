@@ -300,6 +300,7 @@ protected:
     Spline _spline;                 /**< Spline controller */
     ConstantTorque _constant_torque;/**< Constant torque controller */
     angleRead _angle_read;            /**< Angle Read controller */
+    arm_assist1 _arm_assist1;
 };
 
 /**
@@ -328,6 +329,7 @@ protected:
     Spline _spline;                 /**< Spline controller */
     ConstantTorque _constant_torque;/**< Constant torque controller */
     angleRead _angle_read;            /**< Angle Read controller */
+    arm_assist1 _arm_assist1;
 };
 
 #endif

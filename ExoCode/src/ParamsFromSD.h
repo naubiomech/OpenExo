@@ -94,6 +94,7 @@
             {(uint8_t)config_defs::arm_1_controllers::constant_torque,"arm1Controllers/constantTorque.csv"},
             {(uint8_t)config_defs::arm_1_controllers::spline,"arm1Controllers/spline.csv"},
             {(uint8_t)config_defs::arm_1_controllers::angleRead,"arm1Controllers/angleRead.csv"},
+            {(uint8_t)config_defs::arm_1_controllers::arm_assist1,"arm1Controllers/arm_assist1.csv"},
         };
 
         const ParamFilenameKey arm_2
@@ -103,6 +104,7 @@
             {(uint8_t)config_defs::arm_2_controllers::constant_torque,"arm2Controllers/constantTorque.csv"},
             {(uint8_t)config_defs::arm_2_controllers::spline,"arm2Controllers/spline.csv"},
             {(uint8_t)config_defs::arm_2_controllers::angleRead,"arm2Controllers/angleRead.csv"},
+            {(uint8_t)config_defs::arm_2_controllers::arm_assist1,"arm2Controllers/arm_assist1.csv"},
         };
 
     };
