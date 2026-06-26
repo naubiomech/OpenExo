@@ -3057,7 +3057,7 @@ float swingstanceFSRless::calc_motor_cmd()
     Serial.println(vel_alpha);
 
     // Parameters from FranksCollins Hip Controller
-    float start_percent_gait = _controller_data->parameters[controller_defs::franks_collins_hip::start_percent_gait_idx];
+    float start_percent_gait = _controller_data->parameters[controller_defs::swing_stance_fsrless::start_percent_gait_idx];
 
     float mass = _controller_data->parameters[controller_defs::swing_stance_fsrless::mass_idx];                                               /* User bodymass, currently not used but available if you want to normalize torque mangitude. */
     float extension_torque_peak = _controller_data->parameters[controller_defs::swing_stance_fsrless::trough_normalized_torque_Nm_kg_idx];    /* Extension torque setpoint. */
@@ -3332,9 +3332,9 @@ float swingstanceFSRless::calc_motor_cmd()
             cmd = _spline_generation(extension_node1, extension_node2, extension_node3, extension_torque_magnitude_Nm, shifted_percent_gait) + _spline_generation(flexion_node1, flexion_node2, flexion_node3, flexion_torque_magnitude_Nm, percent_gait);
 
             //Determine if it should be open or closed loop control and calculate accordingly
-            if (_controller_data->parameters[controller_defs::franks_collins_hip::use_pid_idx] > 0)
+            if (_controller_data->parameters[controller_defs::swing_stance_fsrless::use_pid_idx] > 0)
             {
-                cmd = cmd + _pid(cmd, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::franks_collins_hip::p_gain_idx], 0, _controller_data->parameters[controller_defs::franks_collins_hip::d_gain_idx]);
+                cmd = cmd + _pid(cmd, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::swing_stance_fsrless::p_gain_idx], _controller_data->parameters[controller_defs::swing_stance_fsrless::i_gain_idx], _controller_data->parameters[controller_defs::swing_stance_fsrless::d_gain_idx]);
             }
             else
             {
@@ -3406,9 +3406,9 @@ float swingstanceFSRless::calc_motor_cmd()
             cmd = _spline_generation(extension_node1, extension_node2, extension_node3, extension_torque_magnitude_Nm, shifted_percent_gait) + _spline_generation(flexion_node1, flexion_node2, flexion_node3, flexion_torque_magnitude_Nm, percent_gait);
 
             //Determine if it should be open or closed loop control and calculate accordingly
-            if (_controller_data->parameters[controller_defs::franks_collins_hip::use_pid_idx] > 0)
+            if (_controller_data->parameters[controller_defs::swing_stance_fsrless::use_pid_idx] > 0)
             {
-                cmd = cmd + _pid(cmd, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::franks_collins_hip::p_gain_idx], 0, _controller_data->parameters[controller_defs::franks_collins_hip::d_gain_idx]);
+                cmd = cmd + _pid(cmd, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::swing_stance_fsrless::p_gain_idx], _controller_data->parameters[controller_defs::swing_stance_fsrless::i_gain_idx], _controller_data->parameters[controller_defs::swing_stance_fsrless::d_gain_idx]);
             }
             else
             {
