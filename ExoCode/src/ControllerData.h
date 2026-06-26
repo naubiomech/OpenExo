@@ -241,14 +241,29 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t num_parameter = 17;
     }
 
-    namespace pjmc_plus 
+    namespace swing_stance_fsrless 
     {
-        const uint8_t mass_idx = 0;
-        const uint8_t stance_setpoint_idx = 1;
-        const uint8_t swing_setpoint_idx = 2;
-        const uint8_t rising_time_idx = 3;
-        const uint8_t velocity_threshold_idx = 4;
-        const uint8_t num_parameter = 5;
+        const uint8_t mass_idx = 0;                             //Mass of the User in kg
+        const uint8_t trough_normalized_torque_Nm_kg_idx = 1;   //Extension Torque in Nm/kg
+        const uint8_t peak_normalized_torque_Nm_kg_idx = 2;     //Flexion Torque in Nm/kg
+        const uint8_t start_percent_gait_idx = 3;               //Percent of Gait Cycle where the curve starts (does not start at 0 so that there is no discontinuity)
+        const uint8_t trough_onset_percent_gait_idx = 4;        //Percent of Gait Cycle where curve for extension torque starts
+        const uint8_t trough_percent_gait_idx = 5;              //Percent of Gait Cycle where peak extension torque occurs
+        const uint8_t mid_time_idx = 6;                         //Time from when curve starts until midpoint of zero torque period between extension and flexion torques
+        const uint8_t mid_duration_idx = 7;                     //Time of zero torque period between extension and flexion torques
+        const uint8_t peak_percent_gait_idx = 8;                //Percent of Gait Cycle where peak flexion torque occurs
+        const uint8_t peak_offset_percent_gait_idx = 9;         //Percent of Gait Cycle where torque stops being applied
+        const uint8_t rising_time_idx = 10;
+        const uint8_t velocity_threshold_idx = 11;
+        const uint8_t angle_alpha_idx = 12;
+        const uint8_t velocity_alpha_idx = 13;
+        const uint8_t K_idx = 14;
+        const uint8_t B_idx = 15;
+        const uint8_t use_pid_idx = 16;                         //Flag to determine whether or not PID used
+        const uint8_t p_gain_idx = 17;                          //Value of P Gain for PID control
+        const uint8_t i_gain_idx = 18;                          //Value of I Gain for PID control
+        const uint8_t d_gain_idx = 19;   
+        const uint8_t num_parameter = 20;
     }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
@@ -452,6 +467,21 @@ class ControllerData {
         //Variables for the PHMC Controller
         float fs;
         float state;
+
+        //Variables for swing_stance_fsrless controller
+        float encoder_offset;
+        float encoder_angle;
+        float norm_angle;
+        float encoder_vel;
+        float norm_vel;
+        bool is_stance;
+        bool check_rising;
+        float max_vel;
+        float min_vel;
+        float expected_swing_duration = 0;
+        float expected_step_duration = 0;
+        float expected_stance_duration = 0;
+        float percent_gait;
 };      
 
 #endif

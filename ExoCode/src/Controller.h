@@ -534,11 +534,147 @@ class swingstanceFSRless : public _Controller
 {
 public:
     swingstanceFSRless(config_defs::joint_id id, ExoData* exo_data);
-    ~swingstanceFSRLess() {};
+    ~swingstanceFSRless() {};
 
     float calc_motor_cmd();
 
 private:
+    void swingstanceFSRless::calibrate_encoders();
+    void swingstanceFSRless::normalize_angle();
+    void swingstanceFSRless::normalize_vel();
+    void swingstanceFSRless::calc_norms();
+
+    bool first_loop;
+    bool second_loop;
+
+    bool is_stance;
+    bool prev_is_stance;
+    bool check_rising;
+    bool check_sinking;
+    unsigned long swing_start_rise_time;
+    unsigned long stance_start_sink_time;
+
+    unsigned long ground_strike_time;
+    unsigned long toe_off_time;
+
+    long long_dt;
+    float dt;
+
+    float encoder_angle;
+    float prev_encoder_angle;
+    float norm_angle;
+    float prev_norm_angle;
+    float max_angle;
+    float min_angle;
+
+    float encoder_vel;
+    float prev_encoder_vel;
+    float norm_vel;
+    float prev_norm_vel;
+    float max_vel;
+    float min_vel;
+
+    unsigned long prev_time;
+    unsigned long start_controller_time;
+
+    //These things are used for the fanrks-collins controller spline
+    float last_percent_gait;
+    float last_start_time;
+
+    /**
+     * @brief calculates the value of a spline defined by the parameters given
+     * @param node1 the percent gait at which to start the spline
+     * @param node2 the percent gait at which the spline reaches its maximum (or minimum)
+     * @param node3 the percent gait at which the spline ends
+     * @param torque_magnitude the output value at the maximum (or minimum) of the spline)
+     * @param shifted_percent_gait the perencet gait at which the spline is to be evaluated
+     * @return the output value of the defien spline at the given percent gait
+     */
+    float _spline_generation(float node1, float node2, float node3, float torque_magnitude, float shifted_percent_gait);
+
+    //These things are used to calc the encoder offset
+    /**
+     * @brief calculates and updates the encoder offset based on the torque cmd given and the 
+     * given B and K values from the SD card for a spring-damper model of deformation
+     * @return none
+     */
+    void update_encoder_offset();
+    float encoder_offset;
+    float encoder_offset_0;
+    float prev_encoder_offset;
+    float correction_factor[2];
+    
+    // These things do local percent gait estimation
+    /**
+     * @brief Calculates the percentage of gait cycle based on the ground contact reading
+     * and an estimate of the step time based on the average time of the last few steps.
+     * Returns the percent gait which saturates at 100%
+     * 
+     * @return percent gait from heel strike
+     */
+    float calc_percent_gait();
+
+    /**
+     * @brief Calculates the percentage of stance phase based on the toe contact reading
+     * and an estimate of the stance time based on the average time of the last few stance phases.
+     * Returns the percent stance which saturates at 100%
+     *
+     * @return percent stance from toe strike
+     */
+    float calc_percent_stance();
+
+    /**
+     * @brief Calculates the percentage of swing phase based on the FSR reading
+     * and an estimate of the swing time based on the average time of the last few swing phases.
+     * Returns the percent swing which saturates at 100%
+     *
+     * @return percent swing
+     */
+    float calc_percent_swing();
+    
+    /**
+     * @brief Calculates the expected duration of a step by averaging the time the last N steps took.
+     * Should only be called when a ground strike has occurred.
+     *
+     * @return expected duration in ms 
+     */
+    float update_expected_duration();
+    
+    /**
+     * @brief Calculates the expected duration of stance by averaging the time the last N stance phases.
+     * 
+     * @return expected stance duration in ms
+     */
+    float update_expected_stance_duration();
+
+    /**
+     * @brief Calculates the expected duration of the swing phase by averaging the time the last N swing phases.
+     *
+     * @return expected swing duration in ms
+     */
+    float update_expected_swing_duration();
+
+    unsigned int expected_step_duration;
+    unsigned int expected_stance_duration;
+    unsigned int expected_swing_duration;
+
+    float percent_gait;
+    float percent_stance;
+    float percent_swing;
+
+    unsigned int prev_ground_strike_time;
+    unsigned int prev_toe_off_time;
+
+    static const uint8_t num_steps_avg = 3;    /**< Number of prior steps used to estimate the expected duration, used for percent gait calculation */
+    unsigned int step_times[num_steps_avg];
+    unsigned int stance_times[num_steps_avg];
+    unsigned int swing_times[num_steps_avg];
+
+    float expected_duration_window_upper_coeff = 3;
+    float expected_duration_window_lower_coeff = -3;
+
+    float angle_threshold;
+
 
 };
 
