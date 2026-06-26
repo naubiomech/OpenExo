@@ -566,6 +566,13 @@ public:
     float startup_motor_angle;
     bool motor_angle_zeroed = false;
     unsigned long motor_angle_zero_time;
+
+    //for damping function
+    float calc_damping_torque(float current_angle, unsigned long current_time);
+    float last_damping_angle = 0;
+    unsigned long last_damping_time = 0;
+    float filtered_joint_angular_velocity = 0.0f;
+
     
 
     /*float previous_command;         /* Stores Previous Loop's Torque Command */

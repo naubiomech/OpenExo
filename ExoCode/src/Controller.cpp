@@ -3080,31 +3080,8 @@ arm_assist1::arm_assist1(config_defs::joint_id id, ExoData* exo_data)
 
 float arm_assist1::calc_motor_cmd()
 {
-    //Creates the cmd variable and initializes it to 0;
-    float cmd_ff = 0;     
-
-    if (_side_data->do_calibration_toe_fsr)          //If the FSRs are being calibrated or if the toe fsr is 0, send a command of zero
-    {
-        cmd_ff = 0;
-    }
-    else
-    {
-        //cmd_ff = _controller_data->parameters[controller_defs::constant_torque::amplitude_idx];         //Send a command at the specified amplitude
-        cmd_ff = 0;
-        logger::println("Angle Read Controller Running");
-    }
-
-    //Set the feed-forward setpoint
-    _controller_data->ff_setpoint = cmd_ff;
-
-    float cmd = 0;
-
-    cmd = cmd_ff;
-
-    //Sets the desired torque for plotting
-    _controller_data->desired_torque = cmd_ff;
-
-    //Zeros motor angle at startup
+    
+    ///////Zeros motor angle at startup///////
     float raw_motor_angle = _joint_data->position;
 
     uint16_t exo_status = _data->get_status();
@@ -3117,6 +3094,10 @@ float arm_assist1::calc_motor_cmd()
         motor_angle = 0;
         _controller_data->motor_angle = motor_angle;
         motor_angle_zero_time = 0;
+        motor_angle_zeroed = false;
+        last_damping_time = 0;
+        last_damping_angle = 0;
+        filtered_joint_angular_velocity = 0.0f;
     }
     else if(!motor_angle_zeroed)
     {
@@ -3145,6 +3126,7 @@ float arm_assist1::calc_motor_cmd()
     //debug to see if joint data position is changing 
     //logger::print("Motor angle: ");
     
+    //serial printing for motor angles
     unsigned long current_time = millis();
     
     if (current_time - last_print_time >= 500)
@@ -3190,11 +3172,75 @@ float arm_assist1::calc_motor_cmd()
         
         //Serial.print("do_zero: ");
         //Serial.print(_joint_data->motor.do_zero);
-        
-        
+
+
     }
-    
+
+    ///////Calulates motor command///////
+    //Creates the cmd variable and initializes it to 0;
+    float cmd_ff = 0;     
+
+    if (_side_data->do_calibration_toe_fsr || !trial_status || !motor_angle_zeroed)          //If the FSRs are being calibrated or if the toe fsr is 0, send a command of zero
+    {
+        cmd_ff = 0;
+    }
+    else
+    {
+        cmd_ff = calc_damping_torque(motor_angle, current_time);
+        //logger::println("Angle Read Controller Running");
+    }
+
+    //Set the feed-forward setpoint
+    float cmd = 0;
+    cmd = cmd_ff;
+    //Sets the desired torque for plotting
+    _controller_data->ff_setpoint = cmd_ff;
+    _controller_data->desired_torque = cmd_ff;
 
     return cmd;
 }
+
+float arm_assist1::calc_damping_torque(float current_angle, unsigned long current_time)
+{
+    if (last_damping_time==0)
+    {
+        last_damping_time = current_time;
+        last_damping_angle = current_angle;
+        filtered_joint_angular_velocity = 0.0f;
+        return 0.0f;
+    }
+
+    float damping_dt = (current_time-last_damping_time) / 1000.0f;
+
+    if (damping_dt <=0.0f)
+    {
+        return 0.0f;
+    }
+
+    float raw_joint_angular_velocity = (current_angle - last_damping_angle) / damping_dt;
+
+    last_damping_angle = current_angle;
+    last_damping_time = current_time;
+
+    //format for calling sd card parameters cmd_ff = _controller_data->parameters[controller_defs::constant_torque::amplitude_idx];
+
+    //Low Pass Filter for joint angular veolcity
+    filtered_joint_angular_velocity = utils::ewma(raw_joint_angular_velocity, filtered_joint_angular_velocity, _controller_data->parameters[controller_defs::arm_assist1::damping_alpha_idx]);
+
+    float joint_angular_velocity = filtered_joint_angular_velocity;
+
+
+    if (abs(joint_angular_velocity) < _controller_data->parameters[controller_defs::arm_assist1::velocity_deadband_idx])
+    {
+        joint_angular_velocity = 0.0f;
+    }
+
+    float damping_torque = - (_controller_data->parameters[controller_defs::arm_assist1::damping_gain_idx]) * joint_angular_velocity;
+
+    damping_torque = constrain(damping_torque, -(_controller_data->parameters[controller_defs::arm_assist1::max_damping_torque_idx]), (_controller_data->parameters[controller_defs::arm_assist1::max_damping_torque_idx]));
+
+    return damping_torque;
+}
+
+
 #endif
