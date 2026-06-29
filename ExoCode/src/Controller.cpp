@@ -3090,14 +3090,14 @@ float swingstanceFSRless::calc_motor_cmd()
 
     if(first_loop & (_joint_data->motor.enabled)) // check motor is enabled before begining
     {
-        Serial.println("entered first loop");
+        //Serial.println("entered first loop");
         start_controller_time = millis();
         first_loop = false;
         second_loop = true;
     }
     if(second_loop & (_joint_data->motor.p != 0.0)) // calibrate encoders
     {
-        Serial.println("entered second loop!!!");
+        //Serial.println("entered second loop!!!");
         calibrate_encoders();
         normalize_angle();
         normalize_vel();
@@ -3135,11 +3135,6 @@ float swingstanceFSRless::calc_motor_cmd()
             prev_encoder_vel = encoder_vel;
             prev_ground_strike_time = 0;
             prev_toe_off_time = 0;
-
-            if(_side_data->is_left)
-            {
-                Serial.println("calibrating 1");
-            }
 
             return 0.0;
         }
@@ -3203,11 +3198,6 @@ float swingstanceFSRless::calc_motor_cmd()
             calc_percent_gait();
             calc_percent_stance();
             calc_percent_swing();
-
-            if(_side_data->is_left)
-            {
-                Serial.println("cal 2");
-            }
 
             // save plotting
             _controller_data->desired_torque = cmd;
@@ -3273,11 +3263,6 @@ float swingstanceFSRless::calc_motor_cmd()
                         expected_step_duration = update_expected_duration();
                         last_start_time = ground_strike_time;
                         
-                        if(_side_data->is_left)
-                        {
-                            Serial.print("returned step duration");
-                            Serial.println(expected_step_duration);
-                        }
                     }
                 }
 
@@ -3307,14 +3292,6 @@ float swingstanceFSRless::calc_motor_cmd()
             percent_stance = calc_percent_stance();
             percent_swing = calc_percent_swing();
 
-            if(_side_data->is_left)
-            {
-                Serial.println("update vel loop");
-                Serial.print("stance? ");
-                Serial.println(is_stance);
-                Serial.print("percent_gait: ");
-                Serial.println(percent_gait);
-            }
             
             //Calcualtes the shifted percent gait cycle to avoid discontinuity at heel strike
             float shifted_percent_gait = (millis() - last_start_time) / expected_step_duration * 100;
@@ -3339,14 +3316,6 @@ float swingstanceFSRless::calc_motor_cmd()
             else
             {
                 cmd = cmd;
-            }
-
-            //cmd = -5.0 * sin(percent_gait / 100.0 * 2 * PI);
-
-            if(_side_data->is_left)
-            {
-                Serial.print("cmd: ");
-                Serial.println(cmd);
             }
 
             // save plotting
@@ -3381,15 +3350,6 @@ float swingstanceFSRless::calc_motor_cmd()
             percent_stance = calc_percent_stance();
             percent_swing = calc_percent_swing();
 
-            if(_side_data->is_left)
-            {
-                Serial.println("just spline loop");
-                Serial.print("stance? ");
-                Serial.println(is_stance);
-                Serial.print("percent_gait: ");
-                Serial.println(percent_gait);
-            }
-
             //Calculates the nodes for the flexion and extension curves for spline generation
             float extension_node1 = extension_peak_percent_gait - extension_rise_percent_gait;
             float extension_node2 = extension_peak_percent_gait;
@@ -3415,14 +3375,6 @@ float swingstanceFSRless::calc_motor_cmd()
                 cmd = cmd;
             }
 
-            //cmd = -5.0 * sin(percent_gait / 100.0 * 2 * PI);
-
-            if(_side_data->is_left)
-            {
-                Serial.print("cmd: ");
-                Serial.println(cmd);
-            }
-
             return cmd;
         }
     }
@@ -3438,14 +3390,6 @@ void swingstanceFSRless::calibrate_encoders()
     float sum_encoder_readings = 0.0;                                        
     for (int i = 0; i < 5; i++)
     {
-        /*if(_joint_data->is_left)
-        {
-            sum_encoder_readings += -1*_joint_data->position;
-        }
-        else
-        {
-            sum_encoder_readings += _joint_data->position;
-        }*/
        sum_encoder_readings += _joint_data->position;
     }
     encoder_offset = sum_encoder_readings/5;
@@ -3632,26 +3576,11 @@ float swingstanceFSRless::calc_percent_swing()
 
 float swingstanceFSRless::update_expected_duration()
 {
-    if(_side_data->is_left)
-    {
-        Serial.println("update expected duration");
-    }
     unsigned int step_time = ground_strike_time - prev_ground_strike_time;
     float expected_step_duration = _controller_data->expected_step_duration;
-    if(_side_data->is_left)
-    {
-        Serial.print("step time: ");
-        Serial.println(step_time);
-        Serial.print("expected step duration");
-        Serial.println(expected_step_duration);
-    }
 		
     if (0 == prev_ground_strike_time) //If the prev time isn't set just return.
     {
-        if(_side_data->is_left)
-        {
-            Serial.println("prev gst == 0");
-        }
         return expected_step_duration;
     }
 
@@ -3669,18 +3598,10 @@ float swingstanceFSRless::update_expected_duration()
     
     if  (num_uninitialized > 0)  //If all the values haven't been replaced
     {
-        if(_side_data->is_left)
-        {
-            Serial.println("unititialized > 0");
-        }
         //Shift all the values and insert the new one
         for (int i = (num_steps_avg - 1); i>0; i--)
         {
             step_times[i] = step_times[i-1];
-            if(_side_data->is_left)
-            {
-                Serial.println(step_times[i]);
-            }
         }
         step_times[0] = step_time;
         
@@ -3693,29 +3614,14 @@ float swingstanceFSRless::update_expected_duration()
         // logger::print("\t]\n");    
     }
 
-    if(_side_data->is_left)
-    {
-        Serial.print("expected_duration_window_upper_coeff * *max_val : ");
-        Serial.println(expected_duration_window_upper_coeff * *max_val);
-        Serial.print("expected_duration_window_lower_coeff * *min_val : ");
-        Serial.println(expected_duration_window_lower_coeff * *min_val);
-    }
     //Consider it a good step if the ground strike falls within a window around the expected duration. Then shift the step times and put in the new value.
     else if ((step_time <= (expected_duration_window_upper_coeff * *max_val)) & (step_time >= (expected_duration_window_lower_coeff * *min_val))) // and (armed_time > ARMED_DURATION_PERCENT * self.expected_duration)): # a better check can be used.  If the person hasn't stopped or the step is good update the vector.  
     {
-        if(_side_data->is_left)
-        {
-            Serial.println("no uninitialized");
-        }
         int sum_step_times = step_time;
         for (int i = (num_steps_avg - 1); i>0; i--)
         {
             sum_step_times += step_times[i-1];
             step_times[i] = step_times[i-1];
-            if(_side_data->is_left)
-            {
-                Serial.println(step_times[i]);
-            }
         }
         step_times[0] = step_time;
         

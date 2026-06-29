@@ -474,6 +474,8 @@ uint8_t ControllerData::get_parameter_length_for(config_defs::JointType joint, u
                     return controller_defs::calibr_manager::num_parameter;
                 case (uint8_t)config_defs::hip_controllers::spline:
                     return controller_defs::spline::num_parameter;
+                case(uint8_t)config_defs::hip_controllers::swing_stance_fsrless:
+                    return controller_defs::swing_stance_fsrless::num_parameter;
                 default:
                     return 0;
             }
