@@ -3078,28 +3078,27 @@ arm_assist1::arm_assist1(config_defs::joint_id id, ExoData* exo_data)
 
 }
 
+
+///////Calculates FeedForward Motor Command///////
 float arm_assist1::calc_motor_cmd()
 {
-    
-    ///////Zeros motor angle at startup///////
+    //Zeros motor angle at startup//
     float raw_motor_angle = _joint_data->position;
 
-    uint16_t exo_status = _data->get_status();
-    bool trial_status = (exo_status == status_defs::messages::trial_on)||(exo_status == status_defs::messages::fsr_calibration)||(exo_status == status_defs::messages::fsr_refinement);
-    //Serial.print("Trial Status: ");
-    //Serial.println(trial_status);
+    uint16_t exo_status = _data->get_status(); //Determines status of exo trial
+    bool trial_status = (exo_status == status_defs::messages::trial_on)||(exo_status == status_defs::messages::fsr_calibration)||(exo_status == status_defs::messages::fsr_refinement); //Determines if trial has started and what state the controller isin
 
-    if (!trial_status)
+    if (!trial_status) //If trial has not started
     {
-        motor_angle = 0;
         _controller_data->motor_angle = motor_angle;
+        motor_angle = 0;
         motor_angle_zero_time = 0;
         motor_angle_zeroed = false;
         last_damping_time = 0;
         last_damping_angle = 0;
         filtered_joint_angular_velocity = 0.0f;
     }
-    else if(!motor_angle_zeroed)
+    else if(!motor_angle_zeroed) //Runs to zero the joint angle if it has not yet been zeroed and the trial has started
     {
         motor_angle = 0;
         _controller_data->motor_angle = motor_angle;
@@ -3116,15 +3115,12 @@ float arm_assist1::calc_motor_cmd()
         }
         
     }
-    else
+    else //Runs in all other cases, including during the main trial 
     {
         //Serial.println("running main loop");
         motor_angle = raw_motor_angle - startup_motor_angle;
         _controller_data->motor_angle = motor_angle;
     }
-
-    //debug to see if joint data position is changing 
-    //logger::print("Motor angle: ");
     
     //serial printing for motor angles
     unsigned long current_time = millis();
@@ -3167,16 +3163,10 @@ float arm_assist1::calc_motor_cmd()
 
         Serial.print("Startup Motor Angle: ");
         Serial.println(startup_motor_angle);
-
-        //For troubleshooting angleRead controller
-        
-        //Serial.print("do_zero: ");
-        //Serial.print(_joint_data->motor.do_zero);
-
-
     }
 
-    ///////Calulates motor command///////
+    //Calulates motor command//
+
     //Creates the cmd variable and initializes it to 0;
     float cmd_ff = 0;     
 
@@ -3193,6 +3183,7 @@ float arm_assist1::calc_motor_cmd()
     //Set the feed-forward setpoint
     float cmd = 0;
     cmd = cmd_ff;
+
     //Sets the desired torque for plotting
     _controller_data->ff_setpoint = cmd_ff;
     _controller_data->desired_torque = cmd_ff;
@@ -3200,6 +3191,7 @@ float arm_assist1::calc_motor_cmd()
     return cmd;
 }
 
+///////Damping Function///////
 float arm_assist1::calc_damping_torque(float current_angle, unsigned long current_time)
 {
     if (last_damping_time==0)
@@ -3221,8 +3213,6 @@ float arm_assist1::calc_damping_torque(float current_angle, unsigned long curren
 
     last_damping_angle = current_angle;
     last_damping_time = current_time;
-
-    //format for calling sd card parameters cmd_ff = _controller_data->parameters[controller_defs::constant_torque::amplitude_idx];
 
     //Low Pass Filter for joint angular veolcity
     filtered_joint_angular_velocity = utils::ewma(raw_joint_angular_velocity, filtered_joint_angular_velocity, _controller_data->parameters[controller_defs::arm_assist1::damping_alpha_idx]);
