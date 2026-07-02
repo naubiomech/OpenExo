@@ -281,6 +281,12 @@ namespace
         param_bound(false, 0.0f, 10.0f, false),       // 3 velocity deadband
         param_bound(false, 0.0f, 20.0f, false),       // 4 max_damping_torque
         param_bound(false, 0.0f, 1.0f, false),       // 5 damping_alpha
+        param_bound(false, 0.0f, 50.0f, false),       // 6 mass_link1
+        param_bound(false, 0.0f, 50.0f, false),       // 7 mass_link2
+        param_bound(false, 0.0f, 5.0f, false),       // 8 com_link1
+        param_bound(false, 0.0f, 5.0f, false),       // 9 com_link2
+        param_bound(false, 0.0f, 5.0f, false),       // 10 length_link1
+        param_bound(false, 0.0f, 100.0f, false),     // 11 gravity_gain
     };
 
     bool bounds_for_zero_torque(uint8_t parameter_index, float* min_out, float* max_out, bool* integer_only_out)

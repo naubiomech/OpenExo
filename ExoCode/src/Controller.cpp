@@ -3176,7 +3176,12 @@ float arm_assist1::calc_motor_cmd()
     }
     else
     {
-        cmd_ff = calc_damping_torque(motor_angle, current_time);
+        float damping_torque_ff = calc_damping_torque(motor_angle, current_time);
+        
+        float gravity_gain = _controller_data->parameters[controller_defs::arm_assist1::gravity_gain_idx];
+        float gravity_torque_ff = (calc_gravity_torque())*gravity_gain;
+
+        cmd_ff = gravity_torque_ff;
         //logger::println("Angle Read Controller Running");
     }
 
@@ -3190,6 +3195,72 @@ float arm_assist1::calc_motor_cmd()
 
     return cmd;
 }
+
+///////Gravity Compenstation Function///////
+float arm_assist1::calc_gravity_torque()
+{
+    float theta1 = 0.0f;
+    float theta2 = 0.0f;
+
+    //Determine if the controller instance is the left or right side arm and read respective angles
+    if (_id == config_defs::joint_id::right_arm_1 || _id == config_defs::joint_id::right_arm_2)
+    {
+        theta1 = _data->right_side.arm_1.controller.motor_angle;
+        theta2 = _data->right_side.arm_2.controller.motor_angle;
+    }
+    
+    else if (_id == config_defs::joint_id::left_arm_1 || _id == config_defs::joint_id::left_arm_2)
+    {
+        theta1 = _data->left_side.arm_1.controller.motor_angle;
+        theta2 = _data->left_side.arm_2.controller.motor_angle;
+    }
+
+    //Calculate gravity torques for arm1 and arm2 joints
+    float gravity_torque1 = calc_arm1_gravity(theta1, theta2);
+    float gravity_torque2 = calc_arm2_gravity(theta1, theta2);
+
+    //return torques 
+    if (_id == config_defs::joint_id::right_arm_1 || _id == config_defs::joint_id::left_arm_1)
+    {
+        return gravity_torque1;
+    }
+    else if (_id == config_defs::joint_id::right_arm_2 || _id == config_defs::joint_id::left_arm_2)
+    {
+        return gravity_torque2;
+    }
+    else
+    {
+        return 0.0f;
+    }
+}
+
+float arm_assist1::calc_arm1_gravity(float theta1, float theta2) //joint1 torque, proximal
+{
+    //
+    //use and return gravity_torque1 for joint 1
+    float gravity_coeff = 9.81;
+    float mass_link1 = _controller_data->parameters[controller_defs::arm_assist1::mass_link1_idx];
+    float mass_link2 = _controller_data->parameters[controller_defs::arm_assist1::mass_link2_idx];
+    float com_link1 = _controller_data->parameters[controller_defs::arm_assist1::com_link1_idx];
+    float com_link2 = _controller_data->parameters[controller_defs::arm_assist1::com_link2_idx];
+    float length_link1 = _controller_data->parameters[controller_defs::arm_assist1::length_link1_idx];
+
+    float gravity_torque1 = (((mass_link1*com_link1) + (mass_link2*length_link1))*gravity_coeff*cos(theta1)) + (mass_link2*com_link2*gravity_coeff*cos(theta1 + theta2));
+    return gravity_torque1;
+}
+
+float arm_assist1::calc_arm2_gravity(float theta1, float theta2) //joint2 torque, distal
+{
+    ////
+    //use and retur gravity_torque 2 for joint 2
+    float gravity_coeff = 9.81;
+    float mass_link2 = _controller_data->parameters[controller_defs::arm_assist1::mass_link2_idx];
+    float com_link2 = _controller_data->parameters[controller_defs::arm_assist1::com_link2_idx];
+
+    float gravity_torque2 = (mass_link2*com_link2*gravity_coeff*cos(theta1 + theta2));
+    return gravity_torque2;
+}
+
 
 ///////Damping Function///////
 float arm_assist1::calc_damping_torque(float current_angle, unsigned long current_time)

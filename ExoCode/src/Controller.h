@@ -573,6 +573,10 @@ public:
     unsigned long last_damping_time = 0;
     float filtered_joint_angular_velocity = 0.0f;
 
+    //For Gravity Compensation
+    float calc_gravity_torque();
+    float calc_arm1_gravity(float theta1, float theta2);
+    float calc_arm2_gravity(float theta1, float theta2);
     
 
     /*float previous_command;         /* Stores Previous Loop's Torque Command */

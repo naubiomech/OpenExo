@@ -256,7 +256,13 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t velocity_deadband_idx = 3;
         const uint8_t max_damping_torque_idx = 4;
         const uint8_t damping_alpha_idx = 5;
-        const uint8_t num_parameter = 6; 
+        const uint8_t mass_link1_idx = 6;
+        const uint8_t mass_link2_idx = 7;
+        const uint8_t com_link1_idx = 8;
+        const uint8_t com_link2_idx = 9;
+        const uint8_t length_link1_idx = 10;
+        const uint8_t gravity_gain_idx = 11;
+        const uint8_t num_parameter = 12; 
     }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters
