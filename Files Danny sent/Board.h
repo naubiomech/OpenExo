@@ -391,8 +391,8 @@
 				//Servo motor pins
 				const unsigned int servo_pins[] = {};
 				
-				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
-				const unsigned int volt_sense = 27;//Set it to 27 to use the onboard voltage sensing. Refer to Config.h and modify RESISTOR_1 and RESISTOR_2 if needed.
+				//Battery voltage sensing pin (for 0.5.1 Mark 3 onboard voltage divider).
+				const unsigned int volt_sense = 27;
             #endif
 
             //Arduino compiles all files not just the ones that are used so this is not under teensy to prevent errors

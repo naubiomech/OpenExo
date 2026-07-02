@@ -1,0 +1,10 @@
+From Danny from OpenExo: we should make these edits to our local firmware every time we pull updates
+EDIT 2026/07/02: his instructions were from an older version of repo so we edited this file to reflect latest
+
+1. Board.h (~line 395, the "volt_sense" inside the active AK_Board_V0_5_1 block): Change: "volt_sense = not_connected_pin;", to: "volt_sense = 27;". Note: there are several "volt_sense" lines for different board versions; only edit the one under the board version selected in Config.h.
+2. config.ini: Copy all parameters to match the attached configuration file.
+3. config.h, lines 26–29: Update the values to the following for proper battery readings:
+    #define BATTERY_SENSOR 3
+    #define CRITICAL_BATT_VAL 21
+    #define RESISTOR_1 21250
+    #define RESISTOR_2 3275
