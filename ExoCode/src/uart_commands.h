@@ -430,12 +430,12 @@ namespace UART_command_handlers
             rx_msg.data[1] = exo_data->right_side.hip.controller.desired_torque;
             rx_msg.data[2] = exo_data->left_side.hip.controller.encoder_angle;
             rx_msg.data[3] = exo_data->left_side.hip.controller.desired_torque;
-            rx_msg.data[4] = exo_data->right_side.hip.controller.is_stance;
-            rx_msg.data[5] = exo_data->right_side.hip.controller.norm_vel;
-            rx_msg.data[6] = exo_data->left_side.hip.controller.is_stance;
-            rx_msg.data[7] = exo_data->left_side.hip.controller.norm_vel;
-            rx_msg.data[8] = exo_data->right_side.hip.controller.norm_angle;
-            rx_msg.data[9] = exo_data->left_side.hip.controller.norm_angle;
+            rx_msg.data[4] = exo_data->right_side.hip.controller.percent_gait/100;
+            rx_msg.data[5] = exo_data->right_side.hip.controller.is_stance;
+            rx_msg.data[6] = exo_data->left_side.hip.controller.percent_gait/100;
+            rx_msg.data[7] = exo_data->left_side.hip.controller.is_stance;
+            rx_msg.data[8] = exo_data->right_side.hip.controller.expected_step_duration/1000;
+            rx_msg.data[9] = exo_data->left_side.hip.controller.expected_step_duration/1000;
 			rx_msg.data[10] = exo_data->get_batt_info(0); //Not saved in the CSV file
             break;
 		}

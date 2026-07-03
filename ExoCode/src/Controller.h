@@ -577,6 +577,8 @@ private:
     unsigned long prev_time;
     unsigned long start_controller_time;
 
+    float prev_cal_flag;
+
     //These things are used for the fanrks-collins controller spline
     float last_percent_gait;
     float last_start_time;
@@ -671,7 +673,7 @@ private:
     unsigned int swing_times[num_steps_avg];
 
     float expected_duration_window_upper_coeff = 3;
-    float expected_duration_window_lower_coeff = -3;
+    float expected_duration_window_lower_coeff = 0;
 
     float angle_threshold;
 

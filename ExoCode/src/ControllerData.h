@@ -263,7 +263,8 @@ namespace controller_defs                   /**< Stores the parameter indexes fo
         const uint8_t p_gain_idx = 17;                          //Value of P Gain for PID control
         const uint8_t i_gain_idx = 18;                          //Value of I Gain for PID control
         const uint8_t d_gain_idx = 19;   
-        const uint8_t num_parameter = 20;
+        const uint8_t cal_flag_idx = 20;                      //change this value to redo calibration
+        const uint8_t num_parameter = 21;
     }
 
     const uint8_t max_parameters = spv2::num_parameter;         //This should be the largest of all the num_parameters

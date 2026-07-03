@@ -3035,6 +3035,8 @@ swingstanceFSRless::swingstanceFSRless(config_defs::joint_id id, ExoData* exo_da
 
     last_percent_gait = -1;
     last_start_time = -1;
+
+    prev_cal_flag = _controller_data->parameters[controller_defs::swing_stance_fsrless::cal_flag_idx];
 }
 
 float swingstanceFSRless::calc_motor_cmd()
@@ -3046,6 +3048,8 @@ float swingstanceFSRless::calc_motor_cmd()
     //float stance_setpoint = _controller_data->parameters[controller_defs::swing_stance_fsrless::stance_setpoint_idx];
     //float swing_setpoint = _controller_data->parameters[controller_defs::swing_stance_fsrless::swing_setpoint_idx];
 
+    float cal_flag = _controller_data->parameters[controller_defs::swing_stance_fsrless::cal_flag_idx];
+
     //Parameters for determining angle based percent gait
     unsigned long rising_time = _controller_data->parameters[controller_defs::swing_stance_fsrless::rising_time_idx];
     float velocity_threshold = _controller_data->parameters[controller_defs::swing_stance_fsrless::velocity_threshold_idx];
@@ -3053,8 +3057,6 @@ float swingstanceFSRless::calc_motor_cmd()
     float vel_alpha = _controller_data->parameters[controller_defs::swing_stance_fsrless::velocity_alpha_idx];
     correction_factor[0] = _controller_data->parameters[controller_defs::swing_stance_fsrless::K_idx];
     correction_factor[1] = _controller_data->parameters[controller_defs::swing_stance_fsrless::B_idx];
-    Serial.print("vel alpha: ");
-    Serial.println(vel_alpha);
 
     // Parameters from FranksCollins Hip Controller
     float start_percent_gait = _controller_data->parameters[controller_defs::swing_stance_fsrless::start_percent_gait_idx];
@@ -3062,28 +3064,20 @@ float swingstanceFSRless::calc_motor_cmd()
     float mass = _controller_data->parameters[controller_defs::swing_stance_fsrless::mass_idx];                                               /* User bodymass, currently not used but available if you want to normalize torque mangitude. */
     float extension_torque_peak = _controller_data->parameters[controller_defs::swing_stance_fsrless::trough_normalized_torque_Nm_kg_idx];    /* Extension torque setpoint. */
     float flexion_torque_peak = _controller_data->parameters[controller_defs::swing_stance_fsrless::peak_normalized_torque_Nm_kg_idx];        /* Flexion torque setpoint. */
-    Serial.print("mass: ");
-    Serial.println(mass);
 
     float extension_torque_magnitude_Nm = -1 * extension_torque_peak;                                                                          /* Sign corrected extension torque magnitude. */
     float flexion_torque_magnitude_Nm = flexion_torque_peak;                                                                                   /* Sign corrected flexion torque magnitude. */
 
     float mid_time_percent_gait = _controller_data->parameters[controller_defs::swing_stance_fsrless::mid_time_idx];                          /* % gait cycle of the middle of the zero torque region of the curve. */
     float mid_duration_percent_gait = _controller_data->parameters[controller_defs::swing_stance_fsrless::mid_duration_idx];                  /* Duration (in % gait cycle) that zero torque is applied */
-    Serial.print("mid_time_percent_gait: ");
-    Serial.println(mid_time_percent_gait);
 
     float extension_peak_percent_gait = _controller_data->parameters[controller_defs::swing_stance_fsrless::trough_percent_gait_idx];         /* % gait cycle where the extension torque curve starts. */
     float extension_rise_percent_gait = _controller_data->parameters[controller_defs::swing_stance_fsrless::trough_onset_percent_gait_idx];   /* % gait cycle where the extension torque curve peaks. */
     float extension_fall_percent_gait = (mid_time_percent_gait - (mid_duration_percent_gait / 2)) - extension_peak_percent_gait;              /* % gait cycle where the extension torque curve ends. */
-    Serial.print("extension_peak_percent_gait: ");
-    Serial.println(extension_peak_percent_gait);
 
     float flexion_peak_percent_gait = _controller_data->parameters[controller_defs::swing_stance_fsrless::peak_percent_gait_idx];             /* % gait cycle where the flexion torque curve starts. */
     float flexion_rise_percent_gait = flexion_peak_percent_gait - (mid_time_percent_gait + (mid_duration_percent_gait / 2));                  /* % gait cycle where the flexion torque curve peaks. */
     float flexion_fall_percent_gait = _controller_data->parameters[controller_defs::swing_stance_fsrless::peak_offset_percent_gait_idx];      /* % gait cycle where the flexion torque curve ends. */
-    Serial.print("flexion_peak_percent_gait: ");
-    Serial.println(flexion_peak_percent_gait);
 
     float expected_duration = _controller_data->expected_step_duration;
     unsigned long curr_time;
@@ -3109,7 +3103,20 @@ float swingstanceFSRless::calc_motor_cmd()
     }
     if((!first_loop) & (!second_loop))
     {
-        if((7500 >= millis() - start_controller_time) && ((millis() - prev_time) >= 5))
+        if(prev_cal_flag != cal_flag) // if we need to recal the expected step time
+        {
+            Serial.print("prev: ");
+            Serial.print(prev_cal_flag);
+            Serial.print(" curr: ");
+            Serial.println(cal_flag);
+            prev_cal_flag = cal_flag;
+            cal_flag = prev_cal_flag;
+            if(!(12500 >= millis() - start_controller_time))
+            {
+                start_controller_time = millis() - 2500;
+            }
+        }
+        if((2500 >= millis() - start_controller_time) && ((millis() - prev_time) >= 5)) // 2.5 seconds to cal just the norm angle and vel
         {
             // calibrate angle and derivatives and normalize
             encoder_angle = _joint_data->position - encoder_offset;
@@ -3138,7 +3145,7 @@ float swingstanceFSRless::calc_motor_cmd()
 
             return 0.0;
         }
-        else if((12500 >= millis() - start_controller_time) && ((millis() - prev_time) >= 5))
+        else if((7500 >= millis() - start_controller_time) && ((millis() - prev_time) >= 5)) //another 5 seconds to cal expected duration and norm angle and vel
         {
             // set up angle and derivative and normalize
             encoder_angle = _joint_data->position - encoder_offset;
@@ -3156,7 +3163,7 @@ float swingstanceFSRless::calc_motor_cmd()
             //Determine stance/swing
             if((norm_vel < -1*velocity_threshold))// & (norm_angle > angle_threshold))
             {
-                if(!check_sinking)
+                if(!check_sinking) // start clock for continued decrease
                 {
                     stance_start_sink_time = millis();
                     check_sinking = true;
@@ -3164,7 +3171,7 @@ float swingstanceFSRless::calc_motor_cmd()
                 if(millis() - stance_start_sink_time >= rising_time)
                 {
                     is_stance = true;
-                    if(is_stance > prev_is_stance)
+                    if(is_stance > prev_is_stance) // switch from swing to stance call heel strike functions
                     {
                         prev_ground_strike_time = ground_strike_time;
                         ground_strike_time = millis();
@@ -3173,11 +3180,11 @@ float swingstanceFSRless::calc_motor_cmd()
                     }
                 }
 
-                check_rising = false;
+                check_rising = false; // we are decreasing so turn off rising
             }
             else if((norm_vel > velocity_threshold))// & (norm_angle < -1*angle_threshold))
             {
-                if(!check_rising)
+                if(!check_rising) // start clock for continued increase
                 {
                     swing_start_rise_time = millis();
                     check_rising = true;
@@ -3185,7 +3192,7 @@ float swingstanceFSRless::calc_motor_cmd()
                 if(millis() - swing_start_rise_time >= rising_time)
                 {
                     is_stance = false;
-                    if(is_stance < prev_is_stance)
+                    if(is_stance < prev_is_stance) // switch stance to swing all toe off functions
                     {
                         prev_toe_off_time = toe_off_time;
                         toe_off_time = millis();
@@ -3193,7 +3200,11 @@ float swingstanceFSRless::calc_motor_cmd()
                     }
                 }
                 
-                check_sinking = false;
+                check_sinking = false; // increasing so turn off decreasing
+            }
+            if((expected_step_duration < 500) && (expected_step_duration != 0)) // if step time is too small recal
+            {
+                prev_cal_flag = cal_flag + 1;
             }
             calc_percent_gait();
             calc_percent_stance();
@@ -3218,12 +3229,14 @@ float swingstanceFSRless::calc_motor_cmd()
             prev_encoder_angle = encoder_angle;
             prev_encoder_vel = encoder_vel;
             prev_is_stance = is_stance;
+            prev_cal_flag = cal_flag;
 
             return 0.0;
         }
         else if((millis() - prev_time) >= 5)
         {
-            
+            rising_time = 0.08 * _controller_data->expected_step_duration; // rising time is now a function of expected step duration
+
             //Determines the time when the user exceeds the defined startpoint of the shifted gait cycle (done to avoid discontinuties realted to heel strike)
             if ((percent_gait >= start_percent_gait) && last_percent_gait < start_percent_gait)
             {
@@ -3245,9 +3258,9 @@ float swingstanceFSRless::calc_motor_cmd()
             calc_norms();
 
             //Determine stance/swing
-            if((norm_vel < -1*velocity_threshold))// & (norm_angle > angle_threshold))
+            if((norm_vel < -1*velocity_threshold) )//& (norm_angle > angle_threshold))
             {
-                if(!check_sinking)
+                if(!check_sinking) // start clock for continued decrease
                 {
                     stance_start_sink_time = millis();
                     check_sinking = true;
@@ -3255,7 +3268,7 @@ float swingstanceFSRless::calc_motor_cmd()
                 if(millis() - stance_start_sink_time >= rising_time)
                 {
                     is_stance = true;
-                    if(is_stance > prev_is_stance)
+                    if(is_stance > prev_is_stance) // switch swing to stance call heel strike functions
                     {
                         prev_ground_strike_time = ground_strike_time;
                         ground_strike_time = millis();
@@ -3266,11 +3279,11 @@ float swingstanceFSRless::calc_motor_cmd()
                     }
                 }
 
-                check_rising = false;
+                check_rising = false; // decreasing so turn off increase clock
             }
             else if((norm_vel > velocity_threshold))// & (norm_angle < -1*angle_threshold))
             {
-                if(!check_rising)
+                if(!check_rising) // start clock for continued increase
                 {
                     swing_start_rise_time = millis();
                     check_rising = true;
@@ -3278,7 +3291,7 @@ float swingstanceFSRless::calc_motor_cmd()
                 if(millis() - swing_start_rise_time >= rising_time)
                 {
                     is_stance = false;
-                    if(is_stance < prev_is_stance)
+                    if(is_stance < prev_is_stance) // switch stance to swing call toe off functions
                     {
                         prev_toe_off_time = toe_off_time;
                         toe_off_time = millis();
@@ -3286,7 +3299,33 @@ float swingstanceFSRless::calc_motor_cmd()
                     }
                 }
                 
-                check_sinking = false;
+                check_sinking = false; // increasing so turn off decrease clock
+            }
+            if(expected_step_duration < 500) // if too short of a step then recal
+            {
+                prev_cal_flag = cal_flag + 1;
+
+                // save plotting
+                _controller_data->desired_torque = cmd;
+                _controller_data->encoder_angle = encoder_angle;
+                _controller_data->norm_angle = norm_angle;
+                _controller_data->encoder_vel = encoder_vel;
+                _controller_data->norm_vel = norm_vel;
+                _controller_data->is_stance = is_stance;
+                _controller_data->check_rising = check_rising;
+                _controller_data->ff_setpoint = cmd;
+                _controller_data->expected_step_duration = expected_step_duration;
+                _controller_data->expected_stance_duration = expected_stance_duration;
+                _controller_data->expected_swing_duration = expected_swing_duration;
+                _controller_data->percent_gait = percent_gait;
+
+                // set prevs            
+                prev_time = curr_time; 
+                prev_encoder_angle = encoder_angle;
+                prev_encoder_vel = encoder_vel;
+                prev_is_stance = is_stance;
+
+                return 0.0;
             }
             percent_gait = calc_percent_gait();
             percent_stance = calc_percent_stance();
@@ -3337,6 +3376,7 @@ float swingstanceFSRless::calc_motor_cmd()
             prev_encoder_angle = encoder_angle;
             prev_encoder_vel = encoder_vel;
             prev_is_stance = is_stance;
+            prev_cal_flag = cal_flag;
 
             //calc encoder offset to apply next iteration
             //update_encoder_offset();
@@ -3344,7 +3384,7 @@ float swingstanceFSRless::calc_motor_cmd()
             return cmd;
 
         }
-        else
+        else //not cal period and too short to calc vel
         {
             percent_gait = calc_percent_gait();
             percent_stance = calc_percent_stance();
@@ -3631,7 +3671,7 @@ float swingstanceFSRless::update_expected_duration()
         // logger::print(_expected_step_duration);
         // logger::print("\n");
     }
-    return expected_step_duration;
+    return step_time; // return expecte_step_duration to get moving average, this returns on the most recent step time
 }
 
 float swingstanceFSRless::update_expected_stance_duration()
