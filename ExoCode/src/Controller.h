@@ -549,35 +549,35 @@ private:
 
     bool is_stance;
     bool prev_is_stance;
-    bool check_rising;
-    bool check_sinking;
-    unsigned long swing_start_rise_time;
-    unsigned long stance_start_sink_time;
+    bool check_rising; // should we be watching to see if the angle is increaseing
+    bool check_sinking;  // should we be watching to see if the angle is decreaseing
+    unsigned long swing_start_rise_time;  // when the angle began rising last
+    unsigned long stance_start_sink_time;  // when the angle started decreasing last
 
-    unsigned long ground_strike_time;
-    unsigned long toe_off_time;
+    unsigned long ground_strike_time;  // time of the last ground strike detected
+    unsigned long toe_off_time; // time of the last toe-off dected
 
-    long long_dt;
-    float dt;
+    long long_dt; //change in time stored as a long for type conversion reasons
+    float dt; //change in time stored as a float for type conversion reasons
 
-    float encoder_angle;
-    float prev_encoder_angle;
-    float norm_angle;
+    float encoder_angle;  // angle of the hip accoring to the encoders (zeroed at the start)
+    float prev_encoder_angle; 
+    float norm_angle; // angle normalized between -1 and 1 based on the first 5 seconds of a trial
     float prev_norm_angle;
     float max_angle;
     float min_angle;
 
-    float encoder_vel;
+    float encoder_vel; // velocity of the hip according to the encoders
     float prev_encoder_vel;
-    float norm_vel;
+    float norm_vel; // normalized between -1 and 1 based on the first 5 seconds
     float prev_norm_vel;
     float max_vel;
     float min_vel;
 
-    unsigned long prev_time;
-    unsigned long start_controller_time;
+    unsigned long prev_time; // time at the last iteration of the controller when velocity was calculated
+    unsigned long start_controller_time; // time when the controller passed the first start condtion (motors enabled)
 
-    float prev_cal_flag;
+    float prev_cal_flag; // used to idicate if the gait phase estimator needs to be recalibrated
 
     //These things are used for the fanrks-collins controller spline
     float last_percent_gait;

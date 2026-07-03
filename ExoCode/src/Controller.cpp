@@ -3105,13 +3105,9 @@ float swingstanceFSRless::calc_motor_cmd()
     {
         if(prev_cal_flag != cal_flag) // if we need to recal the expected step time
         {
-            Serial.print("prev: ");
-            Serial.print(prev_cal_flag);
-            Serial.print(" curr: ");
-            Serial.println(cal_flag);
             prev_cal_flag = cal_flag;
             cal_flag = prev_cal_flag;
-            if(!(12500 >= millis() - start_controller_time))
+            if(!(5000 >= millis() - start_controller_time))
             {
                 start_controller_time = millis() - 2500;
             }
@@ -3145,7 +3141,7 @@ float swingstanceFSRless::calc_motor_cmd()
 
             return 0.0;
         }
-        else if((7500 >= millis() - start_controller_time) && ((millis() - prev_time) >= 5)) //another 5 seconds to cal expected duration and norm angle and vel
+        else if((5000 >= millis() - start_controller_time) && ((millis() - prev_time) >= 5)) //another 5 seconds to cal expected duration and norm angle and vel
         {
             // set up angle and derivative and normalize
             encoder_angle = _joint_data->position - encoder_offset;
@@ -3436,8 +3432,9 @@ void swingstanceFSRless::calibrate_encoders()
     encoder_offset_0 = sum_encoder_readings/5;
 }
 
-void swingstanceFSRless::update_encoder_offset()
+void swingstanceFSRless::update_encoder_offset() //function to determine the encoder offset 
 {
+    // THIS FUNCTION IS NOT CURRENTLY USED
     float cmd = _controller_data->desired_torque;
     //calc encoder offset to apply next iteration
     /*
