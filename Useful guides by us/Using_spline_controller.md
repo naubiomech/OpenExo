@@ -139,3 +139,59 @@ Issues / gotchas you'll hit
   For programmatically changing the spline from an outside program (BLE framing,
   the Teensy-side validation, and a UDP bridge into the GUI), see
   changing_spline_programmatically.md.
+
+  ---
+  Reference: good ankle assistance profiles from the literature
+
+  If you want a starting profile grounded in published work (rather than guessing
+  node values), the ankle-exoskeleton assistance literature — largely from Steve
+  Collins' lab — converges on one shape: a single positive (plantarflexion) pulse
+  during push-off that mimics the biological ankle moment. It is zero through
+  early stance, rises through mid/late stance, peaks around push-off, returns to
+  zero by toe-off, and stays zero through swing. Collins' group actually builds
+  that curve from "two cubic splines joined at their peak" — essentially the same
+  construct as this controller, so it maps directly onto your nodes.
+
+  Their human-in-the-loop studies describe the pulse with four numbers: peak
+  magnitude, peak timing, rise time, and fall time (with fixed onset/offset).
+  Reported values:
+  - Peak magnitude: tested 0.25 / 0.5 / 0.75 N·m/kg; optimum ≈ 0.75 N·m/kg
+    (Zhang et al., Frontiers 2022).
+  - Peak timing: ≈ 48–49% of the gait cycle (Frontiers 2022); ~53–54% of stride
+    in the Science 2017 emulator study — i.e. a ~48–55% push-off window.
+  - Onset (torque starts rising): ≈ 23% of the gait cycle.
+  - Return to zero: around toe-off, ≈ 60–65% of the gait cycle.
+  - Rule of thumb: effective assistance ≈ 60% of the biological ankle torque
+    (Zhang et al., Science 2017).
+
+  Translated to this controller's 5 nodes on the full-gait-cycle axis
+  (use_percent_gait = 1), the shape becomes:
+
+      Node1(0,0)  Node2(25,0)  Node3(48,Tpeak)  Node4(63,0)  Node5(100,0)
+
+  i.e. zero until ~25%, rise to the peak at ~48%, back to zero by ~63% (toe-off),
+  flat zero through swing. The current SDCard/ankleControllers/spline.csv ships
+  this shape with Tpeak = 12 Nm:
+
+      0,0,25,0,48,12,63,0,100,0,0,1,0,0,0,0
+
+  IMPORTANT — the ±15 Nm clamp means you cannot reproduce biological-scale
+  magnitude. Collins' 0.75 N·m/kg is ~56 Nm for a 75 kg adult, far above the
+  firmware's ±15 Nm clamp (issue #6). So use the literature for the SHAPE and
+  TIMING, and set Tpeak to what your hardware/comfort allows (start conservative,
+  e.g. 8–12 Nm, and ramp up while watching torque tracking). Confirm the sign
+  actually assists push-off on your build (direction calibration, issue #7)
+  before trusting the profile.
+
+  Sources:
+  - Zhang et al., Human-in-the-loop optimization of exoskeleton assistance during
+    walking, Science 2017. https://www.science.org/doi/10.1126/science.aal5054
+  - Zhang et al., Improving Walking Economy With an Ankle Exoskeleton Prior to
+    Human-in-the-Loop Optimization, Frontiers in Neurorobotics 2022 (PMC8784531).
+    https://pmc.ncbi.nlm.nih.gov/articles/PMC8784531/
+  - Neuromechanics and Energetics of Walking With an Ankle Exoskeleton Using
+    Neuromuscular-Model Based Control, Frontiers 2021 (PMC8091965).
+    https://pmc.ncbi.nlm.nih.gov/articles/PMC8091965/
+  - Bryan et al., A hip–knee–ankle exoskeleton emulator for studying gait
+    assistance, IJRR 2021.
+    https://journals.sagepub.com/doi/10.1177/0278364920961452
