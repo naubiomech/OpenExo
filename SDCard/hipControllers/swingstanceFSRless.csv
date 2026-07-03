@@ -1,0 +1,6 @@
+5,"header Size, the first N rows will be ignored, except for this first cells in the first two rows",,,,,,,,,,,,,,,,,,,
+21,"parameter number, the number of parameters to read per line",,,,,,,,,,,,,,,,,,,
+,Parameter list for the FranksCollins controller,,,,,,,,,,,,,,,,,,,
+,Parameter order:,,,,,,,,,,,,,,,,,,,
+mass,trough torque,peak torque,start % gait,trough onset % gait,trough %gait,mid time,mid duration,peak % gait,peak offset % gait,rising time (ms),velocity threshold,angle alpha,velocity alpha,K ,B,use pid flag,p,i,d,recal flag
+1,5,3,97,99,25,45,2,70,87,100,0.3,0.95,0.8,5.6,0.0041,0,10,0,50,0
