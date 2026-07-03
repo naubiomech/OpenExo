@@ -1,30 +1,38 @@
 Issues / gotchas you'll hit
 
-  1. The default config.ini is a Hip exo — the ankle is disabled.
+  1. The shipped config.ini is already an ankle exo. (This changed — it used to
+  ship as a Hip exo with the ankle disabled.)
   SDCard/config.ini currently has:
-  - name = Hip, hip = NullMotor, ankle = 0 (ankle not used)
-  - ankleDefaultController = 0
+  - name = Ankle, sides = bilateral
+  - hip = 0, ankle = AK60v3, ankleGearRatio = 4.5
+  - ankleDefaultController = PJMC
+  - ankleUseTorqueSensor = yes, ankleFlipMotorDir = right, ankleFlipTorqueDir = left
 
-  So the ankle joint isn't even instantiated. You must reconfigure it for an
-  ankle (details below).
+  So the ankle joint is already instantiated — you no longer have to reconfigure
+  it from a hip build. Just confirm the motor/gear ratio match your hardware and
+  set the controller to spline if you want Spline as the power-on default (see
+  #2 and the "What to set" section).
 
-  2. The GUI won't even show ankle controllers unless the ankle default
-  controller is set. (This is the subtle one.)
+  2. How the GUI decides whether to show ankle controllers. (Subtle, but the
+  shipped config already handles it.)
   In ListCtrlParams.cpp:80, with the default build flags
   (LIST_CTRL_PARAMS_SEND_MAX = 0), the firmware only streams a joint's controller
   list to the GUI if that joint's default controller is > 1 (i.e., not
-  "disabled"). ankleDefaultController = 0 maps to disabled = 1, which fails the >
-  1 gate → the GUI receives zero ankle controllers, so "Spline" never appears in
-  the dropdown. Setting ankleDefaultController = spline (or any real controller)
-  fixes this and the GUI then lists all ankle controllers including Spline.
+  "disabled"). The shipped ankleDefaultController = PJMC maps to 3
+  (ParseIni.h:183), which passes the > 1 gate, so the GUI already lists all ankle
+  controllers including Spline — you do NOT have to change anything to see it.
+  The gotcha only bites if you set ankleDefaultController = 0, which maps to
+  disabled = 1 and fails the > 1 gate → the GUI receives zero ankle controllers
+  and "Spline" never appears. If that happens, set the default to any real
+  controller (spline, PJMC, …) to restore the list.
 
   3. The default spline.csv runs in simulated gait.
   SDCard/ankleControllers/spline.csv data row is:
   0,0, 25,1, 50,3, 75,-3, 100,0, 1, 0, 0, 0,0,0
   The 11th value (sim_gait_idx) is 1. In Spline::calc_motor_cmd
-  (Controller.cpp:825), sim_gait=1 makes the controller ignore your real gait and
+  (Controller.cpp:832), sim_gait=1 makes the controller ignore your real gait and
   sweep %gait on a fixed 1-second timer (_get_percent_gait(true),
-  Controller.cpp:281). Great for bench-testing a motor, useless for walking
+  Controller.cpp:839). Great for bench-testing a motor, useless for walking
   assistance. Set this to 0 for real walking.
 
   4. use_percent_gait flag changes the x-axis meaning.
@@ -40,11 +48,11 @@ Issues / gotchas you'll hit
   Both percent_gait and percent_stance come from FSR heel/toe strike timing
   (Side.cpp:302–337). Until a few steps establish expected_step_duration,
   percent_gait returns -1, which is ≤ x[0], so the spline outputs y[0]
-  (Controller.cpp:902). Keep node 1 at (0, 0) so you get zero torque while
+  (Controller.cpp:913). Keep node 1 at (0, 0) so you get zero torque while
   standing / before gait is established, and you must Calibrate FSR from the GUI
   before walking.
 
-  6. Hard ±15 Nm clamp. Controller.cpp:856–863 clamps the spline output to ±15 Nm
+  6. Hard ±15 Nm clamp. Controller.cpp:865–872 clamps the spline output to ±15 Nm
   regardless of your node values. Don't expect more.
 
   7. Torque direction & sign — do a direction calibration first (safety).
@@ -90,18 +98,22 @@ Issues / gotchas you'll hit
   spline math, but the firmware initializes them).
   - LOOP_FREQ_HZ 500 is fine.
 
-  SDCard/config.ini (ankle-only)
-  - name = Ankle (bilateral) — or leftAnkle / rightAnkle for one side
-  - sides = bilateral (or left/right)
-  - ankle = your motor, exactly as spelled in the map (AK60, AK60v1.1, AK60v3,
-  AK70, AK80, AK45_36, AK45_10, MaxonMotor). Set hip = 0.
-  - ankleGearRatio = your transmission ratio
-  - ankleDefaultController = spline  ← required so the GUI lists Spline (issue
-  #2). Use exactly spline (note the comment list in the file has a typo "splin" —
-  ignore it).
-  - ankleUseTorqueSensor = yes only if you'll use PID; otherwise 0 is fine
-  - ankleFlipMotorDir / ankleFlipTorqueDir / ankleFlipAngleDir → per your
-  direction calibration
+  SDCard/config.ini (ankle-only) — the shipped file is already an ankle build;
+  values below are what it currently has, with notes on what to confirm/change.
+  - name = Ankle (already set) — use leftAnkle / rightAnkle for one side
+  - sides = bilateral (already set) — or left/right
+  - ankle = AK60v3 (already set). Change to match your motor, exactly as spelled
+  in the map (AK60, AK60v1.1, AK60v3, AK70, AK80, AK45_36, AK45_10, MaxonMotor).
+  hip is already 0.
+  - ankleGearRatio = 4.5 (already set). Change to match your transmission ratio.
+  - ankleDefaultController = PJMC (shipped). PJMC already unlocks the GUI's ankle
+  list so Spline appears (issue #2). Set this to spline only if you want Spline
+  to be the power-on default. Use exactly spline (the comment list in the file
+  has a typo "splin" — ignore it).
+  - ankleUseTorqueSensor = yes (shipped). Needed only if you'll use PID;
+  otherwise 0 is fine.
+  - ankleFlipMotorDir = right / ankleFlipTorqueDir = left (shipped) /
+  ankleFlipAngleDir → confirm against your own direction calibration.
   - leftAnkleRoM / rightAnkleRoM, torque offsets → as appropriate (255 = use
   calibration value)
 
@@ -122,3 +134,8 @@ Issues / gotchas you'll hit
   4. Select Ankle → Spline, pick the parameter set, enable motors / Start.
   5. Take several steps so gait timing establishes, then live-tune node torques
   as needed.
+
+  ---
+  For programmatically changing the spline from an outside program (BLE framing,
+  the Teensy-side validation, and a UDP bridge into the GUI), see
+  changing_spline_programmatically.md.
