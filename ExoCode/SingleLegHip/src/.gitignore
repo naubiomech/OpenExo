@@ -1,0 +1,9 @@
+# other image files
+#.emf
+#.png
+ExoCode/src/.vscode/settings.json
+ExoCode/src/.vs
+.vscode
+.vs
+ExoCode/.vscode
+*/.vs
