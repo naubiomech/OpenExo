@@ -473,6 +473,7 @@ class ControllerData {
         float sum_min;
         bool local_toe_stance;
         float max_torque;
+        float delta_time;
 };      
 
 #endif

@@ -3464,49 +3464,73 @@ float AngleBased::calc_motor_cmd()
         //     Serial.println(filt_cmd_ff);
         // }
         
-        prev_encoder_offset = encoder_offset - encoder_offset_0;
-        prev_encoder_offset = prev_encoder_offset / correction_factor[2];
-        Serial.print("curr time: ");
-        Serial.println(millis());
-        float delta_time = millis() - prev_time;
-        delta_time = delta_time / 1000.0;
-        Serial.print("prev time: ");
-        Serial.println(prev_time);
-        Serial.print("detla time: ");
-        Serial.println(delta_time);
-        Serial.print("K: ");
-        Serial.println(correction_factor[0]);
-        Serial.print("B: ");
-        Serial.println(correction_factor[1]);
-        Serial.print("torque: ");
-        Serial.println(filt_cmd_ff);
-        // Filter the offset to prevent spikes and noise?
-        encoder_offset = correction_factor[0] * prev_encoder_offset;
-        Serial.print("K * delta Theta: ");
-        Serial.println(encoder_offset);
-        encoder_offset = filt_cmd_ff - encoder_offset;
-        Serial.print("Tau - K * delta Theta: ");
-        Serial.println(encoder_offset);
-        encoder_offset = encoder_offset / correction_factor[1];
-        Serial.print("tau - K * delta Theta / B: ");
-        Serial.println(encoder_offset);
-        encoder_offset = encoder_offset * delta_time;
-        Serial.print("tau - K * delta Theta / B * dt: ");
-        Serial.println(encoder_offset);
-        encoder_offset = utils::ewma(encoder_offset, prev_encoder_offset, _controller_data->parameters[controller_defs::angle_based::offset_alpha_idx]);
-        Serial.print("unscaled encoder offset: ");
-        Serial.println(encoder_offset);
+
+        // optimized atan error regression of andgle error from applied torque
+        encoder_offset = encoder_offset_0;// -1*atan(cmd_ff/ correction_factor[1])/correction_factor[2] + encoder_offset_0;
+
+        // // spring damper model of angle error from applied torque
+        // Serial.print("curr time: ");
+        // Serial.println(millis());
+        unsigned long delta_time_long = millis() - prev_time;
+        float delta_time = delta_time_long / 1000.0;
+        if(delta_time > 0.015)
+        // {
+        //     _controller_data->delta_time = delta_time;
+        //     prev_encoder_offset = encoder_offset - encoder_offset_0;
+        //     prev_encoder_offset = prev_encoder_offset / correction_factor[2];
+        //     /*
+        //     Serial.print("prev time: ");
+        //     Serial.println(prev_time);
+        //     Serial.print("detla time: ");
+        //     Serial.println(delta_time);
+        //     Serial.print("K: ");
+        //     Serial.println(correction_factor[0]);
+        //     Serial.print("B: ");
+        //     Serial.println(correction_factor[1]);
+        //     Serial.print("torque: ");
+        //     Serial.println(filt_cmd_ff);
+        //     */
+        //     // Filter the offset to prevent spikes and noise?
+        //     encoder_offset = correction_factor[0] * prev_encoder_offset;
+        //     /*
+        //     Serial.print("K * delta Theta: ");
+        //     Serial.println(encoder_offset);
+        //     */
+        //     encoder_offset = filt_cmd_ff - encoder_offset;
+        //     /*
+        //     Serial.print("Tau - K * delta Theta: ");
+        //     Serial.println(encoder_offset);
+        //     */
+        //     encoder_offset = encoder_offset / correction_factor[1];
+        //     /*
+        //     Serial.print("tau - K * delta Theta / B: ");
+        //     Serial.println(encoder_offset);
+        //     */
+        //     encoder_offset = encoder_offset * delta_time;
+        //     /*
+        //     Serial.print("tau - K * delta Theta / B * dt: ");
+        //     Serial.println(encoder_offset);
+        //     */
+        //     encoder_offset = utils::ewma(encoder_offset, prev_encoder_offset, _controller_data->parameters[controller_defs::angle_based::offset_alpha_idx]);
+        //     /*
+        //     Serial.print("unscaled encoder offset: ");
+        //     Serial.println(encoder_offset);
+        //     */
+        //     encoder_offset = encoder_offset * correction_factor[2];
+        //     encoder_offset = encoder_offset + encoder_offset_0;
+        //     /*
+        //     Serial.print("encoder_offset: ");
+        //     Serial.println(encoder_offset);
+        //     */
+            prev_time = millis();
+        }
         
-        encoder_offset = encoder_offset * correction_factor[2];
-        encoder_offset = encoder_offset + encoder_offset_0;
-        Serial.print("encoder_offset: ");
-        Serial.println(encoder_offset);
 
         // Store the intended encoder offset for plotting
         _controller_data->prev_encoder_offset = prev_encoder_offset*100;
         // Store the encoder offset for plotting
         _controller_data->encoder_offset = (encoder_offset - encoder_offset_0)*100.0;
-        _controller_data->max_torque = delta_time;
+        // _controller_data->max_torque = delta_time;
         // Store the feed-forward setpoint for plotting
         _controller_data->ff_setpoint = filt_cmd_ff;
         _controller_data->desired_torque = filt_cmd_ff;
@@ -3524,8 +3548,7 @@ float AngleBased::calc_motor_cmd()
         prev_cmd = cmd;
         prev_state = state;
         prev_encoder_angle = encoder_angle;
-        prev_time = millis();
-        return 0.0;// cmd;
+        return cmd;
     }
     else
     {
