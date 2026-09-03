@@ -418,9 +418,9 @@ namespace UART_command_handlers
             rx_msg.data[1] = exo_data->right_side.hip.controller.desired_torque;
             rx_msg.data[2] = exo_data->left_side.hip.controller.filtered_torque_reading;
             rx_msg.data[3] = exo_data->left_side.hip.controller.desired_torque;
-            rx_msg.data[4] = exo_data->right_side.percent_gait / 100;
+            rx_msg.data[4] = exo_data->right_side.heel_fsr;
             rx_msg.data[5] = exo_data->right_side.toe_fsr;
-            rx_msg.data[6] = exo_data->left_side.percent_gait / 100;
+            rx_msg.data[6] = exo_data->left_side.heel_fsr;
             rx_msg.data[7] = exo_data->left_side.toe_fsr;
             rx_msg.data[8] = exo_data->right_side.heel_fsr;
             rx_msg.data[9] = exo_data->left_side.heel_fsr;

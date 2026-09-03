@@ -447,7 +447,8 @@ FSR_Wireless::FSR_Wireless(uint8_t addr, uint8_t reg, uint8_t len)
     _addr = addr;
     _reg = reg;
     _len = len;
-    
+    _i2c = I2C::get_instance();
+
     _raw_reading = 0;
     _calibrated_reading = 0;
     
@@ -473,7 +474,7 @@ bool FSR_Wireless::calibrate(bool do_calibrate)
     {
         _start_time = millis();
 
-        _calibration_max = analogRead(_pin);
+        _calibration_max = _i2c->read_wireless(_addr, _reg, _len);
         _calibration_min = _calibration_max;
     }
     
@@ -481,7 +482,7 @@ bool FSR_Wireless::calibrate(bool do_calibrate)
     
     if((_cal_time >= (delta)) & do_calibrate)
     {
-        uint16_t current_reading = analogRead(_pin);
+        uint16_t current_reading = _i2c->read_wireless(_addr, _reg, _len);
 
         _calibration_max = max(_calibration_max, current_reading);
         _calibration_min = min(_calibration_min, current_reading);
@@ -512,7 +513,7 @@ bool FSR_Wireless::refine_calibration(bool do_refinement)
         
         if (_step_count < _num_steps)
         {
-            uint16_t current_reading = analogRead(_pin);
+            uint16_t current_reading = _i2c->read_wireless(_addr, _reg, _len);
 
             _step_max = max(_step_max, current_reading);
             _step_min = min(_step_min, current_reading);
@@ -547,7 +548,7 @@ bool FSR_Wireless::refine_calibration(bool do_refinement)
 
 float FSR_Wireless::read()
 {
-    _raw_reading = analogRead(_pin);
+    _raw_reading = _i2c->read_wireless(_addr, _reg, _len);
 
     if (_calibration_refinement_max > 0)
     {
@@ -607,6 +608,7 @@ FSR_Regressed_Wireless::FSR_Regressed_Wireless(uint8_t addr, uint8_t reg, uint8_
     _addr = addr;
     _reg = reg;
     _len = len;
+    _i2c = I2C::get_instance();
     
     _raw_reading = 0;
     _calibrated_reading = 0;
@@ -634,7 +636,7 @@ bool FSR_Regressed_Wireless::calibrate(bool do_calibrate)
         _start_time = millis();
 
         double p[4] = { 0.0787, -0.8471, 20.599, -22.670 };
-        float Vo = 10 * 3.3 * analogRead(_pin) / 4095;
+        float Vo = 10 * 3.3 * _i2c->read_wireless(_addr, _reg, _len) / 4095;
         Vo = (Vo) / (87.43 * pow((Vo), (-0.6721)) - 7.883);
         Vo = p[0] * Vo * Vo * Vo + p[1] * Vo * Vo + p[2] * Vo + p[3];
         Vo = (Vo < 0.2) ? (0) : (Vo);
@@ -647,7 +649,7 @@ bool FSR_Regressed_Wireless::calibrate(bool do_calibrate)
     if ((_cal_time >= (delta)) & do_calibrate)
     {
         double p[4] = { 0.0787, -0.8471, 20.599, -22.670 };
-        float Vo = 10 * 3.3 * analogRead(_pin) / 4095;
+        float Vo = 10 * 3.3 * _i2c->read_wireless(_addr, _reg, _len) / 4095;
         Vo = (Vo) / (87.43 * pow((Vo), (-0.6721)) - 7.883);
         Vo = p[0] * Vo * Vo * Vo + p[1] * Vo * Vo + p[2] * Vo + p[3];
         Vo = (Vo < 0.2) ? (0) : (Vo);
@@ -683,7 +685,7 @@ bool FSR_Regressed_Wireless::refine_calibration(bool do_refinement)
         if (_step_count < _num_steps)
         {
             double p[4] = { 0.0787, -0.8471, 20.599, -22.670 };
-            float Vo = 10 * 3.3 * analogRead(_pin) / 4095;
+            float Vo = 10 * 3.3 * _i2c->read_wireless(_addr, _reg, _len) / 4095;
             Vo = (Vo) / (87.43 * pow((Vo), (-0.6721)) - 7.883);
             Vo = p[0] * Vo * Vo * Vo + p[1] * Vo * Vo + p[2] * Vo + p[3];
             Vo = (Vo < 0.2) ? (0) : (Vo);
@@ -725,7 +727,7 @@ bool FSR_Regressed_Wireless::refine_calibration(bool do_refinement)
 float FSR_Regressed_Wireless::read()
 {
     double p[4] = { 0.0787, -0.8471, 20.599, -22.670 };
-    float Vo = 10 * 3.3 * analogRead(_pin) / 4095;
+    float Vo = 10 * 3.3 * _i2c->read_wireless(_addr, _reg, _len) / 4095;
     Vo = (Vo) / (87.43 * pow((Vo), (-0.6721)) - 7.883);
     Vo = p[0] * Vo * Vo * Vo + p[1] * Vo * Vo + p[2] * Vo + p[3];
     Vo = (Vo < 0.2) ? (0) : (Vo);

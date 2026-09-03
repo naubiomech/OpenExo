@@ -18,6 +18,7 @@
 #include "Board.h"
 #include "Utilities.h"
 #include "ExoData.h"
+#include "I2CHandler.h"
 
 /**
     * @brief Handles raw (non-regressed) FSR signal. 
@@ -313,6 +314,7 @@ class FSR_Wireless
         uint8_t _addr;                  /* < I2C Address of ESP32 peripheral */
         uint8_t _reg;                   /* < Register of specific FSR value within data block */
         uint8_t _len;                   /* < Byte length of FSR value */
+        I2C* _i2c;                      /* < I2C instance for each FSR */
         
         //Used for calibration
         const uint16_t _cal_time = 5000;    /**< This is time to do the initial calibration */
@@ -348,10 +350,10 @@ class FSR_Wireless
     * Current regression equation is for: Interlink 
     * 
     */
-class FSR_Wireless_Regressed
+class FSR_Regressed_Wireless
 {
 	public:
-		FSR_Wireless_Regressed(uint8_t addr, uint8_t reg, uint8_t len);
+		FSR_Regressed_Wireless(uint8_t addr, uint8_t reg, uint8_t len);
 		
         /**
          * @brief Does an initial time based calculation to find a rough range for the signal
@@ -423,7 +425,8 @@ class FSR_Wireless_Regressed
         uint8_t _addr;                  /* < I2C Address of ESP32 peripheral */
         uint8_t _reg;                   /* < Register of specific FSR value within data block */
         uint8_t _len;                   /* < Byte length of FSR value */
-        
+        I2C* _i2c;                      /* < I2C instance for each FSR */
+
         //Used for calibration
         const uint16_t _cal_time = 5000;    /**< This is time to do the initial calibration */
         uint16_t _start_time;               /**< Stores the time we started the calibration */

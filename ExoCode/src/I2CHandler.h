@@ -12,7 +12,7 @@
 
 #include <Arduino.h>
 
-#if defined(ARDUINO_ARDUINO_NANO33BLE)
+#if defined(ARDUINO_ARDUINO_NANO33BLE) || defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)
 
 #include <Wire.h>
 
@@ -75,6 +75,7 @@ class I2C
 
             float requestedVal = 0;                        // initialize temporary float to store requested data point
             memcpy(&requestedVal, &dataBlock[reg], 4);     // copy data from requested register in dataBlock over to requestedVal
+            
             // debug option to print values within read_wireless
             // Serial.print("Requested register "); Serial.print(reg);
             // Serial.print(", fetched value: "); Serial.print(requestedVal);
