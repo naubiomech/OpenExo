@@ -78,6 +78,8 @@ class ExoBLE
         //BLE connection state
         int _connected = 0;
         bool _handshake_payload_pending = true;
+        bool _tx_subscribed = false;
+        bool _handshake_sent_this_connection = false;
         
         //The Gatt database which defines the services and characteristics
         GattDb _gatt_db = GattDb();

@@ -29,6 +29,7 @@ SideData::SideData(bool is_left, uint8_t* config_to_send)
     this->do_calibration_refinement_toe_fsr = false; 
     this->do_calibration_heel_fsr = false; 
     this->do_calibration_refinement_heel_fsr = false; 
+    this->reset_fsr_calibration = false;
     this->ground_strike = false; 
     this->toe_off = false;
     this->toe_strike = false;

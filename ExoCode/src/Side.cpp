@@ -175,6 +175,19 @@ void Side::check_calibration()
 {
     if (_side_data->is_used)
     {
+        if (_side_data->reset_fsr_calibration)
+        {
+            _toe_fsr.reset_calibration();
+            _heel_fsr.reset_calibration();
+            _side_data->toe_fsr = -1;
+            _side_data->heel_fsr = -1;
+            _side_data->toe_stance = false;
+            _side_data->heel_stance = false;
+            _side_data->prev_toe_stance = false;
+            _side_data->prev_heel_stance = false;
+            _side_data->reset_fsr_calibration = false;
+        }
+
         //Make sure FSR calibration is done before refinement.
         if (_side_data->do_calibration_toe_fsr)
         {

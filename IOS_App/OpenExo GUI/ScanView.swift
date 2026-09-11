@@ -183,7 +183,7 @@ struct ScanView: View {
         VStack(spacing: 10) {
             Divider().background(Color.gray.opacity(0.3))
 
-            // Row 1: Scan + Load Saved
+            // Row 1: Scan + Connect Last Device
             HStack(spacing: 10) {
                 ActionButton(
                     title: ble.isScanning ? "Scanning…" : "Scan",
@@ -194,7 +194,7 @@ struct ScanView: View {
                 ) { ble.startScan() }
 
                 ActionButton(
-                    title: "Load Saved",
+                    title: "Connect Last Device",
                     icon: "bookmark.fill",
                     style: .secondary,
                     isDisabled: !ble.hasSavedDevice || ble.isConnected

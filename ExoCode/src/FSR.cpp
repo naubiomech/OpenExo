@@ -148,6 +148,26 @@ bool FSR::refine_calibration(bool do_refinement)
     return do_refinement;
 };
 
+void FSR::reset_calibration()
+{
+    _raw_reading = 0;
+    _calibrated_reading = 0;
+    _last_do_calibrate = false;
+    _start_time = 0;
+    _calibration_min = 0;
+    _calibration_max = 0;
+    _state = false;
+    _last_do_refinement = false;
+    _step_max_sum = 0;
+    _step_max = 0;
+    _step_min_sum = 0;
+    _step_min = 0;
+    _step_count = 0;
+    _calibration_refinement_min = 0;
+    _calibration_refinement_max = 0;
+    _ground_contact = false;
+};
+
 float FSR::read()
 {
     _raw_reading = analogRead(_pin);
@@ -365,6 +385,26 @@ bool FSR_Regressed::refine_calibration(bool do_refinement)
     _last_do_refinement = do_refinement;
 
     return do_refinement;
+};
+
+void FSR_Regressed::reset_calibration()
+{
+    _raw_reading = 0;
+    _calibrated_reading = 0;
+    _last_do_calibrate = false;
+    _start_time = 0;
+    _calibration_min = 0;
+    _calibration_max = 0;
+    _state = false;
+    _last_do_refinement = false;
+    _step_max_sum = 0;
+    _step_max = 0;
+    _step_min_sum = 0;
+    _step_min = 0;
+    _step_count = 0;
+    _calibration_refinement_min = 0;
+    _calibration_refinement_max = 0;
+    _ground_contact = false;
 };
 
 

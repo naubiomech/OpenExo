@@ -13,9 +13,11 @@
 #include "ExoBLE.h"
 // #include "Battery.h"
 #include "BleMessage.h"
+#include "UART_msg_t.h"
 #include "ParseIni.h"
 #include "ExoData.h"
 #include "BleMessageQueue.h"
+#include "ParamUpdateValidation.h"
 
 /**
  * @brief ComsMCU class. 
@@ -77,6 +79,8 @@ class ComsMCU
          * @param msg Complete BLE message
          */
         void _process_complete_gui_command(BleMessage* msg);
+        void _send_param_update_ack(const param_update::Request& request, bool accepted, param_update::RejectionReason reason);
+        void _send_param_update_ack(UART_msg_t msg);
         void _schedule_system_reset();
         void _maybe_system_reset();
 

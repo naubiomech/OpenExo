@@ -131,6 +131,9 @@ struct ActiveTrialView: View {
                 // Group 2: Controller + Data sections
                 Group {
                     sectionLabel("CONTROLLER")
+                    if let message = ble.activeParamUpdateMessage, !message.isEmpty {
+                        paramWarningBanner(message)
+                    }
                     ControlButton(title: "Update Controller", icon: "slider.horizontal.3") {
                         navPath.append(AppScreen.settings)
                     }
@@ -179,6 +182,24 @@ struct ActiveTrialView: View {
             .fontWeight(.semibold)
             .foregroundStyle(.gray)
             .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func paramWarningBanner(_ message: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.orange)
+                .font(.caption)
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(.orange)
+                .multilineTextAlignment(.leading)
+            Spacer()
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.orange.opacity(0.12))
+        )
     }
 
     // MARK: - Charts Panel

@@ -21,6 +21,7 @@ class UIConfig:
     COLOR_ACTION = "#1976D2"         # Blue - for primary actions (Pause)
     COLOR_SUCCESS = "#4CAF50"        # Green - for success states (Battery good)
     COLOR_WARNING = "#FF5252"        # Light Red - for warnings (Battery low)
+    COLOR_PARAM_REJECT = "#FF9800"   # Orange - for rejected parameter updates
     COLOR_SEPARATOR = "#555555"      # Gray - for visual separators
     COLOR_LABEL = "#AAAAAA"          # Light Gray - for section labels
     

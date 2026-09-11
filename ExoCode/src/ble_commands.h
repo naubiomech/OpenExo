@@ -15,6 +15,7 @@
 #include "StatusDefs.h"     //For ExoDataStatus
 #include "BleMessage.h"
 #include "ParamsFromSD.h"
+#include "ParamUpdateValidation.h"
 
 #include "UARTHandler.h"
 #include "uart_commands.h"
@@ -60,6 +61,7 @@ namespace ble_names
     static const char send_trq_cal        = 'H';
     static const char send_step_count     = 's';
     static const char cal_fsr_finished    = 'n';
+    static const char param_update_ack    = 'a';
 
 };
 
@@ -94,6 +96,7 @@ namespace ble
         {ble_names::send_trq_cal,           2},
         {ble_names::send_step_count,        2},
         {ble_names::cal_fsr_finished,       0},
+        {ble_names::param_update_ack,       5},
     };
 };
 
@@ -424,24 +427,66 @@ namespace ble_handlers
         uart_handler->UART_msg(tx_msg);
     }
 
-    inline static void update_param(ExoData* data, BleMessage* msg)
+    inline static param_update::RejectionReason update_param(
+        ExoData* data,
+        BleMessage* msg,
+        param_update::Request* request_out = NULL)
     {
-        //Send UART message to update parameter
-        logger::println("ble_handlers::update_param() - Got update param message");
-        logger::print("ble_handlers::update_param() - Joint ID: "); logger::println((uint8_t)msg->data[0]);
-        logger::print("ble_handlers::update_param() - Controller ID: "); logger::println((uint8_t)msg->data[1]);
-        logger::print("ble_handlers::update_param() - Param Index: "); logger::println((uint8_t)msg->data[2]);
-        logger::print("ble_handlers::update_param() - Param Value: "); logger::println((uint8_t)msg->data[3]);
-        logger::print("New message\n");
+        param_update::Request request;
+        if (request_out != NULL)
+        {
+            *request_out = request;
+        }
+
+        if (msg == NULL || !msg->is_complete || msg->expecting != param_update::k_expected_ble_fields)
+        {
+            logger::println("ble_handlers::update_param() rejected malformed BLE message", LogLevel::Warn);
+            return param_update::RejectionReason::malformed;
+        }
+
+        if (!param_update::try_float_to_uint8(msg->data[0], &request.joint_id) ||
+            !param_update::try_float_to_uint8(msg->data[1], &request.controller_id) ||
+            !param_update::try_float_to_uint8(msg->data[2], &request.param_index))
+        {
+            logger::println("ble_handlers::update_param() rejected non-integer routing fields", LogLevel::Warn);
+            if (request_out != NULL)
+            {
+                *request_out = request;
+            }
+            return param_update::RejectionReason::malformed;
+        }
+        request.value = msg->data[3];
+        if (request_out != NULL)
+        {
+            *request_out = request;
+        }
+
+        // The BLE MCU forwards parameter updates; the Teensy validates the active
+        // joint/controller/bounds against the authoritative SD-card configuration.
+        param_update::RejectionReason reason = param_update::validate_forwardable_request(request);
+        if (reason != param_update::RejectionReason::accepted)
+        {
+            param_update::log_rejection("ble_handlers::update_param()", request, reason);
+            return reason;
+        }
+
+        logger::print("ble_handlers::update_param() accepted: joint=");
+        logger::print(request.joint_id);
+        logger::print(", controller=");
+        logger::print(request.controller_id);
+        logger::print(", index=");
+        logger::print(request.param_index);
+        logger::print(", value=");
+        logger::println(request.value);
 
         UARTHandler* uart_handler = UARTHandler::get_instance();
         UART_msg_t tx_msg;
         tx_msg.command = UART_command_names::update_controller_param;
-        tx_msg.joint_id = (uint8_t) msg->data[0];
-        tx_msg.data[(uint8_t)UART_command_enums::controller_param::CONTROLLER_ID] = (uint8_t) msg->data[1];
-        tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_INDEX] = (uint8_t) msg->data[2];
-        tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE] = (float) msg->data[3];
-        tx_msg.len = 3;
+        tx_msg.joint_id = request.joint_id;
+        tx_msg.data[(uint8_t)UART_command_enums::controller_param::CONTROLLER_ID] = request.controller_id;
+        tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_INDEX] = request.param_index;
+        tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE] = request.value;
+        tx_msg.len = (uint8_t)UART_command_enums::controller_param::LENGTH;
         uart_handler->UART_msg(tx_msg);
 		
 		#ifdef SIMPLE_DEBUG
@@ -455,6 +500,7 @@ namespace ble_handlers
 		Serial.print(", PARAM_VALUE: ");
 		Serial.print(tx_msg.data[(uint8_t)UART_command_enums::controller_param::PARAM_VALUE]);
 		#endif
+        return param_update::RejectionReason::accepted;
     }
 
 }

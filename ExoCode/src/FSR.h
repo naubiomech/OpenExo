@@ -49,6 +49,8 @@ class FSR
          * @return if the calibration is continuing.
          */
         bool refine_calibration(bool do_refinement);
+
+        void reset_calibration();
         
         /**
          * @brief Reads the sensor and applies the calibration.  
@@ -157,6 +159,8 @@ class FSR_Regressed
          * @return if the calibration is continuing.
          */
         bool refine_calibration(bool do_refinement);
+
+        void reset_calibration();
         
         /**
          * @brief Reads the sensor and applies the calibration.  

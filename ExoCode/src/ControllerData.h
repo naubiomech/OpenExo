@@ -7,8 +7,8 @@
  * @date Jan. 2022
 */
 
-#ifndef Controllerdata_h
-#define ControllerData_h
+#ifndef CONTROLLER_DATA_H
+#define CONTROLLER_DATA_H
 #include <stdint.h>
 
 #include "Arduino.h"
@@ -265,6 +265,14 @@ class ControllerData {
          * @return uint8_t parameter length 
          */
         uint8_t get_parameter_length();
+        static uint8_t get_parameter_length_for(config_defs::JointType joint, uint8_t controller_id);
+        static bool get_parameter_bounds_for(
+            config_defs::JointType joint,
+            uint8_t controller_id,
+            uint8_t parameter_index,
+            float* min_value,
+            float* max_value,
+            bool* integer_only);
         
         
         uint8_t controller;                                 /**< Id of the current controller */

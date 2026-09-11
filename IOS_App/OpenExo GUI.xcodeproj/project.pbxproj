@@ -21,6 +21,7 @@
 		1CB0860D2F69DF900039435C /* ActiveTrialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB0860C2F69DF900039435C /* ActiveTrialView.swift */; };
 		1CB0860F2F69DF900039435C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB0860E2F69DF900039435C /* SettingsView.swift */; };
 		1CB086112F69DF900039435C /* BioFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB086102F69DF900039435C /* BioFeedbackView.swift */; };
+		1CB086142F69DF900039435C /* OpenExoDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB086132F69DF900039435C /* OpenExoDatabase.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 		1CB0860C2F69DF900039435C /* ActiveTrialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveTrialView.swift; sourceTree = "<group>"; };
 		1CB0860E2F69DF900039435C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		1CB086102F69DF900039435C /* BioFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioFeedbackView.swift; sourceTree = "<group>"; };
+		1CB086132F69DF900039435C /* OpenExoDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenExoDatabase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +113,7 @@
 				1CB085DA2F69DF900039435C /* OpenExo_GUIApp.swift */,
 				1CB085DC2F69DF900039435C /* ContentView.swift */,
 				1CB086062F69DF900039435C /* Models.swift */,
+				1CB086132F69DF900039435C /* OpenExoDatabase.swift */,
 				1CB086042F69DF900039435C /* BLEManager.swift */,
 				1CB086082F69DF900039435C /* CSVLogger.swift */,
 				1CB0860A2F69DF900039435C /* ScanView.swift */,
@@ -281,6 +284,7 @@
 				1CB085DD2F69DF900039435C /* ContentView.swift in Sources */,
 				1CB085DB2F69DF900039435C /* OpenExo_GUIApp.swift in Sources */,
 				1CB086072F69DF900039435C /* Models.swift in Sources */,
+				1CB086142F69DF900039435C /* OpenExoDatabase.swift in Sources */,
 				1CB086052F69DF900039435C /* BLEManager.swift in Sources */,
 				1CB086092F69DF900039435C /* CSVLogger.swift in Sources */,
 				1CB0860B2F69DF900039435C /* ScanView.swift in Sources */,
@@ -447,7 +451,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"OpenExo GUI/Preview Content\"";
 				DEVELOPMENT_TEAM = K65G995JWH;
 				ENABLE_PREVIEWS = YES;
@@ -462,7 +466,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openexo.gui;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -477,7 +481,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"OpenExo GUI/Preview Content\"";
 				DEVELOPMENT_TEAM = K65G995JWH;
 				ENABLE_PREVIEWS = YES;
@@ -492,7 +496,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.openexo.gui;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

@@ -132,7 +132,14 @@ void ComsMCU::update_UART()
 
         if (msg.command)
         {
-            UART_command_utils::handle_msg(handler, _data, msg);
+            if (msg.command == UART_command_names::update_controller_param_ack)
+            {
+                _send_param_update_ack(msg);
+            }
+            else
+            {
+                UART_command_utils::handle_msg(handler, _data, msg);
+            }
         }
 
         del_t = 0;
@@ -310,8 +317,15 @@ void ComsMCU::_process_complete_gui_command(BleMessage* msg)
         ble_handlers::new_trq(_data, msg);
         break;
     case ble_names::update_param:
-        ble_handlers::update_param(_data, msg);
+    {
+        param_update::Request request;
+        param_update::RejectionReason reason = ble_handlers::update_param(_data, msg, &request);
+        if (reason != param_update::RejectionReason::accepted)
+        {
+            _send_param_update_ack(request, false, reason);
+        }
         break;
+    }
     case ble_names::reset_system:
         _schedule_system_reset();
         break;
@@ -323,6 +337,57 @@ void ComsMCU::_process_complete_gui_command(BleMessage* msg)
     #if COMSMCU_DEBUG
         logger::println("ComsMCU::_process_complete_gui_command->End");
     #endif
+}
+
+void ComsMCU::_send_param_update_ack(
+    const param_update::Request& request,
+    bool accepted,
+    param_update::RejectionReason reason)
+{
+    BleMessage ack_msg = BleMessage();
+    ack_msg.command = ble_names::param_update_ack;
+    ack_msg.expecting = ble_command_helpers::get_length_for_command(ack_msg.command);
+    ack_msg.is_complete = true;
+    ack_msg.data[0] = request.joint_id;
+    ack_msg.data[1] = request.controller_id;
+    ack_msg.data[2] = request.param_index;
+    ack_msg.data[3] = accepted ? 1.0f : 0.0f;
+    ack_msg.data[4] = (float)((uint8_t)reason);
+    _exo_ble->send_message(ack_msg);
+}
+
+void ComsMCU::_send_param_update_ack(UART_msg_t msg)
+{
+    param_update::Request request;
+    request.joint_id = msg.joint_id;
+    uint8_t accepted_raw = 0;
+    uint8_t reason_raw = (uint8_t)param_update::RejectionReason::malformed;
+
+    bool parsed = (msg.len == (uint8_t)UART_command_enums::controller_param_ack::LENGTH) &&
+        param_update::try_float_to_uint8(
+            msg.data[(uint8_t)UART_command_enums::controller_param_ack::CONTROLLER_ID],
+            &request.controller_id) &&
+        param_update::try_float_to_uint8(
+            msg.data[(uint8_t)UART_command_enums::controller_param_ack::PARAM_INDEX],
+            &request.param_index) &&
+        param_update::try_float_to_uint8(
+            msg.data[(uint8_t)UART_command_enums::controller_param_ack::ACCEPTED],
+            &accepted_raw) &&
+        param_update::try_float_to_uint8(
+            msg.data[(uint8_t)UART_command_enums::controller_param_ack::REASON],
+            &reason_raw);
+
+    if (!parsed)
+    {
+        logger::println("ComsMCU::_send_param_update_ack rejected malformed UART ack", LogLevel::Warn);
+        reason_raw = (uint8_t)param_update::RejectionReason::malformed;
+        accepted_raw = 0;
+    }
+
+    _send_param_update_ack(
+        request,
+        accepted_raw != 0,
+        (param_update::RejectionReason)reason_raw);
 }
 
 void ComsMCU::_schedule_system_reset()

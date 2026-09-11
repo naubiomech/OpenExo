@@ -165,6 +165,16 @@ _Controller::_Controller(config_defs::joint_id id, ExoData* exo_data)
 
 //****************************************************
 
+void _Controller::reset_integral()
+{
+    _pid_error_sum = 0;
+    _prev_input = 0;
+    _prev_de_dt = 0;
+    _prev_pid_time = 0;
+}
+
+//****************************************************
+
 float _Controller::_cf_mfac(float reference, float current_measurement)         //Compact Form Model Free Adaptive Controller (In-development, not yet employed)
 {
     //Calculate k-1 (k_0) delta
@@ -595,7 +605,7 @@ float ProportionalJointMoment::calc_motor_cmd()
     }
 
     /* Low-Pass Filter Measured Torque */
-	const float torque = _joint_data->torque_reading;
+    const float torque = _joint_data->torque_reading;
     const float alpha = (_controller_data->parameters[controller_defs::proportional_joint_moment::torque_alpha_idx] != 0) ? _controller_data->parameters[controller_defs::proportional_joint_moment::torque_alpha_idx] : 0.5;
     _controller_data->filtered_torque_reading = utils::ewma(torque, _controller_data->filtered_torque_reading, alpha); 
 
@@ -656,13 +666,15 @@ float ProportionalJointMoment::calc_motor_cmd()
         if (gain_sched_enabled)
         {
             // Conditions for "near zero" gains:
-            // - setpoint is between +/- 3.5 Nm
-            // - measured torque is within +/- 3.5 Nm of setpoint
-            const float ZERO_BAND_NM = 3.5f;
-            const bool near_zero_setpoint = (fabsf(_controller_data->filtered_setpoint) < 4);
-            const bool near_zero_measured  = (fabsf(_controller_data->filtered_torque_reading) <= ZERO_BAND_NM);
+            // - setpoint is close to zero torque
+            // - measured torque is not far from that zero-torque target
+            const float ZERO_SETPOINT_BAND_NM = 0.5f;
+            const float ZERO_ERROR_BAND_NM = 3.5f;
+            const float torque_error = _controller_data->filtered_setpoint - _controller_data->filtered_torque_reading;
+            const bool near_zero_setpoint = (fabsf(_controller_data->filtered_setpoint) <= ZERO_SETPOINT_BAND_NM);
+            const bool near_zero_error = (fabsf(torque_error) <= ZERO_ERROR_BAND_NM);
 
-            if (near_zero_setpoint && near_zero_measured)
+            if (near_zero_setpoint && near_zero_error)
             {
                 kp_use = _controller_data->parameters[controller_defs::proportional_joint_moment::kp_zero];
                 ki_use = _controller_data->parameters[controller_defs::proportional_joint_moment::ki_zero];
@@ -679,11 +691,18 @@ float ProportionalJointMoment::calc_motor_cmd()
         } // End of gain scheduling
 
         // PID on Motor Command
-        cmd =  _pid(_controller_data->filtered_setpoint,
-                            _controller_data->filtered_torque_reading,
-                            kp_use,
-                            ki_use,
-                            kd_use);
+        if (_joint_data->torque_offset_reading == 0)
+        {
+            cmd = _controller_data->filtered_setpoint;
+        }
+        else
+        {
+            cmd = _controller_data->filtered_setpoint + _pid(_controller_data->filtered_setpoint,
+                                _controller_data->filtered_torque_reading,
+                                kp_use,
+                                ki_use,
+                                kd_use);
+        }
 			
     } // End of PID flag check
     else
@@ -1885,62 +1904,147 @@ Step::Step(config_defs::joint_id id, ExoData* exo_data)
 }
 float Step::calc_motor_cmd()
 {
-    float amplitude   = _controller_data->parameters[controller_defs::step::amplitude_idx];
-    float duration    = _controller_data->parameters[controller_defs::step::duration_idx];
-    int   repetitions = _controller_data->parameters[controller_defs::step::repetitions_idx];
-    float spacing     = _controller_data->parameters[controller_defs::step::spacing_idx];
+    
+    float Amplitude = _controller_data->parameters[controller_defs::step::amplitude_idx];           //Magnitude of Step Response
+    float Duration = _controller_data->parameters[controller_defs::step::duration_idx];             //Duration of Step Response
+    int Repetitions = _controller_data->parameters[controller_defs::step::repetitions_idx];         //Number of Step Responses
+    float Spacing = _controller_data->parameters[controller_defs::step::spacing_idx];               //Time Between Each Step Response
 
-    float t = millis() / 1000.0;
+    float tt = 0;
+    uint16_t exo_status = _data->get_status();
+    const bool active_trial = (exo_status == status_defs::messages::trial_on) ||
+        (exo_status == status_defs::messages::fsr_calibration) ||
+        (exo_status == status_defs::messages::fsr_refinement);
 
-    switch (state)
+    if (_data->user_paused || !active_trial)
     {
-        case STEP_ACTIVE:
-        {
-            if (start_time == 0)
-                start_time = t;
+        n = 1;
+        start_flag = 1;
+        start_time = 0;
+        previous_time = 0;
+        end_time = 0;
+        cmd_ff = 0;
+        previous_command = 0;
+        _controller_data->ff_setpoint = 0;
+        _controller_data->desired_torque = 0;
+        reset_integral();
+        return 0;
+    }
 
-            if ((t - start_time) < duration)
-            {
-                cmd_ff = amplitude;
-            }
-            else
-            {
-                cmd_ff = 0;
-                end_time = t;
-                state = STEP_WAIT;
-            }
-            break;
+    if (n <= Repetitions)                                          //If we are less than the number of desired repetitions
+    {
+        if (start_flag == 1)                                        //If this is the start of this loop
+        {
+            start_time = millis();                                  //Record the start time
+            start_flag = 0;                                         //Set the flag so that we don't continue to record start time
         }
 
-        case STEP_WAIT:
+        float current_time = millis();                              //Measure the current time
+
+        tt = (current_time - start_time) / 1000;                    //Determine the time since the begining of the control iteration, converted to seconds
+
+        if (tt <= Duration)                                         //If the time is less than the desired duration of the step
         {
-            cmd_ff = 0;
+            cmd_ff = Amplitude;                                     //Apply a torque at the desired magnitude 
+        }
+        else
+        {
+            cmd_ff = 0;                                             //Set the torque to 0
+
+            if (previous_time <= Duration && tt > Duration)         //Calculate the time that the amplitude ended
+            {
+                end_time = millis();
+            }
 
             if ((t - end_time) >= spacing)
             {
-                n++;
-
-                if (n < repetitions)
-                {
-                    start_time = t;
-                    state = STEP_ACTIVE;
-                }
-                else
-                {
-                    state = STEP_DONE;
-                }
+                n = n + 1;                                          //Update the iteration count
+                start_flag = 1;                                     //Update the start flag to get a new start time and begin a new cycle
             }
-            break;
         }
 
-        case STEP_DONE:
-        {
-            cmd_ff = 0;
-            break;
-        }
+        previous_time = tt;                                         //Record time to be used as previous time in next loop. 
+
+    }
+    else
+    {
+        cmd_ff = 0;
     }
 
+    //Real-Time Torque Filtering if Using Torque Transducer
+    //if (cmd_ff != previous_command)
+    //{
+    //    flag = 1;
+    //    difference = cmd_ff - previous_command;
+    //    turn = millis();;
+    //}
+
+    //if (difference > 0)
+    //{
+    //    if (flag == 1 && (previous_torque_reading >=  0.9 * cmd_ff))
+    //    {
+    //        flag = 0;
+    //    }
+    //}
+
+    //if (difference < 0)
+    //{
+    //    //if (flag == 1 && (previous_torque_reading <= (1 - 0.9) * cmd_ff))
+    //    //{
+    //    //    flag = 0;
+    //    //}
+    //}
+
+    //if (flag == 0)
+    //{
+    //    _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, (_controller_data->parameters[controller_defs::step::alpha_idx] / 100));
+    //}
+    //else
+    //{
+    //    _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, 1);
+    //}
+
+    _controller_data->filtered_torque_reading = utils::ewma(_joint_data->torque_reading, _controller_data->filtered_torque_reading, (_controller_data->parameters[controller_defs::step::alpha_idx])/100);
+
     _controller_data->ff_setpoint = cmd_ff;
+
+    float cmd = cmd_ff;
+
+    if (_controller_data->parameters[controller_defs::step::pid_flag_idx] > 0)
+    {
+        cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::step::p_gain_idx], _controller_data->parameters[controller_defs::step::i_gain_idx], _controller_data->parameters[controller_defs::step::d_gain_idx]);
+    }
+    else
+    {
+        cmd = cmd_ff;
+    }
+
+    previous_command = cmd_ff;
+
+    previous_torque_reading = _controller_data->filtered_torque_reading;
+
+    //if (active_trial)
+    //{
+    //    if (!_joint_data->is_left)
+    //    {
+    //        Serial.print(_controller_data->ff_setpoint);
+    //        Serial.print(',');
+    //        Serial.print(100);
+    //        Serial.print("\n");
+
+    //        Serial.print(_controller_data->filtered_torque_reading);
+    //        Serial.print(',');
+    //        Serial.print(200);
+    //        Serial.print("\n");
+
+    //        Serial.print(tt*1000);
+    //        Serial.print(',');
+    //        Serial.print(300);
+    //        Serial.print("\n");
+    //    }
+    //}
+
+    //Sets the desired torque for plotting
     _controller_data->desired_torque = cmd_ff;
 
     return cmd_ff;
@@ -3015,7 +3119,14 @@ float PJMC_PLUS::calc_motor_cmd()
 	float cmd;
 	
     //PID on Motor Command
-    cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::pjmc_plus::kp], _controller_data->parameters[controller_defs::pjmc_plus::ki], _controller_data->parameters[controller_defs::pjmc_plus::kd]);
+    if (_joint_data->torque_offset_reading == 0)
+    {
+        cmd = cmd_ff;
+    }
+    else
+    {
+        cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::pjmc_plus::kp], _controller_data->parameters[controller_defs::pjmc_plus::ki], _controller_data->parameters[controller_defs::pjmc_plus::kd]);
+    }
 
     #ifdef CONTROLLER_DEBUG
     logger::println("pjmcPlus::calc_motor_cmd : stop");
@@ -3024,7 +3135,7 @@ float PJMC_PLUS::calc_motor_cmd()
 	//Establish Setpoints
 	_controller_data->ff_setpoint = cmd_ff; 
 	_controller_data->setpoint = cmd;
-    _controller_data->filtered_setpoint = cmd;
+    _controller_data->filtered_setpoint = cmd_ff;
 	
     //Sets the desired torque for plotting
     _controller_data->desired_torque = _controller_data->ff_setpoint;

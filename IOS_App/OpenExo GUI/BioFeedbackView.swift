@@ -50,7 +50,10 @@ struct BioFeedbackView: View {
         }
         .navigationTitle("")
         .navigationBarHidden(true)
-        .onAppear { startTimer() }
+        .onAppear {
+            settings = GUISettings.load()
+            startTimer()
+        }
         .onDisappear { stopTimer() }
         .onChange(of: ble.rtData) { _ in
             appendFSRSample(currentFSRValue)

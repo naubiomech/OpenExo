@@ -77,6 +77,7 @@ class SideData {
         bool do_calibration_refinement_toe_fsr;     /**< Flag for if the toe calibration refinement should be done */
         bool do_calibration_heel_fsr;               /**< Flag for if the heel calibration should be done */
         bool do_calibration_refinement_heel_fsr;    /**< Flag for if the heel calibration refinement should be done */
+        bool reset_fsr_calibration;                 /**< One-shot request to clear FSR calibration state before recalibrating */
 
         float ankle_angle_at_ground_strike;         /**< Estimated angle of the ankle when at ground strike */
         float expected_duration_window_upper_coeff; /**< Factor to multiply by the expected duration to get the upper limit of the window to determine if a ground strike is considered a new step. */
