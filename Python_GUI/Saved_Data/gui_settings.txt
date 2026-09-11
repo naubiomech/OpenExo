@@ -1,0 +1,9 @@
+bilateral=True
+last_joint=Ankle(R) (36)
+last_controller=zeroTorqu
+last_parameter=0
+last_value=1.0
+last_basic_joint_id=0
+last_basic_controller=0
+last_basic_parameter=0
+last_basic_value=0.0

@@ -1823,7 +1823,7 @@ float Chirp::calc_motor_cmd()
 
 //     if (_controller_data->parameters[controller_defs::step::pid_flag_idx] > 0)
 //     {
-//         cmd = cmd_ff + _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::step::p_gain_idx], _controller_data->parameters[controller_defs::step::i_gain_idx], _controller_data->parameters[controller_defs::step::d_gain_idx]);
+//         cmd = cmd_ff; //+ _pid(cmd_ff, _controller_data->filtered_torque_reading, _controller_data->parameters[controller_defs::step::p_gain_idx], _controller_data->parameters[controller_defs::step::i_gain_idx], _controller_data->parameters[controller_defs::step::d_gain_idx]);
 //     }
 //     else
 //     {
@@ -1864,10 +1864,16 @@ float Chirp::calc_motor_cmd()
 
 //     return cmd;
 // }
+
+
+// // NEW STEP CONTROLLER
 Step::Step(config_defs::joint_id id, ExoData* exo_data)
     : _Controller(id, exo_data)
 {
-    Serial.println("NEW STEP CODE LOADED");
+#ifdef CONTROLLER_DEBUG
+    Serial.println("Step OPEN LOOP LOADED");
+#endif
+
     n = 0;
 
     start_time = 0;
@@ -1875,16 +1881,7 @@ Step::Step(config_defs::joint_id id, ExoData* exo_data)
 
     cmd_ff = 0;
 
-    previous_command = 0;
-    previous_torque_reading = 0;
-
-    flag = 0;
-    difference = 0;
-    turn = 0;
-    flag_time = 0;
-    change_time = 0;
-
-    state = STEP_IDLE;
+    state = STEP_ACTIVE;
 }
 float Step::calc_motor_cmd()
 {
@@ -1897,14 +1894,15 @@ float Step::calc_motor_cmd()
 
     switch (state)
     {
-        case STEP_IDLE:
-            start_time = t;
-            state = STEP_ACTIVE;
-            break;
-
         case STEP_ACTIVE:
-            if (t - start_time < duration)
+        {
+            if (start_time == 0)
+                start_time = t;
+
+            if ((t - start_time) < duration)
+            {
                 cmd_ff = amplitude;
+            }
             else
             {
                 cmd_ff = 0;
@@ -1912,8 +1910,10 @@ float Step::calc_motor_cmd()
                 state = STEP_WAIT;
             }
             break;
+        }
 
         case STEP_WAIT:
+        {
             cmd_ff = 0;
 
             if ((t - end_time) >= spacing)
@@ -1927,42 +1927,23 @@ float Step::calc_motor_cmd()
                 }
                 else
                 {
-                    state = STEP_IDLE;
-                    cmd_ff = 0;
+                    state = STEP_DONE;
                 }
             }
             break;
-    }
+        }
 
-    // filtering + PID stays EXACTLY where you already had it
-    _controller_data->filtered_torque_reading =
-        utils::ewma(_joint_data->torque_reading,
-                    _controller_data->filtered_torque_reading,
-                    (_controller_data->parameters[controller_defs::step::alpha_idx]) / 100);
+        case STEP_DONE:
+        {
+            cmd_ff = 0;
+            break;
+        }
+    }
 
     _controller_data->ff_setpoint = cmd_ff;
-
-    float cmd;
-
-    if (_controller_data->parameters[controller_defs::step::pid_flag_idx] > 0)
-    {
-        cmd = cmd_ff + _pid(cmd_ff,
-                             _controller_data->filtered_torque_reading,
-                             _controller_data->parameters[controller_defs::step::p_gain_idx],
-                             _controller_data->parameters[controller_defs::step::i_gain_idx],
-                             _controller_data->parameters[controller_defs::step::d_gain_idx]);
-    }
-    else
-    {
-        cmd = cmd_ff;
-    }
-
-    previous_command = cmd_ff;
-    previous_torque_reading = _controller_data->filtered_torque_reading;
-
     _controller_data->desired_torque = cmd_ff;
 
-    return cmd;
+    return cmd_ff;
 }
 
 /*******************************/

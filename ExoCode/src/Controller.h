@@ -418,6 +418,8 @@ public:
 //     float calc_motor_cmd();         /* Function that calculates the motor command. */
 
 // };
+
+//NEW STEP CLASS
 class Step : public _Controller
 {
 public:
@@ -430,29 +432,19 @@ private:
 
     enum StepState
     {
-        STEP_IDLE,
         STEP_ACTIVE,
-        STEP_WAIT
+        STEP_WAIT,
+        STEP_DONE
     };
 
     StepState state;
 
-    int n;                  // repetition counter
+    int n;
 
     float start_time;
     float end_time;
 
     float cmd_ff;
-
-    float previous_command;
-    float previous_torque_reading;
-
-    // optional debugging / filtering helpers
-    int flag;
-    float difference;
-    float turn;
-    float flag_time;
-    float change_time;
 };
 
 /**

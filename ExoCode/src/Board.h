@@ -60,7 +60,7 @@
 				const unsigned int servo_pins[] = {};
 				
 				//Battery voltage sensing pin (for 0.5.1 Mark 3 only)
-				const unsigned int volt_sense = not_connected_pin;
+				const unsigned int volt_sense = 27;//not_connected_pin;
             #endif
 
             const unsigned int sync_led_on_state = LOW;
