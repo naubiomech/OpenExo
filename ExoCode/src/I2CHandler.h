@@ -11,6 +11,7 @@
 #define I2CHANDLER_H
 
 #include <Arduino.h>
+#include "Logger.h"
 
 #if defined(ARDUINO_ARDUINO_NANO33BLE) || defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY41)
 
@@ -27,12 +28,12 @@ class I2C
 
         void read_i2c(uint8_t* ret, uint8_t addr, uint8_t reg, uint8_t len)
         {
-            // logger::print("Reading from I2C device: ");
-            // logger::print(addr);
-            // logger::print(" at register: ");
-            // logger::print(reg);
-            // logger::print(" with length: ");
-            // logger::println(len);
+            logger::print("Reading from I2C device: ");
+            logger::print(addr);
+            logger::print(" at register: ");
+            logger::print(reg);
+            logger::print(" with length: ");
+            logger::println(len);
 
             Wire.beginTransmission(addr);
             Wire.write(reg);

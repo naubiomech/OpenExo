@@ -3,7 +3,7 @@
 
 #include "Board.h"
 #include "Logger.h"
-//#define FSR_DEBUG 1   //Uncomment if you want to print debug statements
+#define FSR_DEBUG 1   //Uncomment if you want to print debug statements
 
 //Arduino compiles everything in the src folder even if not included so it causes and error for the nano if this is not included.
 #if defined(ARDUINO_TEENSY36)  || defined(ARDUINO_TEENSY41) 
