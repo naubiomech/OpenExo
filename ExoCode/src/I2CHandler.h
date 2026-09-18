@@ -28,12 +28,12 @@ class I2C
 
         void read_i2c(uint8_t* ret, uint8_t addr, uint8_t reg, uint8_t len)
         {
-            logger::print("Reading from I2C device: ");
-            logger::print(addr);
-            logger::print(" at register: ");
-            logger::print(reg);
-            logger::print(" with length: ");
-            logger::println(len);
+            // Serial.print("Reading from I2C device: ");
+            // Serial.print(addr);
+            // Serial.print(" at register: ");
+            // Serial.print(reg);
+            // Serial.print(" with length: ");
+            // Serial.println(len);
 
             Wire.beginTransmission(addr);
             Wire.write(reg);
@@ -45,14 +45,14 @@ class I2C
             }
         }
 
-        void read_i2c_block(uint8_t* ret, uint8_t addr, uint8_t startReg, uint8_t len)
+        bool read_i2c_block(uint8_t* ret, uint8_t addr, uint8_t startReg, uint8_t len)
         {
             Wire.beginTransmission(addr);
             Wire.write(startReg);
             if (Wire.endTransmission() != 0)
             {
                 Serial.println("Failed to set start register for block read.");
-                return;
+                return false;
             }
 
             uint8_t bytesRead = Wire.requestFrom(addr, len);
@@ -61,21 +61,32 @@ class I2C
             {
                 Serial.print("Block read: expected "); Serial.print(len);
                 Serial.print(" bytes but got "); Serial.println(bytesRead);
-                return;
+                return false;
             }
 
             for (uint8_t i = 0; i < len; ++i) {
                 ret[i] = Wire.read();
             }
+
+            return true;
         }
 
         float read_wireless(uint8_t addr, uint8_t reg, uint8_t len)
         {
-            uint8_t dataBlock[len];                        // initialize temporary array to store values, size = len
-            read_i2c_block(dataBlock, addr, 0x00, len);    // read block of data over i2c (starting at zero), store in dataBlock
+            if (reg + sizeof(float) > len)
+            {
+                Serial.println("Wireless FSR register is outside the I2C data block.");
+                return 0;
+            }
+
+            uint8_t dataBlock[len] = {};                  // Store the complete I2C data block.
+            if (!read_i2c_block(dataBlock, addr, 0x00, len))
+            {
+                return 0;
+            }
 
             float requestedVal = 0;                        // initialize temporary float to store requested data point
-            memcpy(&requestedVal, &dataBlock[reg], 4);     // copy data from requested register in dataBlock over to requestedVal
+            memcpy(&requestedVal, &dataBlock[reg], sizeof(requestedVal));     // copy data from requested register in dataBlock over to requestedVal
             
             // debug option to print values within read_wireless
             // Serial.print("Requested register "); Serial.print(reg);
@@ -175,7 +186,7 @@ namespace i2c_cmds
     }
     namespace wireless_fsr
     {
-        const uint8_t len = 4; 
+        const uint8_t len = 4 * sizeof(float); 
         const uint8_t esp_addr = 0x08;
         namespace left_foot_heel
         {
