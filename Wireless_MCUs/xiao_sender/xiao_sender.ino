@@ -35,6 +35,11 @@ struct_message fsr_data;
 // Holds information about the receiver, such as its MAC address
 esp_now_peer_info_t peerInfo;
 
+// previous recorded time & interval to send at (in ms)
+unsigned long prevTime = 0;
+const long interval = 100;
+unsigned long currentTime = 0;
+
 // callback when data is sent
 // It reports whether the data was successfully delivered to the receiver.
 void on_data_sent(const uint8_t* mac_addr, esp_now_send_status_t status)
@@ -50,7 +55,13 @@ void on_data_sent(const uint8_t* mac_addr, esp_now_send_status_t status)
   }
 }
  
-void setup() {
+void setup() 
+{
+  // CHANGE THIS ID FOR EACH SENDER
+  // Sender 1 --> fsr_data.id = 1;
+  // Sender 2 --> fsr_data.id = 2;
+  fsr_data.id = 2;  
+
   // Init Serial Monitor
   Serial.begin(115200);
  
@@ -78,6 +89,7 @@ void setup() {
     Serial.println("Failed to add peer");
     return;
   }
+
 }
  
 /* 
@@ -90,24 +102,27 @@ void setup() {
 
 void loop() 
 {
-  // Change this id for each sender
-  // Sender 1 --> fsr_data.id = 1;
-  // Sender 2 --> fsr_data.id = 2;
-  fsr_data.id = 1;
+  currentTime = millis();
 
-  // Set values to send
-  fsr_data.analog_reading_1 = analogRead(FORCE_SENSOR_PIN_1);
-  fsr_data.analog_reading_2 = analogRead(FORCE_SENSOR_PIN_2);
-  
-  // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &fsr_data, sizeof(fsr_data));
-   
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
-  }
-  else 
+  if (currentTime - prevTime >= interval)
   {
-    Serial.println("Error sending the data");
+    prevTime = currentTime;
+    
+    // Set values to send
+    fsr_data.analog_reading_1 = analogRead(FORCE_SENSOR_PIN_1);
+    fsr_data.analog_reading_2 = analogRead(FORCE_SENSOR_PIN_2);
+    
+    // Send message via ESP-NOW
+    esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &fsr_data, sizeof(fsr_data));
+    
+    if (result == ESP_OK) {
+      Serial.println("Sent with success");
+    }
+    else 
+    {
+      Serial.println("Error sending the data");
+    }
   }
-  delay(2000);
+
+
 }
