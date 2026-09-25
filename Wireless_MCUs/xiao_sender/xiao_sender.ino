@@ -37,8 +37,9 @@ esp_now_peer_info_t peerInfo;
 
 // previous recorded time & interval to send at (in ms)
 unsigned long prevTime = 0;
-const long interval = 100;
 unsigned long currentTime = 0;
+
+const long interval = 100;
 
 // callback when data is sent
 // It reports whether the data was successfully delivered to the receiver.
