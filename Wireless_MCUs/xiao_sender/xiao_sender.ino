@@ -39,7 +39,17 @@ esp_now_peer_info_t peerInfo;
 unsigned long prevTime = 0;
 unsigned long currentTime = 0;
 
-const long interval = 100;
+// CHANGE THESE VALUES BASED ON NEEDS
+  // desired frequency, in hz
+  const long freq = 100; 
+
+  // CHANGE THIS ID FOR EACH SENDER
+    // Sender 1 (R) --> fsr_data.id = 1;
+    // Sender 2 (L) --> fsr_data.id = 2;
+  const int selected_id = 1;
+
+// calculates ms interval based on desired frequency
+const long interval = 1000 / freq; 
 
 // callback when data is sent
 // It reports whether the data was successfully delivered to the receiver.
@@ -55,13 +65,10 @@ void on_data_sent(const uint8_t* mac_addr, esp_now_send_status_t status)
     Serial.println("Delivery Fail");
   }
 }
- 
+
 void setup() 
 {
-  // CHANGE THIS ID FOR EACH SENDER
-  // Sender 1 --> fsr_data.id = 1;
-  // Sender 2 --> fsr_data.id = 2;
-  fsr_data.id = 2;  
+  fsr_data.id = selected_id;  
 
   // Init Serial Monitor
   Serial.begin(115200);
