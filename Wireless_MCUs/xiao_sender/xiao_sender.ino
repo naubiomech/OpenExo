@@ -10,13 +10,13 @@
  * Replace this with the MAC address of the receiver ESP32.
  * It identifies where the data will be sent.
  */
-uint8_t broadcastAddress[] = {0x80, 0xf3, 0xda, 0x5d, 0x95, 0xb8}; //80:f3:da:5d:95:b8
+uint8_t broadcast_address[] = {0x80, 0xf3, 0xda, 0x5d, 0x95, 0xb8}; //80:f3:da:5d:95:b8 
 
 /* 
  * StructMessage
  * -------------
  * Structure holds the sensor readings that each ESP32 board sends.
- *   - id: identifier for the board (1 for Board #1, 2 for Board #2)
+ *   - id: identifier for the board (1 for right, 2 for left)
  *   - analog_reading_1: the first sensor value read from the board
  *   - analog_reading_2: the second sensor value read from the board
  *
@@ -33,11 +33,11 @@ struct struct_message
 // Create a struct_message called fsr_data
 struct_message fsr_data;
 // Holds information about the receiver, such as its MAC address
-esp_now_peer_info_t peerInfo;
+esp_now_peer_info_t peer_info;
 
 // previous recorded time & interval to send at (in ms)
-unsigned long prevTime = 0;
-unsigned long currentTime = 0;
+unsigned long prev_time = 0;
+unsigned long current_time = 0;
 
 // CHANGE THESE VALUES BASED ON NEEDS
   // desired frequency, in hz
@@ -46,13 +46,16 @@ unsigned long currentTime = 0;
   // CHANGE THIS ID FOR EACH SENDER
     // Sender 1 (R) --> fsr_data.id = 1;
     // Sender 2 (L) --> fsr_data.id = 2;
-  const int selected_id = 1;
+  const int selected_id = 2;
 
 // calculates ms interval based on desired frequency
 const long interval = 1000 / freq; 
 
+// true/false flag, has data been requested from receiver?
+bool data_requested = false;
+
 // callback when data is sent
-// It reports whether the data was successfully delivered to the receiver.
+// It reports whether the data was successfully delivered to the receiver, and sets the "data requested" flag to false.
 void on_data_sent(const uint8_t* mac_addr, esp_now_send_status_t status)
 {
   Serial.print("\r\nLast Packet Send Status:\t");
@@ -64,6 +67,21 @@ void on_data_sent(const uint8_t* mac_addr, esp_now_send_status_t status)
   {
     Serial.println("Delivery Fail");
   }
+}
+
+void on_data_recv() 
+{
+  // Send message via ESP-NOW
+  esp_err_t result = esp_now_send(broadcast_address, (uint8_t *) &fsr_data, sizeof(fsr_data));
+  
+  if (result == ESP_OK) {
+    Serial.println("Sent with success");
+  }
+  else 
+  {
+    Serial.println("Error sending the data");
+  }
+
 }
 
 void setup() 
@@ -83,16 +101,22 @@ void setup()
     return;
   }
 
-  // Register the callback to report send status
+  else
+  {
+    Serial.println("ESP-NOW initialized successfully");
+  }
+
+  // Register the callback to report send/receive status
   esp_now_register_send_cb((esp_now_send_cb_t)on_data_sent);
-  
+  esp_now_register_recv_cb((esp_now_recv_cb_t)on_data_recv);
+
   // Register peer
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-  peerInfo.channel = 0;  
-  peerInfo.encrypt = false;
+  memcpy(peer_info.peer_addr, broadcast_address, 6);
+  peer_info.channel = 0;  
+  peer_info.encrypt = false;
   
   // Add peer        
-  if (esp_now_add_peer(&peerInfo) != ESP_OK)
+  if (esp_now_add_peer(&peer_info) != ESP_OK)
   {
     Serial.println("Failed to add peer");
     return;
@@ -104,32 +128,21 @@ void setup()
  * loop
  * ----
  * Runs repeatedly after setup() finishes.
- * It reads FSR values, packages them into a StructMessage,
- * and sends the data to the receiver every 2 seconds.
+ * It reads FSR values and caches them to be sent whenever requested by the receiver
+ * 
  */
 
 void loop() 
 {
-  currentTime = millis();
+  current_time = millis();
 
-  if (currentTime - prevTime >= interval)
+  if (current_time - prev_time >= interval)
   {
-    prevTime = currentTime;
+    prev_time = current_time;
     
-    // Set values to send
+    // Read & cache values to send
     fsr_data.analog_reading_1 = analogRead(FORCE_SENSOR_PIN_1);
     fsr_data.analog_reading_2 = analogRead(FORCE_SENSOR_PIN_2);
-    
-    // Send message via ESP-NOW
-    esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &fsr_data, sizeof(fsr_data));
-    
-    if (result == ESP_OK) {
-      Serial.println("Sent with success");
-    }
-    else 
-    {
-      Serial.println("Error sending the data");
-    }
   }
 
 
