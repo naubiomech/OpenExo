@@ -546,7 +546,19 @@ class AngleBased : public _Controller
 {
 public:
     AngleBased(config_defs::joint_id id, ExoData* exo_data);
-    ~AngleBased() {};    
+    ~AngleBased() {};   
+    
+    union {
+        float estim_angle;
+        byte angle_bytes[4];
+    }angle;
+    union {
+        float estim_rate;
+        byte rate_bytes[4];
+    }rate;
+    int left_nano = 9;
+    float delta_time = 0.0;
+    
     float encoder_angle;            /* Stores current encoder angle, after being normalized to the calibrated offset. */
     float prev_encoder_angle;       /* Stores previous iteration encoder angle*/
     float combined_fsr;             /* Stores the combined(toeand heel) fsr value. */

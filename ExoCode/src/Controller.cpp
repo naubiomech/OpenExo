@@ -3125,7 +3125,7 @@ float AngleBased::calc_motor_cmd()
         local_toe_stance = local_toe_stance_schmitt(); //utils::schmitt_trigger(raw_toe_fsr, local_toe_stance, lower_toe_threshold, upper_toe_threshold);
         _controller_data->local_toe_stance = local_toe_stance; // Store the local toe stance for plotting
         // If we just started, calculate the offset for the angle encoders
-        if(first_loop & (_joint_data->motor.enabled))
+        if(first_loop) // & (_joint_data->motor.enabled)
         {
             first_loop = false;
             start_controller_time = millis();
@@ -3161,10 +3161,56 @@ float AngleBased::calc_motor_cmd()
         }
     if(!first_loop & !second_loop)
     {
-        encoder_angle = _joint_data->position - encoder_offset;
+        unsigned long delta_time_long = millis() - prev_time;
+        delta_time = delta_time_long / 1000.0;
+        prev_time = millis();
+        if(_side_data->is_left)
+        {
+            Wire.requestFrom(9, 4);
+            for(int i=0; i<4; i++) {
+                angle.angle_bytes[i] = Wire.read();
+            }
+            Wire.beginTransmission(9);
+            Wire.write(0);
+            Wire.endTransmission();
+            Wire.requestFrom(9, 4);
+            for(int i = 0; i < 4; i++)
+            {
+                rate.rate_bytes[i] = Wire.read();
+            }
+            float rate_angle = encoder_angle - delta_time*rate.estim_rate;
+            encoder_angle = 0.99*rate_angle + 0.01*(angle.estim_angle) - encoder_offset_0;
+        
+            /**Wire.requestFrom(9, 4);
+            for(int i=0; i<4; i++) {
+                angle.angle_bytes[i] = Wire.read();
+            }
+            if (abs(encoder_angle - angle.estim_angle) > 20)
+            {
+                Wire.beginTransmission(9);
+                Wire.write(0);
+                Wire.endTransmission();
+                Wire.requestFrom(9, 4);
+                for(int i = 0; i < 4; i++)
+                {
+                    rate.rate_bytes[i] = Wire.read();
+                }
+                float rate_angle = encoder_angle - delta_time*rate.estim_rate;
+                encoder_angle = 0.9*rate_angle + 0.1*(angle.estim_angle - encoder_offset_0);
+            }
+            else
+            {
+                encoder_angle = angle.estim_angle - encoder_offset_0;     
+            }
+            **/
+        }
+        Serial.print("imu angle: ");
+        Serial.println(angle.estim_angle);
+
+        encoder_angle = utils::ewma(encoder_angle, prev_encoder_angle, offset_alpha);
         
         //encoder_angle = utils::ewma(intended_encoder_angle, encoder_angle, 0.85); // if using the ewma you must change the if statement above (if(abs(cmd_ff)) >=1) to set intended_encoder_angle rather than encoder_angle
-        _controller_data->encoder_angle = utils::radians_to_degrees(encoder_angle);
+        _controller_data->encoder_angle = encoder_angle;
         // Calculate the Combined FSR value (Toe + Heel)
         combined_fsr = (raw_toe_fsr + raw_heel_fsr);   // Calculates value
         _controller_data->combined_fsr = combined_fsr; // Stores the combined FSR term for plotting
@@ -3471,10 +3517,8 @@ float AngleBased::calc_motor_cmd()
         // // spring damper model of angle error from applied torque
         // Serial.print("curr time: ");
         // Serial.println(millis());
-        unsigned long delta_time_long = millis() - prev_time;
-        float delta_time = delta_time_long / 1000.0;
         if(delta_time > 0.015)
-        // {
+        {
         //     _controller_data->delta_time = delta_time;
         //     prev_encoder_offset = encoder_offset - encoder_offset_0;
         //     prev_encoder_offset = prev_encoder_offset / correction_factor[2];
@@ -3522,7 +3566,7 @@ float AngleBased::calc_motor_cmd()
         //     Serial.print("encoder_offset: ");
         //     Serial.println(encoder_offset);
         //     */
-            prev_time = millis();
+            
         }
         
 
@@ -3562,15 +3606,35 @@ void AngleBased::calibrate_encoders()
     float sum_encoder_readings = 0.0;                                        
     for (int i = 0; i < 5; i++)
     {
-        /*if(_joint_data->is_left)
+        unsigned long delta_time_long = millis() - prev_time;
+        delta_time = delta_time_long / 1000.0;
+        prev_time = millis();
+        if(_side_data->is_left)
         {
-            sum_encoder_readings += -1*_joint_data->position;
+            /* if(delta_time > 0.01)
+            { */
+            
+                Wire.requestFrom(9, 4);
+                for(int i=0; i<4; i++) {
+                    angle.angle_bytes[i] = Wire.read();
+                }
+                /* Wire.beginTransmission(9);
+                Wire.write(0);
+                Wire.endTransmission();
+                Wire.requestFrom(9, 4);
+                for(int i = 0; i < 4; i++)
+                {
+                    rate.rate_bytes[i] = Wire.read();
+                }
+                float rate_angle = encoder_angle - delta_time*rate.estim_rate; */
+                encoder_angle = angle.estim_angle; //0.99*rate_angle + 0.01*(angle.estim_angle - encoder_offset_0);
+                sum_encoder_readings += encoder_angle;
+           /*  }
+            else
+            {
+                i--;
+            } */
         }
-        else
-        {
-            sum_encoder_readings += _joint_data->position;
-        }*/
-       sum_encoder_readings += _joint_data->position;
     }
     encoder_offset = sum_encoder_readings/5;
     encoder_offset_0 = sum_encoder_readings/5;

@@ -16,6 +16,7 @@
 //Standard Libraries
 #include <stdint.h>
 #include <IntervalTimer.h>
+#include <Wire.h>
 
 //Common Libraries
 #include "src/Board.h"
@@ -52,7 +53,8 @@ void setup()
     analogReadResolution(12);
     
     Serial.begin(115200);
-    //delay(500);
+    delay(500);
+    Wire.begin(1);
 
     #ifdef SIMPLE_DEBUG
         Serial.print("\nIn SIMPLE_DEBUG mode, debugging statements are printed.");
