@@ -40,28 +40,36 @@ unsigned long prev_time = 0;
 unsigned long current_time = 0;
 
 // CHANGE THESE VALUES BASED ON NEEDS
-  // desired frequency, in hz
+  // desired frequency, in hz (probably deprecated)
   const long freq = 100; 
 
   // CHANGE THIS ID FOR EACH SENDER
     // Sender 1 (R) --> fsr_data.id = 1;
     // Sender 2 (L) --> fsr_data.id = 2;
-  const int selected_id = 2;
+  const int selected_id = 1;
 
 // calculates ms interval based on desired frequency
 const long interval = 1000 / freq; 
 
 // true/false flag, has data been requested from receiver?
-bool data_requested = false;
+bool send_flag = false;
+volatile bool send_inflight = false;
+unsigned long send_last_attempt_ms = 0;
+const unsigned long send_retry_interval_ms = 10;
 
 // callback when data is sent
 // It reports whether the data was successfully delivered to the receiver, and sets the "data requested" flag to false.
-void on_data_sent(const uint8_t* mac_addr, esp_now_send_status_t status)
+void on_data_sent(const esp_now_send_info_t *tx_info, esp_now_send_status_t status)
 {
+  send_inflight = false;
+
   Serial.print("\r\nLast Packet Send Status:\t");
   if (status == ESP_NOW_SEND_SUCCESS)
   {
     Serial.println("Delivery Success");
+    Serial.println("Sent values: ");
+    Serial.println(fsr_data.analog_reading_1);
+    Serial.println(fsr_data.analog_reading_2);
   }
   else
   {
@@ -69,20 +77,11 @@ void on_data_sent(const uint8_t* mac_addr, esp_now_send_status_t status)
   }
 }
 
-void on_data_recv() 
+void on_data_recv(const esp_now_recv_info_t *info, const uint8_t *incoming_data, int len)
 {
-  // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcast_address, (uint8_t *) &fsr_data, sizeof(fsr_data));
-  
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
-  }
-  else 
-  {
-    Serial.println("Error sending the data");
-  }
-
+  send_flag = true;
 }
+
 
 void setup() 
 {
@@ -107,8 +106,8 @@ void setup()
   }
 
   // Register the callback to report send/receive status
-  esp_now_register_send_cb((esp_now_send_cb_t)on_data_sent);
-  esp_now_register_recv_cb((esp_now_recv_cb_t)on_data_recv);
+  esp_now_register_send_cb(on_data_sent);
+  esp_now_register_recv_cb(on_data_recv);
 
   // Register peer
   memcpy(peer_info.peer_addr, broadcast_address, 6);
@@ -134,6 +133,13 @@ void setup()
 
 void loop() 
 {
+  unsigned long now = millis();
+  if (send_inflight &&
+      (unsigned long)(now - send_last_attempt_ms) >= 100)
+  {
+    send_inflight = false;
+  }
+
   current_time = millis();
 
   if (current_time - prev_time >= interval)
@@ -145,5 +151,26 @@ void loop()
     fsr_data.analog_reading_2 = analogRead(FORCE_SENSOR_PIN_2);
   }
 
+  if (send_flag && !send_inflight &&
+      (unsigned long)(now - send_last_attempt_ms) >= send_retry_interval_ms)
+  {
+    send_last_attempt_ms = now;
+    send_inflight = true;
 
+    // Send message via ESP-NOW
+    esp_err_t result = esp_now_send(broadcast_address, (uint8_t *) &fsr_data, sizeof(fsr_data));
+    
+    if (result == ESP_OK) {
+      send_flag = false;
+      // Serial.println("Sent with success");
+      // Serial.println("Sent values: ");
+      // Serial.println(fsr_data.analog_reading_1);
+      // Serial.println(fsr_data.analog_reading_2);
+    }
+    else 
+    {
+      send_inflight = false;
+      // Serial.println("Error sending the data");
+    }
+  }
 }

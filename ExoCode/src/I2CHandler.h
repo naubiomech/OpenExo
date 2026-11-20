@@ -38,7 +38,7 @@ class I2C
             Wire.beginTransmission(addr);
             Wire.write(reg);
             Wire.endTransmission();
-            Wire.requestFrom(addr, len, false);
+            Wire.requestFrom(addr, len);
             for (uint8_t i=0; i<len; i++)
             {
                 ret[i] = Wire.read();
@@ -73,24 +73,16 @@ class I2C
 
         float read_wireless(uint8_t addr, uint8_t reg, uint8_t len)
         {
-            // if (reg + sizeof(float) > len + sizeof(float))
-            // {
-            //     Serial.println("Wireless FSR register is outside the I2C data block.");
-            //     return 0;
-            // }
-
-            // uint8_t dataBlock[len] = {};                  // Store the complete I2C data block.
-            // if (!read_i2c_block(dataBlock, addr, 0x00, len))
-            // {
-            //     return 0;
-            // }
+            if (reg >= (len * 4))
+            {
+                Serial.println("Wireless FSR register is outside the expected range of I2C data registers.");
+                return 0;
+            }
 
             float requestedVal = 0; // initialize temporary float to store requested data point
             uint8_t response[sizeof(float)] = {};
-
-            // memcpy(&requestedVal, &dataBlock[reg], sizeof(requestedVal));     // copy data from requested register in dataBlock over to requestedVal
             
-            read_i2c(response, addr, reg, len); // read over the SINGLE value via read_i2c into a temporary byte array
+            read_i2c(response, addr, reg, len); // read over the SINGLE value byte array via read_i2c into a temporary byte array
             memcpy(&requestedVal, response, sizeof(requestedVal)); // memcpy the contents of the byte array into a float to be returned
 
             // debug option to print values within read_wireless
